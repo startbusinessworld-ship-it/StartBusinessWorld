@@ -1,0 +1,1014 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Comment sourcer en Chine sans se faire arnaquer en 2026 — Le guide complet : Alibaba, Yiwu, agents sourcing, contrôle qualité, incoterms.">
+  <title>Sourcer en Chine sans se faire arnaquer — Start Business World</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #FAFAF8;
+      --ink:     #111110;
+      --muted:   #888884;
+      --subtle:  #DDDDD8;
+      --surface: #F2F2EF;
+      --gold:    #A67C3A;
+      --red:     #C0392B;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    /* =============================================
+       NAV
+    ============================================= */
+    nav {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 2rem;
+      height: 54px;
+      border-bottom: 1px solid var(--subtle);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(250,250,248,0.96);
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-left { display: flex; gap: 0.15rem; align-items: center; }
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.78rem; color: var(--muted);
+      padding: 0.35rem 0.8rem; border-radius: 4px;
+      transition: all 0.15s; cursor: pointer;
+    }
+    .nav-back:hover { background: var(--surface); color: var(--ink); }
+    .nav-sep { color: var(--subtle); font-size: 0.75rem; }
+    .nav-breadcrumb { font-size: 0.78rem; color: var(--muted); }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem; text-align: center;
+      letter-spacing: -0.01em; white-space: nowrap;
+    }
+
+    .nav-right { display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem; }
+    .nav-login { font-size: 0.78rem; color: var(--muted); padding: 0.35rem 0.8rem; cursor: pointer; transition: color 0.15s; }
+    .nav-login:hover { color: var(--ink); }
+    .nav-join {
+      font-size: 0.75rem; font-weight: 500;
+      background: var(--ink); color: var(--bg);
+      padding: 0.42rem 1.1rem; border-radius: 5px;
+      transition: opacity 0.15s; cursor: pointer;
+    }
+    .nav-join:hover { opacity: 0.8; }
+
+    /* =============================================
+       PROGRESS BAR
+    ============================================= */
+    .progress-bar {
+      position: fixed;
+      top: 54px; left: 0;
+      height: 2px;
+      background: var(--red);
+      width: 0%;
+      z-index: 99;
+      transition: width 0.1s linear;
+    }
+
+    /* =============================================
+       ARTICLE HEADER
+    ============================================= */
+    .article-header {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 4rem 2rem 2.5rem;
+      border-bottom: 1px solid var(--subtle);
+    }
+
+    .article-meta-top {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .article-cat {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--red);
+      background: rgba(192,57,43,0.07);
+      padding: 0.3rem 0.7rem;
+      border-radius: 3px;
+    }
+
+    .article-tag {
+      font-size: 0.65rem;
+      color: var(--muted);
+      background: var(--surface);
+      padding: 0.3rem 0.7rem;
+      border-radius: 3px;
+    }
+
+    .article-header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.9rem, 4vw, 2.8rem);
+      line-height: 1.15;
+      letter-spacing: -0.025em;
+      margin-bottom: 1.2rem;
+    }
+
+    .article-header h1 i { color: var(--gold); }
+
+    .article-deck {
+      font-size: 1.05rem;
+      color: var(--muted);
+      line-height: 1.75;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .article-byline {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 1.2rem;
+      border-top: 1px solid var(--subtle);
+    }
+
+    .byline-left { display: flex; align-items: center; gap: 0.8rem; }
+
+    .author-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 0.85rem;
+      color: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .author-name { font-size: 0.82rem; font-weight: 500; }
+    .article-date { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+
+    .byline-right { display: flex; align-items: center; gap: 1.2rem; }
+    .read-time { font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 0.4rem; }
+    .yt-badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      background: var(--red); color: #fff;
+      font-size: 0.7rem; font-weight: 500;
+      padding: 0.3rem 0.7rem; border-radius: 4px;
+    }
+
+    /* =============================================
+       ARTICLE LAYOUT
+    ============================================= */
+    .article-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    /* =============================================
+       ARTICLE BODY
+    ============================================= */
+    .article-body {
+      padding: 3rem 2rem 4rem 2rem;
+      border-right: 1px solid var(--subtle);
+      max-width: 760px;
+    }
+
+    /* VIDEO EMBED */
+    .video-embed {
+      margin: 0 0 2.5rem;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--subtle);
+      background: var(--ink);
+      position: relative;
+    }
+
+    .video-placeholder {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background: #141412;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      cursor: pointer;
+    }
+
+    .video-play-btn {
+      width: 64px; height: 64px;
+      background: var(--red);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: #fff;
+      padding-left: 5px;
+      transition: transform 0.2s, opacity 0.2s;
+    }
+    .video-placeholder:hover .video-play-btn { transform: scale(1.08); }
+
+    .video-label {
+      font-size: 0.78rem;
+      color: rgba(250,250,248,0.4);
+      letter-spacing: 0.04em;
+    }
+
+    .video-caption {
+      padding: 0.8rem 1rem;
+      font-size: 0.72rem;
+      color: rgba(250,250,248,0.3);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .video-caption::before {
+      content: '';
+      width: 0; height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-left: 7px solid var(--red);
+      flex-shrink: 0;
+    }
+
+    /* PROSE */
+    .prose { color: var(--ink); }
+
+    .prose p {
+      font-size: 1rem;
+      line-height: 1.82;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      color: #2A2A28;
+    }
+
+    .prose h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin: 2.5rem 0 1rem;
+      color: var(--ink);
+    }
+
+    .prose h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem;
+      letter-spacing: -0.015em;
+      line-height: 1.3;
+      margin: 2rem 0 0.8rem;
+      color: var(--ink);
+    }
+
+    .prose ul, .prose ol {
+      margin: 0 0 1.5rem 1.2rem;
+    }
+
+    .prose li {
+      font-size: 1rem;
+      line-height: 1.75;
+      font-weight: 300;
+      color: #2A2A28;
+      margin-bottom: 0.4rem;
+    }
+
+    /* CALLOUT */
+    .callout {
+      margin: 2rem 0;
+      padding: 1.4rem 1.6rem;
+      border-left: 3px solid var(--gold);
+      background: rgba(166,124,58,0.05);
+      border-radius: 0 6px 6px 0;
+    }
+
+    .callout-label {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .callout p {
+      font-size: 0.92rem !important;
+      margin-bottom: 0 !important;
+      color: var(--ink) !important;
+      font-weight: 400 !important;
+    }
+
+    /* WARNING */
+    .warning {
+      margin: 2rem 0;
+      padding: 1.4rem 1.6rem;
+      border-left: 3px solid var(--red);
+      background: rgba(192,57,43,0.05);
+      border-radius: 0 6px 6px 0;
+    }
+    .warning-label {
+      font-size: 0.62rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--red); margin-bottom: 0.5rem;
+    }
+    .warning p { font-size: 0.92rem !important; margin-bottom: 0 !important; color: var(--ink) !important; font-weight: 400 !important; }
+
+    /* AFFILIATE TOOL CARD */
+    .tool-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 1.2rem 1.4rem;
+      border: 1px solid var(--subtle);
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      background: var(--surface);
+      transition: border-color 0.15s;
+      cursor: pointer;
+    }
+    .tool-card:hover { border-color: var(--gold); }
+
+    .tool-card-left { display: flex; align-items: center; gap: 1rem; }
+
+    .tool-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+
+    .tool-card-name { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.15rem; }
+    .tool-card-desc { font-size: 0.75rem; color: var(--muted); font-weight: 300; }
+
+    .tool-card-cta {
+      font-size: 0.72rem; font-weight: 500;
+      white-space: nowrap;
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 0.4rem 0.9rem;
+      border-radius: 4px;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .tool-card:hover .tool-card-cta { background: var(--gold); color: #fff; }
+
+    .affiliate-notice {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-align: center;
+      margin: 0.3rem 0 1rem;
+      font-style: italic;
+    }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--subtle);
+      margin: 2.5rem 0;
+    }
+
+    /* SHARE */
+    .share-section {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--subtle);
+    }
+
+    .share-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .share-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+
+    .share-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.75rem; font-weight: 500;
+      padding: 0.5rem 1rem; border-radius: 5px;
+      border: 1px solid var(--subtle);
+      background: var(--bg);
+      transition: all 0.15s; cursor: pointer;
+      color: var(--ink);
+    }
+    .share-btn:hover { border-color: var(--ink); background: var(--surface); }
+
+    /* AUTHOR BIO */
+    .author-bio {
+      margin-top: 3rem;
+      padding: 1.8rem;
+      border: 1px solid var(--subtle);
+      border-radius: 10px;
+      display: flex;
+      gap: 1.2rem;
+      align-items: flex-start;
+      background: var(--surface);
+    }
+
+    .author-bio-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: var(--ink);
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.1rem; color: var(--bg);
+      flex-shrink: 0;
+    }
+
+    .author-bio h4 { font-size: 0.9rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .author-bio .author-title { font-size: 0.72rem; color: var(--gold); margin-bottom: 0.5rem; }
+    .author-bio p { font-size: 0.78rem; color: var(--muted); line-height: 1.65; font-weight: 300; }
+
+    /* =============================================
+       SIDEBAR
+    ============================================= */
+    .sidebar {
+      padding: 2.5rem 1.8rem;
+      position: sticky;
+      top: 70px;
+    }
+
+    /* TABLE OF CONTENTS */
+    .toc {
+      margin-bottom: 2.5rem;
+    }
+
+    .toc-title {
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+
+    .toc-list { list-style: none; }
+
+    .toc-item {
+      padding: 0.35rem 0;
+      border-bottom: 1px solid var(--subtle);
+    }
+    .toc-item:last-child { border-bottom: none; }
+
+    .toc-link {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      line-height: 1.4;
+      transition: color 0.12s;
+      cursor: pointer;
+    }
+    .toc-link:hover { color: var(--ink); }
+    .toc-link.active { color: var(--red); font-weight: 500; }
+    .toc-num { font-size: 0.65rem; color: var(--subtle); flex-shrink: 0; margin-top: 2px; }
+
+    /* SIDEBAR CLUB CTA */
+    .sidebar-club {
+      background: var(--ink);
+      color: var(--bg);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .sidebar-club::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--gold);
+    }
+
+    .sc-eyebrow {
+      font-size: 0.6rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: rgba(250,250,248,0.3);
+      margin-bottom: 0.8rem; margin-top: 0.3rem;
+    }
+
+    .sc-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.2rem; line-height: 1.2;
+      margin-bottom: 0.6rem;
+    }
+    .sc-title i { color: var(--gold); font-style: italic; }
+
+    .sc-desc {
+      font-size: 0.75rem;
+      color: rgba(250,250,248,0.4);
+      font-weight: 300; line-height: 1.6;
+      margin-bottom: 1.2rem;
+    }
+
+    .sc-price {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.4rem; margin-bottom: 1rem;
+    }
+    .sc-price small { font-family: 'DM Sans'; font-size: 0.8rem; color: rgba(250,250,248,0.3); }
+
+    .sc-btn {
+      display: block; text-align: center;
+      background: var(--gold); color: #fff;
+      padding: 0.7rem; border-radius: 5px;
+      font-size: 0.78rem; font-weight: 500;
+      transition: opacity 0.15s; cursor: pointer;
+      margin-bottom: 0.5rem;
+    }
+    .sc-btn:hover { opacity: 0.88; }
+    .sc-note { font-size: 0.62rem; color: rgba(250,250,248,0.18); text-align: center; }
+
+    /* SIDEBAR TOOLS */
+    .sidebar-tools-title {
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 1rem;
+    }
+
+    .sidebar-tool {
+      display: flex; align-items: center; gap: 0.7rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--subtle);
+      cursor: pointer; transition: opacity 0.12s;
+    }
+    .sidebar-tool:hover { opacity: 0.7; }
+    .sidebar-tool:last-child { border-bottom: none; }
+
+    .st-icon {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      background: var(--surface);
+      border: 1px solid var(--subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+    }
+
+    .st-name { font-size: 0.78rem; font-weight: 500; margin-bottom: 0.1rem; }
+    .st-cat { font-size: 0.62rem; color: var(--muted); }
+
+    /* =============================================
+       RELATED ARTICLES
+    ============================================= */
+    .related {
+      border-top: 1px solid var(--subtle);
+      padding: 3rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .related-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem; letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--subtle);
+      border: 1px solid var(--subtle);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .related-card {
+      background: var(--bg);
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .related-card:hover { background: var(--surface); }
+
+    .rc-cat {
+      font-size: 0.62rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--red); margin-bottom: 0.6rem;
+    }
+
+    .rc-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 0.95rem; line-height: 1.35;
+      margin-bottom: 0.8rem;
+    }
+
+    .rc-meta { font-size: 0.68rem; color: var(--muted); }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer {
+      background: var(--ink); color: var(--bg);
+      padding: 2.5rem 2rem 1.5rem;
+      margin-top: 0;
+    }
+
+    .f-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .f-logo { font-family: 'DM Serif Display', serif; font-size: 1rem; }
+    .f-links { display: flex; gap: 1.5rem; }
+    .f-links a { font-size: 0.72rem; color: rgba(250,250,248,0.35); transition: color 0.12s; }
+    .f-links a:hover { color: var(--bg); }
+    .f-socials { display: flex; gap: 1rem; }
+    .f-social { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.72rem; color: rgba(250,250,248,0.35); transition: color 0.12s; }
+    .f-social:hover { color: var(--bg); }
+    .f-copy { font-size: 0.67rem; color: rgba(250,250,248,0.18); margin-top: 1.2rem; }
+
+    /* =============================================
+       RESPONSIVE
+    ============================================= */
+    @media (max-width: 900px) {
+      .article-layout { grid-template-columns: 1fr; }
+      .article-body { border-right: none; padding: 2rem 1.2rem; }
+      .sidebar { display: none; }
+      .related-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 600px) {
+      nav { grid-template-columns: 1fr auto; }
+      .nav-left, .nav-login { display: none; }
+      .nav-logo { text-align: left; }
+      .article-header { padding: 2rem 1.2rem 1.5rem; }
+      .byline-right { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar" id="progressBar"></div>
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-left">
+      <a href="index.html" class="nav-back">← Blog</a>
+      <span class="nav-sep">/</span>
+      <span class="nav-breadcrumb">Business Chine</span>
+    </div>
+    <a href="index.html" class="nav-logo">Start Business World</a>
+    <div class="nav-right">
+      <div class="nav-login">Se connecter</div>
+      <a href="club.html" class="nav-join">Le Club SBW</a>
+    </div>
+  </nav>
+
+  <!-- ARTICLE HEADER -->
+  <header class="article-header">
+    <div class="article-meta-top">
+      <span class="article-cat">Business Chine</span>
+      <span class="article-tag">Import-Export</span>
+      <span class="article-tag">Sourcing</span>
+    </div>
+    <h1>Sourcer en Chine sans se faire arnaquer :<br><i>le guide complet 2026</i></h1>
+    <p class="article-deck">Alibaba, Yiwu, agents sourcing, contrôle qualité, incoterms — tout ce qu'il faut savoir avant de passer sa première commande import. Le guide que j'aurais voulu avoir à mes débuts.</p>
+    <div class="article-byline">
+      <div class="byline-left">
+        <div class="author-avatar">SBW</div>
+        <div>
+          <div class="author-name">Start Business World</div>
+          <div class="article-date">15 mars 2026 · Mis à jour le 20 mars 2026</div>
+        </div>
+      </div>
+      <div class="byline-right">
+        <div class="read-time">⏱ 18 min de lecture</div>
+        <div class="yt-badge">▶ Vidéo YouTube</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- LAYOUT -->
+  <div class="article-layout">
+
+    <!-- BODY -->
+    <main class="article-body">
+
+      <!-- VIDEO -->
+      <div class="video-embed">
+        <div class="video-placeholder" onclick="this.innerHTML='<iframe width=\'100%\' height=\'100%\' src=\'https://www.youtube.com/embed/VIDEO_ID?autoplay=1\' frameborder=\'0\' allow=\'autoplay; encrypted-media\' allowfullscreen style=\'aspect-ratio:16/9;display:block\'></iframe>';this.style.padding='0'">
+          <div class="video-play-btn">▶</div>
+          <div class="video-label">Regarder la vidéo — 12 min</div>
+        </div>
+        <div class="video-caption">Sourcer en Chine sans se faire arnaquer — Start Business World</div>
+      </div>
+
+      <!-- PROSE -->
+      <div class="prose">
+
+        <p>Quand j'ai passé ma première commande en Chine, j'ai failli perdre 4 000€. Fournisseur fantôme, qualité catastrophique, aucun recours. C'est cette expérience — douloureuse — qui m'a poussé à comprendre réellement comment fonctionne le sourcing en Chine. Aujourd'hui je partage tout ce que j'aurais voulu savoir.</p>
+
+        <h2 id="alibaba">1. Alibaba : comment lire entre les lignes</h2>
+
+        <p>Alibaba est le point de départ de presque tous les importateurs. Mais c'est aussi une jungle où les arnaques côtoient les très bons fournisseurs. La clé : savoir lire les signaux.</p>
+
+        <p>D'abord, <strong>Trade Assurance</strong>. C'est la protection acheteur d'Alibaba. Si ton fournisseur refuse de passer par Trade Assurance, c'est un signal rouge immédiat. Passe ton chemin.</p>
+
+        <div class="callout">
+          <div class="callout-label">💡 Bon à savoir</div>
+          <p>Un fournisseur vérifié "Gold Supplier" depuis plus de 3 ans avec des avis vérifiés et un taux de réponse supérieur à 90% est un bon point de départ — mais ce n'est pas une garantie suffisante.</p>
+        </div>
+
+        <p>Ensuite, regarde l'ancienneté. Un supplier créé il y a 6 mois avec 500 avis 5 étoiles, c'est suspect. Les vrais fournisseurs sérieux ont des profils construits sur des années.</p>
+
+        <h3>Les questions à poser avant tout</h3>
+
+        <ul>
+          <li>Êtes-vous fabricant ou trading company ?</li>
+          <li>Puis-je avoir l'adresse exacte de l'usine ?</li>
+          <li>Acceptez-vous une inspection tierce partie ?</li>
+          <li>Quel est votre MOQ (minimum order quantity) ?</li>
+          <li>Pouvez-vous fournir des échantillons avant la commande ?</li>
+        </ul>
+
+        <div class="warning">
+          <div class="warning-label">⚠️ Attention</div>
+          <p>Ne jamais payer via Western Union ou virement direct vers un compte personnel. Toujours utiliser Trade Assurance ou une solution sécurisée comme Airwallex ou Wise pour les virements.</p>
+        </div>
+
+        <!-- TOOL AFFILIATION -->
+        <div class="tool-card">
+          <div class="tool-card-left">
+            <div class="tool-icon">💳</div>
+            <div>
+              <div class="tool-card-name">Airwallex</div>
+              <div class="tool-card-desc">Compte multi-devises — paiements sécurisés vers la Chine</div>
+            </div>
+          </div>
+          <a href="#" class="tool-card-cta">Ouvrir un compte →</a>
+        </div>
+        <div class="affiliate-notice">Lien d'affiliation — sans coût supplémentaire pour toi</div>
+
+        <h2 id="yiwu">2. Yiwu : le marché physique incontournable</h2>
+
+        <p>Si Alibaba est l'internet du sourcing, Yiwu est la réalité terrain. Le marché de Yiwu (Yiwu International Trade Market) est le plus grand marché de gros au monde avec plus de 75 000 stands répartis sur 5,5 km².</p>
+
+        <p>Pour y aller, il faut prévoir minimum 3 jours sur place. Le premier jour pour s'orienter, les deux suivants pour négocier. Emmène un interprète ou utilise WeChat pour la traduction en temps réel — les vendeurs apprécient quand tu fais l'effort de communiquer en mandarin, même maladroitement.</p>
+
+        <h3>Ce qu'on ne te dit pas sur Yiwu</h3>
+
+        <p>Les prix affichés sont toujours les prix "touriste". La négociation réelle commence après la troisième visite au même stand. Construire une relation (关系 — guānxi) prend du temps mais paye énormément sur le long terme. Un fournisseur avec qui tu as une vraie relation te donnera priorité sur les commandes, flexibilité sur les MOQ et alerte sur les problèmes qualité.</p>
+
+        <hr class="divider">
+
+        <h2 id="agents">3. Les agents sourcing : quand ça vaut le coup</h2>
+
+        <p>Un agent sourcing en Chine peut te faire gagner un temps considérable — surtout si tu ne parles pas mandarin et que tu n'as pas encore de réseau sur place. Mais attention : tous les agents ne se valent pas.</p>
+
+        <div class="callout">
+          <div class="callout-label">✅ Ce qu'un bon agent fait</div>
+          <p>Il négocie en ton nom, visite les usines physiquement, supervise le contrôle qualité et gère la logistique jusqu'au départ. Il est payé à la commission (3-8%) ou au forfait — jamais par le fournisseur.</p>
+        </div>
+
+        <p>Si ton agent est payé par le fournisseur, ses intérêts ne sont pas alignés avec les tiens. C'est le piège numéro 1.</p>
+
+        <h2 id="qualite">4. Le contrôle qualité : non négociable</h2>
+
+        <p>Ne jamais envoyer le solde (généralement 70% restants) avant inspection. C'est la règle d'or du sourcing. Utilise une société d'inspection tierce comme QIMA ou Bureau Veritas — pour 200-300€, tu évites potentiellement des milliers d'euros de marchandise non conforme.</p>
+
+        <h3>Les 3 types d'inspection</h3>
+
+        <ul>
+          <li><strong>PSI (Pre-Shipment Inspection)</strong> — avant l'expédition, quand 80% de la commande est produite. Le plus courant.</li>
+          <li><strong>DPI (During Production Inspection)</strong> — en cours de production. Pour les commandes importantes.</li>
+          <li><strong>Loading Supervision</strong> — au moment du chargement dans le conteneur.</li>
+        </ul>
+
+        <hr class="divider">
+
+        <h2 id="incoterms">5. Incoterms : comprendre qui paie quoi</h2>
+
+        <p>Les incoterms définissent qui (toi ou le fournisseur) prend en charge les frais et risques à chaque étape de la chaîne logistique. Les deux plus courants pour l'import depuis la Chine :</p>
+
+        <ul>
+          <li><strong>FOB (Free On Board)</strong> — le fournisseur prend en charge jusqu'à la mise à bord du bateau. Tu prends le relais à partir de là. C'est l'incoterm recommandé pour les débutants.</li>
+          <li><strong>EXW (Ex Works)</strong> — tu prends tout en charge depuis l'usine. Plus de contrôle, mais plus de responsabilités. Réservé aux importateurs expérimentés.</li>
+        </ul>
+
+        <!-- TOOL AFFILIATION -->
+        <div class="tool-card">
+          <div class="tool-card-left">
+            <div class="tool-icon">💸</div>
+            <div>
+              <div class="tool-card-name">Wise</div>
+              <div class="tool-card-desc">Transferts internationaux — taux réel, frais transparents</div>
+            </div>
+          </div>
+          <a href="#" class="tool-card-cta">Essayer Wise →</a>
+        </div>
+        <div class="affiliate-notice">Lien d'affiliation — sans coût supplémentaire pour toi</div>
+
+        <h2 id="checklist">6. La checklist avant ta première commande</h2>
+
+        <ul>
+          <li>✓ Fournisseur vérifié avec Trade Assurance</li>
+          <li>✓ Échantillon reçu et validé physiquement</li>
+          <li>✓ Contrat ou proforma invoice avec spécifications précises</li>
+          <li>✓ Inspection tierce commandée</li>
+          <li>✓ Paiement via solution sécurisée (30% acompte max)</li>
+          <li>✓ Incoterm défini et compris</li>
+          <li>✓ Transitaire sélectionné</li>
+          <li>✓ Droits de douane calculés en amont</li>
+        </ul>
+
+        <p>Le sourcing en Chine n'est pas magique — c'est un process qui se construit avec du temps, des relations et de la rigueur. Mais une fois rodé, c'est l'un des leviers les plus puissants pour le e-commerce ou la distribution.</p>
+
+      </div><!-- /prose -->
+
+      <!-- SHARE -->
+      <div class="share-section">
+        <div class="share-label">Partager cet article</div>
+        <div class="share-btns">
+          <a href="#" class="share-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            X / Twitter
+          </a>
+          <a href="#" class="share-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/></svg>
+            Instagram
+          </a>
+          <a href="#" class="share-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+            LinkedIn
+          </a>
+          <a href="#" class="share-btn">🔗 Copier le lien</a>
+        </div>
+      </div>
+
+      <!-- AUTHOR BIO -->
+      <div class="author-bio">
+        <div class="author-bio-avatar">SBW</div>
+        <div>
+          <h4>Start Business World</h4>
+          <div class="author-title">Média business international</div>
+          <p>Entrepreneur, expatrié et passionné de business international. Je partage ce que j'apprends sur le terrain — sourcing Chine, fiscalité, création de société et expatriation. Pas de théorie, que du concret.</p>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+      <!-- TABLE OF CONTENTS -->
+      <div class="toc">
+        <div class="toc-title">Dans cet article</div>
+        <ul class="toc-list">
+          <li class="toc-item"><a href="#alibaba" class="toc-link active"><span class="toc-num">01</span>Alibaba : lire entre les lignes</a></li>
+          <li class="toc-item"><a href="#yiwu" class="toc-link"><span class="toc-num">02</span>Yiwu : le marché physique</a></li>
+          <li class="toc-item"><a href="#agents" class="toc-link"><span class="toc-num">03</span>Les agents sourcing</a></li>
+          <li class="toc-item"><a href="#qualite" class="toc-link"><span class="toc-num">04</span>Contrôle qualité</a></li>
+          <li class="toc-item"><a href="#incoterms" class="toc-link"><span class="toc-num">05</span>Incoterms expliqués</a></li>
+          <li class="toc-item"><a href="#checklist" class="toc-link"><span class="toc-num">06</span>La checklist complète</a></li>
+        </ul>
+      </div>
+
+      <!-- CLUB CTA -->
+      <div class="sidebar-club">
+        <div class="sc-eyebrow">Le Club SBW</div>
+        <div class="sc-title">Aller plus loin avec <i>la communauté</i></div>
+        <div class="sc-desc">Formations complètes, groupe d'entraide et bons plans. Rejoins les membres.</div>
+        <div class="sc-price">1€<small>/mois les 3 premiers mois</small></div>
+        <a href="club.html" class="sc-btn">Rejoindre le Club →</a>
+        <div class="sc-note">Sans engagement · Annulation en 1 clic</div>
+      </div>
+
+      <!-- OUTILS SIDEBAR -->
+      <div class="sidebar-tools-title">Outils mentionnés</div>
+      <div class="sidebar-tool">
+        <div class="st-icon">💳</div>
+        <div>
+          <div class="st-name">Airwallex</div>
+          <div class="st-cat">Paiements internationaux</div>
+        </div>
+      </div>
+      <div class="sidebar-tool">
+        <div class="st-icon">💸</div>
+        <div>
+          <div class="st-name">Wise</div>
+          <div class="st-cat">Transferts & compte pro</div>
+        </div>
+      </div>
+      <div class="sidebar-tool">
+        <div class="st-icon">🏢</div>
+        <div>
+          <div class="st-name">LegalPlace</div>
+          <div class="st-cat">Création de société</div>
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- RELATED -->
+  <section class="related">
+    <div class="related-title">À lire ensuite</div>
+    <div class="related-grid">
+      <div class="related-card">
+        <div class="rc-cat">Fiscalité</div>
+        <div class="rc-title">Société Hong Kong vs France : comparatif honnête</div>
+        <div class="rc-meta">12 min de lecture</div>
+      </div>
+      <div class="related-card">
+        <div class="rc-cat">E-commerce</div>
+        <div class="rc-title">Amazon FBA en 2026 : toujours rentable ?</div>
+        <div class="rc-meta">9 min de lecture</div>
+      </div>
+      <div class="related-card">
+        <div class="rc-cat">Expatriation</div>
+        <div class="rc-title">Dubai 2026 : visa, résidence fiscale, coût de vie réel</div>
+        <div class="rc-meta">10 min · Vidéo YouTube</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="f-bottom">
+      <div class="f-logo">Start Business World</div>
+      <div class="f-links">
+        <a href="index.html">Accueil</a>
+        <a href="#">Blog</a>
+        <a href="club.html">Le Club SBW</a>
+        <a href="#">Outils</a>
+      </div>
+      <div class="f-socials">
+        <a href="https://instagram.com/startbusinessworld" target="_blank" class="f-social">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="https://youtube.com/@startbusinessworld" target="_blank" class="f-social">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M10 15l5.19-3L10 9v6m11.56-7.83c.13.47.22 1.1.28 1.9.07.8.1 1.49.1 2.09L22 12c0 2.19-.16 3.8-.44 4.83-.25.9-.83 1.48-1.73 1.73-.47.13-1.33.22-2.65.28-1.3.07-2.49.1-3.59.1L12 19c-4.19 0-6.8-.16-7.83-.44-.9-.25-1.48-.83-1.73-1.73-.13-.47-.22-1.1-.28-1.9-.07-.8-.1-1.49-.1-2.09L2 12c0-2.19.16-3.8.44-4.83.25-.9.83-1.48 1.73-1.73.47-.13 1.33-.22 2.65-.28 1.3-.07 2.49-.1 3.59-.1L12 5c4.19 0 6.8.16 7.83.44.9.25 1.48.83 1.73 1.73z"/></svg>
+        </a>
+        <a href="https://tiktok.com/@startbusinessworld" target="_blank" class="f-social">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="f-copy">© 2026 Start Business World — Certains liens sont des liens d'affiliation</div>
+  </footer>
+
+  <script>
+    // Progress bar lecture
+    window.addEventListener('scroll', () => {
+      const doc = document.documentElement;
+      const scrollTop = doc.scrollTop || document.body.scrollTop;
+      const scrollHeight = doc.scrollHeight - doc.clientHeight;
+      const progress = (scrollTop / scrollHeight) * 100;
+      document.getElementById('progressBar').style.width = progress + '%';
+    });
+
+    // TOC active link
+    const sections = document.querySelectorAll('h2[id]');
+    const tocLinks = document.querySelectorAll('.toc-link');
+    window.addEventListener('scroll', () => {
+      let current = '';
+      sections.forEach(s => {
+        if (window.scrollY >= s.offsetTop - 120) current = s.id;
+      });
+      tocLinks.forEach(l => {
+        l.classList.toggle('active', l.getAttribute('href') === '#' + current);
+      });
+    });
+
+    // Shorts drag scroll
+    const track = document.getElementById('shortsTrack');
+    if (track) {
+      let isDown = false, startX, scrollLeft;
+      track.addEventListener('mousedown', e => { isDown = true; startX = e.pageX - track.offsetLeft; scrollLeft = track.scrollLeft; });
+      track.addEventListener('mouseleave', () => isDown = false);
+      track.addEventListener('mouseup', () => isDown = false);
+      track.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const x = e.pageX - track.offsetLeft; track.scrollLeft = scrollLeft - (x - startX) * 1.5; });
+    }
+  </script>
+
+</body>
+</html>
