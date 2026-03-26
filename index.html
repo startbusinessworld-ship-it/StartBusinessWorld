@@ -46,35 +46,37 @@
       grid-template-columns: 1fr auto 1fr;
       align-items: center;
       padding: 0 2rem;
-      height: 54px;
-      border-bottom: 1px solid var(--subtle);
+      height: 56px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(250, 250, 248, 0.96);
+      background: var(--ink);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
 
-    .nav-left { display: flex; gap: 0.15rem; }
+    .nav-left { display: flex; gap: 0.15rem; align-items: center; }
 
     .nav-item {
       font-size: 0.78rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.5);
       padding: 0.35rem 0.8rem;
       border-radius: 4px;
       transition: all 0.15s;
       cursor: pointer;
+      text-decoration: none;
     }
-    .nav-item:hover { background: var(--surface); color: var(--ink); }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
 
     .nav-logo {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       text-align: center;
       letter-spacing: -0.01em;
       white-space: nowrap;
       user-select: none;
+      color: #fff;
     }
 
     .nav-right {
@@ -86,24 +88,26 @@
 
     .nav-login {
       font-size: 0.78rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.5);
       padding: 0.35rem 0.8rem;
       cursor: pointer;
       transition: color 0.15s;
+      text-decoration: none;
     }
-    .nav-login:hover { color: var(--ink); }
+    .nav-login:hover { color: #fff; }
 
     .nav-join {
       font-size: 0.75rem;
       font-weight: 500;
-      background: var(--ink);
-      color: var(--bg);
+      background: var(--gold);
+      color: #fff;
       padding: 0.42rem 1.1rem;
       border-radius: 5px;
       transition: opacity 0.15s;
       cursor: pointer;
+      text-decoration: none;
     }
-    .nav-join:hover { opacity: 0.8; }
+    .nav-join:hover { opacity: 0.85; }
 
     /* =============================================
        TICKER
@@ -336,6 +340,7 @@
       white-space: nowrap;
     }
     .theme:hover { background: var(--surface); color: var(--ink); }
+    .theme.active-theme { background: var(--red); color: #fff; font-weight: 500; }
 
     /* =============================================
        ARTICLES GRID
@@ -426,14 +431,16 @@
       display: grid;
       grid-template-columns: 240px 1fr;
       border-bottom: 1px solid var(--subtle);
+      background: var(--bg);
     }
 
     .tools-header {
       padding: 2rem;
-      border-right: 1px solid var(--subtle);
+      border-right: 1px solid rgba(166,124,58,0.15);
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      background: #FBF6EB;
     }
 
     .tools-header h2 {
@@ -466,14 +473,21 @@
 
     .tool {
       padding: 1.5rem;
-      border-right: 1px solid var(--subtle);
-      border-bottom: 1px solid var(--subtle);
+      border-right: 1px solid rgba(166,124,58,0.15);
+      border-bottom: 1px solid rgba(166,124,58,0.15);
       cursor: pointer;
       transition: background 0.12s;
+      background: var(--bg);
     }
     .tool:nth-child(3), .tool:nth-child(6) { border-right: none; }
     .tool:nth-child(4), .tool:nth-child(5), .tool:nth-child(6) { border-bottom: none; }
     .tool:hover { background: var(--surface); }
+    .tool.recommended { background: var(--gold); }
+    .tool.recommended:hover { background: #96712F; }
+    .tool.recommended .tool-name { color: #fff; }
+    .tool.recommended .tool-cat { color: rgba(255,255,255,0.65); }
+    .tool.recommended .tool-desc { color: rgba(255,255,255,0.75); }
+    .tool.recommended .tool-link { color: #fff; font-weight:600; }
 
     .tool-name { font-size: 0.92rem; font-weight: 500; margin-bottom: 0.1rem; }
     .tool-cat {
@@ -739,10 +753,10 @@
       cursor: pointer; padding: 6px; border-radius: 4px;
       transition: background 0.15s;
     }
-    .hamburger:hover { background: var(--surface); }
+    .hamburger:hover { background: rgba(255,255,255,0.08); }
     .hamburger span {
       display: block; width: 22px; height: 2px;
-      background: var(--ink); border-radius: 2px;
+      background: #fff; border-radius: 2px;
       transition: all 0.25s;
     }
     .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
@@ -809,12 +823,12 @@
     /* ===== RESPONSIVE ===== */
     @media (max-width: 768px) {
       nav {
-        grid-template-columns: auto 1fr auto;
-        padding: 0 1.2rem; gap: 0.5rem;
+        grid-template-columns: 1fr auto auto;
+        padding: 0 1.2rem; gap: 0;
       }
       .nav-left { display: none; }
       .nav-right { display: none; }
-      .nav-logo { text-align: center; font-size: 1rem; }
+      .nav-logo { text-align: left; font-size: 1rem; color:#fff; }
       .hamburger { display: flex; }
 
       .hero-grid { grid-template-columns: 1fr; }
@@ -876,19 +890,85 @@
       .mod:nth-child(n) { border-right: none; border-bottom: 1px solid var(--subtle); }
       .f-nav-cols { grid-template-columns: 1fr; }
     }
+
+    /* ARTICLE À LA UNE */
+    .featured-top {
+      padding: 2.5rem 2rem;
+      border-bottom: 1px solid var(--subtle);
+      background: var(--ink);
+      color: #F0EDE4;
+      position: relative;
+      overflow: hidden;
+    }
+    .featured-top::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold);
+    }
+    .ft-cat {
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .ft-cat::before { content: '★'; font-size: 0.55rem; }
+    .ft-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      line-height: 1.15; letter-spacing: -0.02em;
+      margin-bottom: 0.8rem; max-width: 700px;
+    }
+    .ft-desc {
+      font-size: 0.9rem; color: rgba(240,237,228,0.5);
+      line-height: 1.7; font-weight: 300;
+      max-width: 600px; margin-bottom: 1.5rem;
+    }
+    .ft-footer {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .ft-time { font-size: 0.72rem; color: rgba(240,237,228,0.35); }
+    .ft-yt {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.68rem; font-weight: 500;
+      background: rgba(192,57,43,0.2); color: #F09595;
+      border: 1px solid rgba(192,57,43,0.3);
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+    }
+    .ft-link {
+      font-size: 0.78rem; font-weight: 500;
+      color: var(--gold); border-bottom: 1px solid rgba(166,124,58,0.3);
+      padding-bottom: 1px; margin-left: auto;
+      transition: border-color 0.15s;
+    }
+    .ft-link:hover { border-color: var(--gold); }
+    @media(max-width:768px){
+      .featured-top { padding: 1.8rem 1.2rem; }
+      .ft-link { margin-left: 0; }
+    }
   </style>
 </head>
 <body>
 
   <!-- NAV -->
   <nav>
-    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
-      <span></span><span></span><span></span>
+    <!-- Desktop gauche -->
+    <div class="nav-left">
+      <a href="blog.html" class="nav-item">Blog</a>
+      <a href="#" class="nav-item">Chine</a>
+      <a href="#" class="nav-item">Expat</a>
+      <a href="#" class="nav-item">Fiscalité</a>
+      <a href="#" class="nav-item">Outils</a>
     </div>
-    <div class="nav-logo">Start Business World</div>
-    <div class="nav-left" style="justify-content:flex-end">
+    <!-- Logo centré -->
+    <a href="index.html" class="nav-logo">Start Business World</a>
+    <!-- Desktop droite -->
+    <div class="nav-right">
       <a href="client-login.html" class="nav-login">Se connecter</a>
       <a href="club.html" class="nav-join">Le Club SBW</a>
+    </div>
+    <!-- Hamburger mobile uniquement -->
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
     </div>
   </nav>
 
@@ -967,48 +1047,47 @@
   </div>
 
   <!-- STATS -->
-  <div class="stats-bar">
-    <div class="stat"><div class="stat-n">57+</div><div class="stat-l">Articles experts</div></div>
-    <div class="stat"><div class="stat-n">8</div><div class="stat-l">Thèmes couverts</div></div>
-    <div class="stat"><div class="stat-n">1€</div><div class="stat-l">Pour démarrer le club</div></div>
-    <div class="stat"><div class="stat-n">0</div><div class="stat-l">Engagement requis</div></div>
-  </div>
+
 
   <!-- THÈMES -->
+  <!-- ARTICLE À LA UNE -->
+  <div class="featured-top">
+    <div class="ft-cat">À la une — Business Chine</div>
+    <h2 class="ft-title">Sourcer en Chine sans se faire arnaquer : Alibaba, Yiwu, agents, contrôle qualité</h2>
+    <p class="ft-desc">Tout ce qu'il faut savoir avant de passer sa première commande import. Le guide que j'aurais voulu avoir à mes débuts.</p>
+    <div class="ft-footer">
+      <span class="ft-time">18 min de lecture</span>
+      <span class="ft-yt">▶ Vidéo YouTube incluse</span>
+      <a href="article.html" class="ft-link">Lire l'article →</a>
+    </div>
+  </div>
+
   <div class="themes-row">
-    <div class="theme">🧠 Mindset</div>
-    <div class="theme">🏛️ Fiscalité</div>
-    <div class="theme">🏢 Création de société</div>
-    <div class="theme">🇨🇳 Business Chine</div>
-    <div class="theme">✈️ Expatriation</div>
-    <div class="theme">📦 E-commerce</div>
-    <div class="theme">💰 Finance</div>
-    <div class="theme">🔗 Import-Export</div>
-    <div class="theme">🛠️ Outils</div>
+    <div class="theme active-theme" onclick="filterTheme('all', this)">✦ Tous</div>
+    <div class="theme" onclick="filterTheme('Mindset', this)">🧠 Mindset</div>
+    <div class="theme" onclick="filterTheme('Fiscalité', this)">🏛️ Fiscalité</div>
+    <div class="theme" onclick="filterTheme('Création de société', this)">🏢 Création de société</div>
+    <div class="theme" onclick="filterTheme('Business Chine', this)">🇨🇳 Business Chine</div>
+    <div class="theme" onclick="filterTheme('Expatriation', this)">✈️ Expatriation</div>
+    <div class="theme" onclick="filterTheme('E-commerce', this)">📦 E-commerce</div>
+    <div class="theme" onclick="filterTheme('Finance', this)">💰 Finance</div>
+    <div class="theme" onclick="filterTheme('Import-Export', this)">🔗 Import-Export</div>
+    <div class="theme" onclick="filterTheme('Outils', this)">🛠️ Outils</div>
   </div>
 
   <!-- ARTICLES -->
   <div class="articles" id="articles">
-    <div class="article featured">
-      <div class="art-cat">À la une — Business Chine</div>
-      <h3>Sourcer en Chine sans se faire arnaquer : Alibaba, Yiwu, agents, contrôle qualité</h3>
-      <p>Tout ce qu'il faut savoir avant de passer sa première commande import. Le guide que j'aurais voulu avoir à mes débuts.</p>
-      <div class="art-footer">
-        <span class="art-time">18 min</span>
-        <span class="yt-pill">▶ YouTube</span>
-      </div>
-    </div>
-    <div class="article">
+    <div class="article" data-cat="Fiscalité">
       <div class="art-cat">Fiscalité</div>
       <h3>Société Hong Kong vs France : comparatif complet</h3>
       <div class="art-footer"><span class="art-time">12 min</span></div>
     </div>
-    <div class="article">
+    <div class="article" data-cat="E-commerce">
       <div class="art-cat">E-commerce</div>
       <h3>Amazon FBA en 2026 : toujours rentable ?</h3>
       <div class="art-footer"><span class="art-time">9 min</span></div>
     </div>
-    <div class="article">
+    <div class="article" data-cat="Expatriation">
       <div class="art-cat">Expatriation</div>
       <h3>Dubai 2026 : visa, résidence fiscale, coût de vie réel</h3>
       <div class="art-footer">
@@ -1016,7 +1095,7 @@
         <span class="yt-pill">▶ YouTube</span>
       </div>
     </div>
-    <div class="article">
+    <div class="article" data-cat="Mindset">
       <div class="art-cat">Mindset</div>
       <h3>Les 7 erreurs mentales qui tuent ton business</h3>
       <div class="art-footer"><span class="art-time">7 min</span></div>
@@ -1225,6 +1304,28 @@
         document.body.style.overflow = ''
       }
     })
+  </script>
+
+  <script>
+    function filterTheme(cat, el) {
+      // Mettre à jour l'onglet actif
+      document.querySelectorAll('.theme').forEach(function(t){ t.classList.remove('active-theme'); });
+      el.classList.add('active-theme');
+
+      // Filtrer les articles
+      var articles = document.querySelectorAll('#articles .article');
+      articles.forEach(function(a){
+        if (cat === 'all' || a.getAttribute('data-cat') === cat) {
+          a.style.display = 'flex';
+        } else {
+          a.style.display = 'none';
+        }
+      });
+
+      // Si aucun article visible, afficher un message
+      var visible = document.querySelectorAll('#articles .article[style="display: flex;"], #articles .article:not([style])');
+      var visibleCount = Array.from(articles).filter(function(a){ return a.style.display !== 'none'; }).length;
+    }
   </script>
 </body>
 </html>
