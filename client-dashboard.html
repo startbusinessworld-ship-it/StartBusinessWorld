@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mon Espace — Club SBW</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #FAFAF8;
+      --ink: #111110;
+      --muted: #888884;
+      --subtle: #DDDDD8;
+      --surface: #F2F2EF;
+      --gold: #A67C3A;
+      --red: #C0392B;
+      --dark: #0E0D0B;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--surface); color: var(--ink); min-height: 100vh; }
+    a { text-decoration: none; color: inherit; }
+
+    /* LAYOUT */
+    .layout { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+
+    /* SIDEBAR */
+    .sidebar {
+      background: var(--dark); color: #F0EDE4;
+      display: flex; flex-direction: column;
+      position: sticky; top: 0; height: 100vh;
+      overflow-y: auto; scrollbar-width: none;
+    }
+    .sidebar::-webkit-scrollbar { display: none; }
+
+    .sidebar-brand {
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .brand-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem; color: #F0EDE4;
+      margin-bottom: 2px;
+    }
+    .brand-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.62rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--gold);
+    }
+    .brand-badge::before { content: '◆'; font-size: 0.4rem; }
+
+    .sidebar-nav { padding: 10px 10px; flex: 1; }
+    .nav-label {
+      font-size: 0.58rem; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(240,237,228,0.25); padding: 12px 8px 5px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 8px 10px; border-radius: 6px;
+      font-size: 0.82rem; color: rgba(240,237,228,0.45);
+      cursor: pointer; transition: all 0.12s; margin-bottom: 1px;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.05); color: #F0EDE4; }
+    .nav-item.active { background: rgba(255,255,255,0.08); color: #F0EDE4; font-weight: 500; }
+    .nav-item svg { flex-shrink: 0; opacity: 0.6; }
+    .nav-item.active svg, .nav-item:hover svg { opacity: 1; }
+    .nav-badge-new {
+      margin-left: auto; background: rgba(192,57,43,0.25);
+      color: #F09595; font-size: 0.6rem; font-weight: 500;
+      padding: 1px 6px; border-radius: 10px;
+    }
+
+    .sidebar-user {
+      padding: 12px 14px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(166,124,58,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.78rem; font-weight: 500; color: var(--gold);
+      flex-shrink: 0;
+    }
+    .user-name { font-size: 0.82rem; font-weight: 500; color: #F0EDE4; }
+    .user-plan { font-size: 0.68rem; color: rgba(240,237,228,0.3); }
+    .user-logout {
+      margin-left: auto; background: none; border: none;
+      color: rgba(240,237,228,0.25); cursor: pointer;
+      font-size: 1rem; transition: color 0.15s; padding: 2px;
+    }
+    .user-logout:hover { color: #F0EDE4; }
+
+    /* MAIN */
+    .main { display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      background: var(--bg); border-bottom: 1px solid var(--subtle);
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .topbar-title { font-size: 0.95rem; font-weight: 500; }
+    .topbar-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+    .topbar-actions { display: flex; gap: 8px; align-items: center; }
+    .btn-gold {
+      background: var(--gold); color: #fff;
+      padding: 7px 14px; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 500;
+      border: none; cursor: pointer; transition: opacity 0.15s;
+    }
+    .btn-gold:hover { opacity: 0.88; }
+    .btn-outline {
+      background: transparent; color: var(--muted);
+      padding: 7px 14px; border-radius: 6px;
+      font-size: 0.78rem; border: 0.5px solid var(--subtle);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+
+    .content { padding: 24px; flex: 1; }
+
+    /* WELCOME BANNER */
+    .welcome-banner {
+      background: var(--dark); color: #F0EDE4;
+      border-radius: 12px; padding: 2rem 2.5rem;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; position: relative; overflow: hidden;
+    }
+    .welcome-banner::before {
+      content: '';
+      position: absolute; top: -60px; right: -60px;
+      width: 250px; height: 250px;
+      background: radial-gradient(circle, rgba(166,124,58,0.15), transparent 65%);
+      pointer-events: none;
+    }
+    .welcome-banner::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gold);
+    }
+    .welcome-text h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem; letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+    .welcome-text h2 i { color: var(--gold); font-style: italic; }
+    .welcome-text p { font-size: 0.82rem; color: rgba(240,237,228,0.45); font-weight: 300; }
+    .welcome-progress { text-align: right; flex-shrink: 0; }
+    .progress-label { font-size: 0.65rem; color: rgba(240,237,228,0.3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
+    .progress-bar-wrap { width: 160px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; background: var(--gold); border-radius: 2px; transition: width 0.5s ease; }
+    .progress-pct { font-size: 0.72rem; color: var(--gold); margin-top: 0.4rem; text-align: right; }
+
+    /* STATS */
+    .stats-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 20px; }
+    .stat-card {
+      background: var(--bg); border: 0.5px solid var(--subtle);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .stat-label { font-size: 0.7rem; color: var(--muted); margin-bottom: 5px; }
+    .stat-value { font-size: 1.4rem; font-weight: 500; line-height: 1; }
+    .stat-sub { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+
+    /* GRILLE CONTENU */
+    .content-grid { display: grid; grid-template-columns: 1fr 300px; gap: 16px; }
+
+    /* MODULES EN COURS */
+    .card {
+      background: var(--bg); border: 0.5px solid var(--subtle);
+      border-radius: 10px; overflow: hidden; margin-bottom: 16px;
+    }
+    .card-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 16px; border-bottom: 0.5px solid var(--subtle);
+    }
+    .card-title { font-size: 0.85rem; font-weight: 500; }
+    .card-link { font-size: 0.72rem; color: var(--muted); transition: color 0.12s; cursor: pointer; }
+    .card-link:hover { color: var(--ink); }
+
+    .module-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-bottom: 0.5px solid var(--subtle);
+      cursor: pointer; transition: background 0.12s;
+    }
+    .module-row:last-child { border-bottom: none; }
+    .module-row:hover { background: var(--surface); }
+    .module-icon {
+      width: 38px; height: 38px; border-radius: 8px;
+      background: var(--surface); border: 0.5px solid var(--subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; flex-shrink: 0;
+    }
+    .module-info { flex: 1; min-width: 0; }
+    .module-name { font-size: 0.82rem; font-weight: 500; margin-bottom: 3px; }
+    .module-meta { font-size: 0.7rem; color: var(--muted); }
+    .module-progress-wrap { width: 80px; flex-shrink: 0; }
+    .module-progress-bar { height: 3px; background: var(--subtle); border-radius: 2px; overflow: hidden; margin-bottom: 3px; }
+    .module-progress-fill { height: 100%; background: var(--gold); border-radius: 2px; }
+    .module-progress-pct { font-size: 0.65rem; color: var(--muted); text-align: right; }
+    .module-status {
+      font-size: 0.65rem; font-weight: 500; padding: 2px 7px;
+      border-radius: 10px; flex-shrink: 0;
+    }
+    .status-done { background: #EAF3DE; color: #27500A; }
+    .status-inprogress { background: #FAEEDA; color: #633806; }
+    .status-locked { background: var(--surface); color: var(--muted); }
+
+    /* ARTICLES RÉCENTS */
+    .article-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-bottom: 0.5px solid var(--subtle);
+      cursor: pointer; transition: background 0.12s;
+    }
+    .article-row:last-child { border-bottom: none; }
+    .article-row:hover { background: var(--surface); }
+    .article-cat { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); margin-bottom: 2px; }
+    .article-title { font-size: 0.8rem; font-weight: 500; line-height: 1.3; }
+    .article-time { font-size: 0.68rem; color: var(--muted); white-space: nowrap; margin-left: auto; flex-shrink: 0; }
+    .article-yt {
+      display: inline-flex; align-items: center; gap: 0.25rem;
+      background: var(--surface); color: var(--ink);
+      border: 0.5px solid var(--subtle);
+      font-size: 0.58rem; font-weight: 500;
+      padding: 2px 6px; border-radius: 3px; flex-shrink: 0;
+    }
+
+    /* SIDEBAR DROITE */
+    .right-sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+    /* ABONNEMENT */
+    .sub-card {
+      background: var(--dark); color: #F0EDE4;
+      border-radius: 10px; padding: 1.4rem;
+      position: relative; overflow: hidden;
+    }
+    .sub-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold);
+    }
+    .sub-label { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(240,237,228,0.3); margin-bottom: 0.6rem; }
+    .sub-plan { font-family: 'DM Serif Display', serif; font-size: 1.3rem; margin-bottom: 0.3rem; }
+    .sub-plan i { color: var(--gold); font-style: italic; }
+    .sub-price { font-size: 1.8rem; font-weight: 500; line-height: 1; margin-bottom: 0.2rem; }
+    .sub-price small { font-size: 0.8rem; font-weight: 300; color: rgba(240,237,228,0.35); }
+    .sub-renewal { font-size: 0.7rem; color: rgba(240,237,228,0.3); margin-bottom: 1.2rem; }
+    .sub-btn {
+      display: block; text-align: center;
+      background: rgba(255,255,255,0.07); color: rgba(240,237,228,0.6);
+      padding: 7px; border-radius: 5px;
+      font-size: 0.75rem; cursor: pointer;
+      border: 0.5px solid rgba(255,255,255,0.1);
+      transition: all 0.15s;
+    }
+    .sub-btn:hover { background: rgba(255,255,255,0.1); color: #F0EDE4; }
+
+    /* BONS PLANS */
+    .deal-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-bottom: 0.5px solid var(--subtle);
+      cursor: pointer; transition: background 0.12s;
+    }
+    .deal-row:last-child { border-bottom: none; }
+    .deal-row:hover { background: var(--surface); }
+    .deal-icon {
+      width: 30px; height: 30px; border-radius: 6px;
+      background: var(--surface); border: 0.5px solid var(--subtle);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+    }
+    .deal-name { font-size: 0.8rem; font-weight: 500; }
+    .deal-desc { font-size: 0.68rem; color: var(--muted); }
+    .deal-link { font-size: 0.68rem; color: var(--gold); margin-left: auto; flex-shrink: 0; }
+
+    /* COMMUNAUTÉ */
+    .community-card {
+      background: var(--bg); border: 0.5px solid var(--subtle);
+      border-radius: 10px; overflow: hidden;
+    }
+    .community-header {
+      padding: 12px 16px; border-bottom: 0.5px solid var(--subtle);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .community-body { padding: 14px 16px; }
+    .community-avatars { display: flex; margin-bottom: 0.8rem; }
+    .community-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(166,124,58,0.12); color: var(--gold);
+      font-size: 0.65rem; font-weight: 500;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--bg); margin-left: -8px;
+    }
+    .community-avatar:first-child { margin-left: 0; }
+    .community-text { font-size: 0.78rem; color: var(--muted); line-height: 1.5; margin-bottom: 1rem; }
+    .community-btn {
+      display: block; text-align: center;
+      background: var(--ink); color: var(--bg);
+      padding: 8px; border-radius: 6px;
+      font-size: 0.78rem; font-weight: 500;
+      cursor: pointer; transition: opacity 0.15s;
+    }
+    .community-btn:hover { opacity: 0.82; }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 24px; right: 24px;
+      background: var(--ink); color: var(--bg);
+      padding: 10px 16px; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 500;
+      z-index: 1000; opacity: 0; transform: translateY(10px);
+      transition: all 0.2s; pointer-events: none;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left: 3px solid #3B6D11; }
+
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      .layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .content-grid { grid-template-columns: 1fr; }
+      .right-sidebar { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-logo">Start Business World</div>
+      <div class="brand-badge">Le Club SBW</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Mon espace</div>
+      <div class="nav-item active" onclick="showSection('dashboard')">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Tableau de bord
+      </div>
+      <div class="nav-item" onclick="showSection('formations')">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1L1 5l7 4 7-4-7-4z"/><path d="M1 10l7 4 7-4"/><path d="M1 7.5l7 4 7-4"/></svg>
+        Formations
+        <span class="nav-badge-new">30</span>
+      </div>
+      <div class="nav-item" onclick="showSection('articles')">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Articles & Ressources
+      </div>
+      <div class="nav-label">Communauté</div>
+      <div class="nav-item" onclick="showSection('communaute')">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/><path d="M11 3c1.5.5 2.5 1.9 2.5 3.5S12.5 9.5 11 10"/><path d="M13 14c1-1 2-2 2-4"/></svg>
+        Groupe d'entraide
+      </div>
+      <div class="nav-item" onclick="showSection('bonsplans')">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+        Bons Plans membres
+      </div>
+      <div class="nav-label">Mon compte</div>
+      <div class="nav-item" onclick="showSection('compte')">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+        Profil & Abonnement
+      </div>
+    </nav>
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userInitials">—</div>
+      <div>
+        <div class="user-name" id="userName">Chargement...</div>
+        <div class="user-plan" id="userPlan">Club SBW</div>
+      </div>
+      <button class="user-logout" onclick="handleLogout()" title="Se déconnecter">⏻</button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Tableau de bord</div>
+        <div class="topbar-sub" id="topbarSub">Bienvenue dans le Club SBW</div>
+      </div>
+      <div class="topbar-actions">
+        <a href="index.html" class="btn-outline">← Retour au site</a>
+        <a href="club.html#rejoindre" class="btn-gold" id="upgradeBtn" style="display:none">Passer à 29€/mois</a>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="sectionDashboard">
+
+        <!-- WELCOME -->
+        <div class="welcome-banner">
+          <div class="welcome-text">
+            <h2>Bonjour, <i id="welcomeName">membre</i> 👋</h2>
+            <p>Continue là où tu t'es arrêté — tu as encore du contenu à explorer.</p>
+          </div>
+          <div class="welcome-progress">
+            <div class="progress-label">Progression globale</div>
+            <div class="progress-bar-wrap">
+              <div class="progress-bar-fill" id="globalProgress" style="width:20%"></div>
+            </div>
+            <div class="progress-pct" id="globalProgressPct">20% complété</div>
+          </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-label">Modules complétés</div>
+            <div class="stat-value" id="statModules">0</div>
+            <div class="stat-sub">sur 30 modules</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Temps de formation</div>
+            <div class="stat-value" id="statTime">0h</div>
+            <div class="stat-sub">visionnés</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Articles lus</div>
+            <div class="stat-value" id="statArticles">0</div>
+            <div class="stat-sub">sur le blog SBW</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Membre depuis</div>
+            <div class="stat-value" id="statSince" style="font-size:1rem">—</div>
+            <div class="stat-sub" id="statPlan">—</div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div>
+            <!-- FORMATIONS EN COURS -->
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">Formations — continuer</div>
+                <div class="card-link" onclick="showSection('formations')">Voir tout →</div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🧠</div>
+                <div class="module-info">
+                  <div class="module-name">Mindset & Fondations</div>
+                  <div class="module-meta">6 modules · 2h30</div>
+                </div>
+                <div class="module-progress-wrap">
+                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:65%"></div></div>
+                  <div class="module-progress-pct">65%</div>
+                </div>
+                <span class="module-status status-inprogress">En cours</span>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🇨🇳</div>
+                <div class="module-info">
+                  <div class="module-name">Business avec la Chine</div>
+                  <div class="module-meta">9 modules · 4h15</div>
+                </div>
+                <div class="module-progress-wrap">
+                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
+                  <div class="module-progress-pct">0%</div>
+                </div>
+                <span class="module-status status-locked">À débloquer</span>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🏛️</div>
+                <div class="module-info">
+                  <div class="module-name">Fiscalité & Structure</div>
+                  <div class="module-meta">8 modules · 3h45</div>
+                </div>
+                <div class="module-progress-wrap">
+                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
+                  <div class="module-progress-pct">0%</div>
+                </div>
+                <span class="module-status status-locked">À débloquer</span>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">📦</div>
+                <div class="module-info">
+                  <div class="module-name">E-commerce</div>
+                  <div class="module-meta">7 modules · 3h20</div>
+                </div>
+                <div class="module-progress-wrap">
+                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
+                  <div class="module-progress-pct">0%</div>
+                </div>
+                <span class="module-status status-locked">À débloquer</span>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">✈️</div>
+                <div class="module-info">
+                  <div class="module-name">Expatriation</div>
+                  <div class="module-meta">6 modules · 2h50</div>
+                </div>
+                <div class="module-progress-wrap">
+                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
+                  <div class="module-progress-pct">0%</div>
+                </div>
+                <span class="module-status status-locked">À débloquer</span>
+              </div>
+            </div>
+
+            <!-- ARTICLES RÉCENTS -->
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">Derniers articles</div>
+                <a href="index.html#articles" class="card-link">Voir le blog →</a>
+              </div>
+              <div class="article-row">
+                <div style="flex:1;min-width:0">
+                  <div class="article-cat">Business Chine</div>
+                  <div class="article-title">Sourcer en Chine sans se faire arnaquer : le guide complet 2026</div>
+                </div>
+                <span class="article-yt">▶ Vidéo</span>
+                <div class="article-time">18 min</div>
+              </div>
+              <div class="article-row">
+                <div style="flex:1;min-width:0">
+                  <div class="article-cat">Fiscalité</div>
+                  <div class="article-title">Société Hong Kong vs France : comparatif honnête</div>
+                </div>
+                <div class="article-time">12 min</div>
+              </div>
+              <div class="article-row">
+                <div style="flex:1;min-width:0">
+                  <div class="article-cat">Expatriation</div>
+                  <div class="article-title">Dubai 2026 : visa, résidence fiscale, coût de vie réel</div>
+                </div>
+                <span class="article-yt">▶ Vidéo</span>
+                <div class="article-time">10 min</div>
+              </div>
+              <div class="article-row">
+                <div style="flex:1;min-width:0">
+                  <div class="article-cat">E-commerce</div>
+                  <div class="article-title">Amazon FBA en 2026 : toujours rentable ?</div>
+                </div>
+                <div class="article-time">9 min</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT SIDEBAR -->
+          <div class="right-sidebar">
+
+            <!-- ABONNEMENT -->
+            <div class="sub-card">
+              <div class="sub-label">Mon abonnement</div>
+              <div class="sub-plan">Club <i>SBW</i></div>
+              <div class="sub-price" id="subPrice">1€<small>/mois</small></div>
+              <div class="sub-renewal" id="subRenewal">Période d'essai · 3 mois</div>
+              <div class="sub-btn" onclick="showSection('compte')">Gérer mon abonnement</div>
+            </div>
+
+            <!-- COMMUNAUTÉ -->
+            <div class="community-card">
+              <div class="community-header">
+                <div class="card-title">Groupe d'entraide</div>
+                <div class="card-link" style="color:var(--gold)">Actif</div>
+              </div>
+              <div class="community-body">
+                <div class="community-avatars">
+                  <div class="community-avatar">TM</div>
+                  <div class="community-avatar">SL</div>
+                  <div class="community-avatar">AK</div>
+                  <div class="community-avatar">JB</div>
+                  <div class="community-avatar" style="background:var(--surface);color:var(--muted);font-size:0.58rem">+85</div>
+                </div>
+                <div class="community-text">89 membres actifs dans le groupe. Pose tes questions, partage tes avancées.</div>
+                <div class="community-btn">Rejoindre le groupe →</div>
+              </div>
+            </div>
+
+            <!-- BONS PLANS -->
+            <div class="card">
+              <div class="card-head">
+                <div class="card-title">Bons Plans du moment</div>
+                <div class="card-link" onclick="showSection('bonsplans')">Voir tout →</div>
+              </div>
+              <div class="deal-row">
+                <div class="deal-icon">💳</div>
+                <div>
+                  <div class="deal-name">Airwallex</div>
+                  <div class="deal-desc">Compte multi-devises offert</div>
+                </div>
+                <div class="deal-link">→</div>
+              </div>
+              <div class="deal-row">
+                <div class="deal-icon">💸</div>
+                <div>
+                  <div class="deal-name">Wise</div>
+                  <div class="deal-desc">Frais offerts sur 1er virement</div>
+                </div>
+                <div class="deal-link">→</div>
+              </div>
+              <div class="deal-row">
+                <div class="deal-icon">🏢</div>
+                <div>
+                  <div class="deal-name">LegalPlace</div>
+                  <div class="deal-desc">-20% sur la création de société</div>
+                </div>
+                <div class="deal-link">→</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- PLACEHOLDER SECTIONS -->
+      <div id="sectionFormations" style="display:none">
+        <div class="card" style="padding:3rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">🎬</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Formations vidéo</div>
+          <div style="color:var(--muted);font-size:0.85rem">Les modules seront disponibles ici dès leur mise en ligne.</div>
+        </div>
+      </div>
+
+      <div id="sectionArticles" style="display:none">
+        <div class="card" style="padding:3rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">📝</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Articles & Ressources</div>
+          <div style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem">Tous les articles du blog SBW accessibles ici.</div>
+          <a href="index.html#articles" class="btn-gold" style="display:inline-block">Voir le blog →</a>
+        </div>
+      </div>
+
+      <div id="sectionCommunaute" style="display:none">
+        <div class="card" style="padding:3rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">💬</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Groupe d'entraide privé</div>
+          <div style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem">Rejoins la communauté des membres actifs du Club SBW.</div>
+          <a href="#" class="btn-gold" style="display:inline-block">Accéder au groupe →</a>
+        </div>
+      </div>
+
+      <div id="sectionBonsplans" style="display:none">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Bons Plans exclusifs membres</div></div>
+          <div class="deal-row"><div class="deal-icon">💳</div><div><div class="deal-name">Airwallex — Compte multi-devises</div><div class="deal-desc">Ouvre ton compte et reçois un bonus de bienvenue exclusif membres SBW.</div></div><div class="deal-link" style="font-size:0.75rem;color:var(--gold)">Obtenir →</div></div>
+          <div class="deal-row"><div class="deal-icon">💸</div><div><div class="deal-name">Wise — Frais offerts</div><div class="deal-desc">Frais offerts sur ton premier virement international via ce lien exclusif.</div></div><div class="deal-link" style="font-size:0.75rem;color:var(--gold)">Obtenir →</div></div>
+          <div class="deal-row"><div class="deal-icon">🏢</div><div><div class="deal-name">LegalPlace — -20% sur la création</div><div class="deal-desc">Crée ta SASU, SAS ou SARL avec 20% de réduction pour les membres SBW.</div></div><div class="deal-link" style="font-size:0.75rem;color:var(--gold)">Obtenir →</div></div>
+          <div class="deal-row"><div class="deal-icon">🛡️</div><div><div class="deal-name">Orus — RC Pro offerte 1 mois</div><div class="deal-desc">Assurance RC Pro avec le premier mois offert pour les membres du Club.</div></div><div class="deal-link" style="font-size:0.75rem;color:var(--gold)">Obtenir →</div></div>
+          <div class="deal-row"><div class="deal-icon">🛒</div><div><div class="deal-name">Shopify — 3 mois à 1€</div><div class="deal-desc">Lance ta boutique Shopify à 1€/mois pendant 3 mois via ce lien partenaire.</div></div><div class="deal-link" style="font-size:0.75rem;color:var(--gold)">Obtenir →</div></div>
+        </div>
+      </div>
+
+      <div id="sectionCompte" style="display:none">
+        <div class="card" style="padding:2rem;max-width:500px">
+          <div class="card-head" style="padding:0 0 16px;margin-bottom:16px;border-bottom:0.5px solid var(--subtle)">
+            <div class="card-title">Mon profil</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div style="font-size:0.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Nom complet</div>
+              <input type="text" id="profileName" style="width:100%;padding:8px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.88rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);outline:none">
+            </div>
+            <div>
+              <div style="font-size:0.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Email</div>
+              <input type="email" id="profileEmail" disabled style="width:100%;padding:8px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.88rem;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--muted);outline:none">
+            </div>
+            <button class="btn-gold" onclick="saveProfile()" style="width:fit-content">Sauvegarder</button>
+          </div>
+          <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--subtle)">
+            <div style="font-size:0.85rem;font-weight:500;margin-bottom:0.5rem">Mon abonnement</div>
+            <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem" id="compteSubInfo">—</div>
+            <button style="font-size:0.78rem;color:var(--red);background:none;border:0.5px solid rgba(192,57,43,0.3);padding:6px 14px;border-radius:5px;cursor:pointer" onclick="cancelSub()">Annuler mon abonnement</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+  const { createClient } = supabase
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  let currentUser = null
+  let currentMember = null
+
+  async function init() {
+    const { data: { session } } = await sb.auth.getSession()
+    if (!session) {
+      window.location.href = 'client-login.html'
+      return
+    }
+    currentUser = session.user
+
+    // Récupère le profil membre
+    const { data: member } = await sb
+      .from('members')
+      .select('*')
+      .eq('email', currentUser.email)
+      .single()
+
+    currentMember = member
+
+    renderUser()
+    renderStats()
+  }
+
+  function renderUser() {
+    const name = currentMember?.full_name || currentUser.email
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    const plan = currentMember?.plan === 'trial' ? '1€/mois — Essai' : '29€/mois'
+
+    document.getElementById('userInitials').textContent = initials
+    document.getElementById('userName').textContent = name
+    document.getElementById('userPlan').textContent = plan
+    document.getElementById('welcomeName').textContent = name.split(' ')[0]
+
+    // Abonnement
+    document.getElementById('subPrice').innerHTML = currentMember?.plan === 'trial'
+      ? '1€<small>/mois</small>'
+      : '29€<small>/mois</small>'
+    document.getElementById('subRenewal').textContent = currentMember?.plan === 'trial'
+      ? 'Période d\'essai · 3 mois'
+      : 'Abonnement actif · sans engagement'
+
+    // Affiche bouton upgrade si trial
+    if (currentMember?.plan === 'trial') {
+      document.getElementById('upgradeBtn').style.display = 'inline-flex'
+    }
+
+    // Profil
+    if (document.getElementById('profileName')) {
+      document.getElementById('profileName').value = currentMember?.full_name || ''
+      document.getElementById('profileEmail').value = currentUser.email
+      document.getElementById('compteSubInfo').textContent =
+        `Plan : ${plan} · Membre depuis ${formatDate(currentMember?.created_at)}`
+    }
+  }
+
+  function renderStats() {
+    document.getElementById('statModules').textContent = '2'
+    document.getElementById('statTime').textContent = '1h30'
+    document.getElementById('statArticles').textContent = '3'
+    document.getElementById('statSince').textContent = formatDate(currentMember?.created_at)
+    document.getElementById('statPlan').textContent = currentMember?.plan === 'trial' ? 'Période d\'essai' : 'Membre actif'
+  }
+
+  function showSection(name) {
+    const sections = ['Dashboard', 'Formations', 'Articles', 'Communaute', 'Bonsplans', 'Compte']
+    sections.forEach(s => {
+      const el = document.getElementById('section' + s)
+      if (el) el.style.display = 'none'
+    })
+    const target = document.getElementById('section' + name.charAt(0).toUpperCase() + name.slice(1))
+    if (target) target.style.display = 'block'
+
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
+    event?.currentTarget?.classList.add('active')
+
+    const titles = {
+      dashboard: ['Tableau de bord', 'Bienvenue dans le Club SBW'],
+      formations: ['Formations', 'Tous tes modules vidéo'],
+      articles: ['Articles & Ressources', 'Le blog Start Business World'],
+      communaute: ['Groupe d\'entraide', 'La communauté des membres'],
+      bonsplans: ['Bons Plans', 'Offres exclusives membres'],
+      compte: ['Mon compte', 'Profil & abonnement']
+    }
+    const t = titles[name] || ['', '']
+    document.getElementById('topbarTitle').textContent = t[0]
+    document.getElementById('topbarSub').textContent = t[1]
+  }
+
+  async function saveProfile() {
+    const name = document.getElementById('profileName').value.trim()
+    if (!name) return
+    await sb.from('members').update({ full_name: name }).eq('email', currentUser.email)
+    showToast('Profil mis à jour !', 'success')
+    renderUser()
+  }
+
+  async function cancelSub() {
+    if (!confirm('Annuler ton abonnement ? Tu perdras l\'accès à la fin du mois.')) return
+    await sb.from('members').update({ plan: 'cancelled', status: 'inactive' }).eq('email', currentUser.email)
+    showToast('Abonnement annulé.')
+    setTimeout(() => window.location.href = 'index.html', 2000)
+  }
+
+  async function handleLogout() {
+    await sb.auth.signOut()
+    window.location.href = 'index.html'
+  }
+
+  function formatDate(str) {
+    if (!str) return '—'
+    return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>
