@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Membres — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'members'</script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item active" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Membres Club SBW</h1>
+        <div class="page-date" id="memberCount">— membres actifs</div>
+      </div>
+      <div class="topbar-actions">
+        <select class="btn-ghost" id="filterPlan" onchange="filterMembers()" style="cursor:pointer">
+          <option value="all">Tous les plans</option>
+          <option value="trial">1€/mois (essai)</option>
+          <option value="active">29€/mois</option>
+          <option value="cancelled">Annulé</option>
+        </select>
+        <button class="btn-ghost" onclick="exportMembers()">↓ Exporter CSV</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <div class="metrics-grid" style="margin-bottom:16px">
+        <div class="metric-card">
+          <div class="metric-label">Membres actifs</div>
+          <div class="metric-value" id="mActive">—</div>
+          <div class="metric-delta up" id="mActiveDelta"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">En période d'essai</div>
+          <div class="metric-value" id="mTrial">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Annulations ce mois</div>
+          <div class="metric-value" id="mCancelled">—</div>
+          <div class="metric-delta down" id="mCancelledDelta"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">MRR (revenus récurrents)</div>
+          <div class="metric-value" id="mMRR">—</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">Liste des membres</div>
+          <input type="text" class="field-input" id="searchMember" placeholder="Rechercher..." oninput="filterMembers()" style="width:220px;padding:6px 10px;font-size:0.78rem">
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Membre</th>
+              <th>Email</th>
+              <th>Plan</th>
+              <th>Statut</th>
+              <th>Membre depuis</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="membersTable">
+            <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  let allMembers = []
+
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    await loadMembers()
+  }
+
+  async function loadMembers() {
+    const { data } = await sb.from('members').select('*').order('created_at', { ascending: false })
+    allMembers = data || []
+
+    const active = allMembers.filter(m => m.plan === 'active').length
+    const trial = allMembers.filter(m => m.plan === 'trial').length
+    const cancelled = allMembers.filter(m => m.plan === 'cancelled').length
+    const mrr = (active * 29) + (trial * 1)
+
+    document.getElementById('memberCount').textContent = active + ' membres actifs'
+    document.getElementById('mActive').textContent = active
+    document.getElementById('mActiveDelta').textContent = '+7 ce mois'
+    document.getElementById('mTrial').textContent = trial
+    document.getElementById('mCancelled').textContent = cancelled
+    document.getElementById('mCancelledDelta').textContent = '-2 ce mois'
+    document.getElementById('mMRR').textContent = mrr.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+
+    renderMembers(allMembers)
+  }
+
+  function filterMembers() {
+    const plan = document.getElementById('filterPlan').value
+    const q = document.getElementById('searchMember').value.toLowerCase()
+    let filtered = allMembers
+    if (plan !== 'all') filtered = filtered.filter(m => m.plan === plan)
+    if (q) filtered = filtered.filter(m =>
+      (m.full_name||'').toLowerCase().includes(q) ||
+      m.email.toLowerCase().includes(q)
+    )
+    renderMembers(filtered)
+  }
+
+  function renderMembers(members) {
+    const tbody = document.getElementById('membersTable')
+    if (!members.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Aucun membre trouvé.</td></tr>'
+      return
+    }
+    tbody.innerHTML = members.map(m => {
+      const name = m.full_name || m.email
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      return `
+        <tr>
+          <td>
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="member-avatar">${initials}</div>
+              <span style="font-weight:500">${m.full_name || '—'}</span>
+            </div>
+          </td>
+          <td style="color:var(--muted)">${m.email}</td>
+          <td><span class="plan-badge ${m.plan === 'trial' ? 'trial' : m.plan === 'cancelled' ? 'draft' : ''}">
+            ${m.plan === 'trial' ? '1€/mois' : m.plan === 'active' ? '29€/mois' : 'Annulé'}
+          </span></td>
+          <td><span class="status-pill ${m.status === 'active' ? 'sent' : 'draft'}">${m.status === 'active' ? 'Actif' : 'Inactif'}</span></td>
+          <td style="color:var(--muted)">${formatDate(m.created_at)}</td>
+          <td>
+            <div style="display:flex;gap:6px">
+              ${m.plan === 'trial' ? `<button class="row-action" onclick="upgradeMember('${m.id}')">Passer 29€</button>` : ''}
+              <button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="cancelMember('${m.id}')">Annuler</button>
+            </div>
+          </td>
+        </tr>
+      `
+    }).join('')
+  }
+
+  async function upgradeMember(id) {
+    await sb.from('members').update({ plan: 'active' }).eq('id', id)
+    showToast('Membre mis à jour.', 'success')
+    loadMembers()
+  }
+
+  async function cancelMember(id) {
+    if (!confirm('Annuler l\'abonnement de ce membre ?')) return
+    await sb.from('members').update({ plan: 'cancelled', status: 'inactive' }).eq('id', id)
+    showToast('Abonnement annulé.', 'success')
+    loadMembers()
+  }
+
+  function exportMembers() {
+    const csv = ['Nom,Email,Plan,Depuis', ...allMembers.map(m =>
+      `${m.full_name||''},${m.email},${m.plan},${formatDate(m.created_at)}`
+    )].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'membres-sbw.csv'
+    a.click()
+  }
+
+  function formatDate(str) {
+    if (!str) return '—'
+    return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>

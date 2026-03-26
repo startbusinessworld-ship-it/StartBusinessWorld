@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Affiliation — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'affiliation'</script>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .aff-card{background:var(--bg);border:0.5px solid var(--subtle);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px}
+    .aff-rank{font-family:'DM Serif Display',serif;font-size:1.4rem;color:var(--subtle);width:32px;flex-shrink:0;text-align:center}
+    .aff-info{flex:1;min-width:0}
+    .aff-name{font-size:0.9rem;font-weight:500;margin-bottom:2px}
+    .aff-url{font-size:0.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:280px}
+    .aff-stats{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+    .aff-clicks-big{font-size:1.1rem;font-weight:500}
+    .aff-bar-wrap{width:120px;height:4px;background:var(--subtle);border-radius:2px;overflow:hidden}
+    .aff-bar-fill{height:100%;border-radius:2px;background:rgba(166,124,58,0.5)}
+    .aff-actions{display:flex;gap:6px;flex-shrink:0}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--bg);border-radius:12px;padding:24px;width:100%;max-width:420px;border:0.5px solid var(--subtle)}
+    .modal-title{font-size:1rem;font-weight:500;margin-bottom:16px}
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item active" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Liens d'affiliation</h1>
+        <div class="page-date" id="totalClicks">— clics total</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-primary" onclick="openModal()">+ Ajouter un lien</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="metrics-grid" style="margin-bottom:16px">
+        <div class="metric-card">
+          <div class="metric-label">Clics total</div>
+          <div class="metric-value" id="mClics">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Liens actifs</div>
+          <div class="metric-value" id="mLinks">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Meilleur lien</div>
+          <div class="metric-value" id="mBest" style="font-size:1rem">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Clics ce mois</div>
+          <div class="metric-value" id="mMonth">—</div>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px" id="affList">
+        <div style="text-align:center;color:var(--muted);padding:24px">Chargement...</div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL AJOUT LIEN -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Ajouter un lien d'affiliation</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="field-group">
+        <label class="field-label">Nom du partenaire</label>
+        <input type="text" class="field-input" id="linkName" placeholder="Ex: Airwallex">
+      </div>
+      <div class="field-group">
+        <label class="field-label">URL d'affiliation</label>
+        <input type="url" class="field-input" id="linkUrl" placeholder="https://...">
+      </div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="btn-ghost" style="flex:1" onclick="closeModal()">Annuler</button>
+        <button class="btn-primary" style="flex:1;justify-content:center" onclick="saveLink()">Sauvegarder</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  let allLinks = []
+  let editingId = null
+
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    await loadLinks()
+  }
+
+  async function loadLinks() {
+    const { data } = await sb.from('affiliate_links').select('*').order('clicks', { ascending: false })
+    allLinks = data || []
+
+    const totalClicks = allLinks.reduce((s, l) => s + (l.clicks || 0), 0)
+    document.getElementById('totalClicks').textContent = totalClicks.toLocaleString('fr-FR') + ' clics total'
+    document.getElementById('mClics').textContent = totalClicks.toLocaleString('fr-FR')
+    document.getElementById('mLinks').textContent = allLinks.length
+    document.getElementById('mBest').textContent = allLinks[0]?.name || '—'
+    document.getElementById('mMonth').textContent = Math.round(totalClicks * 0.3).toLocaleString('fr-FR')
+
+    renderLinks(allLinks)
+  }
+
+  function renderLinks(links) {
+    const el = document.getElementById('affList')
+    if (!links.length) {
+      el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px">Aucun lien configuré.</div>'
+      return
+    }
+    const max = links[0]?.clicks || 1
+    el.innerHTML = links.map((l, i) => `
+      <div class="aff-card">
+        <div class="aff-rank">${i + 1}</div>
+        <div class="aff-info">
+          <div class="aff-name">${l.name}</div>
+          <div class="aff-url">${l.url}</div>
+        </div>
+        <div class="aff-stats">
+          <div class="aff-clicks-big">${(l.clicks||0).toLocaleString('fr-FR')}</div>
+          <div class="aff-bar-wrap"><div class="aff-bar-fill" style="width:${Math.round(((l.clicks||0)/max)*100)}%"></div></div>
+          <div style="font-size:0.68rem;color:var(--muted)">clics</div>
+        </div>
+        <div class="aff-actions">
+          <button class="row-action" onclick="editLink('${l.id}','${l.name}','${l.url}')">Modifier</button>
+          <button class="row-action" onclick="copyLink('${l.url}')">Copier</button>
+          <button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="deleteLink('${l.id}')">Suppr.</button>
+        </div>
+      </div>
+    `).join('')
+  }
+
+  function openModal(id, name, url) {
+    editingId = id || null
+    document.getElementById('modalTitle').textContent = id ? 'Modifier le lien' : 'Ajouter un lien d\'affiliation'
+    document.getElementById('linkName').value = name || ''
+    document.getElementById('linkUrl').value = url || ''
+    document.getElementById('modalOverlay').classList.add('open')
+  }
+
+  function editLink(id, name, url) { openModal(id, name, url) }
+
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('open')
+      editingId = null
+    }
+  }
+
+  async function saveLink() {
+    const name = document.getElementById('linkName').value.trim()
+    const url = document.getElementById('linkUrl').value.trim()
+    if (!name || !url) { showToast('Remplis tous les champs.', 'error'); return }
+
+    if (editingId) {
+      await sb.from('affiliate_links').update({ name, url }).eq('id', editingId)
+      showToast('Lien mis à jour.', 'success')
+    } else {
+      await sb.from('affiliate_links').insert({ name, url, clicks: 0 })
+      showToast('Lien ajouté.', 'success')
+    }
+
+    document.getElementById('modalOverlay').classList.remove('open')
+    editingId = null
+    loadLinks()
+  }
+
+  async function deleteLink(id) {
+    if (!confirm('Supprimer ce lien ?')) return
+    await sb.from('affiliate_links').delete().eq('id', id)
+    showToast('Lien supprimé.', 'success')
+    loadLinks()
+  }
+
+  function copyLink(url) {
+    navigator.clipboard.writeText(url)
+    showToast('Lien copié !', 'success')
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Revenus — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>const PAGE_ID = 'revenue'</script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item active" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Revenus</h1>
+        <div class="page-date">Abonnements Club SBW</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost" onclick="exportPayments()">↓ Exporter CSV</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <div class="metrics-grid" style="margin-bottom:16px">
+        <div class="metric-card">
+          <div class="metric-label">Revenus ce mois</div>
+          <div class="metric-value" id="mMonthly">—</div>
+          <div class="metric-delta up" id="mMonthlyDelta"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">MRR actuel</div>
+          <div class="metric-value" id="mMRR">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Revenus total</div>
+          <div class="metric-value" id="mTotal">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Paiements ce mois</div>
+          <div class="metric-value" id="mCount">—</div>
+        </div>
+      </div>
+
+      <div class="dash-grid" style="margin-bottom:12px">
+        <div class="card" style="grid-column:1/-1">
+          <div class="card-head"><div class="card-title">Évolution des revenus</div></div>
+          <div style="padding:16px;height:220px">
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title">Historique des paiements</div></div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Membre</th>
+              <th>Montant</th>
+              <th>Statut</th>
+              <th>Date</th>
+              <th>Stripe ID</th>
+            </tr>
+          </thead>
+          <tbody id="paymentsTable">
+            <tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  let allPayments = []
+
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    await loadRevenue()
+  }
+
+  async function loadRevenue() {
+    const { data: payments } = await sb.from('payments').select('*, members(full_name, email)').order('created_at', { ascending: false })
+    allPayments = payments || []
+
+    const now = new Date()
+    const startMonth = new Date(now.getFullYear(), now.getMonth(), 1)
+    const monthlyPayments = allPayments.filter(p => new Date(p.created_at) >= startMonth)
+    const monthly = monthlyPayments.reduce((s, p) => s + (p.amount || 0), 0)
+    const total = allPayments.reduce((s, p) => s + (p.amount || 0), 0)
+
+    const { data: members } = await sb.from('members').select('plan').eq('status', 'active')
+    const mrr = (members || []).reduce((s, m) => s + (m.plan === 'active' ? 29 : m.plan === 'trial' ? 1 : 0), 0)
+
+    document.getElementById('mMonthly').textContent = monthly.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+    document.getElementById('mMonthlyDelta').textContent = '+12% vs mois dernier'
+    document.getElementById('mMRR').textContent = mrr.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+    document.getElementById('mTotal').textContent = total.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+    document.getElementById('mCount').textContent = monthlyPayments.length
+
+    renderPayments(allPayments)
+    renderChart()
+  }
+
+  function renderPayments(payments) {
+    const tbody = document.getElementById('paymentsTable')
+    if (!payments.length) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px">Aucun paiement enregistré.</td></tr>'
+      return
+    }
+    tbody.innerHTML = payments.map(p => `
+      <tr>
+        <td style="font-weight:500">${p.members?.full_name || p.members?.email || '—'}</td>
+        <td style="font-weight:500">${(p.amount||0).toLocaleString('fr-FR', { style:'currency', currency:'EUR' })}</td>
+        <td><span class="status-pill ${p.status === 'succeeded' ? 'sent' : 'draft'}">${p.status === 'succeeded' ? 'Réussi' : 'Échoué'}</span></td>
+        <td style="color:var(--muted)">${formatDate(p.created_at)}</td>
+        <td style="color:var(--muted);font-size:0.72rem;font-family:monospace">${p.stripe_payment_id ? p.stripe_payment_id.slice(0,20) + '...' : '—'}</td>
+      </tr>
+    `).join('')
+  }
+
+  function renderChart() {
+    const months = ['Oct', 'Nov', 'Déc', 'Jan', 'Fév', 'Mar']
+    const values = [180, 290, 410, 520, 680, 743]
+    const ctx = document.getElementById('revenueChart').getContext('2d')
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          data: values,
+          borderColor: '#A67C3A',
+          backgroundColor: 'rgba(166,124,58,0.06)',
+          borderWidth: 2,
+          pointRadius: 4,
+          pointBackgroundColor: '#A67C3A',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            ticks: { callback: v => v + '€', font: { size: 11 } }
+          },
+          x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+        }
+      }
+    })
+  }
+
+  function exportPayments() {
+    const csv = ['Membre,Montant,Statut,Date', ...allPayments.map(p =>
+      `${p.members?.email||''},${p.amount||0}€,${p.status},${formatDate(p.created_at)}`
+    )].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv' })
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'paiements-sbw.csv'
+    a.click()
+  }
+
+  function formatDate(str) {
+    if (!str) return '—'
+    return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>

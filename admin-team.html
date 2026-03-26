@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Équipe — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'team'</script>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .team-card{background:var(--bg);border:0.5px solid var(--subtle);border-radius:10px;padding:16px;display:flex;align-items:center;gap:14px}
+    .team-avatar{width:40px;height:40px;border-radius:50%;background:rgba(166,124,58,0.12);color:var(--gold);font-size:0.85rem;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .team-info{flex:1}
+    .team-name{font-size:0.9rem;font-weight:500;margin-bottom:2px}
+    .team-email{font-size:0.75rem;color:var(--muted)}
+    .role-badge{font-size:0.68rem;font-weight:500;padding:3px 8px;border-radius:10px}
+    .role-admin{background:#EEEDFE;color:#3C3489}
+    .role-writer{background:#E1F5EE;color:#085041}
+    .role-editor{background:#FAEEDA;color:#633806}
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:50;align-items:center;justify-content:center}
+    .modal-overlay.open{display:flex}
+    .modal{background:var(--bg);border-radius:12px;padding:24px;width:100%;max-width:400px;border:0.5px solid var(--subtle)}
+    .modal-title{font-size:1rem;font-weight:500;margin-bottom:16px}
+    .access-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:10px}
+    .access-item{background:var(--surface);border-radius:6px;padding:8px 10px;font-size:0.75rem;display:flex;align-items:center;gap:6px}
+    .access-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item active" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Équipe & Rôles</h1>
+        <div class="page-date">Gestion des accès admin</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-primary" onclick="openInviteModal()">+ Inviter un membre</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- LÉGENDE RÔLES -->
+      <div class="dash-grid" style="margin-bottom:16px">
+        <div class="card">
+          <div class="card-head"><div class="card-title">Rôles disponibles</div></div>
+          <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <span class="role-badge role-admin">Admin</span>
+              <div style="font-size:0.78rem;color:var(--muted)">Accès complet — dashboard, articles, newsletter, membres, revenus, affiliation, paramètres.</div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <span class="role-badge role-writer">Rédacteur</span>
+              <div style="font-size:0.78rem;color:var(--muted)">Rédiger et soumettre des articles uniquement. Pas de publication directe — toi tu valides.</div>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px">
+              <span class="role-badge role-editor">Comm</span>
+              <div style="font-size:0.78rem;color:var(--muted)">Créer et envoyer des campagnes email et newsletter uniquement.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">Accès par rôle</div></div>
+          <div style="padding:12px 14px">
+            <div style="display:grid;grid-template-columns:1fr 60px 60px 60px;gap:6px;font-size:0.72rem">
+              <div style="color:var(--muted)">Page</div>
+              <div style="text-align:center;font-weight:500">Admin</div>
+              <div style="text-align:center;font-weight:500">Réd.</div>
+              <div style="text-align:center;font-weight:500">Comm</div>
+              ${[
+                ['Dashboard', true, false, false],
+                ['Articles', true, true, false],
+                ['Newsletter', true, false, true],
+                ['Membres', true, false, false],
+                ['Revenus', true, false, false],
+                ['Affiliation', true, false, false],
+                ['Équipe', true, false, false],
+              ].map(([label, ...access]) => `
+                <div style="padding:4px 0;border-top:0.5px solid var(--subtle);color:var(--ink);font-size:0.75rem">${label}</div>
+                ${access.map(ok => `<div style="text-align:center;border-top:0.5px solid var(--subtle);padding:4px 0">${ok ? '✓' : '—'}</div>`).join('')}
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTE ÉQUIPE -->
+      <div style="display:flex;flex-direction:column;gap:8px" id="teamList">
+        <div style="text-align:center;color:var(--muted);padding:24px">Chargement...</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- MODAL INVITATION -->
+<div class="modal-overlay" id="inviteModal" onclick="closeInviteModal(event)">
+  <div class="modal">
+    <div class="modal-title">Inviter un membre de l'équipe</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="field-group">
+        <label class="field-label">Email</label>
+        <input type="email" class="field-input" id="inviteEmail" placeholder="prenom@email.com">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Nom complet</label>
+        <input type="text" class="field-input" id="inviteName" placeholder="Prénom Nom">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Rôle</label>
+        <select class="field-select" id="inviteRole">
+          <option value="writer">Rédacteur — articles uniquement</option>
+          <option value="editor">Chargé de comm — newsletter uniquement</option>
+          <option value="admin">Admin — accès complet</option>
+        </select>
+      </div>
+      <div style="background:var(--surface);border-radius:6px;padding:10px;font-size:0.75rem;color:var(--muted)">
+        La personne recevra un email pour créer son mot de passe et accéder à l'espace admin.
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn-ghost" style="flex:1" onclick="closeInviteModal()">Annuler</button>
+        <button class="btn-primary" style="flex:1;justify-content:center" onclick="inviteTeamMember()">Envoyer l'invitation</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    await loadTeam()
+  }
+
+  async function loadTeam() {
+    const { data } = await sb.from('users').select('*').order('created_at', { ascending: true })
+    const el = document.getElementById('teamList')
+
+    if (!data || data.length === 0) {
+      el.innerHTML = '<div style="text-align:center;color:var(--muted);padding:24px">Aucun membre d\'équipe.</div>'
+      return
+    }
+
+    el.innerHTML = data.map(u => {
+      const name = u.full_name || u.email
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      const roleClass = u.role === 'admin' ? 'role-admin' : u.role === 'writer' ? 'role-writer' : 'role-editor'
+      const roleLabel = u.role === 'admin' ? 'Admin' : u.role === 'writer' ? 'Rédacteur' : 'Chargé de comm'
+      return `
+        <div class="team-card">
+          <div class="team-avatar">${initials}</div>
+          <div class="team-info">
+            <div class="team-name">${u.full_name || '—'}</div>
+            <div class="team-email">${u.email}</div>
+          </div>
+          <span class="role-badge ${roleClass}">${roleLabel}</span>
+          <div style="display:flex;gap:6px">
+            <select class="field-select" style="font-size:0.75rem;padding:5px 8px;width:auto" onchange="changeRole('${u.id}', this.value)">
+              <option value="writer" ${u.role==='writer'?'selected':''}>Rédacteur</option>
+              <option value="editor" ${u.role==='editor'?'selected':''}>Comm</option>
+              <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+            </select>
+            <button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="removeUser('${u.id}')">Retirer</button>
+          </div>
+        </div>
+      `
+    }).join('')
+  }
+
+  async function changeRole(id, role) {
+    await sb.from('users').update({ role }).eq('id', id)
+    showToast('Rôle mis à jour.', 'success')
+    loadTeam()
+  }
+
+  async function removeUser(id) {
+    if (!confirm('Retirer cet utilisateur de l\'équipe ?')) return
+    await sb.from('users').delete().eq('id', id)
+    showToast('Utilisateur retiré.', 'success')
+    loadTeam()
+  }
+
+  async function inviteTeamMember() {
+    const email = document.getElementById('inviteEmail').value.trim()
+    const name = document.getElementById('inviteName').value.trim()
+    const role = document.getElementById('inviteRole').value
+
+    if (!email) { showToast('L\'email est obligatoire.', 'error'); return }
+
+    // Invite via Supabase Auth
+    const { data, error } = await sb.auth.admin?.inviteUserByEmail?.(email) || { error: null }
+
+    // En attendant Stripe/Edge Functions, on crée directement l'entrée
+    await sb.from('users').insert({ email, full_name: name, role })
+
+    closeInviteModal()
+    showToast('Invitation envoyée à ' + email, 'success')
+    loadTeam()
+  }
+
+  function openInviteModal() {
+    document.getElementById('inviteModal').classList.add('open')
+  }
+
+  function closeInviteModal(e) {
+    if (!e || e.target === document.getElementById('inviteModal')) {
+      document.getElementById('inviteModal').classList.remove('open')
+    }
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>

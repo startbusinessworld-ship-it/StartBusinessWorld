@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Articles — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'articles'</script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item active" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Articles</h1>
+        <div class="page-date" id="articleCount">— articles</div>
+      </div>
+      <div class="topbar-actions">
+        <select class="btn-ghost" id="filterStatus" onchange="filterArticles()" style="cursor:pointer">
+          <option value="all">Tous les statuts</option>
+          <option value="published">Publiés</option>
+          <option value="review">En relecture</option>
+          <option value="draft">Brouillons</option>
+        </select>
+        <select class="btn-ghost" id="filterCat" onchange="filterArticles()" style="cursor:pointer">
+          <option value="all">Toutes les catégories</option>
+          <option value="Business Chine">Business Chine</option>
+          <option value="Fiscalité">Fiscalité</option>
+          <option value="Expatriation">Expatriation</option>
+          <option value="E-commerce">E-commerce</option>
+          <option value="Mindset">Mindset</option>
+          <option value="Finance">Finance</option>
+          <option value="Import-Export">Import-Export</option>
+        </select>
+        <a href="admin-articles-new.html" class="btn-primary">+ Nouvel article</a>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="card">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Catégorie</th>
+              <th>Auteur</th>
+              <th>Statut</th>
+              <th>Vues</th>
+              <th>Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="articlesTable">
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Chargement...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  let allArticles = []
+
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    await loadArticles()
+  }
+
+  async function loadArticles() {
+    const { data } = await sb
+      .from('articles')
+      .select('id, title, category, status, views, created_at, author_id')
+      .order('created_at', { ascending: false })
+
+    allArticles = data || []
+    document.getElementById('articleCount').textContent = allArticles.length + ' articles'
+    renderArticles(allArticles)
+  }
+
+  function filterArticles() {
+    const status = document.getElementById('filterStatus').value
+    const cat = document.getElementById('filterCat').value
+    let filtered = allArticles
+    if (status !== 'all') filtered = filtered.filter(a => a.status === status)
+    if (cat !== 'all') filtered = filtered.filter(a => a.category === cat)
+    renderArticles(filtered)
+  }
+
+  function renderArticles(articles) {
+    const tbody = document.getElementById('articlesTable')
+    if (!articles.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">Aucun article trouvé.</td></tr>'
+      return
+    }
+    tbody.innerHTML = articles.map(a => `
+      <tr>
+        <td style="font-weight:500;max-width:300px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.title}</td>
+        <td><span style="font-size:0.72rem;color:var(--red)">${a.category || '—'}</span></td>
+        <td style="color:var(--muted);font-size:0.75rem">SBW</td>
+        <td><span class="status-pill ${a.status === 'published' ? 'sent' : a.status === 'review' ? 'review' : 'draft'}">
+          ${a.status === 'published' ? 'Publié' : a.status === 'review' ? 'En relecture' : 'Brouillon'}
+        </span></td>
+        <td style="color:var(--muted)">${(a.views||0).toLocaleString('fr-FR')}</td>
+        <td style="color:var(--muted)">${formatDate(a.created_at)}</td>
+        <td>
+          <div style="display:flex;gap:6px">
+            <a href="admin-articles-new.html?id=${a.id}" class="row-action">Éditer</a>
+            ${a.status !== 'published' ? `<button class="row-action" onclick="publishArticle('${a.id}')">Publier</button>` : ''}
+            <button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="deleteArticle('${a.id}')">Supprimer</button>
+          </div>
+        </td>
+      </tr>
+    `).join('')
+  }
+
+  async function publishArticle(id) {
+    await sb.from('articles').update({ status: 'published' }).eq('id', id)
+    showToast('Article publié !', 'success')
+    loadArticles()
+  }
+
+  async function deleteArticle(id) {
+    if (!confirm('Supprimer cet article définitivement ?')) return
+    await sb.from('articles').delete().eq('id', id)
+    showToast('Article supprimé.', 'success')
+    loadArticles()
+  }
+
+  function formatDate(str) {
+    if (!str) return '—'
+    return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>

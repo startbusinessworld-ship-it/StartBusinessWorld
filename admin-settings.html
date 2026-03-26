@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paramètres — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'settings'</script>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .settings-section{margin-bottom:24px}
+    .settings-title{font-size:0.75rem;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:10px}
+    .settings-card{background:var(--bg);border:0.5px solid var(--subtle);border-radius:10px;overflow:hidden}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:0.5px solid var(--subtle)}
+    .settings-row:last-child{border-bottom:none}
+    .settings-label{font-size:0.85rem;font-weight:500;margin-bottom:2px}
+    .settings-desc{font-size:0.72rem;color:var(--muted)}
+    .toggle{width:38px;height:22px;background:var(--subtle);border-radius:11px;position:relative;cursor:pointer;transition:background 0.2s;flex-shrink:0}
+    .toggle.on{background:#3B6D11}
+    .toggle::after{content:'';position:absolute;width:16px;height:16px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left 0.2s}
+    .toggle.on::after{left:19px}
+    .danger-zone{border:1px solid rgba(192,57,43,0.2);border-radius:10px;padding:16px}
+    .danger-title{font-size:0.75rem;font-weight:500;text-transform:uppercase;letter-spacing:0.08em;color:var(--red);margin-bottom:10px}
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item active" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Paramètres</h1>
+        <div class="page-date">Configuration du site</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-primary" onclick="saveSettings()">Sauvegarder</button>
+      </div>
+    </div>
+
+    <div class="content-area" style="max-width:700px">
+
+      <!-- INFOS SITE -->
+      <div class="settings-section">
+        <div class="settings-title">Informations du site</div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div class="field-group">
+            <label class="field-label">Nom du site</label>
+            <input type="text" class="field-input" id="siteName" value="Start Business World">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tagline</label>
+            <input type="text" class="field-input" id="siteTagline" value="Le business mondial, décrypté.">
+          </div>
+          <div class="field-group">
+            <label class="field-label">URL du site</label>
+            <input type="url" class="field-input" id="siteUrl" value="https://start-business-world.vercel.app">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email de contact</label>
+            <input type="email" class="field-input" id="contactEmail" value="hello@startbusinessworld.com">
+          </div>
+        </div>
+      </div>
+
+      <!-- RÉSEAUX SOCIAUX -->
+      <div class="settings-section">
+        <div class="settings-title">Réseaux sociaux</div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div class="field-group">
+            <label class="field-label">Instagram</label>
+            <input type="text" class="field-input" id="instagram" value="@startbusinessworld">
+          </div>
+          <div class="field-group">
+            <label class="field-label">YouTube</label>
+            <input type="text" class="field-input" id="youtube" value="@startbusinessworld">
+          </div>
+          <div class="field-group">
+            <label class="field-label">TikTok</label>
+            <input type="text" class="field-input" id="tiktok" value="@startbusinessworld">
+          </div>
+        </div>
+      </div>
+
+      <!-- CLUB SBW -->
+      <div class="settings-section">
+        <div class="settings-title">Club SBW — Abonnement</div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div class="field-group">
+            <label class="field-label">Prix d'essai (€/mois)</label>
+            <input type="number" class="field-input" id="trialPrice" value="1" step="0.01">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Durée d'essai (mois)</label>
+            <input type="number" class="field-input" id="trialDuration" value="3">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Prix plein (€/mois)</label>
+            <input type="number" class="field-input" id="fullPrice" value="29" step="0.01">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Stripe Public Key</label>
+            <input type="text" class="field-input" id="stripeKey" placeholder="pk_live_...">
+          </div>
+        </div>
+      </div>
+
+      <!-- EMAIL -->
+      <div class="settings-section">
+        <div class="settings-title">Emails — Resend</div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div class="field-group">
+            <label class="field-label">Nom expéditeur par défaut</label>
+            <input type="text" class="field-input" id="fromName" value="Start Business World">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Email expéditeur</label>
+            <input type="email" class="field-input" id="fromEmail" value="hello@startbusinessworld.com">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Resend API Key</label>
+            <input type="password" class="field-input" id="resendKey" placeholder="re_...">
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATIONS -->
+      <div class="settings-section">
+        <div class="settings-title">Notifications</div>
+        <div class="settings-card">
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Nouveau membre</div>
+              <div class="settings-desc">Recevoir un email quand quelqu'un rejoint le Club SBW</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Annulation d'abonnement</div>
+              <div class="settings-desc">Être alerté quand un membre annule</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Nouvel article soumis</div>
+              <div class="settings-desc">Être alerté quand un rédacteur soumet un article</div>
+            </div>
+            <div class="toggle on" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="settings-row">
+            <div>
+              <div class="settings-label">Rapport hebdomadaire</div>
+              <div class="settings-desc">Récapitulatif visites, revenus et membres chaque lundi</div>
+            </div>
+            <div class="toggle" onclick="this.classList.toggle('on')"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MON COMPTE -->
+      <div class="settings-section">
+        <div class="settings-title">Mon compte</div>
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:12px">
+          <div class="field-group">
+            <label class="field-label">Nom complet</label>
+            <input type="text" class="field-input" id="myName" placeholder="Ton nom">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Nouveau mot de passe</label>
+            <input type="password" class="field-input" id="newPassword" placeholder="Laisser vide pour ne pas changer">
+          </div>
+          <button class="btn-ghost" style="width:fit-content" onclick="updatePassword()">Mettre à jour le mot de passe</button>
+        </div>
+      </div>
+
+      <!-- ZONE DANGER -->
+      <div class="danger-zone">
+        <div class="danger-title">Zone dangereuse</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:0.85rem;font-weight:500">Se déconnecter</div>
+            <div style="font-size:0.72rem;color:var(--muted)">Terminer la session admin</div>
+          </div>
+          <button class="btn-red" onclick="handleLogout()">Se déconnecter</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    if (profile.full_name) document.getElementById('myName').value = profile.full_name
+  }
+
+  async function saveSettings() {
+    const name = document.getElementById('myName').value.trim()
+    if (name) {
+      const { data: { user } } = await sb.auth.getUser()
+      await sb.from('users').update({ full_name: name }).eq('id', user.id)
+    }
+    showToast('Paramètres sauvegardés.', 'success')
+  }
+
+  async function updatePassword() {
+    const pwd = document.getElementById('newPassword').value
+    if (!pwd) return
+    if (pwd.length < 6) { showToast('Mot de passe trop court (6 caractères min).', 'error'); return }
+    const { error } = await sb.auth.updateUser({ password: pwd })
+    if (error) { showToast('Erreur : ' + error.message, 'error'); return }
+    document.getElementById('newPassword').value = ''
+    showToast('Mot de passe mis à jour.', 'success')
+  }
+
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>
