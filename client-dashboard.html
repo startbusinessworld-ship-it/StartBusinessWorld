@@ -326,10 +326,57 @@
       .content-grid { grid-template-columns: 1fr; }
       .right-sidebar { display: none; }
     }
+
+    /* MOBILE NAV DASHBOARD */
+    .mobile-topbar {
+      display:none; background:var(--dark); color:#F0EDE4;
+      padding:0 1.2rem; height:52px;
+      align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:100;
+      border-bottom:1px solid rgba(255,255,255,0.07);
+    }
+    .mobile-topbar-logo { font-family:'DM Serif Display',serif; font-size:1rem; }
+    .mobile-ham { display:flex; flex-direction:column; gap:5px; cursor:pointer; padding:5px; }
+    .mobile-ham span { display:block; width:20px; height:2px; background:#F0EDE4; border-radius:2px; transition:all 0.25s; }
+    .mobile-ham.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+    .mobile-ham.open span:nth-child(2) { opacity:0; }
+    .mobile-ham.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+    .mobile-sidebar-overlay {
+      display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5);
+      z-index:200;
+    }
+    .mobile-sidebar-overlay.open { display:block; }
+    @media(max-width:960px){
+      .layout { grid-template-columns:1fr; }
+      .sidebar { display:none; position:fixed; left:-240px; top:0; bottom:0; z-index:201; transition:left 0.25s; }
+      .sidebar.open { display:flex; left:0; }
+      .mobile-topbar { display:flex; }
+      .main { padding-top:0; }
+      .topbar { display:none; }
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+      .content-grid { grid-template-columns:1fr; }
+      .right-sidebar { display:flex; }
+      .content { padding:1rem; }
+      .welcome-banner { flex-direction:column; gap:1rem; padding:1.5rem; }
+      .welcome-progress { text-align:left; }
+      .progress-bar-wrap { width:100%; }
+    }
+    @media(max-width:480px){
+      .stats-row { grid-template-columns:1fr 1fr; gap:8px; }
+      .stat-card { padding:10px 12px; }
+      .stat-value { font-size:1.2rem; }
+    }
   </style>
 </head>
 <body>
 
+<div class="mobile-topbar">
+  <div class="mobile-topbar-logo">Club SBW</div>
+  <div class="mobile-ham" id="mobileHam" onclick="toggleSidebar()">
+    <span></span><span></span><span></span>
+  </div>
+</div>
+<div class="mobile-sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 <div class="layout">
 
   <!-- SIDEBAR -->
@@ -808,5 +855,16 @@
 
   init()
 </script>
+  <script>
+    function toggleSidebar(){
+      var s=document.querySelector('.sidebar'),
+          o=document.getElementById('sidebarOverlay'),
+          h=document.getElementById('mobileHam');
+      s.classList.toggle('open');
+      o.classList.toggle('open');
+      h.classList.toggle('open');
+      document.body.style.overflow=s.classList.contains('open')?'hidden':'';
+    }
+  </script>
 </body>
 </html>

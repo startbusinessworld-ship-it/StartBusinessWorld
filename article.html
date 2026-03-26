@@ -649,10 +649,20 @@
        RESPONSIVE
     ============================================= */
     @media (max-width: 900px) {
+      nav { grid-template-columns: auto 1fr auto; padding:0 1rem; }
       .article-layout { grid-template-columns: 1fr; }
       .article-body { border-right: none; padding: 2rem 1.2rem; }
       .sidebar { display: none; }
       .related-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      nav { grid-template-columns: auto 1fr auto; }
+      .nav-logo { text-align:center; font-size:0.95rem; }
+      .nav-login { display:none; }
+      .article-header { padding: 2rem 1.2rem 1.5rem; }
+      .byline-right { display: none; }
+      .article-header h1 { font-size:1.6rem; }
+      .article-deck { font-size:0.9rem; }
     }
 
     @media (max-width: 600px) {
@@ -662,6 +672,22 @@
       .article-header { padding: 2rem 1.2rem 1.5rem; }
       .byline-right { display: none; }
     }
+
+    /* === HAMBURGER & MENU MOBILE === */
+    .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; border-radius:4px; }
+    .hamburger span { display:block; width:22px; height:2px; background:var(--ink); border-radius:2px; transition:all 0.25s; }
+    .hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity:0; }
+    .hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+    .mobile-menu { display:none; position:fixed; inset:0; top:54px; background:var(--bg); z-index:99; flex-direction:column; border-top:1px solid var(--subtle); overflow-y:auto; }
+    .mobile-menu.open { display:flex; }
+    .mm-section { padding:1.2rem 1.5rem; border-bottom:1px solid var(--subtle); display:flex; flex-direction:column; gap:0.3rem; }
+    .mm-link { display:flex; align-items:center; padding:0.8rem 1rem; border-radius:8px; font-size:0.92rem; color:var(--ink); cursor:pointer; transition:background 0.12s; font-family:inherit; text-decoration:none; }
+    .mm-link:hover { background:var(--surface); }
+    .mm-link.primary { background:var(--ink); color:var(--bg); font-weight:500; justify-content:center; margin-top:0.3rem; }
+    .mm-link.primary:hover { opacity:0.88; }
+    .mm-link.secondary { border:0.5px solid var(--subtle); justify-content:center; font-weight:500; }
+    @media(max-width:768px) { .hamburger { display:flex; } }
   </style>
 </head>
 <body>
@@ -671,17 +697,24 @@
 
   <!-- NAV -->
   <nav>
-    <div class="nav-left">
-      <a href="index.html" class="nav-back">← Blog</a>
-      <span class="nav-sep">/</span>
-      <span class="nav-breadcrumb">Business Chine</span>
-    </div>
+    <div class="hamburger" id="ham"><span></span><span></span><span></span></div>
     <a href="index.html" class="nav-logo">Start Business World</a>
     <div class="nav-right">
-      <div class="nav-login">Se connecter</div>
+      <a href="client-login.html" class="nav-login">Se connecter</a>
       <a href="club.html" class="nav-join">Le Club SBW</a>
     </div>
   </nav>
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mm-section">
+      <a href="client-login.html" class="mm-link secondary">Se connecter</a>
+      <a href="club.html" class="mm-link primary">Le Club SBW →</a>
+    </div>
+    <div class="mm-section">
+      <a href="index.html" class="mm-link">🏠 Accueil</a>
+      <a href="blog.html" class="mm-link">📝 Blog</a>
+      <a href="club.html" class="mm-link">⭐ Le Club SBW</a>
+    </div>
+  </div>
 
   <!-- ARTICLE HEADER -->
   <header class="article-header">
@@ -1010,5 +1043,25 @@
     }
   </script>
 
+
+  <script>
+    (function(){
+      var ham=document.getElementById('ham'), menu=document.getElementById('mobileMenu');
+      if(!ham||!menu) return;
+      ham.addEventListener('click',function(){
+        menu.classList.toggle('open'); ham.classList.toggle('open');
+        document.body.style.overflow=menu.classList.contains('open')?'hidden':'';
+      });
+      menu.querySelectorAll('.mm-link').forEach(function(el){
+        el.addEventListener('click',function(){
+          menu.classList.remove('open'); ham.classList.remove('open');
+          document.body.style.overflow='';
+        });
+      });
+      window.addEventListener('resize',function(){
+        if(window.innerWidth>768){ menu.classList.remove('open'); ham.classList.remove('open'); document.body.style.overflow=''; }
+      });
+    })();
+  </script>
 </body>
 </html>
