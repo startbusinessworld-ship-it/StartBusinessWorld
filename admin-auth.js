@@ -13,6 +13,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 const ROLE_ACCESS = {
   admin:  ['dashboard', 'articles', 'newsletter', 'members', 'revenue', 'affiliation', 'settings', 'team'],
   writer: ['articles'],
+  contributor: ['articles', 'newsletter'],
   editor: ['newsletter']
 }
 
@@ -61,6 +62,7 @@ function getDefaultPage(role) {
   if (role === 'admin')  return 'admin-dashboard.html'
   if (role === 'writer') return 'admin-articles.html'
   if (role === 'editor') return 'admin-newsletter.html'
+  if (role === 'contributor') return 'admin-articles.html'
   return 'admin-login.html'
 }
 

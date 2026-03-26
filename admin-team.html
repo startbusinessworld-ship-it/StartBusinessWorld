@@ -102,6 +102,10 @@
               <div style="font-size:0.78rem;color:var(--muted)">Rédiger et soumettre des articles uniquement. Pas de publication directe — toi tu valides.</div>
             </div>
             <div style="display:flex;align-items:flex-start;gap:10px">
+              <span class="role-badge role-writer">Collaborateur</span>
+              <div style="font-size:0.78rem;color:var(--muted)">Accès articles ET newsletter. Idéal pour un collaborateur polyvalent.
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:10px">
               <span class="role-badge role-editor">Comm</span>
               <div style="font-size:0.78rem;color:var(--muted)">Créer et envoyer des campagnes email et newsletter uniquement.</div>
             </div>
@@ -158,8 +162,10 @@
       <div class="field-group">
         <label class="field-label">Rôle</label>
         <select class="field-select" id="inviteRole">
+          
           <option value="writer">Rédacteur — articles uniquement</option>
           <option value="editor">Chargé de comm — newsletter uniquement</option>
+          <option value="contributor">Collaborateur — articles + newsletter</option>
           <option value="admin">Admin — accès complet</option>
         </select>
       </div>
@@ -196,8 +202,8 @@
     el.innerHTML = data.map(u => {
       const name = u.full_name || u.email
       const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-      const roleClass = u.role === 'admin' ? 'role-admin' : u.role === 'writer' ? 'role-writer' : 'role-editor'
-      const roleLabel = u.role === 'admin' ? 'Admin' : u.role === 'writer' ? 'Rédacteur' : 'Chargé de comm'
+      const roleClass = u.role === 'admin' ? 'role-admin' : u.role === 'writer' ? 'role-writer' : u.role === 'contributor' ? 'role-writer' : 'role-editor'
+      const roleLabel = u.role === 'admin' ? 'Admin' : u.role === 'writer' ? 'Rédacteur' : u.role === 'contributor' ? 'Collaborateur' : 'Chargé de comm'
       return `
         <div class="team-card">
           <div class="team-avatar">${initials}</div>
@@ -209,6 +215,7 @@
           <div style="display:flex;gap:6px">
             <select class="field-select" style="font-size:0.75rem;padding:5px 8px;width:auto" onchange="changeRole('${u.id}', this.value)">
               <option value="writer" ${u.role==='writer'?'selected':''}>Rédacteur</option>
+              <option value="contributor" ${u.role==='contributor'?'selected':''}>Collaborateur</option>
               <option value="editor" ${u.role==='editor'?'selected':''}>Comm</option>
               <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
             </select>
