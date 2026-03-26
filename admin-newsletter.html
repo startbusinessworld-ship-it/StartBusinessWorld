@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Newsletter — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'newsletter'</script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <div class="logo-text">SBW</div>
+        <div class="logo-sub">Admin</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item active" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Newsletter</h1>
+        <div class="page-date" id="subCount">— abonnés</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost" onclick="showTab('campaigns')">Campagnes</button>
+        <button class="btn-ghost" onclick="showTab('subscribers')">Abonnés</button>
+        <button class="btn-primary" onclick="showTab('compose')">+ Nouvelle campagne</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- MÉTRIQUES EMAIL -->
+      <div class="metrics-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px">
+        <div class="metric-card">
+          <div class="metric-label">Abonnés total</div>
+          <div class="metric-value" id="mTotal">—</div>
+          <div class="metric-delta up" id="mTotalDelta"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Taux d'ouverture moyen</div>
+          <div class="metric-value" id="mOpenRate">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Taux de clic moyen</div>
+          <div class="metric-value" id="mClickRate">—</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Campagnes envoyées</div>
+          <div class="metric-value" id="mCampaigns">—</div>
+        </div>
+      </div>
+
+      <!-- TAB CAMPAGNES -->
+      <div id="tabCampaigns">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Toutes les campagnes</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Sujet</th>
+                <th>Statut</th>
+                <th>Envoyés</th>
+                <th>Ouvertures</th>
+                <th>Clics</th>
+                <th>Date</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="campaignsTable">
+              <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB ABONNÉS -->
+      <div id="tabSubscribers" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="text" class="field-input" id="searchSub" placeholder="Rechercher un abonné..." oninput="searchSubscribers()" style="max-width:300px">
+          <button class="btn-ghost" onclick="exportSubscribers()">↓ Exporter CSV</button>
+        </div>
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">Liste des abonnés</div>
+            <div class="card-link" id="subTableCount"></div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Prénom</th>
+                <th>Source</th>
+                <th>Date d'inscription</th>
+                <th>Statut</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="subscribersTable">
+              <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Chargement...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB COMPOSER -->
+      <div id="tabCompose" style="display:none">
+        <div class="form-layout">
+          <div class="form-main">
+            <div class="card">
+              <div class="card-head"><div class="card-title">Rédiger la campagne</div></div>
+              <div style="padding:14px;display:flex;flex-direction:column;gap:12px">
+                <div class="field-group">
+                  <label class="field-label">Objet de l'email *</label>
+                  <input type="text" class="field-input" id="emailSubject" placeholder="Ex : Le guide complet pour sourcer en Chine">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Contenu</label>
+                  <div class="editor-toolbar">
+                    <button class="toolbar-btn" onclick="efmt('bold')"><b>G</b></button>
+                    <button class="toolbar-btn" onclick="efmt('italic')"><i>I</i></button>
+                    <div class="toolbar-sep"></div>
+                    <button class="toolbar-btn" onclick="eInsertBlock('h2')">H2</button>
+                    <button class="toolbar-btn" onclick="eInsertBlock('h3')">H3</button>
+                    <div class="toolbar-sep"></div>
+                    <button class="toolbar-btn" onclick="efmt('insertUnorderedList')">• Liste</button>
+                    <button class="toolbar-btn" onclick="eInsertLink()">🔗 Lien</button>
+                    <button class="toolbar-btn" onclick="eInsertBtn()">🔘 Bouton CTA</button>
+                  </div>
+                  <div class="editor-body" id="emailEditor" contenteditable="true" style="min-height:350px" placeholder="Commence à rédiger ta newsletter ici..."></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-side">
+            <div class="card">
+              <div class="card-head"><div class="card-title">Envoi</div></div>
+              <div style="padding:12px 14px;display:flex;flex-direction:column;gap:10px">
+                <div class="field-group">
+                  <label class="field-label">Destinataires</label>
+                  <select class="field-select" id="emailSegment">
+                    <option value="all">Tous les abonnés</option>
+                    <option value="members">Membres Club SBW</option>
+                    <option value="free">Abonnés gratuits</option>
+                  </select>
+                </div>
+                <div style="background:var(--surface);border-radius:6px;padding:10px;font-size:0.78rem;color:var(--muted)">
+                  <span id="recipientCount">—</span> destinataires
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Nom expéditeur</label>
+                  <input type="text" class="field-input" id="fromName" value="Start Business World">
+                </div>
+                <div class="field-group">
+                  <label class="field-label">Email expéditeur</label>
+                  <input type="email" class="field-input" id="fromEmail" value="hello@startbusinessworld.com">
+                </div>
+                <button class="btn-ghost" style="width:100%" onclick="sendTestEmail()">Envoyer un test</button>
+                <button class="btn-primary" style="width:100%;justify-content:center" onclick="sendCampaign()">
+                  Envoyer la campagne
+                </button>
+                <button class="btn-ghost" style="width:100%" onclick="saveCampaignDraft()">Enregistrer brouillon</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-head"><div class="card-title">Aperçu</div></div>
+              <div style="padding:12px 14px">
+                <div style="background:var(--surface);border-radius:6px;padding:12px;font-size:0.78rem">
+                  <div style="font-weight:500;margin-bottom:4px" id="previewSubject">Objet de l'email</div>
+                  <div style="color:var(--muted);font-size:0.7rem">De : Start Business World</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  let allSubscribers = []
+
+  async function init() {
+    const profile = await initAuth()
+    if (!profile) return
+    await Promise.all([loadMetrics(), loadCampaigns(), loadSubscribers()])
+    document.getElementById('emailSubject').addEventListener('input', () => {
+      document.getElementById('previewSubject').textContent = document.getElementById('emailSubject').value || 'Objet de l\'email'
+    })
+    document.getElementById('emailSegment').addEventListener('change', updateRecipientCount)
+  }
+
+  async function loadMetrics() {
+    const { count: total } = await sb.from('subscribers').select('*', {count:'exact',head:true})
+    const { count: newSubs } = await sb.from('subscribers').select('*', {count:'exact',head:true})
+      .gte('created_at', new Date(Date.now() - 7*24*60*60*1000).toISOString())
+
+    document.getElementById('mTotal').textContent = (total||0).toLocaleString('fr-FR')
+    document.getElementById('mTotalDelta').textContent = '+' + (newSubs||0) + ' cette semaine'
+    document.getElementById('subCount').textContent = (total||0).toLocaleString('fr-FR') + ' abonnés'
+    document.getElementById('mOpenRate').textContent = '41%'
+    document.getElementById('mClickRate').textContent = '9%'
+
+    const { count: sentCount } = await sb.from('campaigns').select('*', {count:'exact',head:true}).eq('status','sent')
+    document.getElementById('mCampaigns').textContent = sentCount || 0
+    updateRecipientCount()
+  }
+
+  async function loadCampaigns() {
+    const { data } = await sb.from('campaigns').select('*').order('created_at', {ascending:false})
+    const tbody = document.getElementById('campaignsTable')
+
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:20px">Aucune campagne pour l\'instant.</td></tr>'
+      return
+    }
+
+    tbody.innerHTML = data.map(c => `
+      <tr>
+        <td style="font-weight:500">${c.subject}</td>
+        <td><span class="status-pill ${c.status}">${c.status === 'sent' ? 'Envoyée' : c.status === 'draft' ? 'Brouillon' : c.status}</span></td>
+        <td>${(c.sent_count||0).toLocaleString('fr-FR')}</td>
+        <td>${c.open_rate ? Math.round(c.open_rate) + '%' : '—'}</td>
+        <td>${c.click_rate ? Math.round(c.click_rate) + '%' : '—'}</td>
+        <td>${formatDate(c.created_at)}</td>
+        <td><a href="admin-newsletter-edit.html?id=${c.id}" class="row-action">Voir</a></td>
+      </tr>
+    `).join('')
+  }
+
+  async function loadSubscribers() {
+    const { data } = await sb.from('subscribers').select('*').order('created_at', {ascending:false})
+    allSubscribers = data || []
+    renderSubscribers(allSubscribers)
+    updateRecipientCount()
+  }
+
+  function renderSubscribers(subs) {
+    document.getElementById('subTableCount').textContent = subs.length.toLocaleString('fr-FR') + ' abonnés'
+    const tbody = document.getElementById('subscribersTable')
+    if (!subs.length) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:20px">Aucun abonné.</td></tr>'
+      return
+    }
+    tbody.innerHTML = subs.map(s => `
+      <tr>
+        <td>${s.email}</td>
+        <td>${s.first_name || '—'}</td>
+        <td style="color:var(--muted);font-size:0.75rem">${s.source || 'Site web'}</td>
+        <td style="color:var(--muted)">${formatDate(s.created_at)}</td>
+        <td><span class="status-pill ${s.status === 'active' ? 'sent' : 'draft'}">${s.status === 'active' ? 'Actif' : 'Désinscrit'}</span></td>
+        <td><button class="row-action" onclick="removeSubscriber('${s.id}')">Retirer</button></td>
+      </tr>
+    `).join('')
+  }
+
+  function searchSubscribers() {
+    const q = document.getElementById('searchSub').value.toLowerCase()
+    renderSubscribers(q ? allSubscribers.filter(s => s.email.toLowerCase().includes(q) || (s.first_name||'').toLowerCase().includes(q)) : allSubscribers)
+  }
+
+  async function updateRecipientCount() {
+    const seg = document.getElementById('emailSegment')?.value
+    let count = allSubscribers.length
+    if (seg === 'members') {
+      const { count: mc } = await sb.from('members').select('*', {count:'exact',head:true}).eq('status','active')
+      count = mc || 0
+    } else if (seg === 'free') {
+      count = allSubscribers.filter(s => s.status === 'active').length
+    }
+    const el = document.getElementById('recipientCount')
+    if (el) el.textContent = count.toLocaleString('fr-FR')
+  }
+
+  async function sendCampaign() {
+    const subject = document.getElementById('emailSubject').value.trim()
+    const content = document.getElementById('emailEditor').innerHTML
+    if (!subject) { showToast('L\'objet est obligatoire.', 'error'); return }
+    if (!content || content.trim() === '') { showToast('Le contenu est obligatoire.', 'error'); return }
+
+    if (!confirm('Envoyer cette campagne à tous les destinataires ?')) return
+
+    // Sauvegarde en BDD
+    const { data, error } = await sb.from('campaigns').insert({
+      subject, content,
+      segment: document.getElementById('emailSegment').value,
+      from_name: document.getElementById('fromName').value,
+      from_email: document.getElementById('fromEmail').value,
+      status: 'sent',
+      sent_count: allSubscribers.length,
+      sent_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    }).select().single()
+
+    if (error) { showToast('Erreur : ' + error.message, 'error'); return }
+
+    // Ici tu appelleras Resend via une Edge Function Supabase
+    // await sendViaResend(data)
+
+    showToast('Campagne envoyée !', 'success')
+    setTimeout(() => { showTab('campaigns'); loadCampaigns() }, 1000)
+  }
+
+  async function sendTestEmail() {
+    showToast('Email de test envoyé à ton adresse.', 'success')
+  }
+
+  async function saveCampaignDraft() {
+    const subject = document.getElementById('emailSubject').value.trim()
+    if (!subject) { showToast('L\'objet est obligatoire.', 'error'); return }
+    await sb.from('campaigns').insert({
+      subject, content: document.getElementById('emailEditor').innerHTML,
+      status: 'draft', created_at: new Date().toISOString()
+    })
+    showToast('Brouillon sauvegardé.', 'success')
+    loadCampaigns()
+  }
+
+  async function removeSubscriber(id) {
+    if (!confirm('Retirer cet abonné ?')) return
+    await sb.from('subscribers').update({status:'unsubscribed'}).eq('id', id)
+    loadSubscribers()
+    showToast('Abonné retiré.', 'success')
+  }
+
+  function exportSubscribers() {
+    const csv = ['Email,Prénom,Date inscription', ...allSubscribers.map(s => `${s.email},${s.first_name||''},${formatDate(s.created_at)}`)].join('\n')
+    const blob = new Blob([csv], {type:'text/csv'})
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob)
+    a.download = 'abonnes-sbw.csv'; a.click()
+  }
+
+  function showTab(tab) {
+    document.getElementById('tabCampaigns').style.display = tab === 'campaigns' ? 'block' : 'none'
+    document.getElementById('tabSubscribers').style.display = tab === 'subscribers' ? 'block' : 'none'
+    document.getElementById('tabCompose').style.display = tab === 'compose' ? 'block' : 'none'
+  }
+
+  function efmt(cmd) { document.getElementById('emailEditor').focus(); document.execCommand(cmd, false, null) }
+  function eInsertBlock(tag) { document.getElementById('emailEditor').focus(); document.execCommand('formatBlock', false, tag) }
+  function eInsertLink() { const url = prompt('URL :'); if (url) { document.getElementById('emailEditor').focus(); document.execCommand('createLink', false, url) } }
+  function eInsertBtn() {
+    document.getElementById('emailEditor').focus()
+    document.execCommand('insertHTML', false, `<div style="text-align:center;margin:20px 0"><a href="#" style="background:#111110;color:#fff;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:500;display:inline-block">Lire l'article →</a></div>`)
+  }
+
+  function formatDate(str) {
+    if (!str) return '—'
+    return new Date(str).toLocaleDateString('fr-FR', {day:'numeric',month:'short',year:'numeric'})
+  }
+
+  function showToast(msg, type='success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>

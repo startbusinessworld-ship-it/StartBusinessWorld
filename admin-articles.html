@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouvel article — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'articles'</script>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .word-count{font-size:0.7rem;color:var(--muted);margin-top:4px;text-align:right}
+    .toolbar-group{display:flex;gap:2px;padding:0 4px;border-right:1px solid var(--subtle)}
+    .toolbar-group:last-child{border-right:none}
+    .char-remaining{font-size:0.68rem;color:var(--muted);text-align:right;margin-top:2px}
+    .preview-box{background:var(--surface);border:0.5px solid var(--subtle);border-radius:6px;padding:12px;font-size:0.8rem;color:var(--muted);min-height:60px;line-height:1.6}
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo">
+        <div class="logo-text">SBW</div>
+        <div class="logo-sub">Admin</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles.html" class="nav-item active" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-team.html" class="nav-item" data-access="team">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+          Équipe & Rôles
+        </a>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title" id="pageTitle">Nouvel article</h1>
+        <div class="page-date" id="saveStatus">Non sauvegardé</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-ghost" onclick="saveDraft()">Enregistrer brouillon</button>
+        <button class="btn-ghost" id="previewBtn" onclick="previewArticle()">Aperçu ↗</button>
+        <button class="btn-primary" id="submitBtn" onclick="submitArticle()">Soumettre pour relecture</button>
+        <button class="btn-red" id="publishBtn" onclick="publishArticle()" style="display:none">Publier</button>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <div class="form-layout">
+
+        <!-- ÉDITEUR PRINCIPAL -->
+        <div class="form-main">
+
+          <!-- TITRE -->
+          <div class="field-group">
+            <label class="field-label">Titre de l'article *</label>
+            <input type="text" class="field-input" id="artTitle" placeholder="Ex : Comment sourcer en Chine sans se faire arnaquer"
+              style="font-size:1.05rem;font-weight:500;padding:12px 14px"
+              oninput="updateSlug();autoSave()">
+          </div>
+
+          <!-- ACCROCHE -->
+          <div class="field-group">
+            <label class="field-label">Accroche (description courte) *</label>
+            <textarea class="field-textarea" id="artDeck" rows="2"
+              placeholder="Résumé en 1-2 phrases — apparaît sur la home et dans Google."
+              oninput="updateMetaPreview();autoSave()"></textarea>
+            <div class="char-remaining" id="deckCount">0 / 160 caractères</div>
+          </div>
+
+          <!-- ÉDITEUR RICHE -->
+          <div class="field-group">
+            <label class="field-label">Contenu *</label>
+            <div class="editor-toolbar">
+              <div class="toolbar-group">
+                <button class="toolbar-btn" onclick="fmt('bold')" title="Gras"><b>G</b></button>
+                <button class="toolbar-btn" onclick="fmt('italic')" title="Italique"><i>I</i></button>
+                <button class="toolbar-btn" onclick="fmt('underline')" title="Souligné"><u>S</u></button>
+              </div>
+              <div class="toolbar-group">
+                <button class="toolbar-btn" onclick="insertHeading(2)">H2</button>
+                <button class="toolbar-btn" onclick="insertHeading(3)">H3</button>
+              </div>
+              <div class="toolbar-group">
+                <button class="toolbar-btn" onclick="fmt('insertUnorderedList')">• Liste</button>
+                <button class="toolbar-btn" onclick="fmt('insertOrderedList')">1. Liste</button>
+                <button class="toolbar-btn" onclick="insertBlockquote()">❝ Citation</button>
+              </div>
+              <div class="toolbar-group">
+                <button class="toolbar-btn" onclick="insertLink()">🔗 Lien</button>
+                <button class="toolbar-btn" onclick="insertCallout()">💡 Note</button>
+                <button class="toolbar-btn" onclick="insertWarning()">⚠️ Avertissement</button>
+              </div>
+              <div class="toolbar-group">
+                <button class="toolbar-btn" onclick="fmt('removeFormat')">✕ Effacer</button>
+              </div>
+            </div>
+            <div class="editor-body" id="editor" contenteditable="true"
+              oninput="updateWordCount();autoSave()"
+              placeholder="Commence à rédiger ton article ici..."></div>
+            <div class="word-count" id="wordCount">0 mots</div>
+          </div>
+
+        </div>
+
+        <!-- SIDEBAR FORMULAIRE -->
+        <div class="form-side">
+
+          <!-- STATUT -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">Statut</div></div>
+            <div style="padding:12px 14px">
+              <div class="field-group" style="margin-bottom:10px">
+                <label class="field-label">État</label>
+                <select class="field-select" id="artStatus">
+                  <option value="draft">Brouillon</option>
+                  <option value="review">En relecture</option>
+                  <option value="published">Publié</option>
+                </select>
+              </div>
+              <div class="field-group">
+                <label class="field-label">URL de l'article</label>
+                <input type="text" class="field-input" id="artSlug" placeholder="url-de-larticle" style="font-size:0.8rem;color:var(--muted)">
+              </div>
+            </div>
+          </div>
+
+          <!-- CATÉGORIE & TAGS -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">Catégorie</div></div>
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+              <select class="field-select" id="artCategory" onchange="autoSave()">
+                <option value="">Choisir une catégorie</option>
+                <option value="Business Chine">Business Chine</option>
+                <option value="Fiscalité">Fiscalité</option>
+                <option value="Expatriation">Expatriation</option>
+                <option value="E-commerce">E-commerce</option>
+                <option value="Mindset">Mindset</option>
+                <option value="Finance">Finance</option>
+                <option value="Import-Export">Import-Export</option>
+                <option value="Création société">Création société</option>
+              </select>
+              <div class="field-group">
+                <label class="field-label">Tags (séparés par virgule)</label>
+                <input type="text" class="field-input" id="artTags" placeholder="Alibaba, Sourcing, Import" oninput="autoSave()">
+              </div>
+            </div>
+          </div>
+
+          <!-- VIDÉO YOUTUBE -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">Vidéo YouTube</div></div>
+            <div style="padding:12px 14px">
+              <label class="field-label">ID de la vidéo</label>
+              <input type="text" class="field-input" id="artYoutubeId" placeholder="ex: dQw4w9WgXcQ" oninput="autoSave()" style="margin-top:4px">
+              <div style="font-size:0.68rem;color:var(--muted);margin-top:6px">
+                L'ID se trouve après <code>?v=</code> dans l'URL YouTube
+              </div>
+            </div>
+          </div>
+
+          <!-- OUTILS AFFILIATION -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">Outils mentionnés</div></div>
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;cursor:pointer"><input type="checkbox" value="Airwallex" class="aff-tool"> Airwallex</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;cursor:pointer"><input type="checkbox" value="Wise" class="aff-tool"> Wise</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;cursor:pointer"><input type="checkbox" value="LegalPlace" class="aff-tool"> LegalPlace</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;cursor:pointer"><input type="checkbox" value="Orus" class="aff-tool"> Orus</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;cursor:pointer"><input type="checkbox" value="Shopify" class="aff-tool"> Shopify</label>
+              <label style="display:flex;align-items:center;gap:8px;font-size:0.8rem;cursor:pointer"><input type="checkbox" value="Amazon FBA" class="aff-tool"> Amazon FBA</label>
+            </div>
+          </div>
+
+          <!-- SEO -->
+          <div class="card">
+            <div class="card-head"><div class="card-title">SEO</div></div>
+            <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+              <div class="field-group">
+                <label class="field-label">Meta titre</label>
+                <input type="text" class="field-input" id="artMetaTitle" placeholder="Titre pour Google" oninput="autoSave()">
+              </div>
+              <div class="field-group">
+                <label class="field-label">Meta description</label>
+                <textarea class="field-textarea" id="artMetaDesc" rows="2" placeholder="Description pour Google (150-160 caractères)" oninput="autoSave()"></textarea>
+              </div>
+              <div style="background:var(--surface);border:0.5px solid var(--subtle);border-radius:6px;padding:10px;font-size:0.75rem">
+                <div style="color:#1a0dab;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="seoTitle">Titre de l'article — Start Business World</div>
+                <div style="color:#006621;font-size:0.68rem;margin-bottom:2px">startbusinessworld.com/articles/<span id="seoSlug">url-article</span></div>
+                <div style="color:var(--muted)" id="seoDesc">L'accroche de ton article apparaîtra ici...</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+  let currentArticleId = null
+  let autoSaveTimer = null
+  let userProfile = null
+  let isAdmin = false
+
+  async function init() {
+    userProfile = await initAuth()
+    if (!userProfile) return
+
+    isAdmin = userProfile.role === 'admin'
+
+    // Admin peut publier directement
+    if (isAdmin) {
+      document.getElementById('publishBtn').style.display = 'inline-flex'
+      document.getElementById('submitBtn').textContent = 'Soumettre'
+    }
+
+    // Si édition d'un article existant
+    const params = new URLSearchParams(window.location.search)
+    const editId = params.get('id')
+    if (editId) {
+      await loadArticle(editId)
+      document.getElementById('pageTitle').textContent = 'Modifier l\'article'
+    }
+  }
+
+  async function loadArticle(id) {
+    const { data } = await sb.from('articles').select('*').eq('id', id).single()
+    if (!data) return
+    currentArticleId = id
+    document.getElementById('artTitle').value = data.title || ''
+    document.getElementById('artDeck').value = data.deck || ''
+    document.getElementById('artSlug').value = data.slug || ''
+    document.getElementById('artCategory').value = data.category || ''
+    document.getElementById('artTags').value = (data.tags || []).join(', ')
+    document.getElementById('artYoutubeId').value = data.youtube_id || ''
+    document.getElementById('artMetaTitle').value = data.meta_title || ''
+    document.getElementById('artMetaDesc').value = data.meta_description || ''
+    document.getElementById('artStatus').value = data.status || 'draft'
+    document.getElementById('editor').innerHTML = data.content || ''
+    ;(data.tools || []).forEach(t => {
+      document.querySelectorAll('.aff-tool').forEach(cb => {
+        if (cb.value === t) cb.checked = true
+      })
+    })
+    updateWordCount()
+    updateMetaPreview()
+  }
+
+  function getArticleData(status) {
+    const tools = [...document.querySelectorAll('.aff-tool:checked')].map(c => c.value)
+    return {
+      title: document.getElementById('artTitle').value.trim(),
+      deck: document.getElementById('artDeck').value.trim(),
+      slug: document.getElementById('artSlug').value.trim() || slugify(document.getElementById('artTitle').value),
+      category: document.getElementById('artCategory').value,
+      tags: document.getElementById('artTags').value.split(',').map(t => t.trim()).filter(Boolean),
+      youtube_id: document.getElementById('artYoutubeId').value.trim() || null,
+      meta_title: document.getElementById('artMetaTitle').value.trim(),
+      meta_description: document.getElementById('artMetaDesc').value.trim(),
+      content: document.getElementById('editor').innerHTML,
+      tools,
+      status,
+      author_id: userProfile?.id,
+      updated_at: new Date().toISOString()
+    }
+  }
+
+  async function saveDraft() {
+    await saveArticle('draft')
+  }
+
+  async function submitArticle() {
+    if (!document.getElementById('artTitle').value.trim()) {
+      showToast('Le titre est obligatoire.', 'error'); return
+    }
+    await saveArticle(isAdmin ? 'draft' : 'review')
+    showToast(isAdmin ? 'Brouillon sauvegardé.' : 'Article soumis pour relecture !', 'success')
+  }
+
+  async function publishArticle() {
+    await saveArticle('published')
+    showToast('Article publié !', 'success')
+  }
+
+  async function saveArticle(status) {
+    const data = getArticleData(status)
+    let result
+
+    if (currentArticleId) {
+      result = await sb.from('articles').update(data).eq('id', currentArticleId).select().single()
+    } else {
+      data.created_at = new Date().toISOString()
+      data.views = 0
+      result = await sb.from('articles').insert(data).select().single()
+    }
+
+    if (result.error) {
+      showToast('Erreur : ' + result.error.message, 'error')
+      return
+    }
+
+    if (!currentArticleId) {
+      currentArticleId = result.data.id
+      history.replaceState(null, '', '?id=' + currentArticleId)
+    }
+
+    document.getElementById('saveStatus').textContent = 'Sauvegardé à ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'})
+    showToast('Sauvegardé.', 'success')
+  }
+
+  function autoSave() {
+    clearTimeout(autoSaveTimer)
+    document.getElementById('saveStatus').textContent = 'Modifications non sauvegardées...'
+    autoSaveTimer = setTimeout(() => saveDraft(), 3000)
+  }
+
+  // Outils éditeur
+  function fmt(cmd) { document.getElementById('editor').focus(); document.execCommand(cmd, false, null) }
+
+  function insertHeading(level) {
+    document.getElementById('editor').focus()
+    document.execCommand('formatBlock', false, 'h' + level)
+  }
+
+  function insertBlockquote() {
+    document.getElementById('editor').focus()
+    document.execCommand('formatBlock', false, 'blockquote')
+  }
+
+  function insertLink() {
+    const url = prompt('URL du lien :')
+    if (url) { document.getElementById('editor').focus(); document.execCommand('createLink', false, url) }
+  }
+
+  function insertCallout() {
+    const sel = window.getSelection()
+    const text = sel.toString() || 'Contenu de la note...'
+    document.getElementById('editor').focus()
+    document.execCommand('insertHTML', false,
+      `<div style="margin:1rem 0;padding:12px 16px;border-left:3px solid #A67C3A;background:rgba(166,124,58,0.05);border-radius:0 6px 6px 0"><div style="font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#A67C3A;margin-bottom:4px">💡 Bon à savoir</div><p style="margin:0">${text}</p></div>`)
+  }
+
+  function insertWarning() {
+    document.getElementById('editor').focus()
+    document.execCommand('insertHTML', false,
+      `<div style="margin:1rem 0;padding:12px 16px;border-left:3px solid #C0392B;background:rgba(192,57,43,0.05);border-radius:0 6px 6px 0"><div style="font-size:0.65rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#C0392B;margin-bottom:4px">⚠️ Attention</div><p style="margin:0">Contenu de l'avertissement...</p></div>`)
+  }
+
+  function previewArticle() {
+    if (!currentArticleId) { showToast('Sauvegarde d\'abord l\'article.', 'error'); return }
+    window.open('../article.html?id=' + currentArticleId, '_blank')
+  }
+
+  // Helpers
+  function slugify(str) {
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')
+  }
+
+  function updateSlug() {
+    const title = document.getElementById('artTitle').value
+    document.getElementById('artSlug').value = slugify(title)
+    document.getElementById('seoTitle').textContent = title + ' — Start Business World'
+    document.getElementById('seoSlug').textContent = slugify(title)
+  }
+
+  function updateMetaPreview() {
+    const deck = document.getElementById('artDeck').value
+    document.getElementById('deckCount').textContent = deck.length + ' / 160 caractères'
+    document.getElementById('seoDesc').textContent = deck || 'L\'accroche apparaîtra ici...'
+  }
+
+  function updateWordCount() {
+    const text = document.getElementById('editor').innerText || ''
+    const words = text.trim().split(/\s+/).filter(w => w.length > 0).length
+    document.getElementById('wordCount').textContent = words.toLocaleString('fr-FR') + ' mots'
+  }
+
+  function showToast(msg, type='success') {
+    const t = document.getElementById('toast')
+    t.textContent = msg
+    t.className = 'toast ' + type + ' show'
+    setTimeout(() => t.classList.remove('show'), 2500)
+  }
+
+  init()
+</script>
+</body>
+</html>
