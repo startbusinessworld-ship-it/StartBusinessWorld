@@ -360,6 +360,8 @@
       display: flex;
       flex-direction: column;
       gap: 0.7rem;
+      box-sizing: border-box;
+      width: 100%;
     }
     .article:last-child { border-right: none; }
     .article:hover { background: var(--surface); }
@@ -896,9 +898,9 @@
 
       .themes-row { padding: 0; }
 
-      .articles { display:grid; grid-template-columns: 1fr; }
-      .article { display:flex; border-right:none; border-bottom: 1px solid var(--subtle); padding:1.5rem 1.2rem; }
-      .article.featured { grid-column: span 1; }
+      .articles { display:grid; grid-template-columns: 1fr; width:100%; }
+      .article { display:flex !important; flex-direction:column; border-right:none !important; border-bottom: 1px solid var(--subtle); padding:1.5rem 1.2rem; width:100%; box-sizing:border-box; }
+      .article.featured { grid-column: span 1; background: var(--ink); }
       .article { padding: 1.5rem; }
 
       .tools-section { grid-template-columns: 1fr; }
@@ -1455,6 +1457,9 @@
 
         container.appendChild(card);
       }
+
+      // Forcer l'affichage sur mobile
+      container.style.display = "grid";
     }
 
     function filterTheme(cat, el) {
