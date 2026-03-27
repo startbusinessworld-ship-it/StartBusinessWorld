@@ -164,7 +164,7 @@
 
       <div class="field">
         <label>ID Vidéo YouTube</label>
-        <input type="text" id="inYoutube" placeholder="Ex: dQw4w9WgXcQ">
+        <input type="text" id="inYoutube" placeholder="Lien YouTube ou ID (ex: https://youtu.be/ABC123)">
       </div>
 
       <div class="field full">
@@ -264,9 +264,21 @@ function closeModal() {
 
 function extractYtId(val) {
   if (!val) return null;
-  var m = val.match(/[a-zA-Z0-9_-]{11}(?=[?&\s]|$)/);
-  if (m) return m[0];
-  if (val.length === 11) return val;
+  val = val.trim();
+  // Juste un ID de 11 chars
+  if (/^[a-zA-Z0-9_-]{11}$/.test(val)) return val;
+  // youtu.be/ID ou youtu.be/ID?si=...
+  var m = val.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  if (m) return m[1];
+  // youtube.com/watch?v=ID
+  m = val.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+  if (m) return m[1];
+  // youtube.com/shorts/ID
+  m = val.match(/shorts\/([a-zA-Z0-9_-]{11})/);
+  if (m) return m[1];
+  // youtube.com/embed/ID
+  m = val.match(/embed\/([a-zA-Z0-9_-]{11})/);
+  if (m) return m[1];
   return null;
 }
 
