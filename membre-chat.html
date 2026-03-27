@@ -217,7 +217,16 @@ textarea#msgInput::placeholder{color:var(--muted)}
 
 @media(max-width:768px){
   .channels-sidebar{display:none}
-  .msg-body{max-width:80%}
+  .msg-body{max-width:82%}
+  .chat-header{padding:8px 12px}
+  .ch-members{display:none}
+  .search-btn span{display:none}
+  .messages-wrap{padding:10px 12px}
+  .input-bar{padding:8px 10px}
+  .msg-actions{display:none !important}
+}
+@media(max-width:768px) and (hover:none){
+  .msg:hover .msg-actions{opacity:0}
 }
 </style>
 </head>

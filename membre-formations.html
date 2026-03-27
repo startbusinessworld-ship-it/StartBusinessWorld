@@ -192,8 +192,19 @@ nav{
 @media(max-width:768px){
   .layout{grid-template-columns:1fr}
   .sidebar{display:none}
+  .main{min-height:calc(100vh - 54px)}
+  .view-list{padding:1rem}
   .detail-layout{grid-template-columns:1fr}
-  .modules-panel{max-height:40vh;border-left:none;border-top:.5px solid var(--subtle)}
+  .modules-panel{max-height:50vh;border-left:none;border-top:.5px solid var(--subtle);position:static}
+  .f-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .player-zone{padding:1rem}
+  .video-box{border-radius:8px}
+  .action-bar{flex-direction:column}
+  .btn-done,.btn-next{width:100%}
+  .detail-header{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .detail-meta{display:none}
+}
+@media(max-width:400px){
   .f-grid{grid-template-columns:1fr}
 }
 </style>

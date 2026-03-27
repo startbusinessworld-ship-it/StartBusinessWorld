@@ -319,16 +319,68 @@
     .toast.success { border-left: 3px solid #3B6D11; }
 
     /* RESPONSIVE */
-    @media (max-width: 960px) {
+    /* ── BOTTOM NAV MOBILE ── */
+    .mobile-nav {
+      display: none;
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--dark); border-top: 1px solid rgba(255,255,255,0.08);
+      padding: 8px 0 calc(8px + env(safe-area-inset-bottom));
+      z-index: 200;
+    }
+    .mobile-nav-items { display: flex; justify-content: space-around; align-items: center; }
+    .mobile-nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      padding: 4px 8px; cursor: pointer; border: none; background: none;
+      color: rgba(255,255,255,0.35); font-family: inherit; transition: color .15s;
+      font-size: 0.58rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .mobile-nav-item.active { color: var(--gold); }
+    .mobile-nav-item span.icon { font-size: 1.2rem; }
+
+    /* ── MOBILE TOPBAR ── */
+    .mobile-topbar {
+      display: none; background: var(--dark);
+      padding: 12px 16px; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .mobile-topbar-logo { font-family: 'DM Serif Display', serif; color: #fff; font-size: 1rem; }
+    .mobile-topbar-right { display: flex; align-items: center; gap: 10px; }
+    .mobile-user-av {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: rgba(166,124,58,0.2); color: var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.72rem; font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
       .layout { grid-template-columns: 1fr; }
       .sidebar { display: none; }
-      .stats-row { grid-template-columns: repeat(2,1fr); }
+      .topbar { display: none; }
+      .mobile-topbar { display: flex; }
+      .mobile-nav { display: block; }
+      .content { padding: 16px 14px 90px; }
+      .stats-row { grid-template-columns: repeat(2,1fr); gap: 8px; }
       .content-grid { grid-template-columns: 1fr; }
       .right-sidebar { display: none; }
+      .welcome-banner { padding: 1.4rem; flex-direction: column; align-items: flex-start; gap: 14px; }
+      .welcome-progress { width: 100%; }
+      .progress-bar-wrap { width: 100%; }
+      .stat-value { font-size: 1.2rem; }
+      .module-progress-wrap { width: 60px; }
+      .btn-gold, .btn-outline { font-size: 0.72rem; padding: 6px 10px; }
     }
   </style>
 </head>
 <body>
+
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar" id="mobileTopbar">
+  <div class="mobile-topbar-logo">Start Business World</div>
+  <div class="mobile-topbar-right">
+    <div class="mobile-user-av" id="mobileUserAv">—</div>
+    <button class="btn-outline" onclick="handleLogout()" style="font-size:0.7rem;padding:4px 10px;border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)">Quitter</button>
+  </div>
+</div>
 
 <div class="layout">
 
@@ -693,6 +745,32 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- BOTTOM NAV MOBILE -->
+<div class="mobile-nav">
+  <div class="mobile-nav-items">
+    <button class="mobile-nav-item active" id="mbn-dashboard" onclick="showSection('dashboard', this)">
+      <span class="icon">🏠</span>
+      <span>Accueil</span>
+    </button>
+    <button class="mobile-nav-item" id="mbn-formations" onclick="window.location.href='membre-formations.html'">
+      <span class="icon">🎓</span>
+      <span>Formations</span>
+    </button>
+    <button class="mobile-nav-item" id="mbn-communaute" onclick="window.location.href='membre-chat.html'">
+      <span class="icon">💬</span>
+      <span>Chat</span>
+    </button>
+    <button class="mobile-nav-item" id="mbn-prestige" onclick="window.location.href='membre-prestige.html'">
+      <span class="icon">⭐</span>
+      <span>Prestige</span>
+    </button>
+    <button class="mobile-nav-item" id="mbn-compte" onclick="showSection('compte', this)">
+      <span class="icon">👤</span>
+      <span>Compte</span>
+    </button>
+  </div>
+</div>
+
 <script>
   const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
@@ -778,6 +856,7 @@
     const plan = currentMember?.plan === 'trial' ? '1€/mois — Essai' : '29€/mois'
 
     document.getElementById('userInitials').textContent = initials
+    var mav = document.getElementById('mobileUserAv'); if(mav) mav.textContent = initials;
     document.getElementById('userName').textContent = name
     document.getElementById('userPlan').textContent = plan
     document.getElementById('welcomeName').textContent = name.split(' ')[0]
@@ -813,6 +892,11 @@
   }
 
   function showSection(name, el) {
+    // Sync bottom nav
+    document.querySelectorAll('.mobile-nav-item').forEach(function(i) { i.classList.remove('active'); });
+    var mbn = document.getElementById('mbn-' + name);
+    if (mbn) mbn.classList.add('active');
+
     const sections = ['Dashboard', 'Formations', 'Articles', 'Communaute', 'Bonsplans', 'Compte']
     sections.forEach(s => {
       const elem = document.getElementById('section' + s)

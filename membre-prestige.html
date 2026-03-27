@@ -150,9 +150,15 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
 @keyframes spin{to{transform:rotate(360deg)}}
 
 @media(max-width:768px){
-  .stats-grid{grid-template-columns:repeat(2,1fr)}
-  .hero-top{flex-direction:column;text-align:center}
+  .page{padding:1rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .hero-top{flex-direction:row;align-items:center}
+  .level-badge{width:60px;height:60px;font-size:1.8rem}
+  .hero-name{font-size:1.3rem}
+  .prestige-hero{padding:1.5rem}
   .level-progress-mini{display:none}
+  .hof-row{padding:10px 12px}
+  .legend-reward{padding:1.2rem}
 }
 </style>
 </head>
