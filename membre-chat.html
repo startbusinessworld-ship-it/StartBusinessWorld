@@ -193,6 +193,15 @@ textarea#msgInput::placeholder{color:var(--muted)}
 .rule-n{width:20px;height:20px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.62rem;flex-shrink:0;margin-top:1px}
 .modal-close{width:100%;margin-top:16px;padding:10px;background:var(--ink);color:#fff;border:none;border-radius:7px;font-family:inherit;font-size:.87rem;cursor:pointer}
 
+/* Modération */
+.mod-btn{background:none;border:none;cursor:pointer;font-size:.72rem;padding:2px 6px;border-radius:4px;font-family:inherit;transition:all .1s}
+.mod-ban{color:#dc2626}
+.mod-ban:hover{background:rgba(220,38,38,.1)}
+.mod-mute{color:#f59e0b}
+.mod-mute:hover{background:rgba(245,158,11,.1)}
+.banned-banner{background:rgba(220,38,38,.08);border:.5px solid rgba(220,38,38,.2);border-radius:8px;padding:10px 16px;font-size:.82rem;color:#dc2626;text-align:center;margin:8px 0}
+.muted-banner{background:rgba(245,158,11,.08);border:.5px solid rgba(245,158,11,.2);border-radius:8px;padding:8px 16px;font-size:.78rem;color:#92400e;text-align:center;margin:4px 0}
+
 /* Notif */
 .notif-toast{
   position:fixed;top:70px;right:20px;
@@ -342,6 +351,11 @@ var SB = supabase.createClient(
 );
 
 var user = null;
+var ADMIN_IDS = ["bf231dfe-b726-485f-b6ea-b6c5d6312f10"];
+var mutedUsers = {};
+var bannedUsers = {};
+
+function isAdmin() { return ADMIN_IDS.indexOf(user.id) !== -1; }
 var userName = "";
 var curChannel = "general";
 var messages = [];
@@ -355,6 +369,59 @@ var EMOJIS = ["👍","🔥","💯","🙌","❤️"];
 var notifEnabled = false;
 
 // ── INIT ──
+// ── MODÉRATION ──
+async function loadModeration() {
+  var res = await SB.from("moderation").select("*");
+  (res.data || []).forEach(function(m) {
+    if (m.action === "ban") bannedUsers[m.user_id] = m;
+    if (m.action === "mute") mutedUsers[m.user_id] = m;
+  });
+}
+
+async function banUser(userId, userName) {
+  if (!isAdmin()) return;
+  var already = bannedUsers[userId];
+  if (already) {
+    if (!confirm("Débannir " + userName + " ?")) return;
+    await SB.from("moderation").delete().eq("user_id", userId);
+    delete bannedUsers[userId];
+    showNotifToast("Modération", userName + " a été débanni.");
+    return;
+  }
+  var reason = prompt("Raison du bannissement de " + userName + " (optionnel) :");
+  if (reason === null) return;
+  await SB.from("moderation").upsert({
+    user_id: userId, user_name: userName,
+    action: "ban", reason: reason, banned_by: user.id
+  }, { onConflict: "user_id" });
+  bannedUsers[userId] = { user_id: userId, user_name: userName, action: "ban", reason: reason };
+  // Supprimer tous ses messages du canal
+  await SB.from("messages").delete().eq("user_id", userId).eq("channel", curChannel);
+  document.querySelectorAll(".msg[data-user='" + userId + "']").forEach(function(el) { el.remove(); });
+  showNotifToast("🚫 Banni", userName + " a été banni du groupe.");
+}
+
+async function muteUser(userId, userName) {
+  if (!isAdmin()) return;
+  var already = mutedUsers[userId];
+  if (already) {
+    if (!confirm("Retirer la sourdine de " + userName + " ?")) return;
+    await SB.from("moderation").delete().eq("user_id", userId);
+    delete mutedUsers[userId];
+    showNotifToast("Modération", userName + " peut de nouveau écrire.");
+    return;
+  }
+  var dur = prompt("Durée en heures (laisse vide = illimité) :");
+  if (dur === null) return;
+  var expiresAt = dur ? new Date(Date.now() + parseInt(dur) * 3600000).toISOString() : null;
+  await SB.from("moderation").upsert({
+    user_id: userId, user_name: userName,
+    action: "mute", banned_by: user.id, expires_at: expiresAt
+  }, { onConflict: "user_id" });
+  mutedUsers[userId] = { user_id: userId, action: "mute", expires_at: expiresAt };
+  showNotifToast("🔇 Sourdine", userName + " a été mis en sourdine" + (dur ? " pour " + dur + "h" : "."));
+}
+
 async function init() {
   var s = await SB.auth.getSession();
   if (!s.data.session) { window.location.href = "client-login.html"; return; }
@@ -385,6 +452,8 @@ async function init() {
     notifEnabled = true;
   }
 
+  await loadModeration();
+  await checkIfBanned();
   await loadChannel("general");
   subscribeRealtime();
   updateOnlineCount();
@@ -468,6 +537,7 @@ function appendMsgEl(msg, container, isNew) {
   div.className = "msg" + (isOwn?" own":"") + (isSame?" same":"") + (msg.pinned?" msg-pinned":"");
   div.id = "msg_" + msg.id;
   div.setAttribute("data-id", msg.id);
+  div.setAttribute("data-user", msg.user_id);
 
   // Badge prestige async
   getUserBadge(msg.user_id).then(function(badge) {
@@ -490,13 +560,21 @@ function appendMsgEl(msg, container, isNew) {
   var rxHtml = buildReactionsHtml(msg.id);
 
   // Actions
+  var modBtns = "";
+  if (isAdmin() && !isOwn) {
+    modBtns =
+      '<button class="act-btn mod-mute" onclick="muteUser(\'' + msg.user_id + '\',\'' + escAttr(msg.user_name) + '\')" title="Mettre en sourdine">🔇</button>' +
+      '<button class="act-btn mod-ban" onclick="banUser(\'' + msg.user_id + '\',\'' + escAttr(msg.user_name) + '\')" title="Bannir">🚫</button>';
+  }
+
   var actHtml = '<div class="msg-actions">' +
     '<div class="emoji-picker" id="ep_' + msg.id + '">' +
       EMOJIS.map(function(e) { return '<span class="emoji-opt" onclick="addReaction(\'' + msg.id + '\',\'' + e + '\')">' + e + '</span>'; }).join("") +
     '</div>' +
     '<button class="act-btn" onclick="toggleEmojiPicker(\'' + msg.id + '\')" title="Réagir">😊</button>' +
     '<button class="act-btn" onclick="setReply(\'' + msg.id + '\',\'' + escAttr(msg.user_name) + '\',\'' + escAttr(msg.content.slice(0,60)) + '\')" title="Répondre">↩</button>' +
-    (isOwn || isOwn ? '<button class="act-btn" onclick="pinMessage(\'' + msg.id + '\')" title="Épingler">📌</button>' : '') +
+    modBtns +
+    (isOwn ? '<button class="act-btn" onclick="pinMessage(\'' + msg.id + '\')" title="Épingler">📌</button>' : '') +
     (isOwn ? '<button class="act-btn del" onclick="deleteMsg(\'' + msg.id + '\',this)" title="Supprimer">✕</button>' : '') +
   '</div>';
 
@@ -538,6 +616,24 @@ function buildReactionsHtml(msgId) {
 }
 
 // ── ENVOI ──
+async function checkIfBanned() {
+  if (bannedUsers[user.id]) {
+    var wrap = document.getElementById("messagesWrap");
+    wrap.insertAdjacentHTML("afterbegin", '<div class="banned-banner">🚫 Tu as été banni du groupe par un administrateur.</div>');
+    document.getElementById("msgInput").disabled = true;
+    document.getElementById("sendBtn").disabled = true;
+    document.getElementById("msgInput").placeholder = "Tu es banni de ce groupe.";
+    return;
+  }
+  if (mutedUsers[user.id]) {
+    var exp = mutedUsers[user.id].expires_at;
+    var msg = exp ? "jusqu'au " + new Date(exp).toLocaleString("fr-FR") : "indéfiniment";
+    document.getElementById("msgInput").disabled = true;
+    document.getElementById("sendBtn").disabled = true;
+    document.getElementById("msgInput").placeholder = "Tu es en sourdine " + msg + ".";
+  }
+}
+
 async function sendMessage() {
   var input = document.getElementById("msgInput");
   var content = input.value.trim();
