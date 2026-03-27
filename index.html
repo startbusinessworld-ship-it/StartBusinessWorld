@@ -1231,30 +1231,64 @@
         var list = res.data || [];
         var container = document.getElementById("shortsContainer");
         if (!container) return;
+
+        container.innerHTML = "";
+
         if (list.length === 0) {
-          container.innerHTML = "<p style='color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%'>Aucun short.</p>";
+          var p = document.createElement("p");
+          p.textContent = "Aucun short disponible.";
+          p.style.cssText = "color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%";
+          container.appendChild(p);
           return;
         }
-        var html = "";
+
         for (var i = 0; i < list.length; i++) {
           var s = list[i];
-          html += "<div class="short-card" data-url="https://youtube.com/shorts/" + s.youtube_id + "">";
-          html += "<div class="short-thumb">";
-          html += "<img src="https://i.ytimg.com/vi/" + s.youtube_id + "/mqdefault.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">";
-          html += "<div class="short-play">&#9654;</div>";
-          html += "</div>";
-          html += "<div class="short-info">";
-          html += "<div class="short-tag">" + (s.category || "") + "</div>";
-          html += "<div class="short-title">" + s.title + "</div>";
-          html += "</div></div>";
-        }
-        container.innerHTML = html;
-        container.querySelectorAll(".short-card").forEach(function(card) {
+
+          var card = document.createElement("div");
+          card.className = "short-card";
+          card.setAttribute("data-url", "https://youtube.com/shorts/" + s.youtube_id);
+
+          var thumb = document.createElement("div");
+          thumb.className = "short-thumb";
+
+          var img = document.createElement("img");
+          img.src = "https://i.ytimg.com/vi/" + s.youtube_id + "/mqdefault.jpg";
+          img.style.cssText = "position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover";
+
+          var play = document.createElement("div");
+          play.className = "short-play";
+          play.innerHTML = "&#9654;";
+
+          thumb.appendChild(img);
+          thumb.appendChild(play);
+
+          var info = document.createElement("div");
+          info.className = "short-info";
+
+          var tag = document.createElement("div");
+          tag.className = "short-tag";
+          tag.textContent = s.category || "";
+
+          var title = document.createElement("div");
+          title.className = "short-title";
+          title.textContent = s.title;
+
+          info.appendChild(tag);
+          info.appendChild(title);
+
+          card.appendChild(thumb);
+          card.appendChild(info);
+
           card.addEventListener("click", function() {
             window.open(this.getAttribute("data-url"), "_blank");
           });
-        });
-      } catch(e) { console.error("Shorts error:", e); }
+
+          container.appendChild(card);
+        }
+      } catch(e) {
+        console.error("Shorts error:", e);
+      }
     }
 
     var track = document.getElementById("shortsTrack");
@@ -1276,49 +1310,81 @@
           .limit(12);
         allArticles = res.data || [];
         renderArticles();
-      } catch(e) { console.error("Articles error:", e); }
+      } catch(e) {
+        console.error("Articles error:", e);
+      }
     }
 
     function renderArticles() {
       var container = document.getElementById("articles");
       if (!container) return;
+
+      container.innerHTML = "";
+
       var filtered = allArticles.filter(function(a) {
         if (currentTheme === "all") return true;
         return (a.category || "").indexOf(currentTheme) !== -1;
       });
+
       if (!filtered.length) {
-        container.innerHTML = "<div style='text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem;grid-column:1/-1'>Aucun article pour cette categorie.</div>";
+        var msg = document.createElement("div");
+        msg.textContent = "Aucun article pour cette categorie.";
+        msg.style.cssText = "text-align:center;padding:3rem;color:#888;font-size:0.85rem;grid-column:1/-1";
+        container.appendChild(msg);
         return;
       }
-      var html = "";
+
       for (var i = 0; i < filtered.length; i++) {
         var a = filtered[i];
         var isFeatured = (i === 0 && currentTheme === "all");
         var firstCat = (a.category || "").split(",")[0].trim();
         var link = a.slug ? a.slug + ".html" : "article.html";
-        var ytBadge = a.youtube_id ? "<span class="yt-pill">&#9654; YouTube</span>" : "";
-        var views = (a.views || 0).toLocaleString("fr-FR");
-        html += "<div class="article" + (isFeatured ? " featured" : "") + "" data-link="" + link + "" style="cursor:pointer">";
-        html += "<div class="art-cat">" + firstCat + "</div>";
-        html += "<h3>" + a.title + "</h3>";
-        if (a.deck) html += "<p>" + a.deck + "</p>";
-        html += "<div class="art-footer">";
-        html += "<span class="art-time">" + readTime(a.deck) + " min</span>";
-        html += ytBadge;
-        html += "<span style="margin-left:auto;font-size:0.68rem;opacity:0.4">" + views + " vues</span>";
-        html += "</div></div>";
-      }
-      container.innerHTML = html;
-      container.querySelectorAll("[data-link]").forEach(function(el) {
-        el.addEventListener("click", function() {
+
+        var card = document.createElement("div");
+        card.className = "article" + (isFeatured ? " featured" : "");
+        card.style.cursor = "pointer";
+        card.setAttribute("data-link", link);
+
+        var cat = document.createElement("div");
+        cat.className = "art-cat";
+        cat.textContent = firstCat;
+
+        var h3 = document.createElement("h3");
+        h3.textContent = a.title;
+
+        card.appendChild(cat);
+        card.appendChild(h3);
+
+        if (a.deck) {
+          var p = document.createElement("p");
+          p.textContent = a.deck;
+          card.appendChild(p);
+        }
+
+        var footer = document.createElement("div");
+        footer.className = "art-footer";
+
+        var time = document.createElement("span");
+        time.className = "art-time";
+        var words = a.deck ? a.deck.split(" ").length : 0;
+        time.textContent = Math.max(3, Math.round(words / 200) + 5) + " min";
+        footer.appendChild(time);
+
+        if (a.youtube_id) {
+          var yt = document.createElement("span");
+          yt.className = "yt-pill";
+          yt.textContent = "YouTube";
+          footer.appendChild(yt);
+        }
+
+        card.appendChild(footer);
+
+        card.addEventListener("click", function() {
           window.location.href = this.getAttribute("data-link");
         });
-      });
-    }
 
-    function readTime(text) {
-      if (!text) return 5;
-      return Math.max(3, Math.round(text.split(" ").length / 200) + 5);
+        container.appendChild(card);
+      }
     }
 
     function filterTheme(cat, el) {
