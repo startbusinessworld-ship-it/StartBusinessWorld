@@ -1103,14 +1103,14 @@
 
   <!-- THÈMES -->
   <!-- ARTICLE À LA UNE -->
-  <div class="featured-top">
-    <div class="ft-cat">À la une — Business Chine</div>
-    <h2 class="ft-title">Sourcer en Chine sans se faire arnaquer : Alibaba, Yiwu, agents, contrôle qualité</h2>
-    <p class="ft-desc">Tout ce qu'il faut savoir avant de passer sa première commande import. Le guide que j'aurais voulu avoir à mes débuts.</p>
+  <div class="featured-top" id="featuredTop" style="display:none">
+    <div class="ft-cat" id="ftCat">À la une</div>
+    <h2 class="ft-title" id="ftTitle"></h2>
+    <p class="ft-desc" id="ftDesc"></p>
     <div class="ft-footer">
-      <span class="ft-time">18 min de lecture</span>
-      <span class="ft-yt">▶ Vidéo YouTube incluse</span>
-      <a href="article.html" class="ft-link">Lire l'article →</a>
+      <span class="ft-time" id="ftTime"></span>
+      <span class="ft-yt" id="ftYt" style="display:none">▶ Vidéo YouTube incluse</span>
+      <a href="#" class="ft-link" id="ftLink">Lire l'article →</a>
     </div>
   </div>
 
@@ -1258,6 +1258,41 @@
       "https://grwimhqsthcmfwblwdwg.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
     );
+
+    // ARTICLE À LA UNE
+    async function loadFeatured() {
+      try {
+        var res = await SB.from("articles")
+          .select("id, title, deck, category, youtube_id, created_at")
+          .eq("status", "published")
+          .eq("featured", true)
+          .single();
+
+        var a = res.data;
+        var box = document.getElementById("featuredTop");
+        if (!a || !box) return;
+
+        var firstCat = (a.category || "").split(",")[0].trim();
+        document.getElementById("ftCat").textContent = "À la une — " + firstCat;
+        document.getElementById("ftTitle").textContent = a.title;
+        document.getElementById("ftDesc").textContent = a.deck || "";
+
+        var words = (a.deck || "").split(" ").length;
+        document.getElementById("ftTime").textContent = Math.max(3, Math.round(words / 200) + 5) + " min de lecture";
+
+        if (a.youtube_id) document.getElementById("ftYt").style.display = "inline-flex";
+
+        document.getElementById("ftLink").href = "article.html?id=" + a.id;
+        document.getElementById("ftLink").addEventListener("click", function(e) {
+          e.preventDefault();
+          window.location.href = "article.html?id=" + a.id;
+        });
+
+        box.style.display = "block";
+      } catch(e) {
+        console.log("Pas d article a la une:", e);
+      }
+    }
 
     // SHORTS
     async function loadShorts() {
@@ -1478,6 +1513,7 @@
       document.body.style.overflow = "";
     }
 
+    loadFeatured();
     loadShorts();
     loadArticles();
   </script>
