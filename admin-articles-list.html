@@ -397,20 +397,23 @@ async function saveArticle() {
   if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
   if (!selectedCats.length) { showToast('Sélectionne au moins une catégorie.', 'error'); return; }
 
+  var isFeatured = document.getElementById('inFeatured').checked;
+
   var data = {
     title: title,
-    category: selectedCats.join(', '),  // "Business Chine, Fiscalité"
+    category: selectedCats.join(', '),
     status: document.getElementById('inStatus').value,
     deck: document.getElementById('inDeck').value.trim(),
     content: document.getElementById('inContent').value.trim(),
     youtube_id: extractYtId(document.getElementById('inYoutube').value.trim()),
     slug: title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    featured: isFeatured,
     updated_at: new Date().toISOString()
   };
 
-  // Si featured coché, retirer le featured des autres
-  if (data.featured) {
-    await sb.from('articles').update({ featured: false }).neq('id', editId || '00000000-0000-0000-0000-000000000000');
+  // Si featured coché, retirer le featured des autres d'abord
+  if (isFeatured) {
+    await sb.from('articles').update({ featured: false }).eq('featured', true);
   }
 
   var res;

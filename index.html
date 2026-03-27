@@ -1381,9 +1381,15 @@
           .order("created_at", { ascending: false })
           .limit(12);
         allArticles = res.data || [];
+        console.log("Articles chargés:", allArticles.length);
         renderArticles();
       } catch(e) {
         console.error("Articles error:", e);
+        var container = document.getElementById("articles");
+        if (container) {
+          container.style.display = "block";
+          container.innerHTML = "<p style='padding:2rem;color:red;font-size:0.8rem'>Erreur chargement: " + e.message + "</p>";
+        }
       }
     }
 
@@ -1391,6 +1397,7 @@
       var container = document.getElementById("articles");
       if (!container) return;
 
+      container.style.display = "grid";
       container.innerHTML = "";
 
       var filtered = allArticles.filter(function(a) {
