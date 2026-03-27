@@ -47,33 +47,33 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(250,250,248,0.96);
+      background: #111110;
       backdrop-filter: blur(10px);
     }
 
     .nav-left { display: flex; gap: 0.15rem; align-items: center; }
     .nav-back {
       display: inline-flex; align-items: center; gap: 0.4rem;
-      font-size: 0.78rem; color: var(--muted);
+      font-size: 0.78rem; color: rgba(255,255,255,0.5);
       padding: 0.35rem 0.8rem; border-radius: 4px;
       transition: all 0.15s; cursor: pointer;
     }
-    .nav-back:hover { background: var(--surface); color: var(--ink); }
+    .nav-back:hover { background: rgba(255,255,255,0.08); color: #fff; }
     .nav-sep { color: var(--subtle); font-size: 0.75rem; }
     .nav-breadcrumb { font-size: 0.78rem; color: var(--muted); }
 
     .nav-logo {
       font-family: 'DM Serif Display', serif;
       font-size: 1.2rem; text-align: center;
-      letter-spacing: -0.01em; white-space: nowrap;
+      letter-spacing: -0.01em; white-space: nowrap; color:#fff;
     }
 
     .nav-right { display: flex; justify-content: flex-end; align-items: center; gap: 0.8rem; }
-    .nav-login { font-size: 0.78rem; color: var(--muted); padding: 0.35rem 0.8rem; cursor: pointer; transition: color 0.15s; }
-    .nav-login:hover { color: var(--ink); }
+    .nav-login { font-size: 0.78rem; color: rgba(255,255,255,0.5); padding: 0.35rem 0.8rem; cursor: pointer; transition: color 0.15s; }
+    .nav-login:hover { color: #fff; }
     .nav-join {
       font-size: 0.75rem; font-weight: 500;
-      background: var(--ink); color: var(--bg);
+      background: var(--gold); color: #fff;
       padding: 0.42rem 1.1rem; border-radius: 5px;
       transition: opacity 0.15s; cursor: pointer;
     }

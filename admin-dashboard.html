@@ -28,12 +28,12 @@
         </a>
 
         <div class="nav-section">Contenu</div>
-        <a href="admin-articles.html" class="nav-item" data-access="articles">
+        <a href="admin-articles-list.html" class="nav-item" data-access="articles">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
           Articles
           <span class="nav-badge" id="draftCount">—</span>
         </a>
-        <a href="admin-shorts.html" class="nav-item">
+        <a href="admin-shorts.html" class="nav-item" data-access="articles">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
           Shorts YouTube
         </a>
@@ -81,7 +81,7 @@
       </div>
       <div class="topbar-actions">
         <a href="https://startbusinessworld.github.io" target="_blank" class="btn-ghost">Voir le site ↗</a>
-        <a href="admin-articles.html" class="btn-primary">+ Nouvel article</a>
+        <a href="admin-articles-list.html" class="btn-primary">+ Nouvel article</a>
       </div>
     </div>
 
@@ -113,7 +113,7 @@
 
       <!-- ACTIONS RAPIDES -->
       <div class="quick-actions">
-        <a href="admin-articles.html" class="qa-btn primary">
+        <a href="admin-articles-list.html" class="qa-btn primary">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v14M1 8h14"/></svg>
           Rédiger un article
         </a>
@@ -138,7 +138,7 @@
         <div class="card">
           <div class="card-head">
             <div class="card-title">Articles récents</div>
-            <a href="admin-articles.html" class="card-link">Gérer →</a>
+            <a href="admin-articles-list.html" class="card-link">Gérer →</a>
           </div>
           <div id="articlesList">
             <div class="loading-row">Chargement...</div>
@@ -251,7 +251,7 @@
         </div>
         <div class="row-right">
           <span class="row-views">${(a.views||0).toLocaleString('fr-FR')}</span>
-          <a href="admin-articles-edit.html?id=${a.id}" class="row-action">Éditer</a>
+          <a href="admin-articles-list.html" class="row-action">Gérer</a>
         </div>
       </div>
     `).join('')

@@ -739,7 +739,7 @@
     .shorts-track::-webkit-scrollbar { display: none; }
     .shorts-track:active { cursor: grabbing; }
     .short-card { flex: 0 0 180px; scroll-snap-align: start; cursor: pointer; }
-    .short-thumb { width: 180px; height: 320px; background: #1C1C1A; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.15s; margin-bottom: 0.8rem; }
+    .short-thumb { width: 180px; height: 320px; background: #1C1C1A; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); position: relative; overflow: hidden; transition: border-color 0.15s; margin-bottom: 0.8rem; }
     .short-card:hover .short-thumb { border-color: rgba(255,255,255,0.18); }
     .short-card:hover .short-play { opacity: 1; transform: scale(1.1); }
     .short-play { width: 44px; height: 44px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #fff; opacity: 0.65; transition: all 0.2s; padding-left: 3px; }
@@ -1354,53 +1354,60 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Supabase
-    const _sb = supabase.createClient(
-      'https://grwimhqsthcmfwblwdwg.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
-    )
+    const SUPA_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co';
+    const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc';
+    const _sb = supabase.createClient(SUPA_URL, SUPA_KEY);
 
     async function loadShorts() {
-      const { data } = await _sb
-        .from('shorts')
-        .select('*')
-        .eq('status', 'published')
-        .order('created_at', { ascending: false })
+      try {
+        var res = await _sb.from('shorts').select('*').eq('status', 'published').order('created_at', { ascending: false });
+        var shorts = res.data || [];
+        var container = document.getElementById('shortsContainer');
+        if (!container) return;
 
-      const container = document.getElementById('shortsContainer')
+        if (shorts.length === 0) {
+          container.innerHTML = '<p style="color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%">Aucun short pour l'instant.</p>';
+          return;
+        }
 
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div style="color:rgba(240,237,228,0.3);font-size:0.82rem;padding:2rem;text-align:center;width:100%">Aucun short disponible pour l'instant.</div>'
-        return
+        var html = '';
+        for (var i = 0; i < shorts.length; i++) {
+          var s = shorts[i];
+          var ytUrl = 'https://youtube.com/shorts/' + s.youtube_id;
+          var imgUrl = 'https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg';
+          html += '<div class="short-card" data-url="' + ytUrl + '">';
+          html += '<div class="short-thumb">';
+          html += '<img src="' + imgUrl + '" alt="' + s.title + '" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">';
+          html += '<div class="short-play">&#9654;</div>';
+          html += '</div>';
+          html += '<div class="short-info">';
+          html += '<div class="short-tag">' + (s.category || '') + '</div>';
+          html += '<div class="short-title">' + s.title + '</div>';
+          html += '</div>';
+          html += '</div>';
+        }
+        container.innerHTML = html;
+
+        // Ajouter les onclick après insertion
+        container.querySelectorAll('.short-card').forEach(function(card) {
+          card.addEventListener('click', function() {
+            window.open(this.getAttribute('data-url'), '_blank');
+          });
+        });
+
+      } catch(e) {
+        console.error('Erreur shorts:', e);
       }
-
-      container.innerHTML = data.map(s => `
-        <div class="short-card" onclick="window.open('https://youtube.com/shorts/${s.youtube_id}','_blank')" style="cursor:pointer">
-          <div class="short-thumb">
-            <img src="https://i.ytimg.com/vi/${s.youtube_id}/mqdefault.jpg"
-              alt="${s.title}"
-              style="width:100%;height:100%;object-fit:cover;display:block"
-              onerror="this.style.display='none';this.parentElement.querySelector('.short-play').style.opacity='0.8'">
-            <div class="short-play" style="position:absolute">▶</div>
-          </div>
-          <div class="short-info">
-            <div class="short-tag">${s.category || ''}</div>
-            <div class="short-title">${s.title}</div>
-          </div>
-        </div>
-      `).join('')
     }
 
-    loadShorts()
+    loadShorts();
 
     // Navigation
-    const track = document.getElementById('shortsTrack');
-    document.getElementById('sNext').addEventListener('click', () => {
-      track.scrollBy({ left: 200, behavior: 'smooth' });
-    });
-    document.getElementById('sPrev').addEventListener('click', () => {
-      track.scrollBy({ left: -200, behavior: 'smooth' });
-    });
+    var track = document.getElementById('shortsTrack');
+    var btnNext = document.getElementById('sNext');
+    var btnPrev = document.getElementById('sPrev');
+    if (btnNext) btnNext.addEventListener('click', function() { track.scrollBy({ left: 200, behavior: 'smooth' }); });
+    if (btnPrev) btnPrev.addEventListener('click', function() { track.scrollBy({ left: -200, behavior: 'smooth' }); });
   </script>
 
   <script>
