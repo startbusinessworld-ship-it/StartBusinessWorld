@@ -252,27 +252,10 @@
 
 <!-- MODALE OUTIL -->
 <div class="link-modal" id="outilModal">
-  <div class="link-modal-box">
-    <div class="link-modal-title">🛠️ Insérer un outil affilié</div>
-    <select id="outilSelect" style="width:100%;padding:8px 10px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.85rem;font-family:DM Sans,sans-serif;background:var(--bg);color:var(--ink);outline:none;margin-bottom:6px">
-      <option value="">Choisir un outil...</option>
-      <option value="LegalPlace|Création de société en France|https://c3po.link/QP9duxvAkg">LegalPlace — Création de société</option>
-      <option value="Luminos Corp|Création de société à Hong Kong|https://www.luminoscorp.com">Luminos Corp — Hong Kong</option>
-      <option value="Airwallex|Compte multi-devises et paiements internationaux|https://www.airwallex.com/app/signup?utm_source=agent_referral&utm_medium=partner_referral&utm_campaign=cn&utm_term=hongkongwinchine&utm_content=1">Airwallex — Paiements internationaux</option>
-      <option value="Wise|Transferts et compte pro international|https://wise.com/invite/ihpc/ayoubhassanr2">Wise — Transferts internationaux</option>
-      <option value="XTransfer|Paiements B2B avec la Chine|https://www.xtransfer.cn/register?campaign=partner&businessSource=partner-leads&code=165698">XTransfer — Paiements Chine</option>
-      <option value="Shopify|Lancer sa boutique en ligne|https://shopify.pxf.io/c/5645860/1061744/13624">Shopify — E-commerce</option>
-      <option value="Wix|Créer son site web facilement|https://wix.pxf.io/c/5645860/2049257/25616">Wix — Création de site</option>
-      <option value="CapCut|Montage vidéo pour les réseaux sociaux|https://capcutaffiliateprogram.pxf.io/jeK1EP">CapCut — Montage vidéo</option>
-      <option value="Airalo|eSIM internationale pour voyageurs|https://airalo.pxf.io/c/5645860/1268485/15608">Airalo — eSIM internationale</option>
-      <option value="Kiwi.com|Trouver les meilleurs vols|https://kiwi.com/user/refer-friend/">Kiwi.com — Vols & voyages</option>
-      <option value="Orus|Assurance RC Pro en ligne|https://www.orus.eu/?utm_campaign=Affilae&utm_medium=partner&utm_source=Riahi#ae155">Orus — Assurance pro</option>
-      <option value="ACS Assurance|Assurance pour expatriés|https://wa.me/66630830047?text=Bonjour%2C%20je%20viens%20de%20la%20part%20de%20Start%20Business%20World">ACS — Assurance expatriation</option>
-    </select>
-    <div class="link-modal-btns">
-      <button class="btn-ghost" style="flex:1" onclick="closeOutilModal()">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" onclick="confirmOutil()">Insérer</button>
-    </div>
+  <div class="link-modal-box" style="max-width:520px">
+    <div class="link-modal-title" style="margin-bottom:14px">🛠️ Choisir un outil à insérer</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:380px;overflow-y:auto;margin-bottom:12px" id="outilGrid"></div>
+    <button class="btn-ghost" style="width:100%" onclick="closeOutilModal()">Annuler</button>
   </div>
 </div>
 
@@ -547,34 +530,66 @@ function confirmLink() {
   closeLinkModal();
 }
 
+var OUTILS = [
+  { nom: "LegalPlace",    cat: "Création de société",      url: "https://c3po.link/QP9duxvAkg" },
+  { nom: "Luminos Corp",  cat: "Société à Hong Kong",       url: "https://www.luminoscorp.com" },
+  { nom: "Airwallex",     cat: "Paiements internationaux",  url: "https://www.airwallex.com/app/signup?utm_source=agent_referral&utm_medium=partner_referral&utm_campaign=cn&utm_term=hongkongwinchine&utm_content=1" },
+  { nom: "Wise",          cat: "Transferts internationaux", url: "https://wise.com/invite/ihpc/ayoubhassanr2" },
+  { nom: "XTransfer",     cat: "Paiements Chine",           url: "https://www.xtransfer.cn/register?campaign=partner&businessSource=partner-leads&code=165698" },
+  { nom: "Shopify",       cat: "E-commerce",                url: "https://shopify.pxf.io/c/5645860/1061744/13624" },
+  { nom: "Wix",           cat: "Création de site",          url: "https://wix.pxf.io/c/5645860/2049257/25616" },
+  { nom: "CapCut",        cat: "Montage vidéo",             url: "https://capcutaffiliateprogram.pxf.io/jeK1EP" },
+  { nom: "Airalo",        cat: "eSIM internationale",       url: "https://airalo.pxf.io/c/5645860/1268485/15608" },
+  { nom: "Kiwi.com",      cat: "Vols et voyages",           url: "https://kiwi.com/user/refer-friend/" },
+  { nom: "Orus",          cat: "Assurance pro",             url: "https://www.orus.eu/?utm_campaign=Affilae&utm_medium=partner&utm_source=Riahi#ae155" },
+  { nom: "ACS Assurance", cat: "Assurance expatriation",    url: "https://wa.me/66630830047?text=Bonjour%2C%20je%20viens%20de%20la%20part%20de%20Start%20Business%20World" }
+];
+
 function insertOutil() {
   var ta = document.getElementById("inContent");
   _savedStart = ta.selectionStart;
   _savedEnd = ta.selectionEnd;
-  document.getElementById("outilNom").value = "";
-  document.getElementById("outilDesc").value = "";
-  document.getElementById("outilUrl").value = "";
+
+  var grid = document.getElementById("outilGrid");
+  grid.innerHTML = "";
+
+  OUTILS.forEach(function(o) {
+    var btn = document.createElement("button");
+    btn.style.cssText = "display:flex;flex-direction:column;align-items:flex-start;padding:10px 12px;border:0.5px solid var(--subtle);border-radius:8px;background:var(--bg);cursor:pointer;transition:all 0.12s;text-align:left;font-family:inherit;width:100%";
+    btn.onmouseover = function() { this.style.borderColor = "var(--gold)"; this.style.background = "rgba(166,124,58,0.05)"; };
+    btn.onmouseout = function() { this.style.borderColor = "var(--subtle)"; this.style.background = "var(--bg)"; };
+
+    var nom = document.createElement("div");
+    nom.textContent = o.nom;
+    nom.style.cssText = "font-weight:600;font-size:0.85rem;color:var(--ink);margin-bottom:2px";
+
+    var cat = document.createElement("div");
+    cat.textContent = o.cat;
+    cat.style.cssText = "font-size:0.7rem;color:var(--muted)";
+
+    btn.appendChild(nom);
+    btn.appendChild(cat);
+
+    btn.addEventListener("click", (function(outil) {
+      return function() {
+        var ta = document.getElementById("inContent");
+        var insert = "\n\n[OUTIL:" + outil.nom + "|" + outil.cat + "|" + outil.url + "]\n\n";
+        var val = ta.value;
+        ta.value = val.substring(0, _savedStart) + insert + val.substring(_savedEnd);
+        ta.focus();
+        closeOutilModal();
+        showToast(outil.nom + " inséré !", "success");
+      };
+    })(o));
+
+    grid.appendChild(btn);
+  });
+
   document.getElementById("outilModal").classList.add("open");
-  document.getElementById("outilNom").focus();
 }
 
 function closeOutilModal() {
   document.getElementById("outilModal").classList.remove("open");
-}
-
-function confirmOutil() {
-  var sel = document.getElementById("outilSelect").value;
-  if (!sel) return;
-  var parts = sel.split("|");
-  var nom = parts[0];
-  var desc = parts[1];
-  var url = parts[2];
-  var ta = document.getElementById("inContent");
-  var insert = "\n\n[OUTIL:" + nom + "|" + desc + "|" + url + "]\n\n";
-  var val = ta.value;
-  ta.value = val.substring(0, _savedStart) + insert + val.substring(_savedEnd);
-  ta.focus();
-  closeOutilModal();
 }
 
 function fmtDate(str) {
