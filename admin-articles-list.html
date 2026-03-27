@@ -434,7 +434,7 @@ async function saveArticle() {
 
 async function loadArticles() {
   var res = await sb.from('articles')
-    .select('id, title, category, status, views, created_at, deck, content, youtube_id, slug')
+    .select('id, title, category, status, views, created_at, deck, content, youtube_id, slug, featured')
     .order('created_at', { ascending: false });
 
   articles = res.data || [];
