@@ -1219,174 +1219,144 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ============================================
-    // SUPABASE — client unique pour toute la page
-    // ============================================
     var SB = supabase.createClient(
-      'https://grwimhqsthcmfwblwdwg.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+      "https://grwimhqsthcmfwblwdwg.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
     );
 
-    // ============================================
     // SHORTS
-    // ============================================
     async function loadShorts() {
       try {
-        var res = await SB.from('shorts').select('*').eq('status', 'published').order('created_at', { ascending: false });
-        var shorts = res.data || [];
-        var container = document.getElementById('shortsContainer');
+        var res = await SB.from("shorts").select("*").eq("status", "published").order("created_at", { ascending: false });
+        var list = res.data || [];
+        var container = document.getElementById("shortsContainer");
         if (!container) return;
-
-        if (shorts.length === 0) {
-          container.innerHTML = "<p style='color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%'>Aucun short.</p>";
+        if (list.length === 0) {
+          container.innerHTML = "<p style="color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%">Aucun short.</p>";
           return;
         }
-
-        var html = '';
-        for (var i = 0; i < shorts.length; i++) {
-          var s = shorts[i];
-          html += '<div class="short-card" data-url="https://youtube.com/shorts/' + s.youtube_id + '">';
-          html += '<div class="short-thumb">';
-          html += '<img src="https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">';
-          html += '<div class="short-play">&#9654;</div>';
-          html += '</div>';
-          html += '<div class="short-info">';
-          html += '<div class="short-tag">' + (s.category || '') + '</div>';
-          html += '<div class="short-title">' + s.title + '</div>';
-          html += '</div></div>';
+        var html = "";
+        for (var i = 0; i < list.length; i++) {
+          var s = list[i];
+          html += "<div class="short-card" data-url="https://youtube.com/shorts/" + s.youtube_id + "">";
+          html += "<div class="short-thumb">";
+          html += "<img src="https://i.ytimg.com/vi/" + s.youtube_id + "/mqdefault.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover">";
+          html += "<div class="short-play">&#9654;</div>";
+          html += "</div>";
+          html += "<div class="short-info">";
+          html += "<div class="short-tag">" + (s.category || "") + "</div>";
+          html += "<div class="short-title">" + s.title + "</div>";
+          html += "</div></div>";
         }
         container.innerHTML = html;
-
-        container.querySelectorAll('.short-card').forEach(function(card) {
-          card.addEventListener('click', function() {
-            window.open(this.getAttribute('data-url'), '_blank');
+        container.querySelectorAll(".short-card").forEach(function(card) {
+          card.addEventListener("click", function() {
+            window.open(this.getAttribute("data-url"), "_blank");
           });
         });
-      } catch(e) {
-        console.error('Shorts error:', e);
-      }
+      } catch(e) { console.error("Shorts error:", e); }
     }
 
-    // Navigation shorts
-    var track = document.getElementById('shortsTrack');
-    var btnNext = document.getElementById('sNext');
-    var btnPrev = document.getElementById('sPrev');
-    if (btnNext) btnNext.addEventListener('click', function() { track.scrollBy({ left: 200, behavior: 'smooth' }); });
-    if (btnPrev) btnPrev.addEventListener('click', function() { track.scrollBy({ left: -200, behavior: 'smooth' }); });
+    var track = document.getElementById("shortsTrack");
+    var btnNext = document.getElementById("sNext");
+    var btnPrev = document.getElementById("sPrev");
+    if (btnNext) btnNext.addEventListener("click", function() { track.scrollBy({ left: 200, behavior: "smooth" }); });
+    if (btnPrev) btnPrev.addEventListener("click", function() { track.scrollBy({ left: -200, behavior: "smooth" }); });
 
-    // ============================================
     // ARTICLES
-    // ============================================
-    var _allArticles = [];
-    var _currentTheme = 'all';
+    var allArticles = [];
+    var currentTheme = "all";
 
     async function loadArticles() {
       try {
-        var res = await SB.from('articles')
-          .select('id, title, deck, category, slug, youtube_id, created_at, views')
-          .eq('status', 'published')
-          .order('created_at', { ascending: false })
+        var res = await SB.from("articles")
+          .select("id, title, deck, category, slug, youtube_id, created_at, views")
+          .eq("status", "published")
+          .order("created_at", { ascending: false })
           .limit(12);
-
-        _allArticles = res.data || [];
+        allArticles = res.data || [];
         renderArticles();
-      } catch(e) {
-        console.error('Articles error:', e);
-      }
+      } catch(e) { console.error("Articles error:", e); }
     }
 
     function renderArticles() {
-      var container = document.getElementById('articles');
+      var container = document.getElementById("articles");
       if (!container) return;
-
-      var filtered = _allArticles.filter(function(a) {
-        if (_currentTheme === 'all') return true;
-        return (a.category || '').indexOf(_currentTheme) !== -1;
+      var filtered = allArticles.filter(function(a) {
+        if (currentTheme === "all") return true;
+        return (a.category || "").indexOf(currentTheme) !== -1;
       });
-
       if (!filtered.length) {
-        container.innerHTML = "<div style='text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem;grid-column:1/-1'>Aucun article pour cette categorie.</div>";
+        container.innerHTML = "<div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem;grid-column:1/-1">Aucun article pour cette categorie.</div>";
         return;
       }
-
-      var html = '';
+      var html = "";
       for (var i = 0; i < filtered.length; i++) {
         var a = filtered[i];
-        var isFeatured = (i === 0 && _currentTheme === 'all');
-        var firstCat = (a.category || '').split(',')[0].trim();
-        var link = a.slug ? a.slug + '.html' : 'article.html';
-        var ytBadge = a.youtube_id ? '<span class="yt-pill">&#9654; YouTube</span>' : '';
-        var views = (a.views || 0).toLocaleString('fr-FR');
-
-        html += '<div class="article' + (isFeatured ? ' featured' : '') + '" data-link="' + link + '" style="cursor:pointer">';
-        html += '<div class="art-cat">' + firstCat + '</div>';
-        html += '<h3>' + a.title + '</h3>';
-        if (a.deck) html += '<p>' + a.deck + '</p>';
-        html += '<div class="art-footer">';
-        html += '<span class="art-time">' + readTime(a.deck) + ' min</span>';
+        var isFeatured = (i === 0 && currentTheme === "all");
+        var firstCat = (a.category || "").split(",")[0].trim();
+        var link = a.slug ? a.slug + ".html" : "article.html";
+        var ytBadge = a.youtube_id ? "<span class="yt-pill">&#9654; YouTube</span>" : "";
+        var views = (a.views || 0).toLocaleString("fr-FR");
+        html += "<div class="article" + (isFeatured ? " featured" : "") + "" data-link="" + link + "" style="cursor:pointer">";
+        html += "<div class="art-cat">" + firstCat + "</div>";
+        html += "<h3>" + a.title + "</h3>";
+        if (a.deck) html += "<p>" + a.deck + "</p>";
+        html += "<div class="art-footer">";
+        html += "<span class="art-time">" + readTime(a.deck) + " min</span>";
         html += ytBadge;
-        html += '<span style="margin-left:auto;font-size:0.68rem;opacity:0.4">' + views + ' vues</span>';
-        html += '</div></div>';
+        html += "<span style="margin-left:auto;font-size:0.68rem;opacity:0.4">" + views + " vues</span>";
+        html += "</div></div>";
       }
       container.innerHTML = html;
-
-      // Attacher les clics après injection
-      container.querySelectorAll('[data-link]').forEach(function(el) {
-        el.addEventListener('click', function() {
-          window.location.href = this.getAttribute('data-link');
+      container.querySelectorAll("[data-link]").forEach(function(el) {
+        el.addEventListener("click", function() {
+          window.location.href = this.getAttribute("data-link");
         });
       });
     }
 
     function readTime(text) {
       if (!text) return 5;
-      return Math.max(3, Math.round(text.split(' ').length / 200) + 5);
+      return Math.max(3, Math.round(text.split(" ").length / 200) + 5);
     }
 
     function filterTheme(cat, el) {
-      _currentTheme = cat;
-      document.querySelectorAll('.theme').forEach(function(t) { t.classList.remove('active-theme'); });
-      el.classList.add('active-theme');
+      currentTheme = cat;
+      document.querySelectorAll(".theme").forEach(function(t) { t.classList.remove("active-theme"); });
+      el.classList.add("active-theme");
       renderArticles();
     }
 
-    // ============================================
-    // MENU MOBILE
-    // ============================================
     function toggleMenu() {
-      var menu = document.getElementById('mobileMenu');
-      var ham = document.getElementById('hamburger');
+      var menu = document.getElementById("mobileMenu");
+      var ham = document.getElementById("hamburger");
       if (!menu || !ham) return;
-      menu.classList.toggle('open');
-      ham.classList.toggle('open');
-      document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+      menu.classList.toggle("open");
+      ham.classList.toggle("open");
+      document.body.style.overflow = menu.classList.contains("open") ? "hidden" : "";
     }
 
-    // ============================================
-    // MENU MOBILE — fermer au clic sur un lien
-    // ============================================
-    document.querySelectorAll('.mobile-nav-link, .mobile-theme-btn').forEach(function(el) {
-      el.addEventListener('click', function() {
-        var menu = document.getElementById('mobileMenu');
-        var ham = document.getElementById('hamburger');
-        if (menu) menu.classList.remove('open');
-        if (ham) ham.classList.remove('open');
-        document.body.style.overflow = '';
+    document.querySelectorAll(".mobile-nav-link, .mobile-theme-btn").forEach(function(el) {
+      el.addEventListener("click", function() {
+        var menu = document.getElementById("mobileMenu");
+        var ham = document.getElementById("hamburger");
+        if (menu) menu.classList.remove("open");
+        if (ham) ham.classList.remove("open");
+        document.body.style.overflow = "";
       });
     });
-    window.addEventListener('resize', function() {
+
+    window.addEventListener("resize", function() {
       if (window.innerWidth > 768) {
-        var menu = document.getElementById('mobileMenu');
-        var ham = document.getElementById('hamburger');
-        if (menu) menu.classList.remove('open');
-        if (ham) ham.classList.remove('open');
-        document.body.style.overflow = '';
+        var menu = document.getElementById("mobileMenu");
+        var ham = document.getElementById("hamburger");
+        if (menu) menu.classList.remove("open");
+        if (ham) ham.classList.remove("open");
+        document.body.style.overflow = "";
       }
     });
 
-    // ============================================
-    // LANCEMENT
-    // ============================================
     loadShorts();
     loadArticles();
   </script>
