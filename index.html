@@ -1268,9 +1268,9 @@
           .select("id, title, deck, category, youtube_id, created_at")
           .eq("status", "published")
           .eq("featured", true)
-          .single();
+          .limit(1);
 
-        var a = res.data;
+        var a = res.data && res.data.length ? res.data[0] : null;
         var box = document.getElementById("featuredTop");
         if (!a || !box) return;
 
@@ -1285,10 +1285,6 @@
         if (a.youtube_id) document.getElementById("ftYt").style.display = "inline-flex";
 
         document.getElementById("ftLink").href = "article.html?id=" + a.id;
-        document.getElementById("ftLink").addEventListener("click", function(e) {
-          e.preventDefault();
-          window.location.href = "article.html?id=" + a.id;
-        });
 
         box.style.display = "block";
       } catch(e) {
