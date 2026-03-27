@@ -1291,12 +1291,9 @@
       <a href="https://youtube.com/@startbusinessworld" target="_blank" class="shorts-yt-link">Voir la chaîne →</a>
     </div>
     <div class="shorts-track" id="shortsTrack">
-      <div class="short-card"><div class="short-thumb"><div class="short-play">▶</div><div class="short-duration">0:58</div></div><div class="short-info"><div class="short-tag">Business Chine</div><div class="short-title">Comment trouver un fournisseur fiable sur Alibaba en 5 min</div></div></div>
-      <div class="short-card"><div class="short-thumb"><div class="short-play">▶</div><div class="short-duration">0:52</div></div><div class="short-info"><div class="short-tag">Fiscalité</div><div class="short-title">Pourquoi créer sa société à Hong Kong en 2026</div></div></div>
-      <div class="short-card"><div class="short-thumb"><div class="short-play">▶</div><div class="short-duration">0:45</div></div><div class="short-info"><div class="short-tag">Expatriation</div><div class="short-title">Le vrai coût de la vie à Dubai — chiffres réels</div></div></div>
-      <div class="short-card"><div class="short-thumb"><div class="short-play">▶</div><div class="short-duration">0:59</div></div><div class="short-info"><div class="short-tag">E-commerce</div><div class="short-title">Amazon FBA vs Shopify : lequel choisir pour débuter</div></div></div>
-      <div class="short-card"><div class="short-thumb"><div class="short-play">▶</div><div class="short-duration">0:48</div></div><div class="short-info"><div class="short-tag">Mindset</div><div class="short-title">L'erreur numéro 1 des entrepreneurs débutants</div></div></div>
-      <div class="short-card"><div class="short-thumb"><div class="short-play">▶</div><div class="short-duration">0:55</div></div><div class="short-info"><div class="short-tag">Finance</div><div class="short-title">Wise vs Airwallex : lequel pour payer tes fournisseurs chinois</div></div></div>
+      <div id="shortsContainer" style="display:flex;gap:1rem;width:100%">
+        <div style="color:rgba(240,237,228,0.3);font-size:0.82rem;padding:2rem;text-align:center;width:100%">Chargement des shorts...</div>
+      </div>
     </div>
     <div class="shorts-nav">
       <button class="snav-btn" id="sPrev">←</button>
@@ -1355,13 +1352,54 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // Supabase
+    const _sb = supabase.createClient(
+      'https://grwimhqsthcmfwblwdwg.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+    )
+
+    async function loadShorts() {
+      const { data } = await _sb
+        .from('shorts')
+        .select('*')
+        .eq('status', 'published')
+        .order('created_at', { ascending: false })
+
+      const container = document.getElementById('shortsContainer')
+
+      if (!data || data.length === 0) {
+        container.innerHTML = '<div style="color:rgba(240,237,228,0.3);font-size:0.82rem;padding:2rem;text-align:center;width:100%">Aucun short disponible pour l'instant.</div>'
+        return
+      }
+
+      container.innerHTML = data.map(s => `
+        <div class="short-card" onclick="window.open('https://youtube.com/shorts/${s.youtube_id}','_blank')" style="cursor:pointer">
+          <div class="short-thumb">
+            <img src="https://i.ytimg.com/vi/${s.youtube_id}/mqdefault.jpg"
+              alt="${s.title}"
+              style="width:100%;height:100%;object-fit:cover;display:block"
+              onerror="this.style.display='none';this.parentElement.querySelector('.short-play').style.opacity='0.8'">
+            <div class="short-play" style="position:absolute">▶</div>
+          </div>
+          <div class="short-info">
+            <div class="short-tag">${s.category || ''}</div>
+            <div class="short-title">${s.title}</div>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    loadShorts()
+
+    // Navigation
     const track = document.getElementById('shortsTrack');
     document.getElementById('sNext').addEventListener('click', () => {
-      track.scrollBy({ left: 220, behavior: 'smooth' });
+      track.scrollBy({ left: 200, behavior: 'smooth' });
     });
     document.getElementById('sPrev').addEventListener('click', () => {
-      track.scrollBy({ left: -220, behavior: 'smooth' });
+      track.scrollBy({ left: -200, behavior: 'smooth' });
     });
   </script>
 
