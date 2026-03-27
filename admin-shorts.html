@@ -6,7 +6,7 @@
   <title>Shorts — SBW Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>const PAGE_ID = 'shorts'</script>
+  <script>const PAGE_ID = 'articles'</script>
   <link rel="stylesheet" href="admin.css">
   <style>
     .short-preview {
@@ -221,49 +221,56 @@
       el.innerHTML = '<div class="empty-row">Aucun short ajouté. Clique sur "+ Ajouter un Short" pour commencer.</div>'
       return
     }
-    el.innerHTML = shorts.map(s => `
-      <div class="short-row">
-        <div class="short-preview">
-          <img src="https://i.ytimg.com/vi/${s.youtube_id}/mqdefault.jpg" alt="${s.title}"
-            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="short-preview-placeholder" style="display:none">▶</div>
-        </div>
-        <div class="short-info">
-          <div class="short-title-text">${s.title}</div>
-          <div class="short-meta">
-            <span style="color:var(--red);font-size:0.65rem;text-transform:uppercase;letter-spacing:0.08em">${s.category || '—'}</span>
-            <span>·</span>
-            <span>ID: ${s.youtube_id}</span>
-            <span>·</span>
-            <span>${formatDate(s.created_at)}</span>
-          </div>
-        </div>
-        <span class="status-pill ${s.status === 'published' ? 'sent' : 'draft'}">${s.status === 'published' ? 'Publié' : 'Brouillon'}</span>
-        <div style="display:flex;gap:6px">
-          <button class="row-action" onclick="editShort('${s.id}','${s.youtube_id}','${s.title}','${s.category||''}','${s.status}')">Modifier</button>
-          <a href="https://youtube.com/shorts/${s.youtube_id}" target="_blank" class="row-action">Voir ↗</a>
-          <button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="deleteShort('${s.id}')">Suppr.</button>
-        </div>
-      </div>
-    `).join('')
+    var html = ''
+    for (var i = 0; i < shorts.length; i++) {
+      var s = shorts[i]
+      var statusClass = s.status === 'published' ? 'sent' : 'draft'
+      var statusLabel = s.status === 'published' ? 'Publié' : 'Brouillon'
+      html += '<div class="short-row">'
+      html += '<div class="short-preview">'
+      html += '<img src="https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg" alt="Short" onerror="this.style.display='none'">'
+      html += '</div>'
+      html += '<div class="short-info">'
+      html += '<div class="short-title-text">' + s.title + '</div>'
+      html += '<div class="short-meta">'
+      html += '<span style="color:var(--red);font-size:0.65rem;text-transform:uppercase">' + (s.category || '—') + '</span>'
+      html += '<span>·</span><span>ID: ' + s.youtube_id + '</span>'
+      html += '<span>·</span><span>' + formatDate(s.created_at) + '</span>'
+      html += '</div></div>'
+      html += '<span class="status-pill ' + statusClass + '">' + statusLabel + '</span>'
+      html += '<div style="display:flex;gap:6px">'
+      html += '<button class="row-action" data-id="' + s.id + '" data-ytid="' + s.youtube_id + '" data-cat="' + (s.category||'') + '" data-status="' + s.status + '" onclick="editShortFromBtn(this)">Modifier</button>'
+      html += '<a href="https://youtube.com/shorts/' + s.youtube_id + '" target="_blank" class="row-action">Voir ↗</a>'
+      html += '<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" data-id="' + s.id + '" onclick="deleteShortFromBtn(this)">Suppr.</button>'
+      html += '</div></div>'
+    }
+    el.innerHTML = html
+    // Stocker les titres séparément pour éviter les problèmes d'échappement
+    el.querySelectorAll('[data-id]').forEach(function(btn) {
+      var id = btn.getAttribute('data-id')
+      var short = shorts.find(function(s) { return s.id === id })
+      if (short) btn._shortData = short
+    })
   }
 
   function renderPreview(shorts) {
-    const el = document.getElementById('shortsPreview')
+    var el = document.getElementById('shortsPreview')
     if (!shorts.length) {
       el.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);padding:2rem;text-align:center;width:100%">Aucun short publié</div>'
       return
     }
-    el.innerHTML = shorts.map(s => `
-      <div style="flex:0 0 100px;cursor:pointer" onclick="window.open('https://youtube.com/shorts/${s.youtube_id}','_blank')">
-        <div style="width:100px;height:178px;border-radius:8px;overflow:hidden;background:#1C1C1A;margin-bottom:6px;border:0.5px solid var(--subtle)">
-          <img src="https://i.ytimg.com/vi/${s.youtube_id}/mqdefault.jpg" alt="${s.title}"
-            style="width:100%;height:100%;object-fit:cover">
-        </div>
-        <div style="font-size:0.68rem;font-weight:500;line-height:1.3;color:var(--ink)">${s.title}</div>
-        <div style="font-size:0.6rem;color:var(--red);margin-top:2px;text-transform:uppercase;letter-spacing:0.06em">${s.category||''}</div>
-      </div>
-    `).join('')
+    var html = ''
+    for (var i = 0; i < shorts.length; i++) {
+      var s = shorts[i]
+      html += '<div style="flex:0 0 100px;cursor:pointer" onclick="window.open('https://youtube.com/shorts/' + s.youtube_id + '','_blank')">'
+      html += '<div style="width:100px;height:178px;border-radius:8px;overflow:hidden;background:#1C1C1A;margin-bottom:6px;border:0.5px solid var(--subtle)">'
+      html += '<img src="https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg" alt="Short" style="width:100%;height:100%;object-fit:cover">'
+      html += '</div>'
+      html += '<div style="font-size:0.68rem;font-weight:500;line-height:1.3;color:var(--ink)">' + s.title + '</div>'
+      html += '<div style="font-size:0.6rem;color:var(--red);margin-top:2px;text-transform:uppercase">' + (s.category||'') + '</div>'
+      html += '</div>'
+    }
+    el.innerHTML = html
   }
 
   function extractId() {
@@ -288,7 +295,7 @@
     if (id) {
       currentYoutubeId = id
       document.getElementById('detectedId').textContent = id
-      document.getElementById('previewImg').src = `https://i.ytimg.com/vi/${id}/mqdefault.jpg`
+      document.getElementById('previewImg').src = 'https://i.ytimg.com/vi/' + id + '/mqdefault.jpg'
       document.getElementById('previewWrap').style.display = 'flex'
     } else {
       currentYoutubeId = null
@@ -299,7 +306,7 @@
   function openModal(id, ytId, title, cat, status) {
     editingId = id || null
     document.getElementById('modalTitle').textContent = id ? 'Modifier le Short' : 'Ajouter un Short YouTube'
-    document.getElementById('shortUrl').value = ytId ? `https://youtube.com/shorts/${ytId}` : ''
+    document.getElementById('shortUrl').value = ytId ? 'https://youtube.com/shorts/' + ytId : ''
     document.getElementById('shortTitle').value = title || ''
     document.getElementById('shortCategory').value = cat || ''
     document.getElementById('shortStatus').value = status || 'published'
@@ -308,6 +315,15 @@
   }
 
   function editShort(id, ytId, title, cat, status) { openModal(id, ytId, title, cat, status) }
+
+  function editShortFromBtn(btn) {
+    var s = btn._shortData || {}
+    openModal(s.id, s.youtube_id, s.title, s.category, s.status)
+  }
+
+  function deleteShortFromBtn(btn) {
+    deleteShort(btn.getAttribute('data-id'))
+  }
 
   function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId = null; currentYoutubeId = null }
   function closeModalClick(e) { if (e.target === document.getElementById('modalOverlay')) closeModal() }

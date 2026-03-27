@@ -73,16 +73,14 @@ function renderUserNav(profile) {
     ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)
     : profile.email.slice(0,2).toUpperCase()
 
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:0.5px solid rgba(255,255,255,0.08)">
-      <div style="width:28px;height:28px;border-radius:50%;background:rgba(166,124,58,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#A67C3A;flex-shrink:0">${initials}</div>
-      <div style="min-width:0;flex:1">
-        <div style="font-size:12px;font-weight:500;color:#F0EDE4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${profile.full_name || profile.email}</div>
-        <div style="font-size:10px;color:rgba(240,237,228,0.4);text-transform:capitalize">${profile.role}</div>
-      </div>
-      <button onclick="handleLogout()" style="background:none;border:none;cursor:pointer;color:rgba(240,237,228,0.3);font-size:12px;padding:2px" title="Déconnexion">⏻</button>
-    </div>
-  `
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:0.5px solid rgba(255,255,255,0.08)">' +
+    '<div style="width:28px;height:28px;border-radius:50%;background:rgba(166,124,58,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#A67C3A;flex-shrink:0">' + initials + '</div>' +
+    '<div style="min-width:0;flex:1">' +
+      '<div style="font-size:12px;font-weight:500;color:#F0EDE4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (profile.full_name || profile.email) + '</div>' +
+      '<div style="font-size:10px;color:rgba(240,237,228,0.4);text-transform:capitalize">' + profile.role + '</div>' +
+    '</div>' +
+    '<button onclick="handleLogout()" style="background:none;border:none;cursor:pointer;color:rgba(240,237,228,0.3);font-size:12px;padding:2px" title="Déconnexion">&#9167;</button>' +
+  '</div>'
 }
 
 function renderSidebarByRole(role) {
