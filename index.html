@@ -1246,110 +1246,92 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
     );
 
-    // SIDE CARDS HERO
-    async function loadSideCards() {
+    // HERO ARTICLES : 7 catégories différentes → 3 side cards + 4 ticker
+    async function loadSideCards() {}  // appelé séparément mais géré dans loadHeroArticles
+
+    async function loadTicker() {}  // idem
+
+    async function loadHeroArticles() {
       try {
         var res = await SB.from("articles")
           .select("id,title,category,youtube_id,deck")
           .eq("status","published")
           .order("created_at",{ascending:false})
-          .limit(20);
+          .limit(50);
         var all = res.data || [];
 
-        // 1 article par catégorie, max 3
-        var seen = {};
-        var articles = [];
-        for (var i = 0; i < all.length; i++) {
-          var cat = (all[i].category || "").split(",")[0].trim();
-          if (cat && !seen[cat] && articles.length < 3) {
-            seen[cat] = true;
-            articles.push(all[i]);
-          }
-        }
-        var container = document.getElementById("sideCards");
-        if (!container || !articles.length) return;
-
-        container.innerHTML = "";
-        for (var i = 0; i < articles.length; i++) {
-          var a = articles[i];
-          var cat = (a.category || "").split(",")[0].trim();
-          var words = (a.deck || "").split(" ").length;
-          var mins = Math.max(3, Math.round(words / 200) + 5);
-          var link = "article.html?id=" + a.id;
-
-          var card = document.createElement("div");
-          card.className = "side-card";
-          card.style.cursor = "pointer";
-          card.onclick = (function(l) { return function() { window.location.href = l; }; })(link);
-
-          var top = document.createElement("div");
-          var catEl = document.createElement("div");
-          catEl.className = "sc-cat";
-          catEl.textContent = cat;
-          var titleEl = document.createElement("div");
-          titleEl.className = "sc-title";
-          titleEl.textContent = a.title;
-          top.appendChild(catEl);
-          top.appendChild(titleEl);
-
-          var meta = document.createElement("div");
-          meta.className = "sc-meta";
-          var timeEl = document.createElement("span");
-          timeEl.textContent = mins + " min";
-          meta.appendChild(timeEl);
-          if (a.youtube_id) {
-            var ytEl = document.createElement("span");
-            ytEl.className = "sc-yt";
-            ytEl.textContent = "▶ YouTube";
-            meta.appendChild(ytEl);
-          }
-
-          card.appendChild(top);
-          card.appendChild(meta);
-          container.appendChild(card);
-        }
-      } catch(e) { console.error("SideCards error:", e); }
-    }
-
-    // TICKER
-    async function loadTicker() {
-      try {
-        var res = await SB.from("articles").select("id,title,category").eq("status","published").order("created_at",{ascending:false}).limit(20);
-        var articles = res.data || [];
-        if (!articles.length) return;
-
-        // Prendre le dernier article de chaque catégorie
+        // 1 article par catégorie, max 7
         var seen = {};
         var byCategory = [];
-        for (var i = 0; i < articles.length; i++) {
-          var a = articles[i];
-          var cat = (a.category || "").split(",")[0].trim();
-          if (cat && !seen[cat]) {
+        for (var i = 0; i < all.length; i++) {
+          var cat = (all[i].category || "").split(",")[0].trim();
+          if (cat && !seen[cat] && byCategory.length < 7) {
             seen[cat] = true;
-            byCategory.push({ id: a.id, title: a.title, cat: cat });
+            byCategory.push(all[i]);
           }
         }
 
-        var track = document.getElementById("tickerTrack");
-        if (!track) return;
-        track.innerHTML = "";
-
-        // Doubler les items pour l'effet défilant infini
-        var items = byCategory.concat(byCategory);
-        for (var j = 0; j < items.length; j++) {
-          var item = items[j];
-          var div = document.createElement("div");
-          div.className = "ticker-item";
-          div.setAttribute("data-id", item.id);
-          div.innerHTML = "<b>" + item.cat + "</b> — " + item.title;
-          div.addEventListener("click", (function(id) {
-            return function() { window.location.href = "article.html?id=" + id; };
-          })(item.id));
-          track.appendChild(div);
+        // 3 premiers → side cards
+        var sideArticles = byCategory.slice(0, 3);
+        var container = document.getElementById("sideCards");
+        if (container && sideArticles.length) {
+          container.innerHTML = "";
+          for (var i = 0; i < sideArticles.length; i++) {
+            var a = sideArticles[i];
+            var cat = (a.category || "").split(",")[0].trim();
+            var words = (a.deck || "").split(" ").length;
+            var mins = Math.max(3, Math.round(words / 200) + 5);
+            var link = "article.html?id=" + a.id;
+            var card = document.createElement("div");
+            card.className = "side-card";
+            card.style.cursor = "pointer";
+            card.onclick = (function(l) { return function() { window.location.href = l; }; })(link);
+            var top = document.createElement("div");
+            var catEl = document.createElement("div");
+            catEl.className = "sc-cat";
+            catEl.textContent = cat;
+            var titleEl = document.createElement("div");
+            titleEl.className = "sc-title";
+            titleEl.textContent = a.title;
+            top.appendChild(catEl);
+            top.appendChild(titleEl);
+            var meta = document.createElement("div");
+            meta.className = "sc-meta";
+            var timeEl = document.createElement("span");
+            timeEl.textContent = mins + " min";
+            meta.appendChild(timeEl);
+            if (a.youtube_id) {
+              var ytEl = document.createElement("span");
+              ytEl.className = "sc-yt";
+              ytEl.textContent = "▶ YouTube";
+              meta.appendChild(ytEl);
+            }
+            card.appendChild(top);
+            card.appendChild(meta);
+            container.appendChild(card);
+          }
         }
-      } catch(e) {
-        console.error("Ticker error:", e);
-      }
+
+        // 4 suivants → ticker
+        var tickerArticles = byCategory.slice(3, 7);
+        var track = document.getElementById("tickerTrack");
+        if (track && tickerArticles.length) {
+          track.innerHTML = "";
+          // Doubler pour défilement infini
+          var items = tickerArticles.concat(tickerArticles);
+          for (var j = 0; j < items.length; j++) {
+            var item = items[j];
+            var div = document.createElement("div");
+            div.className = "ticker-item";
+            var itemCat = (item.category || "").split(",")[0].trim();
+            div.innerHTML = "<b>" + itemCat + "</b> — " + item.title;
+            div.addEventListener("click", (function(id) {
+              return function() { window.location.href = "article.html?id=" + id; };
+            })(item.id));
+            track.appendChild(div);
+          }
+        }
+      } catch(e) { console.error("HeroArticles error:", e); }
     }
 
     // ARTICLE À LA UNE
@@ -1615,8 +1597,7 @@
     }
 
     loadFeatured();
-    loadSideCards();
-    loadTicker();
+    loadHeroArticles();
     loadShorts();
     loadArticles();
   </script>
