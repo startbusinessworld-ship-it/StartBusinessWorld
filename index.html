@@ -739,10 +739,15 @@
     .shorts-track::-webkit-scrollbar { display: none; }
     .shorts-track:active { cursor: grabbing; }
     .short-card { flex: 0 0 180px; scroll-snap-align: start; cursor: pointer; }
+    .video-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.88); z-index: 1000; align-items: center; justify-content: center; }
+    .video-modal.open { display: flex; }
+    .video-modal-inner { position: relative; width: 100%; max-width: 380px; aspect-ratio: 9/16; border-radius: 12px; overflow: hidden; }
+    .video-modal-inner iframe { width: 100%; height: 100%; border: none; }
+    .video-modal-close { position: absolute; top: -40px; right: 0; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 8px; }
     .short-thumb { width: 180px; height: 320px; background: #1C1C1A; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); position: relative; overflow: hidden; transition: border-color 0.15s; margin-bottom: 0.8rem; }
     .short-card:hover .short-thumb { border-color: rgba(255,255,255,0.18); }
     .short-card:hover .short-play { opacity: 1; transform: scale(1.1); }
-    .short-play { width: 44px; height: 44px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #fff; opacity: 0.65; transition: all 0.2s; padding-left: 3px; }
+    .short-play { width: 44px; height: 44px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #fff; opacity: 0.65; transition: all 0.2s; padding-left: 3px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2; }
     .short-duration { position: absolute; bottom: 0.6rem; right: 0.6rem; font-size: 0.62rem; font-weight: 500; background: rgba(0,0,0,0.65); color: #fff; padding: 0.15rem 0.45rem; border-radius: 3px; }
     .short-tag { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); margin-bottom: 0.3rem; }
     .short-title { font-family: 'DM Serif Display', serif; font-size: 0.82rem; line-height: 1.35; color: rgba(250,250,248,0.7); }
@@ -1217,6 +1222,14 @@
     </div>
   </footer>
 
+  <!-- MODALE VIDEO -->
+  <div class="video-modal" id="videoModal" onclick="closeVideo(event)">
+    <div class="video-modal-inner">
+      <button class="video-modal-close" onclick="closeVideoBtn()">✕</button>
+      <iframe id="videoFrame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     var SB = supabase.createClient(
@@ -1247,7 +1260,7 @@
 
           var card = document.createElement("div");
           card.className = "short-card";
-          card.setAttribute("data-url", "https://youtube.com/shorts/" + s.youtube_id);
+          card.setAttribute("data-ytid", s.youtube_id);
 
           var thumb = document.createElement("div");
           thumb.className = "short-thumb";
@@ -1281,7 +1294,7 @@
           card.appendChild(info);
 
           card.addEventListener("click", function() {
-            window.open(this.getAttribute("data-url"), "_blank");
+            openVideo(this.getAttribute("data-ytid"));
           });
 
           container.appendChild(card);
@@ -1422,6 +1435,26 @@
         document.body.style.overflow = "";
       }
     });
+
+    function openVideo(ytId) {
+      var modal = document.getElementById("videoModal");
+      var frame = document.getElementById("videoFrame");
+      frame.src = "https://www.youtube.com/embed/" + ytId + "?autoplay=1&rel=0";
+      modal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeVideo(e) {
+      if (e.target === document.getElementById("videoModal")) closeVideoBtn();
+    }
+
+    function closeVideoBtn() {
+      var modal = document.getElementById("videoModal");
+      var frame = document.getElementById("videoFrame");
+      frame.src = "";
+      modal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
 
     loadShorts();
     loadArticles();
