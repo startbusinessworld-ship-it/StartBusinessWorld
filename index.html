@@ -1417,12 +1417,11 @@
 
       for (var i = 0; i < filtered.length; i++) {
         var a = filtered[i];
-        var isFeatured = (i === 0 && currentTheme === "all");
         var firstCat = (a.category || "").split(",")[0].trim();
         var link = "article.html?id=" + a.id;
 
         var card = document.createElement("div");
-        card.className = "article" + (isFeatured ? " featured" : "");
+        card.className = "article";
         card.setAttribute("data-link", link);
         card.style.cursor = "pointer";
 
