@@ -215,23 +215,118 @@ textarea#msgInput::placeholder{color:var(--muted)}
 .notif-author{font-weight:500;margin-bottom:2px;font-size:.78rem}
 .notif-text{color:rgba(240,237,228,.6);font-size:.75rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-@media(max-width:768px){
-  .channels-sidebar{display:none}
-  .msg-body{max-width:82%}
-  .chat-header{padding:8px 12px}
-  .ch-members{display:none}
-  .search-btn span{display:none}
-  .messages-wrap{padding:10px 12px}
-  .input-bar{padding:8px 10px}
-  .msg-actions{display:none !important}
+/* ── MOBILE TOPBAR ── */
+.mob-topbar{
+  display:none;background:var(--dark);height:50px;
+  padding:0 14px;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;flex-shrink:0;
 }
+.mob-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:.95rem;text-decoration:none}
+.mob-topbar-right{display:flex;align-items:center;gap:8px}
+.mob-channel-selector{
+  display:none;
+  background:rgba(255,255,255,.08);border:none;
+  color:#fff;font-family:"DM Sans",sans-serif;font-size:.78rem;
+  padding:5px 10px;border-radius:6px;cursor:pointer;
+  -webkit-appearance:none;appearance:none;
+}
+
+/* Réactions longpress mobile */
+.mob-reaction-bar{
+  display:none;
+  position:fixed;z-index:400;
+  background:#fff;border-radius:30px;padding:8px 12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.15);gap:6px;
+  transform:translateY(-8px);
+}
+.mob-reaction-bar.on{display:flex}
+.mob-react-opt{font-size:1.4rem;cursor:pointer;padding:2px 4px;border-radius:6px;transition:transform .1s}
+.mob-react-opt:active{transform:scale(1.2)}
+
+/* Bottom nav */
+.mob-bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--dark);border-top:1px solid rgba(255,255,255,.08);
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:200;
+}
+.mob-nav-items{display:flex;justify-content:space-around}
+.mob-nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:3px 6px;cursor:pointer;border:none;background:none;
+  color:rgba(255,255,255,.3);font-family:inherit;
+  font-size:.52rem;font-weight:500;text-transform:uppercase;letter-spacing:.03em;
+}
+.mob-nav-btn.act{color:var(--gold)}
+.mob-nav-btn .ico{font-size:1.15rem}
+
+@media(max-width:768px){
+  /* Cacher nav desktop */
+  nav{display:none}
+  .mob-topbar{display:flex}
+  .mob-channel-selector{display:block}
+  .mob-bottom-nav{display:block}
+
+  /* Layout */
+  .app{height:calc(100vh - 50px)}
+  .channels-sidebar{display:none}
+  .chat-zone{height:100%}
+
+  /* Header */
+  .chat-header{padding:7px 12px;min-height:44px}
+  .ch-title{font-size:.85rem}
+  .ch-members{display:none}
+  .search-btn{padding:5px 8px;font-size:.72rem}
+  .search-btn svg{width:12px;height:12px}
+
+  /* Messages */
+  .messages-wrap{padding:8px 10px 8px;padding-bottom:calc(8px + env(safe-area-inset-bottom))}
+  .msg-body{max-width:84%}
+  .msg-bubble{font-size:.83rem;padding:7px 11px}
+  .msg-av{width:26px;height:26px;font-size:.6rem}
+  .msg-name{font-size:.6rem}
+
+  /* Input */
+  .input-bar{
+    padding:8px 10px;
+    padding-bottom:calc(8px + env(safe-area-inset-bottom));
+    gap:7px;
+  }
+  textarea#msgInput{font-size:.87rem}
+  .send-btn{width:32px;height:32px}
+
+  /* Reply */
+  .reply-preview{padding:7px 12px}
+  .reply-preview-text{font-size:.75rem}
+
+  /* Typing */
+  .typing-bar{height:20px;padding:0 12px}
+
+  /* Actions hover → cachées (remplacées par longpress) */
+  .msg-actions{display:none !important}
+  .msg:hover .msg-actions{opacity:0 !important}
+
+  /* Reactions plus grandes */
+  .reaction{padding:3px 9px;font-size:.82rem}
+
+  /* Pinned */
+  .pinned-banner{padding:6px 12px;font-size:.72rem}
+
+  /* Search */
+  .search-bar{padding:7px 12px}
+  .search-input{font-size:.83rem}
+
+  /* Scroll messages au dessus de la bottom nav */
+  .messages-wrap{padding-bottom:calc(56px + env(safe-area-inset-bottom)) !important}
+}
+
 @media(max-width:768px) and (hover:none){
-  .msg:hover .msg-actions{opacity:0}
+  .msg:hover .msg-actions{opacity:0 !important}
 }
 </style>
 </head>
 <body>
 
+<!-- NAV DESKTOP -->
 <nav>
   <a href="index.html" class="nav-logo">Start Business World</a>
   <div class="nav-right">
@@ -240,6 +335,23 @@ textarea#msgInput::placeholder{color:var(--muted)}
     <button class="btn-sm" id="logoutBtn">Déconnexion</button>
   </div>
 </nav>
+
+<!-- TOPBAR MOBILE -->
+<div class="mob-topbar">
+  <a href="index.html" class="mob-logo">SBW</a>
+  <div class="mob-topbar-right">
+    <select class="mob-channel-selector" id="mobChannelSelect" onchange="onMobChannelChange(this.value)">
+      <option value="general">#général</option>
+      <option value="chine">#business-chine</option>
+      <option value="fiscalite">#fiscalité</option>
+      <option value="ecommerce">#e-commerce</option>
+      <option value="expatriation">#expatriation</option>
+      <option value="victoires">#🏆 victoires</option>
+    </select>
+    <button onclick="showRules()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:.85rem;cursor:pointer;padding:4px">📋</button>
+    <button id="logoutBtnMob" style="background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);padding:3px 9px;border-radius:4px;font-size:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif">✕</button>
+  </div>
+</div>
 
 <div class="app">
 
@@ -334,6 +446,38 @@ textarea#msgInput::placeholder{color:var(--muted)}
 <div class="notif-toast" id="notifToast" onclick="this.classList.remove('show')">
   <div class="notif-author" id="notifAuthor"></div>
   <div class="notif-text" id="notifText"></div>
+</div>
+
+<!-- BOTTOM NAV MOBILE -->
+<div class="mob-bottom-nav">
+  <div class="mob-nav-items">
+    <button class="mob-nav-btn" onclick="window.location.href='client-dashboard.html'">
+      <span class="ico">🏠</span><span>Accueil</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-formations.html'">
+      <span class="ico">🎓</span><span>Formations</span>
+    </button>
+    <button class="mob-nav-btn act">
+      <span class="ico">💬</span><span>Chat</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-prestige.html'">
+      <span class="ico">⭐</span><span>Prestige</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-affiliation.html'">
+      <span class="ico">💸</span><span>Affil.</span>
+    </button>
+  </div>
+</div>
+
+<!-- BARRE RÉACTIONS MOBILE (longpress) -->
+<div class="mob-reaction-bar" id="mobReactionBar">
+  <span class="mob-react-opt" onclick="mobReact('👍')">👍</span>
+  <span class="mob-react-opt" onclick="mobReact('🔥')">🔥</span>
+  <span class="mob-react-opt" onclick="mobReact('💯')">💯</span>
+  <span class="mob-react-opt" onclick="mobReact('🙌')">🙌</span>
+  <span class="mob-react-opt" onclick="mobReact('❤️')">❤️</span>
+  <span class="mob-react-opt" onclick="mobReplyFromBar()" style="font-size:1rem;padding:4px 6px">↩</span>
+  <span class="mob-react-opt" onclick="closeMobReactionBar()" style="font-size:.85rem;color:var(--muted);padding:4px 6px">✕</span>
 </div>
 
 <!-- RÈGLES -->
@@ -874,6 +1018,90 @@ function escHtml(t) { return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 function escAttr(t) { return (t||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;"); }
 function showRules() { document.getElementById("rulesOverlay").classList.add("on"); }
 function hideRules() { document.getElementById("rulesOverlay").classList.remove("on"); }
+
+// ── MOBILE ──
+var mobCurrentMsgId = null;
+var mobCurrentMsg = null;
+var longpressTimer = null;
+
+function onMobChannelChange(ch) {
+  curChannel = ch;
+  // Sync sidebar desktop
+  document.querySelectorAll(".ch-item").forEach(function(el) {
+    el.classList.toggle("active", el.getAttribute("data-channel") === ch);
+  });
+  var nameMap = { general:"général", chine:"business-chine", fiscalite:"fiscalité", ecommerce:"e-commerce", expatriation:"expatriation", victoires:"🏆 victoires" };
+  document.getElementById("channelName").textContent = nameMap[ch] || ch;
+  document.getElementById("msgInput").placeholder = "Message #" + (nameMap[ch] || ch) + "...";
+  cancelReply();
+  loadChannel(ch);
+}
+
+// Long press sur les messages pour réactions/reply
+function setupLongpress(el, msgId) {
+  el.addEventListener("touchstart", function(e) {
+    longpressTimer = setTimeout(function() {
+      mobCurrentMsgId = msgId;
+      var msg = messages.find(function(m) { return m.id === msgId; });
+      mobCurrentMsg = msg;
+      var bar = document.getElementById("mobReactionBar");
+      var rect = el.getBoundingClientRect();
+      bar.style.left = Math.min(rect.left, window.innerWidth - 220) + "px";
+      bar.style.top = (rect.top - 60 + window.scrollY) + "px";
+      bar.classList.add("on");
+      if (navigator.vibrate) navigator.vibrate(40);
+    }, 500);
+  }, { passive: true });
+  el.addEventListener("touchend", function() { clearTimeout(longpressTimer); }, { passive: true });
+  el.addEventListener("touchmove", function() { clearTimeout(longpressTimer); }, { passive: true });
+}
+
+function mobReact(emoji) {
+  if (mobCurrentMsgId) addReaction(mobCurrentMsgId, emoji);
+  closeMobReactionBar();
+}
+
+function mobReplyFromBar() {
+  if (mobCurrentMsg) {
+    setReply(mobCurrentMsg.id, mobCurrentMsg.user_name, mobCurrentMsg.content.slice(0, 60));
+  }
+  closeMobReactionBar();
+  document.getElementById("msgInput").focus();
+}
+
+function closeMobReactionBar() {
+  document.getElementById("mobReactionBar").classList.remove("on");
+  mobCurrentMsgId = null;
+  mobCurrentMsg = null;
+}
+
+document.addEventListener("touchstart", function(e) {
+  if (!e.target.closest("#mobReactionBar")) closeMobReactionBar();
+}, { passive: true });
+
+// Patch appendMsgEl pour ajouter le longpress
+var _origAppend = appendMsgEl;
+appendMsgEl = function(msg, container, isNew) {
+  _origAppend(msg, container, isNew);
+  if (window.innerWidth <= 768) {
+    var el = document.getElementById("msg_" + msg.id);
+    if (el) setupLongpress(el, msg.id);
+  }
+};
+
+// Logout mobile
+var lbm = document.getElementById("logoutBtnMob");
+if (lbm) lbm.onclick = async function() {
+  await SB.auth.signOut(); window.location.href = "client-login.html";
+};
+
+// Keyboard sur iOS — scroll en bas quand clavier s'ouvre
+var input = document.getElementById("msgInput");
+if (input) {
+  input.addEventListener("focus", function() {
+    setTimeout(function() { scrollToBottom(true); }, 300);
+  });
+}
 
 init();
 </script>
