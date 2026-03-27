@@ -189,28 +189,139 @@ nav{
 .no-formation svg{opacity:.15}
 
 /* Mobile */
+/* ── MOBILE TOPBAR ── */
+.mobile-topbar{
+  display:none;background:var(--dark);
+  height:50px;padding:0 14px;
+  align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;flex-shrink:0;
+}
+.mob-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:.95rem;text-decoration:none}
+.mob-back{font-size:.75rem;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:inherit;transition:color .15s}
+.mob-back:hover{color:#fff}
+
+/* ── MOBILE BOTTOM NAV ── */
+.mob-bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--dark);border-top:1px solid rgba(255,255,255,.08);
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:200;
+}
+.mob-nav-items{display:flex;justify-content:space-around}
+.mob-nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:3px 6px;cursor:pointer;border:none;background:none;
+  color:rgba(255,255,255,.3);font-family:inherit;
+  font-size:.52rem;font-weight:500;text-transform:uppercase;letter-spacing:.03em;
+}
+.mob-nav-btn.act{color:var(--gold)}
+.mob-nav-btn .ico{font-size:1.15rem}
+
+/* ── TIROIR MODULES MOBILE ── */
+.mob-modules-drawer{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--dark);border-radius:16px 16px 0 0;
+  z-index:300;max-height:70vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s ease;
+}
+.mob-modules-drawer.open{transform:translateY(0)}
+.mob-drawer-handle{
+  width:36px;height:4px;background:rgba(255,255,255,.2);
+  border-radius:2px;margin:12px auto 0;
+}
+.mob-drawer-close{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 16px 8px;
+}
+.mob-drawer-title{font-size:.82rem;font-weight:500;color:#fff}
+.mob-drawer-x{background:none;border:none;color:rgba(255,255,255,.4);font-size:1rem;cursor:pointer;padding:2px 6px}
+.mob-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.5);z-index:299;
+}
+.mob-overlay.on{display:block}
+
+/* ── STICKY ACTIONS MOBILE ── */
+.mob-sticky-actions{
+  display:none;
+  position:fixed;bottom:calc(52px + env(safe-area-inset-bottom));
+  left:0;right:0;padding:10px 14px;
+  background:rgba(250,250,248,.95);backdrop-filter:blur(8px);
+  border-top:.5px solid var(--subtle);z-index:150;
+  gap:8px;
+}
+.mob-plan-btn{
+  position:fixed;
+  bottom:calc(60px + env(safe-area-inset-bottom));
+  right:14px;z-index:160;
+  background:var(--dark);color:rgba(255,255,255,.7);
+  border:.5px solid rgba(255,255,255,.15);
+  border-radius:22px;padding:7px 14px;
+  font-size:.72rem;font-family:inherit;cursor:pointer;
+  display:none;align-items:center;gap:5px;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+
 @media(max-width:768px){
+  /* Cacher nav desktop */
+  nav{display:none}
+  .mobile-topbar{display:none} /* on utilise .mob-topbar */
+  .mob-top{display:flex !important}
+
   .layout{grid-template-columns:1fr}
   .sidebar{display:none}
-  .main{min-height:calc(100vh - 54px)}
-  .view-list{padding:1rem}
-  .detail-layout{grid-template-columns:1fr}
-  .modules-panel{max-height:50vh;border-left:none;border-top:.5px solid var(--subtle);position:static}
-  .f-grid{grid-template-columns:1fr 1fr;gap:10px}
-  .player-zone{padding:1rem}
-  .video-box{border-radius:8px}
-  .action-bar{flex-direction:column}
-  .btn-done,.btn-next{width:100%}
-  .detail-header{padding:10px 14px;flex-wrap:wrap;gap:8px}
+  .main{min-height:calc(100vh - 50px)}
+
+  /* VUE LISTE */
+  .view-list{padding:12px 12px 80px}
+  .welcome-title{font-size:1.3rem}
+  .welcome-sub{font-size:.78rem;margin-bottom:16px}
+  .f-grid{grid-template-columns:1fr;gap:10px}
+  .f-card-cover{aspect-ratio:21/9;font-size:2rem}
+
+  /* VUE DÉTAIL */
+  .detail-header{
+    padding:8px 12px;position:sticky;top:50px;
+    background:#fff;z-index:10;
+    border-bottom:.5px solid var(--subtle);
+  }
   .detail-meta{display:none}
+  .detail-title{font-size:.88rem}
+
+  .detail-layout{grid-template-columns:1fr;overflow:visible}
+
+  /* Vidéo pleine largeur */
+  .player-zone{padding:0 0 100px}
+  .video-box{
+    border-radius:0;
+    margin-bottom:0;
+    aspect-ratio:16/9;
+  }
+
+  /* Infos leçon sous la vidéo */
+  .lecon-title-h{font-size:.95rem;padding:14px 14px 6px}
+  .lecon-body{padding:0 14px;font-size:.83rem}
+
+  /* Actions sticky */
+  .action-bar{display:none}
+  .mob-sticky-actions{display:flex}
+  .btn-done,.btn-next{flex:1}
+
+  /* Modules panel → tiroir */
+  .modules-panel{display:none}
+  .mob-modules-drawer{display:block}
+  .mob-bottom-nav{display:block}
+  .mob-plan-btn{display:flex}
 }
-@media(max-width:400px){
-  .f-grid{grid-template-columns:1fr}
+
+@media(max-width:380px){
+  .f-card-cover{aspect-ratio:21/9}
 }
 </style>
 </head>
 <body>
 
+<!-- NAV DESKTOP -->
 <nav>
   <a href="index.html" class="nav-logo">Start Business World</a>
   <div class="nav-right">
@@ -219,6 +330,15 @@ nav{
     <button class="btn-logout" id="logoutBtn">Déconnexion</button>
   </div>
 </nav>
+
+<!-- TOPBAR MOBILE -->
+<div style="display:none;background:var(--dark);height:50px;padding:0 14px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0" class="mob-top" id="mobTopbar">
+  <a href="index.html" style="font-family:'DM Serif Display',serif;color:#fff;font-size:.95rem;text-decoration:none">Start Business World</a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <button onclick="window.location.href='client-dashboard.html'" style="font-size:.72rem;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:inherit">← Dashboard</button>
+    <button id="logoutBtnMob" style="background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);padding:3px 10px;border-radius:4px;font-size:.7rem;cursor:pointer;font-family:inherit">Quitter</button>
+  </div>
+</div>
 
 <div class="layout">
 
@@ -299,6 +419,56 @@ nav{
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- STICKY ACTIONS MOBILE -->
+<div class="mob-sticky-actions" id="mobActions">
+  <button class="btn-done" id="btnDoneMob" style="display:none" onclick="markDone()">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8"/></svg>
+    Terminée
+  </button>
+  <button class="btn-next" id="btnNextMob" style="display:none" onclick="goNext()">
+    Suivante →
+  </button>
+</div>
+
+<!-- BOUTON PLAN MOBILE -->
+<button class="mob-plan-btn" id="mobPlanBtn" onclick="openDrawer()">
+  📋 Plan <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l5-4 5 4M3 10l5-4 5 4"/></svg>
+</button>
+
+<!-- OVERLAY -->
+<div class="mob-overlay" id="mobOverlay" onclick="closeDrawer()"></div>
+
+<!-- TIROIR MODULES MOBILE -->
+<div class="mob-modules-drawer" id="mobDrawer">
+  <div class="mob-drawer-handle"></div>
+  <div class="mob-drawer-close">
+    <div class="mob-drawer-title" id="mobDrawerTitle">Plan de la formation</div>
+    <button class="mob-drawer-x" onclick="closeDrawer()">✕</button>
+  </div>
+  <div style="padding:0 0 20px" id="mobModsList"></div>
+</div>
+
+<!-- BOTTOM NAV MOBILE -->
+<div class="mob-bottom-nav">
+  <div class="mob-nav-items">
+    <button class="mob-nav-btn" onclick="window.location.href='client-dashboard.html'">
+      <span class="ico">🏠</span><span>Accueil</span>
+    </button>
+    <button class="mob-nav-btn act">
+      <span class="ico">🎓</span><span>Formations</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-chat.html'">
+      <span class="ico">💬</span><span>Chat</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-prestige.html'">
+      <span class="ico">⭐</span><span>Prestige</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-affiliation.html'">
+      <span class="ico">💸</span><span>Affil.</span>
+    </button>
   </div>
 </div>
 
@@ -616,6 +786,84 @@ function showList() {
   renderSidebar();
   loadFormations();
 }
+
+// ── MOBILE ──
+function isMobile() { return window.innerWidth <= 768; }
+
+function openDrawer() {
+  document.getElementById("mobDrawer").classList.add("open");
+  document.getElementById("mobOverlay").classList.add("on");
+  document.body.style.overflow = "hidden";
+  // Sync contenu
+  var src = document.getElementById("modsList").innerHTML;
+  document.getElementById("mobModsList").innerHTML = src;
+  if (curFormation) document.getElementById("mobDrawerTitle").textContent = curFormation.title;
+}
+
+function closeDrawer() {
+  document.getElementById("mobDrawer").classList.remove("open");
+  document.getElementById("mobOverlay").classList.remove("on");
+  document.body.style.overflow = "";
+}
+
+function syncMobileActions() {
+  if (!isMobile()) return;
+  var btnDone = document.getElementById("btnDone");
+  var btnNext = document.getElementById("btnNext");
+  var btnDoneMob = document.getElementById("btnDoneMob");
+  var btnNextMob = document.getElementById("btnNextMob");
+  if (btnDone && btnDoneMob) {
+    btnDoneMob.style.display = btnDone.style.display;
+    btnDoneMob.className = btnDone.className;
+    btnDoneMob.innerHTML = btnDone.innerHTML;
+  }
+  if (btnNext && btnNextMob) {
+    btnNextMob.style.display = btnNext.style.display;
+  }
+  var plan = document.getElementById("mobPlanBtn");
+  if (plan) plan.style.display = curFormation ? "flex" : "none";
+}
+
+// Sync après playLecon et markDone
+var _origPlay = playLecon;
+playLecon = function(l) {
+  _origPlay(l);
+  setTimeout(syncMobileActions, 50);
+  // Sur mobile scroll en haut
+  if (isMobile()) window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+var _origMark = markDone;
+markDone = function() {
+  _origMark();
+  setTimeout(syncMobileActions, 50);
+  // Resync le tiroir
+  if (document.getElementById("mobDrawer").classList.contains("open")) {
+    var src = document.getElementById("modsList").innerHTML;
+    document.getElementById("mobModsList").innerHTML = src;
+  }
+};
+
+// Logout mobile
+var logoutMob = document.getElementById("logoutBtnMob");
+if (logoutMob) logoutMob.onclick = async function() {
+  await SB.auth.signOut(); window.location.href = "client-login.html";
+};
+
+// Sync logoutBtn
+var lb = document.getElementById("logoutBtn");
+if (lb) lb.onclick = async function() {
+  await SB.auth.signOut(); window.location.href = "client-login.html";
+};
+
+// Swipe down pour fermer le tiroir
+var drawer = document.getElementById("mobDrawer");
+var startY = 0;
+drawer.addEventListener("touchstart", function(e) { startY = e.touches[0].clientY; }, { passive: true });
+drawer.addEventListener("touchmove", function(e) {
+  var diff = e.touches[0].clientY - startY;
+  if (diff > 60) closeDrawer();
+}, { passive: true });
 
 init();
 </script>
