@@ -1012,38 +1012,37 @@
       var ytWrap = document.querySelector(".video-embed");
       if (ytWrap) {
         if (a.youtube_id) {
-          // Miniature cliquable qui lance la video en 16:9
+          var cleanId = (a.youtube_id || "").split("?")[0].split("&")[0];
+          var ytUrl = "https://www.youtube.com/watch?v=" + cleanId;
+
           ytWrap.innerHTML = "";
           ytWrap.style.cssText = "position:relative;width:100%;aspect-ratio:16/9;border-radius:10px;overflow:hidden;background:#1C1C1A;cursor:pointer;margin-bottom:2rem";
 
           var thumb = document.createElement("img");
-          var cleanId = (a.youtube_id || "").split("?")[0].split("&")[0];
           thumb.src = "https://i.ytimg.com/vi/" + cleanId + "/hqdefault.jpg";
           thumb.style.cssText = "width:100%;height:100%;object-fit:cover;display:block";
+          ytWrap.appendChild(thumb);
 
+          var overlay = document.createElement("div");
+          overlay.style.cssText = "position:absolute;inset:0;background:rgba(0,0,0,0.2)";
+          ytWrap.appendChild(overlay);
 
           var playBtn = document.createElement("div");
-          playBtn.style.cssText = "position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:64px;height:64px;background:rgba(192,57,43,0.92);border-radius:50%;display:flex;align-items:center;justify-content:center";
+          playBtn.style.cssText = "position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:68px;height:68px;background:#C0392B;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.4)";
           var triangle = document.createElement("div");
-          triangle.style.cssText = "width:0;height:0;border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent #fff;margin-left:4px";
+          triangle.style.cssText = "width:0;height:0;border-style:solid;border-width:13px 0 13px 22px;border-color:transparent transparent transparent #fff;margin-left:5px";
           playBtn.appendChild(triangle);
-
-          ytWrap.appendChild(thumb);
           ytWrap.appendChild(playBtn);
 
-          ytWrap.addEventListener("click", function() {
-            this.innerHTML = "";
-            this.style.cursor = "default";
-            var iframe = document.createElement("iframe");
-            var cleanId = a.youtube_id.split("?")[0].split("&")[0];
-            iframe.src = "https://www.youtube-nocookie.com/embed/" + cleanId + "?autoplay=1&rel=0";
-            iframe.style.cssText = "width:100%;height:100%;border:none;display:block";
-            iframe.setAttribute("allowfullscreen", "");
-            iframe.setAttribute("allow", "autoplay; encrypted-media");
-            this.appendChild(iframe);
-          }.bind(ytWrap));
+          var lbl = document.createElement("div");
+          lbl.textContent = "Regarder sur YouTube";
+          lbl.style.cssText = "position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.7);color:#fff;font-size:0.75rem;padding:4px 12px;border-radius:20px;white-space:nowrap";
+          ytWrap.appendChild(lbl);
 
-          // Afficher le badge YouTube dans le header
+          ytWrap.addEventListener("click", function() {
+            window.open(ytUrl, "_blank");
+          });
+
           var bylineRight = document.getElementById("bylineRight");
           if (bylineRight) bylineRight.style.display = "flex";
 
