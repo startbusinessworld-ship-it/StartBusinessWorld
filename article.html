@@ -555,6 +555,7 @@
       color: var(--muted); margin-bottom: 1rem;
     }
 
+    .sidebar-tool { cursor: pointer; }
     .sidebar-tool {
       display: flex; align-items: center; gap: 0.7rem;
       padding: 0.7rem 0;
@@ -801,28 +802,8 @@
       </div>
 
       <!-- OUTILS SIDEBAR -->
-      <div class="sidebar-tools-title">Outils mentionnés</div>
-      <div class="sidebar-tool">
-        <div class="st-icon">💳</div>
-        <div>
-          <div class="st-name">Airwallex</div>
-          <div class="st-cat">Paiements internationaux</div>
-        </div>
-      </div>
-      <div class="sidebar-tool">
-        <div class="st-icon">💸</div>
-        <div>
-          <div class="st-name">Wise</div>
-          <div class="st-cat">Transferts & compte pro</div>
-        </div>
-      </div>
-      <div class="sidebar-tool">
-        <div class="st-icon">🏢</div>
-        <div>
-          <div class="st-name">LegalPlace</div>
-          <div class="st-cat">Création de société</div>
-        </div>
-      </div>
+      <div class="sidebar-tools-title">Outils recommandés</div>
+      <div id="sidebarTools"></div>
 
     </aside>
   </div>
@@ -1040,8 +1021,15 @@
           ytWrap.appendChild(lbl);
 
           ytWrap.addEventListener("click", function() {
-            window.open(ytUrl, "_blank");
-          });
+            this.innerHTML = "";
+            this.style.cursor = "default";
+            var iframe = document.createElement("iframe");
+            iframe.src = "https://www.youtube.com/embed/" + cleanId + "?autoplay=1&rel=0";
+            iframe.style.cssText = "width:100%;height:100%;border:none;display:block";
+            iframe.setAttribute("allowfullscreen", "");
+            iframe.setAttribute("allow", "autoplay; encrypted-media");
+            this.appendChild(iframe);
+          }.bind(ytWrap));
 
           var bylineRight = document.getElementById("bylineRight");
           if (bylineRight) bylineRight.style.display = "flex";
@@ -1063,6 +1051,27 @@
     }
 
     loadArticle();
+    loadSidebarTools();
+
+    async function loadSidebarTools() {
+      var container = document.getElementById("sidebarTools");
+      if (!container) return;
+      var res = await SB.from("affiliate_links").select("*").order("clicks", { ascending: false }).limit(5);
+      var tools = res.data || [];
+      if (!tools.length) { container.style.display = "none"; return; }
+      container.innerHTML = "";
+      for (var i = 0; i < tools.length; i++) {
+        var t = tools[i];
+        var div = document.createElement("div");
+        div.className = "sidebar-tool";
+        div.style.cursor = "pointer";
+        div.innerHTML = "<div class='st-icon'>🔗</div><div><div class='st-name'>" + t.name + "</div><div class='st-cat'>Lien affilié</div></div>";
+        div.addEventListener("click", (function(url) {
+          return function() { window.open(url, "_blank"); };
+        })(t.url));
+        container.appendChild(div);
+      }
+    }
   </script>
 
 </body>
