@@ -272,7 +272,7 @@ textarea#msgInput::placeholder{color:var(--muted)}
   .mob-bottom-nav{display:block}
 
   /* Layout */
-  .app{height:calc(100vh - 50px);padding-bottom:calc(52px + env(safe-area-inset-bottom))}
+  .app{height:calc(100vh - 50px)}
   .channels-sidebar{display:none}
   .chat-zone{height:100%}
 
@@ -290,10 +290,26 @@ textarea#msgInput::placeholder{color:var(--muted)}
   .msg-av{width:26px;height:26px;font-size:.6rem}
   .msg-name{font-size:.6rem}
 
-  /* Input */
+  /* Input FIXE au dessus de la bottom nav */
   .input-bar{
+    position:fixed;
+    bottom:calc(52px + env(safe-area-inset-bottom));
+    left:0;right:0;
     padding:8px 10px;
     gap:7px;
+    z-index:150;
+    box-shadow:0 -2px 10px rgba(0,0,0,.08);
+  }
+  /* Reply preview aussi fixe */
+  .reply-preview{
+    position:fixed;
+    bottom:calc(98px + env(safe-area-inset-bottom));
+    left:0;right:0;
+    z-index:149;
+  }
+  /* Messages : espace en bas pour input fixe + bottom nav */
+  .messages-wrap{
+    padding-bottom:calc(120px + env(safe-area-inset-bottom)) !important;
   }
   textarea#msgInput{font-size:.87rem}
   .send-btn{width:32px;height:32px}
