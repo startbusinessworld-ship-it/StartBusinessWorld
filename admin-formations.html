@@ -350,7 +350,7 @@ function renderCol2() {
   html += '</div></div></div>';
 
   if (!modules.length) {
-    html += '<div style="padding:3rem;text-align:center;color:var(--muted);font-size:0.82rem"><div style="margin-bottom:12px">Aucun module</div><button class="btn-primary" onclick="openModuleModal(null)">+ Créer le premier module</button></div>';
+    html += '<div style="padding:3rem;text-align:center;font-size:0.85rem"><div style="font-weight:500;margin-bottom:6px">Formation créée !</div><div style="color:var(--muted);margin-bottom:16px;font-size:0.78rem">Ajoute maintenant ton premier module</div><button class="btn-primary" onclick="openModuleModal(null)" style="justify-content:center">+ Créer le premier module</button></div>';
   } else {
     modules.forEach(function(m, mi) {
       var lecons = m.lecons || [];
@@ -380,7 +380,7 @@ function renderCol2() {
       html += '<button class="add-lecon-btn" onclick="newLecon(\'' + m.id + '\')">+ Ajouter une leçon</button>';
       html += '</div></div>';
     });
-    html += '<div style="padding:16px 20px;border-top:0.5px solid var(--subtle)"><button class="btn-ghost" onclick="openModuleModal(null)" style="width:100%">+ Ajouter un module</button></div>';
+    html += '<div style="padding:12px 20px;border-top:0.5px solid var(--subtle)"><button class="btn-primary" onclick="openModuleModal(null)" style="width:100%;justify-content:center">+ Ajouter un module</button></div>';
   }
 
   document.getElementById('col2').innerHTML = html;
