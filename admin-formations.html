@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Formations — SBW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>const PAGE_ID = 'articles'</script>
+<link rel="stylesheet" href="admin.css">
+<style>
+.formations-layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; height: calc(100vh - 54px); overflow: hidden; }
+.formations-sidebar { border-right: 0.5px solid var(--subtle); overflow-y: auto; }
+.formations-main { overflow-y: auto; padding: 0; }
+
+/* Sidebar formations */
+.f-sidebar-head { padding: 16px; border-bottom: 0.5px solid var(--subtle); display: flex; align-items: center; justify-content: space-between; }
+.f-sidebar-title { font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.f-list { padding: 8px; }
+.f-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.12s; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.f-item:hover { background: var(--surface); }
+.f-item.active { background: var(--ink); color: #fff; }
+.f-item-name { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f-item-meta { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
+.f-item.active .f-item-meta { color: rgba(255,255,255,0.45); }
+.f-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
+
+/* Main panel */
+.f-main-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 1rem; color: var(--muted); }
+.f-main-empty svg { opacity: 0.2; }
+
+/* Formation editor */
+.f-editor { padding: 24px; }
+.f-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--subtle); }
+.f-editor-title-row { flex: 1; }
+.f-editor-title { font-size: 1.1rem; font-weight: 500; }
+.f-editor-status { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+/* Modules */
+.modules-section { margin-bottom: 24px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-label { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+
+.module-card { border: 0.5px solid var(--subtle); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+.module-head { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--surface); transition: background 0.12s; }
+.module-head:hover { background: var(--subtle); }
+.module-chevron { transition: transform 0.2s; font-size: 0.7rem; color: var(--muted); }
+.module-chevron.open { transform: rotate(90deg); }
+.module-name { font-size: 0.88rem; font-weight: 500; flex: 1; }
+.module-count { font-size: 0.7rem; color: var(--muted); }
+.module-actions { display: flex; gap: 4px; }
+.module-body { display: none; padding: 8px; background: var(--bg); }
+.module-body.open { display: block; }
+
+/* Leçons */
+.lecon-item { padding: 10px 12px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.12s; }
+.lecon-item:hover { background: var(--surface); }
+.lecon-num { font-size: 0.68rem; color: var(--muted); width: 20px; flex-shrink: 0; }
+.lecon-title { font-size: 0.83rem; flex: 1; }
+.lecon-yt { font-size: 0.68rem; color: var(--red); }
+.lecon-dur { font-size: 0.68rem; color: var(--muted); }
+.lecon-add { padding: 8px 12px; font-size: 0.78rem; color: var(--muted); cursor: pointer; border-radius: 6px; border: none; background: none; width: 100%; text-align: left; transition: background 0.12s; }
+.lecon-add:hover { background: var(--surface); color: var(--ink); }
+
+/* MODALES */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+.overlay.on { display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+.modal-box { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 540px; border: 0.5px solid var(--subtle); margin: auto; }
+.modal-head { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.7rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px 12px; border: 0.5px solid var(--subtle); border-radius: 6px; font-size: 0.85rem; font-family: "DM Sans", sans-serif; background: var(--bg); color: var(--ink); outline: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
+.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+
+/* Leçon editor panel */
+.lecon-panel { border-left: 0.5px solid var(--subtle); }
+</style>
+</head>
+<body>
+<div class="admin-layout">
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <div class="nav-section">Contenu</div>
+      <a href="admin-articles-list.html" class="nav-item" data-access="articles">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Articles
+      </a>
+      <a href="admin-shorts.html" class="nav-item" data-access="shorts">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
+        Shorts YouTube
+      </a>
+      <a href="admin-formations.html" class="nav-item active" data-access="articles">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
+        Formations
+      </a>
+      <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+        Newsletter
+      </a>
+      <div class="nav-section">Communauté</div>
+      <a href="admin-members.html" class="nav-item" data-access="members">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+        Membres Club
+      </a>
+      <div class="nav-section">Monétisation</div>
+      <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+        Revenus
+      </a>
+      <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+        Affiliation
+      </a>
+      <div class="nav-section">Admin</div>
+      <a href="admin-team.html" class="nav-item" data-access="team">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+        Équipe
+      </a>
+      <a href="admin-settings.html" class="nav-item" data-access="settings">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+        Paramètres
+      </a>
+    </nav>
+  </div>
+  <div id="userInfo"></div>
+</aside>
+
+<main class="main-content" style="padding:0;overflow:hidden">
+  <div class="topbar" style="padding:0 24px">
+    <div>
+      <h1 class="page-title">Formations</h1>
+      <div class="page-date" id="countLine">—</div>
+    </div>
+    <div class="topbar-actions">
+      <button class="btn-primary" id="addFormationBtn">+ Nouvelle formation</button>
+    </div>
+  </div>
+
+  <div class="formations-layout">
+    <!-- SIDEBAR FORMATIONS -->
+    <div class="formations-sidebar">
+      <div class="f-list" id="formationsList">
+        <div class="f-empty">Chargement...</div>
+      </div>
+    </div>
+
+    <!-- PANEL PRINCIPAL -->
+    <div class="formations-main" id="formationsMain">
+      <div class="f-main-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
+        <div>Sélectionne une formation</div>
+        <div style="font-size:0.78rem">ou crée-en une nouvelle</div>
+      </div>
+    </div>
+  </div>
+</main>
+</div>
+
+<!-- MODAL FORMATION -->
+<div class="overlay" id="overlayFormation">
+  <div class="modal-box">
+    <div class="modal-head" id="modalFormationHead">Nouvelle formation</div>
+    <div class="field">
+      <label>Titre *</label>
+      <input type="text" id="fTitle" placeholder="Ex: Sourcer en Chine — Masterclass complète">
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="fDesc" rows="3" placeholder="Ce que les membres vont apprendre..."></textarea>
+    </div>
+    <div class="field">
+      <label>Statut</label>
+      <select id="fStatus">
+        <option value="draft">Brouillon — non visible</option>
+        <option value="published">Publié — visible aux membres</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" style="flex:1" id="cancelFormationBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveFormationBtn">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL MODULE -->
+<div class="overlay" id="overlayModule">
+  <div class="modal-box">
+    <div class="modal-head" id="modalModuleHead">Nouveau module</div>
+    <div class="field">
+      <label>Titre du module *</label>
+      <input type="text" id="mTitle" placeholder="Ex: Les bases du sourcing">
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" style="flex:1" id="cancelModuleBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveModuleBtn">Créer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LEÇON -->
+<div class="overlay" id="overlayLecon">
+  <div class="modal-box" style="max-width:580px">
+    <div class="modal-head" id="modalLeconHead">Nouvelle leçon</div>
+    <div class="field">
+      <label>Titre *</label>
+      <input type="text" id="lTitle" placeholder="Ex: Trouver un fournisseur sur Alibaba">
+    </div>
+    <div class="field">
+      <label>Vidéo YouTube (URL ou ID)</label>
+      <input type="text" id="lYoutube" placeholder="https://youtu.be/ABC123 ou ABC123">
+    </div>
+    <div class="field">
+      <label>Durée (minutes)</label>
+      <input type="number" id="lDuration" placeholder="10" min="1">
+    </div>
+    <div class="field">
+      <label>Contenu texte</label>
+      <textarea id="lContent" rows="6" placeholder="Texte de la leçon, notes, ressources..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" style="flex:1" id="cancelLeconBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveLeconBtn">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="admin-auth.js"></script>
+<script>
+var formations = [];
+var currentFormation = null;
+var modules = [];
+var editFormationId = null;
+var editModuleId = null;
+var editLeconId = null;
+var currentModuleId = null;
+
+// =====================
+// INIT
+// =====================
+initAuth().then(function(profile) {
+  if (!profile) return;
+  loadFormations();
+
+  document.getElementById('addFormationBtn').addEventListener('click', function() { openFormationModal(null); });
+  document.getElementById('cancelFormationBtn').addEventListener('click', function() { closeOverlay('overlayFormation'); });
+  document.getElementById('saveFormationBtn').addEventListener('click', saveFormation);
+  document.getElementById('cancelModuleBtn').addEventListener('click', function() { closeOverlay('overlayModule'); });
+  document.getElementById('saveModuleBtn').addEventListener('click', saveModule);
+  document.getElementById('cancelLeconBtn').addEventListener('click', function() { closeOverlay('overlayLecon'); });
+  document.getElementById('saveLeconBtn').addEventListener('click', saveLecon);
+
+  ['overlayFormation','overlayModule','overlayLecon'].forEach(function(id) {
+    document.getElementById(id).addEventListener('click', function(e) {
+      if (e.target === this) closeOverlay(id);
+    });
+  });
+});
+
+// =====================
+// FORMATIONS
+// =====================
+async function loadFormations() {
+  var res = await sb.from('formations').select('*').order('position').order('created_at');
+  formations = res.data || [];
+  document.getElementById('countLine').textContent = formations.length + ' formation' + (formations.length > 1 ? 's' : '');
+  renderFormationsList();
+}
+
+function renderFormationsList() {
+  var el = document.getElementById('formationsList');
+  if (!formations.length) {
+    el.innerHTML = '<div class="f-empty">Aucune formation.<br>Crée-en une !</div>';
+    return;
+  }
+  el.innerHTML = '';
+  formations.forEach(function(f) {
+    var item = document.createElement('div');
+    item.className = 'f-item' + (currentFormation && currentFormation.id === f.id ? ' active' : '');
+    var pill = f.status === 'published' ? '🟢' : '⚪';
+    item.innerHTML = '<span class="f-item-name">' + f.title + '</span><span class="f-item-meta">' + pill + '</span>';
+    item.addEventListener('click', function() { selectFormation(f); });
+    el.appendChild(item);
+  });
+}
+
+function selectFormation(f) {
+  currentFormation = f;
+  renderFormationsList();
+  loadModules(f.id);
+}
+
+function openFormationModal(f) {
+  editFormationId = f ? f.id : null;
+  document.getElementById('modalFormationHead').textContent = f ? 'Modifier la formation' : 'Nouvelle formation';
+  document.getElementById('fTitle').value = f ? f.title : '';
+  document.getElementById('fDesc').value = f ? (f.description || '') : '';
+  document.getElementById('fStatus').value = f ? f.status : 'draft';
+  document.getElementById('saveFormationBtn').textContent = f ? 'Mettre à jour' : 'Créer';
+  openOverlay('overlayFormation');
+  document.getElementById('fTitle').focus();
+}
+
+async function saveFormation() {
+  var title = document.getElementById('fTitle').value.trim();
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
+  var data = {
+    title: title,
+    description: document.getElementById('fDesc').value.trim(),
+    status: document.getElementById('fStatus').value
+  };
+  var res;
+  if (editFormationId) {
+    res = await sb.from('formations').update(data).eq('id', editFormationId);
+  } else {
+    data.position = formations.length;
+    res = await sb.from('formations').insert(data);
+  }
+  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+  showToast(editFormationId ? 'Formation mise à jour !' : 'Formation créée !', 'success');
+  closeOverlay('overlayFormation');
+  await loadFormations();
+  if (!editFormationId && formations.length) {
+    selectFormation(formations[formations.length - 1]);
+  }
+}
+
+async function deleteFormation(id) {
+  if (!confirm('Supprimer cette formation et tous ses modules ?')) return;
+  await sb.from('formations').delete().eq('id', id);
+  currentFormation = null;
+  document.getElementById('formationsMain').innerHTML = '<div class="f-main-empty"><div>Formation supprimée</div></div>';
+  loadFormations();
+  showToast('Supprimée.', 'success');
+}
+
+// =====================
+// MODULES
+// =====================
+async function loadModules(formationId) {
+  var res = await sb.from('modules').select('*, lecons(*)').eq('formation_id', formationId).order('position');
+  modules = res.data || [];
+  renderEditor();
+}
+
+function renderEditor() {
+  if (!currentFormation) return;
+  var f = currentFormation;
+  var html = '<div class="f-editor">';
+
+  // Header
+  html += '<div class="f-editor-head">';
+  html += '<div class="f-editor-title-row">';
+  html += '<div class="f-editor-title">' + f.title + '</div>';
+  html += '<div class="f-editor-status">' + (f.status === 'published' ? '🟢 Publiée' : '⚪ Brouillon') + ' · ' + modules.length + ' module' + (modules.length > 1 ? 's' : '') + '</div>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:6px">';
+  html += '<button class="row-action" onclick="openFormationModal(currentFormation)">✏️ Modifier</button>';
+  html += '<button class="row-action" style="color:var(--red)" onclick="deleteFormation(\'' + f.id + '\')">Supprimer</button>';
+  html += '</div></div>';
+
+  // Modules
+  html += '<div class="modules-section">';
+  html += '<div class="section-head"><span class="section-label">Modules</span>';
+  html += '<button class="btn-primary" style="font-size:0.75rem;padding:5px 12px" onclick="openModuleModal(null)">+ Module</button>';
+  html += '</div>';
+
+  if (!modules.length) {
+    html += '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;border:1px dashed var(--subtle);border-radius:8px">Aucun module — commence par en créer un</div>';
+  } else {
+    modules.forEach(function(m, mi) {
+      var lecons = m.lecons || [];
+      html += '<div class="module-card">';
+      html += '<div class="module-head" onclick="toggleModule(\'mod' + mi + '\')">';
+      html += '<span class="module-chevron" id="chev' + mi + '">▶</span>';
+      html += '<span class="module-name">' + m.title + '</span>';
+      html += '<span class="module-count">' + lecons.length + ' leçon' + (lecons.length > 1 ? 's' : '') + '</span>';
+      html += '<div class="module-actions" onclick="event.stopPropagation()">';
+      html += '<button class="row-action" onclick="openModuleModal(' + JSON.stringify(m).replace(/"/g, '&quot;') + ')">✏️</button>';
+      html += '<button class="row-action" style="color:var(--red)" onclick="deleteModule(\'' + m.id + '\')">✕</button>';
+      html += '</div></div>';
+      html += '<div class="module-body" id="mod' + mi + '">';
+      lecons.sort(function(a,b) { return a.position - b.position; }).forEach(function(l, li) {
+        html += '<div class="lecon-item" onclick="openLeconModal(' + JSON.stringify(l).replace(/"/g, '&quot;') + ', \'' + m.id + '\')">';
+        html += '<span class="lecon-num">' + String(li+1).padStart(2,'0') + '</span>';
+        html += '<span class="lecon-title">' + l.title + '</span>';
+        if (l.youtube_id) html += '<span class="lecon-yt">▶ YouTube</span>';
+        if (l.duration_min) html += '<span class="lecon-dur">' + l.duration_min + ' min</span>';
+        html += '</div>';
+      });
+      html += '<button class="lecon-add" onclick="openLeconModal(null, \'' + m.id + '\')">+ Ajouter une leçon</button>';
+      html += '</div></div>';
+    });
+  }
+  html += '</div></div>';
+
+  document.getElementById('formationsMain').innerHTML = html;
+}
+
+function toggleModule(id) {
+  var body = document.getElementById(id);
+  var idx = id.replace('mod','');
+  var chev = document.getElementById('chev' + idx);
+  if (body) {
+    body.classList.toggle('open');
+    if (chev) chev.style.transform = body.classList.contains('open') ? 'rotate(90deg)' : '';
+  }
+}
+
+function openModuleModal(m) {
+  editModuleId = m ? m.id : null;
+  document.getElementById('modalModuleHead').textContent = m ? 'Modifier le module' : 'Nouveau module';
+  document.getElementById('mTitle').value = m ? m.title : '';
+  document.getElementById('saveModuleBtn').textContent = m ? 'Mettre à jour' : 'Créer';
+  openOverlay('overlayModule');
+  document.getElementById('mTitle').focus();
+}
+
+async function saveModule() {
+  var title = document.getElementById('mTitle').value.trim();
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
+  var res;
+  if (editModuleId) {
+    res = await sb.from('modules').update({ title: title }).eq('id', editModuleId);
+  } else {
+    res = await sb.from('modules').insert({ title: title, formation_id: currentFormation.id, position: modules.length });
+  }
+  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+  showToast(editModuleId ? 'Module mis à jour !' : 'Module créé !', 'success');
+  closeOverlay('overlayModule');
+  loadModules(currentFormation.id);
+}
+
+async function deleteModule(id) {
+  if (!confirm('Supprimer ce module et ses leçons ?')) return;
+  await sb.from('modules').delete().eq('id', id);
+  loadModules(currentFormation.id);
+  showToast('Module supprimé.', 'success');
+}
+
+// =====================
+// LEÇONS
+// =====================
+function openLeconModal(l, moduleId) {
+  editLeconId = l ? l.id : null;
+  currentModuleId = moduleId;
+  document.getElementById('modalLeconHead').textContent = l ? 'Modifier la leçon' : 'Nouvelle leçon';
+  document.getElementById('lTitle').value = l ? l.title : '';
+  document.getElementById('lYoutube').value = l ? (l.youtube_id || '') : '';
+  document.getElementById('lDuration').value = l ? (l.duration_min || '') : '';
+  document.getElementById('lContent').value = l ? (l.content || '') : '';
+  document.getElementById('saveLeconBtn').textContent = l ? 'Mettre à jour' : 'Ajouter';
+  openOverlay('overlayLecon');
+  document.getElementById('lTitle').focus();
+}
+
+async function saveLecon() {
+  var title = document.getElementById('lTitle').value.trim();
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
+
+  // Extraire l'ID YouTube
+  var ytRaw = document.getElementById('lYoutube').value.trim();
+  var ytId = null;
+  if (ytRaw) {
+    var m = ytRaw.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([a-zA-Z0-9_-]{11})/);
+    ytId = m ? m[1] : (ytRaw.length === 11 ? ytRaw : null);
+  }
+
+  var data = {
+    title: title,
+    youtube_id: ytId,
+    duration_min: parseInt(document.getElementById('lDuration').value) || 0,
+    content: document.getElementById('lContent').value.trim()
+  };
+
+  var res;
+  if (editLeconId) {
+    res = await sb.from('lecons').update(data).eq('id', editLeconId);
+  } else {
+    // Compter les leçons existantes pour la position
+    var mod = modules.find(function(m) { return m.id === currentModuleId; });
+    data.module_id = currentModuleId;
+    data.position = mod ? (mod.lecons || []).length : 0;
+    res = await sb.from('lecons').insert(data);
+  }
+
+  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+  showToast(editLeconId ? 'Leçon mise à jour !' : 'Leçon ajoutée !', 'success');
+  closeOverlay('overlayLecon');
+  loadModules(currentFormation.id);
+}
+
+// =====================
+// HELPERS
+// =====================
+function openOverlay(id) { document.getElementById(id).classList.add('on'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'success') + ' show';
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>
