@@ -1263,13 +1263,15 @@
     // ARTICLE À LA UNE
     async function loadFeatured() {
       try {
-        var res = await SB.from("articles")
-          .select("id, title, deck, category, youtube_id, created_at")
-          .eq("status", "published")
-          .eq("featured", true)
-          .limit(1);
-
-        var a = res.data && res.data.length ? res.data[0] : null;
+        var url3 = "https://grwimhqsthcmfwblwdwg.supabase.co/rest/v1/articles?select=id,title,deck,category,youtube_id,created_at&status=eq.published&featured=eq.true&limit=1";
+        var resp3 = await fetch(url3, {
+          headers: {
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+          }
+        });
+        var feat = await resp3.json();
+        var a = Array.isArray(feat) && feat.length ? feat[0] : null;
         var box = document.getElementById("featuredTop");
         if (!a || !box) return;
 
@@ -1294,8 +1296,15 @@
     // SHORTS
     async function loadShorts() {
       try {
-        var res = await SB.from("shorts").select("*").eq("status", "published").order("created_at", { ascending: false });
-        var list = res.data || [];
+        var url2 = "https://grwimhqsthcmfwblwdwg.supabase.co/rest/v1/shorts?select=*&status=eq.published&order=created_at.desc";
+        var resp2 = await fetch(url2, {
+          headers: {
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+          }
+        });
+        var list = await resp2.json();
+        if (!Array.isArray(list)) list = [];
         var container = document.getElementById("shortsContainer");
         if (!container) return;
 
@@ -1370,21 +1379,19 @@
 
     async function loadArticles() {
       try {
-        var res = await SB.from("articles")
-          .select("id, title, deck, category, slug, youtube_id, created_at, views")
-          .eq("status", "published")
-          .order("created_at", { ascending: false })
-          .limit(12);
-        allArticles = res.data || [];
-        console.log("Articles chargés:", allArticles.length);
+        var url = "https://grwimhqsthcmfwblwdwg.supabase.co/rest/v1/articles?select=id,title,deck,category,slug,youtube_id,created_at,views&status=eq.published&order=created_at.desc&limit=12";
+        var resp = await fetch(url, {
+          headers: {
+            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+          }
+        });
+        allArticles = await resp.json();
+        if (!Array.isArray(allArticles)) allArticles = [];
+        console.log("Articles:", allArticles.length);
         renderArticles();
       } catch(e) {
         console.error("Articles error:", e);
-        var container = document.getElementById("articles");
-        if (container) {
-          container.style.display = "block";
-          container.innerHTML = "<p style='padding:2rem;color:red;font-size:0.8rem'>Erreur chargement: " + e.message + "</p>";
-        }
       }
     }
 
@@ -1417,7 +1424,7 @@
         var card = document.createElement("div");
         card.className = "article" + (isFeatured ? " featured" : "");
         card.setAttribute("data-link", link);
-        card.style.cssText = "cursor:pointer;display:flex;flex-direction:column;gap:0.7rem;padding:2rem;box-sizing:border-box;width:100%;" + (isFeatured ? "background:var(--ink);color:#F0EDE4;" : "");
+        card.style.cursor = "pointer";
 
         var cat = document.createElement("div");
         cat.className = "art-cat";
