@@ -330,9 +330,9 @@
     .mobile-nav-items { display: flex; justify-content: space-around; align-items: center; }
     .mobile-nav-item {
       display: flex; flex-direction: column; align-items: center; gap: 3px;
-      padding: 4px 8px; cursor: pointer; border: none; background: none;
+      padding: 4px 4px; cursor: pointer; border: none; background: none;
       color: rgba(255,255,255,0.35); font-family: inherit; transition: color .15s;
-      font-size: 0.58rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em;
+      font-size: 0.52rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em;
     }
     .mobile-nav-item.active { color: var(--gold); }
     .mobile-nav-item span.icon { font-size: 1.2rem; }
@@ -767,6 +767,10 @@
     <button class="mobile-nav-item" id="mbn-prestige" onclick="window.location.href='membre-prestige.html'">
       <span class="icon">⭐</span>
       <span>Prestige</span>
+    </button>
+    <button class="mobile-nav-item" id="mbn-affiliation" onclick="window.location.href='membre-affiliation.html'">
+      <span class="icon">🔗</span>
+      <span>Affiliation</span>
     </button>
     <button class="mobile-nav-item" id="mbn-compte" onclick="showSection('compte', this)">
       <span class="icon">👤</span>
