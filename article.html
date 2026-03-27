@@ -673,14 +673,18 @@
       .sidebar { display: none; }
       .related-grid { grid-template-columns: 1fr; }
     }
-    @media (max-width: 600px) {
-      nav { grid-template-columns: auto 1fr auto; }
-      .nav-logo { text-align:center; font-size:0.95rem; }
+    @media (max-width: 768px) {
+      nav { grid-template-columns: auto 1fr auto; padding: 0 1rem; gap: 0; }
+      .nav-logo { text-align:center; font-size:1rem; }
       .nav-login { display:none; }
+      .nav-join { font-size:0.7rem; padding:0.35rem 0.7rem; }
       .article-header { padding: 2rem 1.2rem 1.5rem; }
       .byline-right { display: none; }
       .article-header h1 { font-size:1.6rem; }
       .article-deck { font-size:0.9rem; }
+      .article-layout { grid-template-columns: 1fr; }
+      .article-body { border-right: none; padding: 1.5rem 1.2rem; }
+      .sidebar { display: none; }
     }
 
     @media (max-width: 600px) {
@@ -693,7 +697,7 @@
 
     /* === HAMBURGER & MENU MOBILE === */
     .hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:6px; border-radius:4px; }
-    .hamburger span { display:block; width:22px; height:2px; background:var(--ink); border-radius:2px; transition:all 0.25s; }
+    .hamburger span { display:block; width:22px; height:2px; background:#fff; border-radius:2px; transition:all 0.25s; }
     .hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
     .hamburger.open span:nth-child(2) { opacity:0; }
     .hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
@@ -771,19 +775,15 @@
       <div class="share-section">
         <div class="share-label">Partager cet article</div>
         <div class="share-btns">
-          <a href="#" class="share-btn">
+          <a id="shareTwitter" href="#" target="_blank" class="share-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             X / Twitter
           </a>
-          <a href="#" class="share-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/></svg>
-            Instagram
-          </a>
-          <a href="#" class="share-btn">
+          <a id="shareLinkedIn" href="#" target="_blank" class="share-btn">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
             LinkedIn
           </a>
-          <a href="#" class="share-btn">🔗 Copier le lien</a>
+          <button onclick="copyLink()" class="share-btn">🔗 Copier le lien</button>
         </div>
       </div>
 
@@ -1226,6 +1226,25 @@
 
       // Meta title
       document.title = a.title + " — Start Business World";
+
+      // Boutons de partage
+      var pageUrl = encodeURIComponent(window.location.href);
+      var pageTitle = encodeURIComponent(a.title);
+      var tw = document.getElementById("shareTwitter");
+      var li = document.getElementById("shareLinkedIn");
+      if (tw) tw.href = "https://twitter.com/intent/tweet?text=" + pageTitle + "&url=" + pageUrl;
+      if (li) li.href = "https://www.linkedin.com/sharing/share-offsite/?url=" + pageUrl;
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(window.location.href).then(function() {
+        var btn = document.querySelector(".share-btn[onclick]");
+        if (btn) {
+          var orig = btn.textContent;
+          btn.textContent = "✓ Lien copié !";
+          setTimeout(function() { btn.textContent = orig; }, 2000);
+        }
+      });
     }
 
     loadArticle();
