@@ -1054,12 +1054,7 @@
   <!-- TICKER -->
   <div class="ticker">
     <div class="ticker-label">À lire</div>
-    <div class="ticker-track">
-      <div class="ticker-item"><b>Chine</b> — Sourcer sans se faire arnaquer</div>
-      <div class="ticker-item"><b>HK vs France</b> — Quel statut choisir ?</div>
-      <div class="ticker-item"><b>Dubai 2026</b> — Résidence fiscale, coût réel</div>
-      <div class="ticker-item"><b>Amazon FBA</b> — Encore rentable en 2026 ?</div>
-      <div class="ticker-item"><b>Wise vs Airwallex</b> — Comparatif complet</div>
+    <div class="ticker-track" id="tickerTrack">
     </div>
   </div>
 
@@ -1260,18 +1255,52 @@
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
     );
 
+    // TICKER
+    async function loadTicker() {
+      try {
+        var res = await SB.from("articles").select("id,title,category").eq("status","published").order("created_at",{ascending:false}).limit(20);
+        var articles = res.data || [];
+        if (!articles.length) return;
+
+        // Prendre le dernier article de chaque catégorie
+        var seen = {};
+        var byCategory = [];
+        for (var i = 0; i < articles.length; i++) {
+          var a = articles[i];
+          var cat = (a.category || "").split(",")[0].trim();
+          if (cat && !seen[cat]) {
+            seen[cat] = true;
+            byCategory.push({ id: a.id, title: a.title, cat: cat });
+          }
+        }
+
+        var track = document.getElementById("tickerTrack");
+        if (!track) return;
+        track.innerHTML = "";
+
+        // Doubler les items pour l'effet défilant infini
+        var items = byCategory.concat(byCategory);
+        for (var j = 0; j < items.length; j++) {
+          var item = items[j];
+          var div = document.createElement("div");
+          div.className = "ticker-item";
+          div.setAttribute("data-id", item.id);
+          div.innerHTML = "<b>" + item.cat + "</b> — " + item.title;
+          div.addEventListener("click", (function(id) {
+            return function() { window.location.href = "article.html?id=" + id; };
+          })(item.id));
+          track.appendChild(div);
+        }
+      } catch(e) {
+        console.error("Ticker error:", e);
+      }
+    }
+
     // ARTICLE À LA UNE
     async function loadFeatured() {
       try {
-        var url3 = "https://grwimhqsthcmfwblwdwg.supabase.co/rest/v1/articles?select=id,title,deck,category,youtube_id,created_at&status=eq.published&featured=eq.true&limit=1";
-        var resp3 = await fetch(url3, {
-          headers: {
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
-          }
-        });
-        var feat = await resp3.json();
-        var a = Array.isArray(feat) && feat.length ? feat[0] : null;
+        var res = await SB.from("articles").select("id,title,deck,category,youtube_id,created_at").eq("status","published").eq("featured",true).limit(1);
+        var a = res.data && res.data.length ? res.data[0] : null;
         var box = document.getElementById("featuredTop");
         if (!a || !box) return;
 
@@ -1296,15 +1325,8 @@
     // SHORTS
     async function loadShorts() {
       try {
-        var url2 = "https://grwimhqsthcmfwblwdwg.supabase.co/rest/v1/shorts?select=*&status=eq.published&order=created_at.desc";
-        var resp2 = await fetch(url2, {
-          headers: {
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
-          }
-        });
-        var list = await resp2.json();
-        if (!Array.isArray(list)) list = [];
+        var res = await SB.from("shorts").select("*").eq("status","published").order("created_at",{ascending:false});
+        var list = res.data || [];
         var container = document.getElementById("shortsContainer");
         if (!container) return;
 
@@ -1379,15 +1401,8 @@
 
     async function loadArticles() {
       try {
-        var url = "https://grwimhqsthcmfwblwdwg.supabase.co/rest/v1/articles?select=id,title,deck,category,slug,youtube_id,created_at,views&status=eq.published&order=created_at.desc&limit=12";
-        var resp = await fetch(url, {
-          headers: {
-            "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc",
-            "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
-          }
-        });
-        allArticles = await resp.json();
-        if (!Array.isArray(allArticles)) allArticles = [];
+        var res = await SB.from("articles").select("id,title,deck,category,slug,youtube_id,created_at,views").eq("status","published").order("created_at",{ascending:false}).limit(12);
+        allArticles = res.data || [];
         console.log("Articles:", allArticles.length);
         renderArticles();
       } catch(e) {
@@ -1527,6 +1542,7 @@
     }
 
     loadFeatured();
+    loadTicker();
     loadShorts();
     loadArticles();
   </script>
