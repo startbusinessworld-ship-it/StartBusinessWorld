@@ -1,174 +1,186 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Articles — SBW Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>const PAGE_ID = 'articles'</script>
-  <link rel="stylesheet" href="admin.css">
-  <style>
-    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center; padding:1rem; }
-    .modal-overlay.open { display:flex; }
-    .modal { background:var(--bg); border-radius:12px; padding:24px; width:100%; max-width:640px; max-height:90vh; overflow-y:auto; border:0.5px solid var(--subtle); }
-    .modal-title { font-size:1.1rem; font-weight:500; margin-bottom:1.2rem; }
-    .editor-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .editor-full { grid-column: 1 / -1; }
-    textarea.field-input { resize:vertical; min-height:140px; font-family:'DM Sans',sans-serif; line-height:1.6; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Articles — SBW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>const PAGE_ID = 'articles'</script>
+<link rel="stylesheet" href="admin.css">
+<style>
+/* MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+.overlay.on { display: flex; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
+.modal-box { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 600px; border: 0.5px solid var(--subtle); position: relative; z-index: 1000; margin: auto; }
+.modal-head { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.7rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 5px; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px 12px; border: 0.5px solid var(--subtle); border-radius: 6px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); outline: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
+.field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.full { grid-column: 1 / -1; }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+
+/* CATÉGORIES MULTI-SELECT */
+.cats-grid { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.cat-chip {
+  padding: 5px 12px; border-radius: 20px;
+  font-size: 0.75rem; font-weight: 500;
+  border: 1px solid var(--subtle);
+  background: var(--surface); color: var(--muted);
+  cursor: pointer; transition: all 0.12s; user-select: none;
+}
+.cat-chip:hover { border-color: var(--ink); color: var(--ink); }
+.cat-chip.selected { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.empty-msg { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+</style>
 </head>
 <body>
 <div class="admin-layout">
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
-      <nav class="sidebar-nav">
-        <div class="nav-section">Principal</div>
-        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-          Dashboard
-        </a>
-        <div class="nav-section">Contenu</div>
-        <a href="admin-articles-list.html" class="nav-item active" data-access="articles">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
-          Articles
-        </a>
-        <a href="admin-shorts.html" class="nav-item" data-access="shorts">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
-          Shorts YouTube
-        </a>
-        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
-          Newsletter
-        </a>
-        <div class="nav-section">Communauté</div>
-        <a href="admin-members.html" class="nav-item" data-access="members">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
-          Membres Club
-        </a>
-        <div class="nav-section">Monétisation</div>
-        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
-          Revenus
-        </a>
-        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
-          Affiliation
-        </a>
-        <div class="nav-section">Admin</div>
-        <a href="admin-team.html" class="nav-item" data-access="team">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
-          Équipe & Rôles
-        </a>
-        <a href="admin-settings.html" class="nav-item" data-access="settings">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
-          Paramètres
-        </a>
-      </nav>
-    </div>
-    <div id="userInfo"></div>
-  </aside>
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <div class="nav-section">Contenu</div>
+      <a href="admin-articles-list.html" class="nav-item active" data-access="articles">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Articles
+      </a>
+      <a href="admin-shorts.html" class="nav-item" data-access="shorts">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
+        Shorts YouTube
+      </a>
+      <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+        Newsletter
+      </a>
+      <div class="nav-section">Communauté</div>
+      <a href="admin-members.html" class="nav-item" data-access="members">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+        Membres Club
+      </a>
+      <div class="nav-section">Monétisation</div>
+      <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+        Revenus
+      </a>
+      <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+        Affiliation
+      </a>
+      <div class="nav-section">Admin</div>
+      <a href="admin-team.html" class="nav-item" data-access="team">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+        Équipe & Rôles
+      </a>
+      <a href="admin-settings.html" class="nav-item" data-access="settings">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+        Paramètres
+      </a>
+    </nav>
+  </div>
+  <div id="userInfo"></div>
+</aside>
 
-  <main class="main-content">
-    <div class="topbar">
-      <div>
-        <h1 class="page-title">Articles</h1>
-        <div class="page-date" id="articleCount">Chargement...</div>
-      </div>
-      <div class="topbar-actions">
-        <select class="btn-ghost" id="filterStatus" onchange="applyFilters()" style="cursor:pointer">
-          <option value="all">Tous les statuts</option>
-          <option value="published">Publiés</option>
-          <option value="draft">Brouillons</option>
-          <option value="review">En relecture</option>
-        </select>
-        <select class="btn-ghost" id="filterCat" onchange="applyFilters()" style="cursor:pointer">
-          <option value="all">Toutes catégories</option>
-          <option value="Business Chine">Business Chine</option>
-          <option value="Fiscalité">Fiscalité</option>
-          <option value="Expatriation">Expatriation</option>
-          <option value="E-commerce">E-commerce</option>
-          <option value="Mindset">Mindset</option>
-          <option value="Finance">Finance</option>
-          <option value="Import-Export">Import-Export</option>
-        </select>
-        <button class="btn-primary" onclick="openModal(null)">+ Nouvel article</button>
-      </div>
+<main class="main-content">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">Articles</h1>
+      <div class="page-date" id="countLine">Chargement...</div>
     </div>
+    <div class="topbar-actions">
+      <select class="btn-ghost" id="filterStatus" style="cursor:pointer">
+        <option value="all">Tous les statuts</option>
+        <option value="published">Publiés</option>
+        <option value="draft">Brouillons</option>
+        <option value="review">En relecture</option>
+      </select>
+      <button class="btn-primary" id="addBtn">+ Nouvel article</button>
+    </div>
+  </div>
 
-    <div class="content-area">
-      <div class="card">
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Titre</th>
-              <th>Catégorie</th>
-              <th>Statut</th>
-              <th>Vues</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="articlesTable">
-            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">Chargement...</td></tr>
-          </tbody>
-        </table>
-      </div>
+  <div class="content-area">
+    <div class="card">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Titre</th>
+            <th>Catégories</th>
+            <th>Statut</th>
+            <th>Vues</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tbody">
+          <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">Chargement...</td></tr>
+        </tbody>
+      </table>
     </div>
-  </main>
+  </div>
+</main>
 </div>
 
-<!-- MODAL ÉDITION -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalClick(event)">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle">Nouvel article</div>
-    <div class="editor-grid">
-      <div class="field-group editor-full">
-        <label class="field-label">Titre *</label>
-        <input type="text" class="field-input" id="artTitle" placeholder="Titre de l'article">
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal-box">
+    <div class="modal-head" id="modalHead">Nouvel article</div>
+    <div class="grid2">
+
+      <div class="field full">
+        <label>Titre *</label>
+        <input type="text" id="inTitle" placeholder="Titre de l'article">
       </div>
-      <div class="field-group">
-        <label class="field-label">Catégorie *</label>
-        <select class="field-select" id="artCategory">
-          <option value="">Choisir...</option>
-          <option value="Business Chine">Business Chine</option>
-          <option value="Fiscalité">Fiscalité</option>
-          <option value="Expatriation">Expatriation</option>
-          <option value="E-commerce">E-commerce</option>
-          <option value="Mindset">Mindset</option>
-          <option value="Finance">Finance</option>
-          <option value="Import-Export">Import-Export</option>
-        </select>
+
+      <div class="field full">
+        <label>Catégories (sélectionne une ou plusieurs)</label>
+        <div class="cats-grid" id="catsGrid">
+          <div class="cat-chip" data-cat="Business Chine">🇨🇳 Business Chine</div>
+          <div class="cat-chip" data-cat="Fiscalité">🏛️ Fiscalité</div>
+          <div class="cat-chip" data-cat="Expatriation">✈️ Expatriation</div>
+          <div class="cat-chip" data-cat="E-commerce">📦 E-commerce</div>
+          <div class="cat-chip" data-cat="Mindset">🧠 Mindset</div>
+          <div class="cat-chip" data-cat="Finance">💰 Finance</div>
+          <div class="cat-chip" data-cat="Import-Export">🔗 Import-Export</div>
+        </div>
       </div>
-      <div class="field-group">
-        <label class="field-label">Statut</label>
-        <select class="field-select" id="artStatus">
+
+      <div class="field">
+        <label>Statut</label>
+        <select id="inStatus">
           <option value="draft">Brouillon</option>
           <option value="review">En relecture</option>
           <option value="published">Publié</option>
         </select>
       </div>
-      <div class="field-group editor-full">
-        <label class="field-label">Résumé</label>
-        <input type="text" class="field-input" id="artDeck" placeholder="Courte description affichée dans la liste d'articles">
+
+      <div class="field">
+        <label>ID Vidéo YouTube</label>
+        <input type="text" id="inYoutube" placeholder="Ex: dQw4w9WgXcQ">
       </div>
-      <div class="field-group editor-full">
-        <label class="field-label">Contenu</label>
-        <textarea class="field-input" id="artContent" rows="8" placeholder="Contenu complet de l'article..."></textarea>
+
+      <div class="field full">
+        <label>Résumé</label>
+        <input type="text" id="inDeck" placeholder="Courte description affichée dans la liste">
       </div>
-      <div class="field-group">
-        <label class="field-label">ID Vidéo YouTube</label>
-        <input type="text" class="field-input" id="artYoutube" placeholder="Ex: dQw4w9WgXcQ">
+
+      <div class="field full">
+        <label>Contenu de l'article</label>
+        <textarea id="inContent" rows="8" placeholder="Écris ton article ici..."></textarea>
       </div>
-      <div class="field-group">
-        <label class="field-label">Slug (URL)</label>
-        <input type="text" class="field-input" id="artSlug" placeholder="mon-article-en-minuscules">
-      </div>
+
     </div>
-    <div style="display:flex;gap:8px;margin-top:1.2rem">
-      <button class="btn-ghost" style="flex:1" onclick="closeModal()">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" id="saveBtn" onclick="saveArticle()">Sauvegarder</button>
+    <div class="btn-row">
+      <button class="btn-ghost" style="flex:1" id="cancelBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveBtn">Créer l'article</button>
     </div>
   </div>
 </div>
@@ -177,162 +189,209 @@
 
 <script src="admin-auth.js"></script>
 <script>
-  var allArticles = []
-  var editingId = null
+var articles = [];
+var editId = null;
+var selectedCats = [];
 
-  async function init() {
-    var profile = await initAuth()
-    if (!profile) return
-    await loadArticles()
-  }
+var CATS = ['Business Chine', 'Fiscalité', 'Expatriation', 'E-commerce', 'Mindset', 'Finance', 'Import-Export'];
 
-  async function loadArticles() {
-    var res = await sb.from('articles')
-      .select('id, title, category, status, views, created_at, slug, deck, youtube_id, content')
-      .order('created_at', { ascending: false })
-
-    allArticles = res.data || []
-    document.getElementById('articleCount').textContent = allArticles.length + ' articles'
-    applyFilters()
-  }
-
-  function applyFilters() {
-    var status = document.getElementById('filterStatus').value
-    var cat = document.getElementById('filterCat').value
-    var filtered = allArticles.filter(function(a) {
-      var okStatus = status === 'all' || a.status === status
-      var okCat = cat === 'all' || a.category === cat
-      return okStatus && okCat
-    })
-    renderTable(filtered)
-  }
-
-  function renderTable(articles) {
-    var tbody = document.getElementById('articlesTable')
-    if (!articles.length) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">Aucun article trouvé.</td></tr>'
-      return
-    }
-
-    var html = ''
-    for (var i = 0; i < articles.length; i++) {
-      var a = articles[i]
-      var statusClass = a.status === 'published' ? 'sent' : a.status === 'review' ? 'review' : 'draft'
-      var statusLabel = a.status === 'published' ? 'Publié' : a.status === 'review' ? 'Relecture' : 'Brouillon'
-      var actionBtn = a.status !== 'published'
-        ? '<button class="row-action" style="color:#27500A;border-color:rgba(59,109,17,0.3)" onclick="changeStatus(\'' + a.id + '\',\'published\')">Publier</button>'
-        : '<button class="row-action" style="color:var(--muted)" onclick="changeStatus(\'' + a.id + '\',\'draft\')">Dépublier</button>'
-
-      html += '<tr>'
-      html += '<td style="max-width:280px">'
-      html += '<div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px">' + a.title + '</div>'
-      if (a.deck) html += '<div style="font-size:0.7rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px">' + a.deck + '</div>'
-      html += '</td>'
-      html += '<td><span style="font-size:0.7rem;color:var(--red);text-transform:uppercase;letter-spacing:0.06em">' + (a.category || '—') + '</span></td>'
-      html += '<td><span class="status-pill ' + statusClass + '">' + statusLabel + '</span></td>'
-      html += '<td style="color:var(--muted)">' + (a.views || 0).toLocaleString('fr-FR') + '</td>'
-      html += '<td style="color:var(--muted);white-space:nowrap">' + formatDate(a.created_at) + '</td>'
-      html += '<td><div style="display:flex;gap:5px">'
-      html += '<button class="row-action" onclick="editArticle(\'' + a.id + '\')">✏️ Modifier</button>'
-      html += actionBtn
-      html += '<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="deleteArticle(\'' + a.id + '\')">Suppr.</button>'
-      html += '</div></td>'
-      html += '</tr>'
-    }
-    tbody.innerHTML = html
-  }
-
-  function openModal(article) {
-    editingId = article ? article.id : null
-    document.getElementById('modalTitle').textContent = article ? 'Modifier l\'article' : 'Nouvel article'
-    document.getElementById('artTitle').value = article ? (article.title || '') : ''
-    document.getElementById('artCategory').value = article ? (article.category || '') : ''
-    document.getElementById('artStatus').value = article ? (article.status || 'draft') : 'draft'
-    document.getElementById('artDeck').value = article ? (article.deck || '') : ''
-    document.getElementById('artContent').value = article ? (article.content || '') : ''
-    document.getElementById('artYoutube').value = article ? (article.youtube_id || '') : ''
-    document.getElementById('artSlug').value = article ? (article.slug || '') : ''
-    document.getElementById('saveBtn').textContent = article ? 'Mettre à jour' : 'Créer l\'article'
-    document.getElementById('modalOverlay').classList.add('open')
-  }
-
-  function editArticle(id) {
-    for (var i = 0; i < allArticles.length; i++) {
-      if (allArticles[i].id === id) { openModal(allArticles[i]); return }
-    }
-  }
-
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('open')
-    editingId = null
-  }
-
-  function closeModalClick(e) {
-    if (e.target === document.getElementById('modalOverlay')) closeModal()
-  }
-
-  async function saveArticle() {
-    var title = document.getElementById('artTitle').value.trim()
-    if (!title) { showToast('Le titre est obligatoire.', 'error'); return }
-
-    var slug = document.getElementById('artSlug').value.trim()
-    if (!slug) slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-
-    var data = {
-      title: title,
-      category: document.getElementById('artCategory').value,
-      status: document.getElementById('artStatus').value,
-      deck: document.getElementById('artDeck').value.trim(),
-      content: document.getElementById('artContent').value.trim(),
-      youtube_id: document.getElementById('artYoutube').value.trim() || null,
-      slug: slug,
-      updated_at: new Date().toISOString()
-    }
-
-    var error
-    if (editingId) {
-      var res = await sb.from('articles').update(data).eq('id', editingId)
-      error = res.error
-      if (!error) showToast('Article mis à jour !', 'success')
+// Chips catégories — peuvent être init avant l'auth
+document.querySelectorAll('.cat-chip').forEach(function(chip) {
+  chip.addEventListener('click', function() {
+    var cat = this.getAttribute('data-cat');
+    var idx = selectedCats.indexOf(cat);
+    if (idx === -1) {
+      selectedCats.push(cat);
+      this.classList.add('selected');
     } else {
-      data.created_at = new Date().toISOString()
-      data.views = 0
-      var res = await sb.from('articles').insert(data)
-      error = res.error
-      if (!error) showToast('Article créé !', 'success')
+      selectedCats.splice(idx, 1);
+      this.classList.remove('selected');
     }
+  });
+});
 
-    if (error) { showToast('Erreur : ' + error.message, 'error'); return }
-    closeModal()
-    loadArticles()
+document.getElementById('filterStatus').addEventListener('change', renderTable);
+
+// Init auth puis attacher les events
+initAuth().then(function(profile) {
+  if (!profile) return;
+  loadArticles();
+
+  document.getElementById('addBtn').addEventListener('click', function() { openModal(null); });
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  document.getElementById('saveBtn').addEventListener('click', saveArticle);
+  document.getElementById('overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+});
+
+function openModal(article) {
+  editId = article ? article.id : null;
+  selectedCats = [];
+
+  document.getElementById('modalHead').textContent = article ? 'Modifier l\'article' : 'Nouvel article';
+  document.getElementById('inTitle').value = article ? (article.title || '') : '';
+  document.getElementById('inStatus').value = article ? (article.status || 'draft') : 'draft';
+  document.getElementById('inDeck').value = article ? (article.deck || '') : '';
+  document.getElementById('inContent').value = article ? (article.content || '') : '';
+  document.getElementById('inYoutube').value = article ? (article.youtube_id || '') : '';
+  document.getElementById('saveBtn').textContent = article ? 'Mettre à jour' : 'Créer l\'article';
+
+  // Reset chips
+  document.querySelectorAll('.cat-chip').forEach(function(chip) {
+    chip.classList.remove('selected');
+  });
+
+  // Pré-sélectionner les catégories existantes
+  if (article && article.category) {
+    // Peut être une string "Cat1, Cat2" ou juste "Cat1"
+    var cats = article.category.split(',').map(function(c) { return c.trim(); });
+    cats.forEach(function(cat) {
+      selectedCats.push(cat);
+      document.querySelectorAll('.cat-chip').forEach(function(chip) {
+        if (chip.getAttribute('data-cat') === cat) chip.classList.add('selected');
+      });
+    });
   }
 
-  async function changeStatus(id, status) {
-    await sb.from('articles').update({ status: status }).eq('id', id)
-    showToast(status === 'published' ? 'Article publié !' : 'Article repassé en brouillon.', 'success')
-    loadArticles()
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('inTitle').focus();
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('on');
+  editId = null;
+  selectedCats = [];
+}
+
+async function saveArticle() {
+  var title = document.getElementById('inTitle').value.trim();
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
+  if (!selectedCats.length) { showToast('Sélectionne au moins une catégorie.', 'error'); return; }
+
+  var data = {
+    title: title,
+    category: selectedCats.join(', '),  // "Business Chine, Fiscalité"
+    status: document.getElementById('inStatus').value,
+    deck: document.getElementById('inDeck').value.trim(),
+    content: document.getElementById('inContent').value.trim(),
+    youtube_id: document.getElementById('inYoutube').value.trim() || null,
+    slug: title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    updated_at: new Date().toISOString()
+  };
+
+  var res;
+  if (editId) {
+    res = await sb.from('articles').update(data).eq('id', editId);
+  } else {
+    data.created_at = new Date().toISOString();
+    data.views = 0;
+    res = await sb.from('articles').insert(data);
   }
 
-  async function deleteArticle(id) {
-    if (!confirm('Supprimer cet article définitivement ?')) return
-    await sb.from('articles').delete().eq('id', id)
-    showToast('Article supprimé.', 'success')
-    loadArticles()
+  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+
+  showToast(editId ? 'Article mis à jour !' : 'Article créé !', 'success');
+  closeModal();
+  loadArticles();
+}
+
+async function loadArticles() {
+  var res = await sb.from('articles')
+    .select('id, title, category, status, views, created_at, deck, content, youtube_id, slug')
+    .order('created_at', { ascending: false });
+
+  articles = res.data || [];
+  document.getElementById('countLine').textContent = articles.length + ' articles';
+  renderTable();
+}
+
+function renderTable() {
+  var statusFilter = document.getElementById('filterStatus').value;
+  var filtered = articles.filter(function(a) {
+    return statusFilter === 'all' || a.status === statusFilter;
+  });
+
+  var tbody = document.getElementById('tbody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--muted)">Aucun article.</td></tr>';
+    return;
   }
 
-  function formatDate(str) {
-    if (!str) return '—'
-    return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
-  }
+  var html = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var a = filtered[i];
+    var pill = a.status === 'published' ? 'sent' : a.status === 'review' ? 'review' : 'draft';
+    var label = a.status === 'published' ? 'Publié' : a.status === 'review' ? 'Relecture' : 'Brouillon';
 
-  function showToast(msg, type) {
-    var t = document.getElementById('toast')
-    t.textContent = msg
-    t.className = 'toast ' + (type || 'success') + ' show'
-    setTimeout(function() { t.classList.remove('show') }, 2500)
-  }
+    // Afficher les catégories comme chips
+    var cats = (a.category || '').split(',').map(function(c) { return c.trim(); }).filter(Boolean);
+    var catsHtml = cats.map(function(c) {
+      return '<span style="font-size:0.65rem;color:var(--red);background:rgba(192,57,43,0.07);padding:2px 6px;border-radius:10px;white-space:nowrap">' + c + '</span>';
+    }).join(' ');
 
-  init()
+    var toggleBtn = a.status !== 'published'
+      ? '<button class="row-action" style="color:#27500A;border-color:rgba(59,109,17,0.3)" data-status-id="' + a.id + '" data-new-status="published">Publier</button>'
+      : '<button class="row-action" style="color:var(--muted)" data-status-id="' + a.id + '" data-new-status="draft">Dépublier</button>';
+
+    html += '<tr>';
+    html += '<td style="max-width:260px">';
+    html += '<div style="font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">' + a.title + '</div>';
+    if (a.deck) html += '<div style="font-size:0.7rem;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:240px">' + a.deck + '</div>';
+    html += '</td>';
+    html += '<td><div style="display:flex;gap:4px;flex-wrap:wrap">' + (catsHtml || '—') + '</div></td>';
+    html += '<td><span class="status-pill ' + pill + '">' + label + '</span></td>';
+    html += '<td style="color:var(--muted)">' + (a.views || 0).toLocaleString('fr-FR') + '</td>';
+    html += '<td style="color:var(--muted);white-space:nowrap">' + fmtDate(a.created_at) + '</td>';
+    html += '<td><div style="display:flex;gap:5px">';
+    html += '<button class="row-action" data-edit-idx="' + articles.indexOf(a) + '">✏️ Modifier</button>';
+    html += toggleBtn;
+    html += '<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" data-del-id="' + a.id + '">Suppr.</button>';
+    html += '</div></td>';
+    html += '</tr>';
+  }
+  tbody.innerHTML = html;
+
+  // Events
+  tbody.querySelectorAll('[data-edit-idx]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      openModal(articles[parseInt(this.getAttribute('data-edit-idx'))]);
+    });
+  });
+  tbody.querySelectorAll('[data-status-id]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      changeStatus(this.getAttribute('data-status-id'), this.getAttribute('data-new-status'));
+    });
+  });
+  tbody.querySelectorAll('[data-del-id]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      deleteArticle(this.getAttribute('data-del-id'));
+    });
+  });
+}
+
+async function changeStatus(id, status) {
+  await sb.from('articles').update({ status: status }).eq('id', id);
+  showToast(status === 'published' ? 'Article publié !' : 'Repassé en brouillon.', 'success');
+  loadArticles();
+}
+
+async function deleteArticle(id) {
+  if (!confirm('Supprimer cet article définitivement ?')) return;
+  await sb.from('articles').delete().eq('id', id);
+  showToast('Article supprimé.', 'success');
+  loadArticles();
+}
+
+function fmtDate(str) {
+  if (!str) return '—';
+  return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'success') + ' show';
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
 </script>
 </body>
 </html>

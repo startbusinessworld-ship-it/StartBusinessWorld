@@ -1,193 +1,165 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shorts — SBW Admin</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>const PAGE_ID = 'shorts'</script>
-  <link rel="stylesheet" href="admin.css">
-  <style>
-    .short-preview {
-      width: 120px; height: 213px;
-      border-radius: 8px; overflow: hidden;
-      background: #1C1C1A; flex-shrink: 0;
-      position: relative;
-    }
-    .short-preview img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
-    .short-preview-placeholder {
-      width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
-      color: rgba(255,255,255,0.3); font-size: 2rem;
-    }
-    .shorts-list { display: flex; flex-direction: column; gap: 1px; background: var(--subtle); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--subtle); }
-    .short-row { background: var(--bg); padding: 1rem 1.2rem; display: flex; align-items: center; gap: 1rem; transition: background 0.12s; }
-    .short-row:hover { background: var(--surface); }
-    .short-info { flex: 1; min-width: 0; }
-    .short-title-text { font-size: 0.85rem; font-weight: 500; margin-bottom: 0.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .short-meta { font-size: 0.72rem; color: var(--muted); display: flex; gap: 0.6rem; }
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; }
-    .modal-overlay.open { display: flex; }
-    .modal { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; border: 0.5px solid var(--subtle); }
-    .modal-title { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
-    .preview-wrap { display: flex; gap: 1rem; align-items: flex-start; margin-top: 12px; }
-    .preview-thumb { width: 90px; height: 160px; border-radius: 6px; overflow: hidden; background: var(--surface); flex-shrink: 0; }
-    .preview-thumb img { width: 100%; height: 100%; object-fit: cover; }
-    .preview-thumb-empty { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; }
-    .url-hint { font-size: 0.68rem; color: var(--muted); margin-top: 4px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shorts YouTube — SBW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>const PAGE_ID = 'shorts'</script>
+<link rel="stylesheet" href="admin.css">
+<style>
+.shorts-grid { display: flex; flex-direction: column; gap: 1px; background: var(--subtle); border-radius: 10px; overflow: hidden; border: 0.5px solid var(--subtle); }
+.short-row { background: var(--bg); padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+.short-row:hover { background: var(--surface); }
+.short-thumb-small { width: 50px; height: 88px; border-radius: 6px; overflow: hidden; background: #1C1C1A; flex-shrink: 0; }
+.short-thumb-small img { width: 100%; height: 100%; object-fit: cover; }
+.short-info { flex: 1; min-width: 0; }
+.short-name { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+.short-meta { font-size: 0.72rem; color: var(--muted); }
+
+/* MODAL */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+.overlay.on { display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal-box { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 460px; border: 0.5px solid var(--subtle); position: relative; z-index: 1000; }
+.modal-head { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.7rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.field input, .field select { width: 100%; padding: 8px 12px; border: 0.5px solid var(--subtle); border-radius: 6px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); outline: none; }
+.field input:focus, .field select:focus { border-color: var(--ink); }
+.hint { font-size: 0.68rem; color: var(--muted); margin-top: 3px; }
+.preview-box { display: none; background: var(--surface); border-radius: 8px; padding: 12px; margin-bottom: 12px; display: flex; align-items: center; gap: 12px; }
+.preview-img { width: 56px; height: 100px; border-radius: 6px; overflow: hidden; background: #1C1C1A; flex-shrink: 0; }
+.preview-img img { width: 100%; height: 100%; object-fit: cover; }
+.preview-id { font-size: 0.78rem; font-weight: 500; font-family: monospace; }
+.preview-ok { font-size: 0.7rem; color: #27500A; margin-top: 4px; }
+.btn-row { display: flex; gap: 8px; margin-top: 16px; }
+.empty-msg { padding: 3rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+</style>
 </head>
 <body>
 <div class="admin-layout">
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
-      <nav class="sidebar-nav">
-        <div class="nav-section">Principal</div>
-        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-          Dashboard
-        </a>
-        <div class="nav-section">Contenu</div>
-        <a href="admin-articles.html" class="nav-item" data-access="articles">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
-          Articles
-        </a>
-        <a href="admin-shorts.html" class="nav-item active" data-access="shorts">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
-          Shorts YouTube
-        </a>
-        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
-          Newsletter
-        </a>
-        <div class="nav-section">Communauté</div>
-        <a href="admin-members.html" class="nav-item" data-access="members">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
-          Membres Club
-        </a>
-        <div class="nav-section">Monétisation</div>
-        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
-          Revenus
-        </a>
-        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
-          Affiliation
-        </a>
-        <div class="nav-section">Admin</div>
-        <a href="admin-team.html" class="nav-item" data-access="team">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
-          Équipe & Rôles
-        </a>
-        <a href="admin-settings.html" class="nav-item" data-access="settings">
-          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
-          Paramètres
-        </a>
-      </nav>
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">Principal</div>
+      <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+        Dashboard
+      </a>
+      <div class="nav-section">Contenu</div>
+      <a href="admin-articles-list.html" class="nav-item" data-access="articles">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Articles
+      </a>
+      <a href="admin-shorts.html" class="nav-item active" data-access="shorts">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
+        Shorts YouTube
+      </a>
+      <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+        Newsletter
+      </a>
+      <div class="nav-section">Communauté</div>
+      <a href="admin-members.html" class="nav-item" data-access="members">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+        Membres Club
+      </a>
+      <div class="nav-section">Monétisation</div>
+      <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+        Revenus
+      </a>
+      <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+        Affiliation
+      </a>
+      <div class="nav-section">Admin</div>
+      <a href="admin-team.html" class="nav-item" data-access="team">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
+        Équipe & Rôles
+      </a>
+      <a href="admin-settings.html" class="nav-item" data-access="settings">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+        Paramètres
+      </a>
+    </nav>
+  </div>
+  <div id="userInfo"></div>
+</aside>
+
+<main class="main-content">
+  <div class="topbar">
+    <div>
+      <h1 class="page-title">Shorts YouTube</h1>
+      <div class="page-date" id="countLine">—</div>
     </div>
-    <div id="userInfo"></div>
-  </aside>
-
-  <main class="main-content">
-    <div class="topbar">
-      <div>
-        <h1 class="page-title">Shorts YouTube</h1>
-        <div class="page-date" id="shortCount">— shorts publiés</div>
-      </div>
-      <div class="topbar-actions">
-        <button class="btn-primary" onclick="openModal()">+ Ajouter un Short</button>
-      </div>
+    <div class="topbar-actions">
+      <button class="btn-primary" id="addBtn">+ Ajouter un Short</button>
     </div>
+  </div>
 
-    <div class="content-area">
-
-      <!-- PREVIEW SITE -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="card-head">
-          <div class="card-title">Aperçu — comme sur le site</div>
-          <div class="card-link" style="font-size:0.72rem;color:var(--muted)">Défilement horizontal</div>
-        </div>
-        <div style="display:flex;gap:12px;overflow-x:auto;padding:16px;scrollbar-width:none" id="shortsPreview">
-          <div style="font-size:0.8rem;color:var(--muted);padding:2rem;text-align:center;width:100%">Aucun short pour l'instant</div>
-        </div>
-      </div>
-
-      <!-- LISTE -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-title">Tous les shorts</div>
-        </div>
-        <div id="shortsList">
-          <div class="loading-row">Chargement...</div>
-        </div>
-      </div>
-
+  <div class="content-area">
+    <div class="card">
+      <div id="shortsList"><div class="empty-msg">Chargement...</div></div>
     </div>
-  </main>
+  </div>
+</main>
 </div>
 
-<!-- MODAL AJOUT -->
-<div class="modal-overlay" id="modalOverlay" onclick="closeModalClick(event)">
-  <div class="modal">
-    <div class="modal-title" id="modalTitle">Ajouter un Short YouTube</div>
-    <div style="display:flex;flex-direction:column;gap:12px">
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal-box">
+    <div class="modal-head" id="modalHead">Ajouter un Short</div>
 
-      <div class="field-group">
-        <label class="field-label">URL YouTube du Short *</label>
-        <input type="text" class="field-input" id="shortUrl"
-          placeholder="https://youtube.com/shorts/ABC123 ou https://youtu.be/ABC123"
-          oninput="extractId()">
-        <div class="url-hint">Colle l'URL complète de ton Short — l'ID est extrait automatiquement</div>
-      </div>
+    <div class="field">
+      <label>URL YouTube du Short *</label>
+      <input type="text" id="inUrl" placeholder="https://youtube.com/shorts/ABC123">
+      <div class="hint">Colle l'URL complète — l'ID est extrait automatiquement</div>
+    </div>
 
-      <!-- PREVIEW EN TEMPS RÉEL -->
-      <div class="preview-wrap" id="previewWrap" style="display:none">
-        <div class="preview-thumb">
-          <img id="previewImg" src="" alt="Miniature">
-        </div>
-        <div style="flex:1">
-          <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px">ID détecté</div>
-          <div style="font-size:0.85rem;font-weight:500;font-family:monospace" id="detectedId">—</div>
-          <div style="font-size:0.7rem;color:var(--muted);margin-top:8px">Miniature chargée ✓</div>
-        </div>
+    <div id="previewZone" style="display:none; background:var(--surface); border-radius:8px; padding:12px; margin-bottom:12px; display:none; align-items:center; gap:12px;">
+      <div style="width:56px;height:100px;border-radius:6px;overflow:hidden;background:#1C1C1A;flex-shrink:0">
+        <img id="previewImg" src="" alt="" style="width:100%;height:100%;object-fit:cover">
       </div>
+      <div>
+        <div style="font-size:0.72rem;color:var(--muted);margin-bottom:4px">ID détecté</div>
+        <div id="previewId" style="font-size:0.85rem;font-weight:500;font-family:monospace"></div>
+        <div style="font-size:0.7rem;color:#27500A;margin-top:4px">✓ Miniature chargée</div>
+      </div>
+    </div>
 
-      <div class="field-group">
-        <label class="field-label">Titre du Short *</label>
-        <input type="text" class="field-input" id="shortTitle" placeholder="Ex : Comment sourcer en Chine en 5 min">
-      </div>
+    <div class="field">
+      <label>Titre *</label>
+      <input type="text" id="inTitle" placeholder="Ex: Comment sourcer en Chine en 5 min">
+    </div>
 
-      <div class="field-group">
-        <label class="field-label">Catégorie</label>
-        <select class="field-select" id="shortCategory">
-          <option value="">Choisir une catégorie</option>
-          <option value="Business Chine">Business Chine</option>
-          <option value="Fiscalité">Fiscalité</option>
-          <option value="Expatriation">Expatriation</option>
-          <option value="E-commerce">E-commerce</option>
-          <option value="Mindset">Mindset</option>
-          <option value="Finance">Finance</option>
-          <option value="Import-Export">Import-Export</option>
-        </select>
-      </div>
+    <div class="field">
+      <label>Catégorie</label>
+      <select id="inCat">
+        <option value="">Choisir...</option>
+        <option value="Business Chine">Business Chine</option>
+        <option value="Fiscalité">Fiscalité</option>
+        <option value="Expatriation">Expatriation</option>
+        <option value="E-commerce">E-commerce</option>
+        <option value="Mindset">Mindset</option>
+        <option value="Finance">Finance</option>
+        <option value="Import-Export">Import-Export</option>
+      </select>
+    </div>
 
-      <div class="field-group">
-        <label class="field-label">Statut</label>
-        <select class="field-select" id="shortStatus">
-          <option value="published">Publié — visible sur le site</option>
-          <option value="draft">Brouillon — caché</option>
-        </select>
-      </div>
+    <div class="field">
+      <label>Statut</label>
+      <select id="inStatus">
+        <option value="published">Publié — visible sur le site</option>
+        <option value="draft">Brouillon — caché</option>
+      </select>
+    </div>
 
-      <div style="display:flex;gap:8px;margin-top:4px">
-        <button class="btn-ghost" style="flex:1" onclick="closeModal()">Annuler</button>
-        <button class="btn-primary" style="flex:1;justify-content:center" onclick="saveShort()">Publier le Short</button>
-      </div>
+    <div class="btn-row">
+      <button class="btn-ghost" style="flex:1" id="cancelBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveBtn">Publier</button>
     </div>
   </div>
 </div>
@@ -196,183 +168,169 @@
 
 <script src="admin-auth.js"></script>
 <script>
-  let editingId = null
-  let currentYoutubeId = null
+var shorts = [];
+var editId = null;
+var ytId = null;
 
-  async function init() {
-    const profile = await initAuth()
-    if (!profile) return
-    await loadShorts()
+// Attendre que le DOM soit prêt
+// Initialisation au chargement
+initAuth().then(function(profile) {
+  if (!profile) return;
+  loadShorts();
+
+  document.getElementById('addBtn').addEventListener('click', function() { openModal(null); });
+  document.getElementById('cancelBtn').addEventListener('click', closeModal);
+  document.getElementById('saveBtn').addEventListener('click', saveShort);
+  document.getElementById('inUrl').addEventListener('input', function() { extractYtId(this.value); });
+  document.getElementById('overlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+});
+
+function extractYtId(url) {
+  url = url.trim();
+  var id = null;
+  var m;
+
+  m = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/);
+  if (m) id = m[1];
+
+  m = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
+  if (m) id = m[1];
+
+  m = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+  if (m) id = m[1];
+
+  if (!id && /^[a-zA-Z0-9_-]{11}$/.test(url)) id = url;
+
+  ytId = id;
+
+  var zone = document.getElementById('previewZone');
+  if (id) {
+    document.getElementById('previewId').textContent = id;
+    document.getElementById('previewImg').src = 'https://i.ytimg.com/vi/' + id + '/mqdefault.jpg';
+    zone.style.display = 'flex';
+  } else {
+    zone.style.display = 'none';
+  }
+}
+
+function openModal(short) {
+  editId = short ? short.id : null;
+  ytId = short ? short.youtube_id : null;
+
+  document.getElementById('modalHead').textContent = short ? 'Modifier le Short' : 'Ajouter un Short';
+  document.getElementById('inUrl').value = short ? 'https://youtube.com/shorts/' + short.youtube_id : '';
+  document.getElementById('inTitle').value = short ? short.title : '';
+  document.getElementById('inCat').value = short ? (short.category || '') : '';
+  document.getElementById('inStatus').value = short ? short.status : 'published';
+  document.getElementById('saveBtn').textContent = short ? 'Mettre à jour' : 'Publier';
+
+  if (short) extractYtId(document.getElementById('inUrl').value);
+  else {
+    document.getElementById('previewZone').style.display = 'none';
+    ytId = null;
   }
 
-  async function loadShorts() {
-    const { data } = await sb.from('shorts').select('*').order('created_at', { ascending: false })
-    const list = data || []
+  document.getElementById('overlay').classList.add('on');
+  document.getElementById('inUrl').focus();
+}
 
-    document.getElementById('shortCount').textContent = list.filter(s => s.status === 'published').length + ' shorts publiés'
+function closeModal() {
+  document.getElementById('overlay').classList.remove('on');
+  editId = null;
+  ytId = null;
+}
 
-    renderList(list)
-    renderPreview(list.filter(s => s.status === 'published'))
+async function saveShort() {
+  if (!ytId) { showToast('Colle une URL YouTube valide.', 'error'); return; }
+  var title = document.getElementById('inTitle').value.trim();
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
+
+  var data = {
+    youtube_id: ytId,
+    title: title,
+    category: document.getElementById('inCat').value,
+    status: document.getElementById('inStatus').value
+  };
+
+  var res;
+  if (editId) {
+    res = await sb.from('shorts').update(data).eq('id', editId);
+  } else {
+    data.created_at = new Date().toISOString();
+    res = await sb.from('shorts').insert(data);
   }
 
-  function renderList(shorts) {
-    const el = document.getElementById('shortsList')
-    if (!shorts.length) {
-      el.innerHTML = '<div class="empty-row">Aucun short ajouté. Clique sur "+ Ajouter un Short" pour commencer.</div>'
-      return
-    }
-    var html = ''
-    for (var i = 0; i < shorts.length; i++) {
-      var s = shorts[i]
-      var statusClass = s.status === 'published' ? 'sent' : 'draft'
-      var statusLabel = s.status === 'published' ? 'Publié' : 'Brouillon'
-      html += '<div class="short-row">'
-      html += '<div class="short-preview">'
-      html += '<img src="https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg" alt="Short" onerror="this.style.display='none'">'
-      html += '</div>'
-      html += '<div class="short-info">'
-      html += '<div class="short-title-text">' + s.title + '</div>'
-      html += '<div class="short-meta">'
-      html += '<span style="color:var(--red);font-size:0.65rem;text-transform:uppercase">' + (s.category || '—') + '</span>'
-      html += '<span>·</span><span>ID: ' + s.youtube_id + '</span>'
-      html += '<span>·</span><span>' + formatDate(s.created_at) + '</span>'
-      html += '</div></div>'
-      html += '<span class="status-pill ' + statusClass + '">' + statusLabel + '</span>'
-      html += '<div style="display:flex;gap:6px">'
-      html += '<button class="row-action" data-id="' + s.id + '" data-ytid="' + s.youtube_id + '" data-cat="' + (s.category||'') + '" data-status="' + s.status + '" onclick="editShortFromBtn(this)">Modifier</button>'
-      html += '<a href="https://youtube.com/shorts/' + s.youtube_id + '" target="_blank" class="row-action">Voir ↗</a>'
-      html += '<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" data-id="' + s.id + '" onclick="deleteShortFromBtn(this)">Suppr.</button>'
-      html += '</div></div>'
-    }
-    el.innerHTML = html
-    // Stocker les titres séparément pour éviter les problèmes d'échappement
-    el.querySelectorAll('[data-id]').forEach(function(btn) {
-      var id = btn.getAttribute('data-id')
-      var short = shorts.find(function(s) { return s.id === id })
-      if (short) btn._shortData = short
-    })
+  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
+
+  showToast(editId ? 'Short mis à jour !' : 'Short publié sur le site !', 'success');
+  closeModal();
+  loadShorts();
+}
+
+async function loadShorts() {
+  var res = await sb.from('shorts').select('*').order('created_at', { ascending: false });
+  shorts = res.data || [];
+
+  var published = shorts.filter(function(s) { return s.status === 'published'; }).length;
+  document.getElementById('countLine').textContent = shorts.length + ' shorts · ' + published + ' publiés';
+
+  renderList();
+}
+
+function renderList() {
+  var el = document.getElementById('shortsList');
+  if (!shorts.length) {
+    el.innerHTML = '<div class="empty-msg">Aucun short. Clique sur "+ Ajouter un Short" pour commencer.</div>';
+    return;
   }
 
-  function renderPreview(shorts) {
-    var el = document.getElementById('shortsPreview')
-    if (!shorts.length) {
-      el.innerHTML = '<div style="font-size:0.8rem;color:var(--muted);padding:2rem;text-align:center;width:100%">Aucun short publié</div>'
-      return
-    }
-    var html = ''
-    for (var i = 0; i < shorts.length; i++) {
-      var s = shorts[i]
-      html += '<div style="flex:0 0 100px;cursor:pointer" onclick="window.open('https://youtube.com/shorts/' + s.youtube_id + '','_blank')">'
-      html += '<div style="width:100px;height:178px;border-radius:8px;overflow:hidden;background:#1C1C1A;margin-bottom:6px;border:0.5px solid var(--subtle)">'
-      html += '<img src="https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg" alt="Short" style="width:100%;height:100%;object-fit:cover">'
-      html += '</div>'
-      html += '<div style="font-size:0.68rem;font-weight:500;line-height:1.3;color:var(--ink)">' + s.title + '</div>'
-      html += '<div style="font-size:0.6rem;color:var(--red);margin-top:2px;text-transform:uppercase">' + (s.category||'') + '</div>'
-      html += '</div>'
-    }
-    el.innerHTML = html
+  var html = '<div class="shorts-grid">';
+  for (var i = 0; i < shorts.length; i++) {
+    var s = shorts[i];
+    var pill = s.status === 'published' ? 'sent' : 'draft';
+    var label = s.status === 'published' ? 'Publié' : 'Brouillon';
+    html += '<div class="short-row">';
+    html += '<div class="short-thumb-small"><img src="https://i.ytimg.com/vi/' + s.youtube_id + '/mqdefault.jpg" alt=""></div>';
+    html += '<div class="short-info">';
+    html += '<div class="short-name">' + s.title + '</div>';
+    html += '<div class="short-meta">' + (s.category || '—') + ' · ' + s.youtube_id + '</div>';
+    html += '</div>';
+    html += '<span class="status-pill ' + pill + '">' + label + '</span>';
+    html += '<div style="display:flex;gap:6px">';
+    html += '<button class="row-action" data-idx="' + i + '">Modifier</button>';
+    html += '<a href="https://youtube.com/shorts/' + s.youtube_id + '" target="_blank" class="row-action">Voir ↗</a>';
+    html += '<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" data-del="' + s.id + '">Suppr.</button>';
+    html += '</div></div>';
   }
+  html += '</div>';
+  el.innerHTML = html;
 
-  function extractId() {
-    const url = document.getElementById('shortUrl').value.trim()
-    let id = null
+  // Attacher les events après injection
+  el.querySelectorAll('[data-idx]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      openModal(shorts[parseInt(this.getAttribute('data-idx'))]);
+    });
+  });
+  el.querySelectorAll('[data-del]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      deleteShort(this.getAttribute('data-del'));
+    });
+  });
+}
 
-    // youtube.com/shorts/ID
-    const m1 = url.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/)
-    if (m1) id = m1[1]
+async function deleteShort(id) {
+  if (!confirm('Supprimer ce short ?')) return;
+  await sb.from('shorts').delete().eq('id', id);
+  showToast('Supprimé.', 'success');
+  loadShorts();
+}
 
-    // youtu.be/ID
-    const m2 = url.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/)
-    if (m2) id = m2[1]
-
-    // youtube.com/watch?v=ID
-    const m3 = url.match(/[?&]v=([a-zA-Z0-9_-]{11})/)
-    if (m3) id = m3[1]
-
-    // Juste l'ID directement (11 chars)
-    if (!id && url.match(/^[a-zA-Z0-9_-]{11}$/)) id = url
-
-    if (id) {
-      currentYoutubeId = id
-      document.getElementById('detectedId').textContent = id
-      document.getElementById('previewImg').src = 'https://i.ytimg.com/vi/' + id + '/mqdefault.jpg'
-      document.getElementById('previewWrap').style.display = 'flex'
-    } else {
-      currentYoutubeId = null
-      document.getElementById('previewWrap').style.display = 'none'
-    }
-  }
-
-  function openModal(id, ytId, title, cat, status) {
-    editingId = id || null
-    document.getElementById('modalTitle').textContent = id ? 'Modifier le Short' : 'Ajouter un Short YouTube'
-    document.getElementById('shortUrl').value = ytId ? 'https://youtube.com/shorts/' + ytId : ''
-    document.getElementById('shortTitle').value = title || ''
-    document.getElementById('shortCategory').value = cat || ''
-    document.getElementById('shortStatus').value = status || 'published'
-    if (ytId) { currentYoutubeId = ytId; extractId() }
-    document.getElementById('modalOverlay').classList.add('open')
-  }
-
-  function editShort(id, ytId, title, cat, status) { openModal(id, ytId, title, cat, status) }
-
-  function editShortFromBtn(btn) {
-    var s = btn._shortData || {}
-    openModal(s.id, s.youtube_id, s.title, s.category, s.status)
-  }
-
-  function deleteShortFromBtn(btn) {
-    deleteShort(btn.getAttribute('data-id'))
-  }
-
-  function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingId = null; currentYoutubeId = null }
-  function closeModalClick(e) { if (e.target === document.getElementById('modalOverlay')) closeModal() }
-
-  async function saveShort() {
-    if (!currentYoutubeId) { showToast('Colle une URL YouTube valide.', 'error'); return }
-    const title = document.getElementById('shortTitle').value.trim()
-    if (!title) { showToast('Le titre est obligatoire.', 'error'); return }
-
-    const data = {
-      youtube_id: currentYoutubeId,
-      title,
-      category: document.getElementById('shortCategory').value,
-      status: document.getElementById('shortStatus').value,
-    }
-
-    if (editingId) {
-      await sb.from('shorts').update(data).eq('id', editingId)
-      showToast('Short mis à jour !', 'success')
-    } else {
-      data.created_at = new Date().toISOString()
-      await sb.from('shorts').insert(data)
-      showToast('Short publié sur le site !', 'success')
-    }
-
-    closeModal()
-    loadShorts()
-  }
-
-  async function deleteShort(id) {
-    if (!confirm('Supprimer ce short ?')) return
-    await sb.from('shorts').delete().eq('id', id)
-    showToast('Short supprimé.', 'success')
-    loadShorts()
-  }
-
-  function formatDate(str) {
-    if (!str) return '—'
-    return new Date(str).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })
-  }
-
-  function showToast(msg, type = 'success') {
-    const t = document.getElementById('toast')
-    t.textContent = msg
-    t.className = 'toast ' + type + ' show'
-    setTimeout(() => t.classList.remove('show'), 2500)
-  }
-
-  init()
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + (type || 'success') + ' show';
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
 </script>
 </body>
 </html>
