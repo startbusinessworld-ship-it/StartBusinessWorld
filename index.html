@@ -898,10 +898,9 @@
 
       .themes-row { padding: 0; }
 
-      .articles { display:grid; grid-template-columns: 1fr; width:100%; }
-      .article { display:flex !important; flex-direction:column; border-right:none !important; border-bottom: 1px solid var(--subtle); padding:1.5rem 1.2rem; width:100%; box-sizing:border-box; }
-      .article.featured { grid-column: span 1; background: var(--ink); }
-      .article { padding: 1.5rem; }
+      .articles { display:grid !important; grid-template-columns: 1fr !important; width:100% !important; }
+      .article { display:flex !important; flex-direction:column !important; border-right:none !important; border-bottom: 1px solid var(--subtle) !important; padding:1.5rem 1.2rem !important; width:100% !important; box-sizing:border-box !important; }
+      .article.featured { grid-column: span 1 !important; background: var(--ink) !important; }
 
       .tools-section { grid-template-columns: 1fr; }
       .tools-header { border-right: none; border-bottom: 1px solid var(--subtle); padding: 1.5rem; }
@@ -1417,8 +1416,8 @@
 
         var card = document.createElement("div");
         card.className = "article" + (isFeatured ? " featured" : "");
-        card.style.cursor = "pointer";
         card.setAttribute("data-link", link);
+        card.style.cssText = "cursor:pointer;display:flex;flex-direction:column;gap:0.7rem;padding:2rem;box-sizing:border-box;width:100%;" + (isFeatured ? "background:var(--ink);color:#F0EDE4;" : "");
 
         var cat = document.createElement("div");
         cat.className = "art-cat";
