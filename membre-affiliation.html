@@ -140,14 +140,72 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
 .toast-notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:8px;font-size:.82rem;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap}
 .toast-notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ── MOBILE TOPBAR ── */
+.mobile-topbar{
+  display:none;background:var(--dark);
+  padding:12px 16px;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.mobile-topbar-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:1rem}
+.mobile-back-btn{font-size:.75rem;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:inherit}
+
 @media(max-width:768px){
-  .page{padding:1rem}
-  .aff-hero{padding:1.5rem}
-  .hero-title{font-size:1.4rem}
-  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
-  .how-steps{grid-template-columns:1fr}
-  .hero-stats{gap:16px}
+  /* Cacher la nav desktop */
+  nav{display:none}
+  .mobile-topbar{display:flex}
+
+  .page{padding:1rem 14px 100px}
+  .aff-hero{padding:1.4rem}
+  .hero-title{font-size:1.3rem}
+  .hero-sub{font-size:.82rem}
+  .hero-stats{gap:20px}
+  .hero-stat-n{font-size:1.6rem}
+
+  /* Lien — plein largeur */
+  .link-box{flex-wrap:wrap;gap:8px}
+  .link-text{width:100%;font-size:.78rem}
+  .btn-copy{width:100%;justify-content:center}
   .share-row{gap:6px}
+  .share-btn{flex:1;justify-content:center;padding:9px 8px;font-size:.72rem}
+
+  /* Stats 2 colonnes */
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .stat-card{padding:14px 12px}
+  .stat-value{font-size:1.3rem}
+
+  /* Stripe */
+  .stripe-card{padding:16px}
+  .stripe-head{flex-wrap:wrap;gap:8px}
+  .btn-stripe{width:100%;justify-content:center}
+
+  /* History */
+  .history-row{flex-wrap:wrap;gap:4px}
+  .history-date{width:100%;margin-bottom:2px}
+
+  /* How */
+  .how-steps{grid-template-columns:1fr;gap:4px}
+  .how-step{padding:14px 10px;text-align:left;display:flex;gap:12px;align-items:flex-start}
+  .how-emoji{font-size:1.4rem;flex-shrink:0;margin-bottom:0}
+}
+
+/* ── BOTTOM NAV MOBILE ── */
+.mobile-bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--dark);border-top:1px solid rgba(255,255,255,.08);
+  padding:8px 0 calc(8px + env(safe-area-inset-bottom));z-index:200;
+}
+.mobile-bottom-nav-items{display:flex;justify-content:space-around}
+.mbn-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:4px 8px;cursor:pointer;border:none;background:none;
+  color:rgba(255,255,255,.35);font-family:inherit;font-size:.58rem;
+  font-weight:500;text-transform:uppercase;letter-spacing:.04em;
+}
+.mbn-item.active{color:var(--gold)}
+.mbn-item .ico{font-size:1.2rem}
+
+@media(max-width:768px){
+  .mobile-bottom-nav{display:block}
 }
 </style>
 </head>
@@ -160,6 +218,12 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <button class="btn-sm" id="logoutBtn">Déconnexion</button>
   </div>
 </nav>
+
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar">
+  <div class="mobile-topbar-logo">Start Business World</div>
+  <button class="mobile-back-btn" onclick="window.location.href='client-dashboard.html'">← Dashboard</button>
+</div>
 
 <div class="page">
 
@@ -295,6 +359,27 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
 </div>
 
 <div class="toast-notif" id="toastNotif"></div>
+
+<!-- BOTTOM NAV MOBILE -->
+<div class="mobile-bottom-nav">
+  <div class="mobile-bottom-nav-items">
+    <button class="mbn-item" onclick="window.location.href='client-dashboard.html'">
+      <span class="ico">🏠</span><span>Accueil</span>
+    </button>
+    <button class="mbn-item" onclick="window.location.href='membre-formations.html'">
+      <span class="ico">🎓</span><span>Formations</span>
+    </button>
+    <button class="mbn-item" onclick="window.location.href='membre-chat.html'">
+      <span class="ico">💬</span><span>Chat</span>
+    </button>
+    <button class="mbn-item" onclick="window.location.href='membre-prestige.html'">
+      <span class="ico">⭐</span><span>Prestige</span>
+    </button>
+    <button class="mbn-item active" onclick="window.location.href='membre-affiliation.html'">
+      <span class="ico">🔗</span><span>Affiliation</span>
+    </button>
+  </div>
+</div>
 
 <script>
 var SB = supabase.createClient(
