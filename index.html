@@ -1069,7 +1069,7 @@
       <p class="hero-deck">Fiscalité, sourcing en Chine, création de société, e-commerce et expatriation. Des articles approfondis, des vidéos et une communauté — pour entrepreneurs qui pensent global.</p>
       <div class="hero-ctas">
         <a href="club.html" class="cta-primary">Rejoindre le Club SBW</a>
-        <a href="#articles" class="cta-sec">Lire le blog →</a>
+        <a href="#articles" class="cta-sec" onclick="event.preventDefault();document.getElementById('articles').scrollIntoView({behavior:'smooth'})">Lire le blog →</a>
       </div>
     </div>
     <div class="hero-side">
@@ -1100,7 +1100,7 @@
   <!-- STATS -->
 
 
-  <!-- THÈMES -->\n  <!-- ARTICLE À LA UNE -->
+  <!-- ARTICLE À LA UNE -->
   <div class="featured-top" id="featuredTop" style="display:none;cursor:pointer" onclick="window.location.href=document.getElementById('ftLink').href">
     <div class="ft-cat" id="ftCat">À la une</div>
     <h2 class="ft-title" id="ftTitle"></h2>
@@ -1134,6 +1134,9 @@
   <!-- ARTICLES -->
   <div class="articles" id="articles">
     <div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem" id="articlesLoader">Chargement des articles...</div>
+  </div>
+  <div id="articlesFooter" style="display:none;text-align:center;padding:2rem;border-top:1px solid var(--subtle)">
+    <a href="blog.html" style="font-size:0.85rem;color:var(--muted);border:0.5px solid var(--subtle);padding:0.6rem 1.6rem;border-radius:4px;text-decoration:none;transition:all 0.15s" onmouseover="this.style.color='var(--ink)';this.style.borderColor='var(--ink)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--subtle)'">Voir tous les articles →</a>
   </div>
 
   <!-- CLUB SBW -->
@@ -1422,7 +1425,7 @@
 
     async function loadArticles() {
       try {
-        var res = await SB.from("articles").select("id,title,deck,category,slug,youtube_id,created_at,views").eq("status","published").order("created_at",{ascending:false}).limit(12);
+        var res = await SB.from("articles").select("id,title,deck,category,slug,youtube_id,created_at,views").eq("status","published").order("created_at",{ascending:false}).limit(9);
         allArticles = res.data || [];
         console.log("Articles:", allArticles.length);
         renderArticles();
@@ -1504,6 +1507,10 @@
 
       // Forcer l'affichage sur mobile
       container.style.display = "grid";
+
+      // Afficher le bouton "Voir tous les articles"
+      var footer = document.getElementById("articlesFooter");
+      if (footer) footer.style.display = filtered.length > 0 ? "block" : "none";
     }
 
     function filterTheme(cat, el) {
