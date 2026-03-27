@@ -732,5 +732,35 @@
       });
     })();
   </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// Tracker le lien d'affiliation
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var ref = params.get('ref');
+  if (ref) {
+    // Sauvegarder en cookie 30 jours
+    var expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+    document.cookie = "sbw_ref=" + encodeURIComponent(ref) + "; expires=" + expires + "; path=/";
+    // Incrémenter le compteur de clics
+    var SB = supabase.createClient(
+      "https://grwimhqsthcmfwblwdwg.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+    );
+    SB.from("affiliations")
+      .select("id, clicks")
+      .eq("ref_code", ref)
+      .single()
+      .then(function(res) {
+        if (res.data) {
+          SB.from("affiliations")
+            .update({ clicks: (res.data.clicks || 0) + 1 })
+            .eq("ref_code", ref)
+            .then();
+        }
+      });
+  }
+})();
+</script>
 </body>
 </html>

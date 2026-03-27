@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programme Affiliation — Club SBW</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);--muted:#888;--gold:#A67C3A;--red:#C0392B;--dark:#0E0D0B}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:1.1rem}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-back{font-size:.78rem;color:rgba(255,255,255,.5);transition:color .15s}
+.nav-back:hover{color:#fff}
+.btn-sm{background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:4px 12px;border-radius:4px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-sm:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+
+.page{max-width:860px;margin:0 auto;padding:2rem}
+
+/* HERO */
+.aff-hero{
+  background:var(--dark);border-radius:16px;padding:2.5rem;
+  position:relative;overflow:hidden;margin-bottom:24px;
+  border:.5px solid rgba(166,124,58,.2);
+}
+.aff-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:300px;height:300px;background:radial-gradient(circle,rgba(166,124,58,.12),transparent 60%);pointer-events:none}
+.hero-eyebrow{font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.hero-eyebrow::before{content:'◆';font-size:.4rem}
+.hero-title{font-family:"DM Serif Display",serif;font-size:1.8rem;color:#fff;letter-spacing:-.02em;margin-bottom:8px;line-height:1.1}
+.hero-title i{color:var(--gold);font-style:italic}
+.hero-sub{font-size:.88rem;color:rgba(255,255,255,.45);line-height:1.65;max-width:500px;margin-bottom:24px}
+
+/* Stats hero */
+.hero-stats{display:flex;gap:24px;flex-wrap:wrap}
+.hero-stat{text-align:center}
+.hero-stat-n{font-family:"DM Serif Display",serif;font-size:2rem;color:var(--gold);line-height:1;margin-bottom:3px}
+.hero-stat-l{font-size:.65rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.06em}
+
+/* LIEN AFFILIATION */
+.link-card{background:#fff;border:.5px solid var(--subtle);border-radius:14px;padding:24px;margin-bottom:20px}
+.link-card-title{font-size:.82rem;font-weight:500;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.link-card-sub{font-size:.75rem;color:var(--muted);margin-bottom:16px}
+.link-box{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border-radius:10px;padding:12px 16px;
+  border:.5px solid var(--subtle);
+}
+.link-text{flex:1;font-size:.82rem;color:var(--ink);font-family:"DM Sans",sans-serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:none;border:none;outline:none;cursor:text}
+.btn-copy{
+  background:var(--ink);color:#fff;border:none;padding:7px 16px;
+  border-radius:7px;font-size:.78rem;font-weight:500;cursor:pointer;
+  font-family:inherit;transition:all .15s;white-space:nowrap;flex-shrink:0;
+}
+.btn-copy:hover{background:var(--red)}
+.btn-copy.copied{background:#27500A}
+
+.share-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.share-btn{
+  display:flex;align-items:center;gap:6px;padding:7px 14px;
+  border-radius:7px;font-size:.75rem;font-weight:500;cursor:pointer;
+  border:none;font-family:inherit;transition:all .15s;
+}
+.share-wa{background:#25D366;color:#fff}
+.share-wa:hover{opacity:.88}
+.share-x{background:#000;color:#fff}
+.share-x:hover{opacity:.85}
+.share-link{background:var(--surface);color:var(--ink);border:.5px solid var(--subtle)}
+.share-link:hover{border-color:var(--ink)}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-card{background:#fff;border:.5px solid var(--subtle);border-radius:12px;padding:16px;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.stat-card.clicks::after{background:#3b82f6}
+.stat-card.convs::after{background:#22c55e}
+.stat-card.pending::after{background:var(--gold)}
+.stat-card.paid::after{background:var(--ink)}
+.stat-icon{font-size:1.4rem;margin-bottom:6px}
+.stat-value{font-size:1.5rem;font-weight:500;line-height:1;margin-bottom:3px}
+.stat-label{font-size:.7rem;color:var(--muted)}
+.stat-note{font-size:.62rem;color:var(--muted);margin-top:4px}
+
+/* STRIPE CONNECT */
+.stripe-card{
+  background:#fff;border:.5px solid var(--subtle);border-radius:14px;
+  padding:24px;margin-bottom:20px;
+}
+.stripe-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.stripe-logo{width:36px;height:36px;background:#635BFF;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stripe-logo svg{fill:#fff}
+.stripe-info-title{font-size:.88rem;font-weight:500;margin-bottom:2px}
+.stripe-info-sub{font-size:.72rem;color:var(--muted)}
+.stripe-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:8px;font-size:.8rem;margin-bottom:16px}
+.stripe-status.connected{background:rgba(39,80,10,.08);color:#27500A;border:.5px solid rgba(39,80,10,.2)}
+.stripe-status.disconnected{background:rgba(0,0,0,.04);color:var(--muted);border:.5px solid var(--subtle)}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.connected .status-dot{background:#22c55e}
+.disconnected .status-dot{background:var(--muted)}
+.btn-stripe{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#635BFF;color:#fff;border:none;
+  padding:10px 20px;border-radius:8px;font-size:.85rem;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;
+}
+.btn-stripe:hover{opacity:.88}
+.stripe-note{font-size:.72rem;color:var(--muted);margin-top:10px;line-height:1.55;display:flex;align-items:flex-start;gap:6px}
+.stripe-note svg{flex-shrink:0;margin-top:1px}
+
+/* HISTORIQUE */
+.history-card{background:#fff;border:.5px solid var(--subtle);border-radius:14px;overflow:hidden;margin-bottom:20px}
+.history-head{padding:14px 20px;border-bottom:.5px solid var(--subtle);display:flex;align-items:center;justify-content:space-between}
+.history-title{font-size:.85rem;font-weight:500}
+.history-empty{padding:3rem;text-align:center;color:var(--muted);font-size:.85rem}
+.history-row{display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:.5px solid var(--subtle);font-size:.82rem}
+.history-row:last-child{border-bottom:none}
+.history-date{color:var(--muted);font-size:.72rem;flex-shrink:0;width:90px}
+.history-desc{flex:1}
+.history-amount{font-weight:500;flex-shrink:0}
+.history-amount.pending{color:var(--gold)}
+.history-amount.paid{color:#27500A}
+.history-badge{font-size:.6rem;font-weight:500;padding:2px 8px;border-radius:10px;flex-shrink:0}
+.badge-pending{background:rgba(166,124,58,.1);color:var(--gold)}
+.badge-paid{background:rgba(39,80,10,.1);color:#27500A}
+
+/* COMMENT CA MARCHE */
+.how-card{background:#fff;border:.5px solid var(--subtle);border-radius:14px;padding:24px;margin-bottom:20px}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+.how-step{text-align:center;padding:16px 12px}
+.how-num{width:36px;height:36px;border-radius:50%;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:500;margin:0 auto 10px}
+.how-emoji{font-size:1.6rem;margin-bottom:8px}
+.how-step-title{font-size:.82rem;font-weight:500;margin-bottom:4px}
+.how-step-desc{font-size:.72rem;color:var(--muted);line-height:1.5}
+
+/* Toast */
+.toast-notif{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:10px 20px;border-radius:8px;font-size:.82rem;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap}
+.toast-notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media(max-width:768px){
+  .page{padding:1rem}
+  .aff-hero{padding:1.5rem}
+  .hero-title{font-size:1.4rem}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .how-steps{grid-template-columns:1fr}
+  .hero-stats{gap:16px}
+  .share-row{gap:6px}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Start Business World</a>
+  <div class="nav-right">
+    <a href="client-dashboard.html" class="nav-back">← Dashboard</a>
+    <button class="btn-sm" id="logoutBtn">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="aff-hero">
+    <div class="hero-eyebrow">Programme Affiliation</div>
+    <div class="hero-title">Gagne <i>25€</i> par membre<br>que tu recommandes</div>
+    <div class="hero-sub">Partage ton lien unique. Quand un de tes filleuls passe en abonnement mensuel 29€, tu reçois automatiquement 25€ sur ton compte Stripe. Sans limite.</div>
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-n">25€</div>
+        <div class="hero-stat-l">Par conversion</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">∞</div>
+        <div class="hero-stat-l">Sans limite</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">Auto</div>
+        <div class="hero-stat-l">Paiement Stripe</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIEN AFFILIATION -->
+  <div class="link-card">
+    <div class="link-card-title">🔗 Ton lien unique</div>
+    <div class="link-card-sub">Partage ce lien — chaque inscription via ce lien te sera attribuée</div>
+    <div class="link-box">
+      <input type="text" class="link-text" id="refLink" value="Chargement..." readonly>
+      <button class="btn-copy" id="copyBtn" onclick="copyLink()">Copier</button>
+    </div>
+    <div class="share-row">
+      <button class="share-btn share-wa" onclick="shareWhatsApp()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </button>
+      <button class="share-btn share-x" onclick="shareX()">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        X / Twitter
+      </button>
+      <button class="share-btn share-link" onclick="copyLink()">
+        📋 Copier le lien
+      </button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card clicks">
+      <div class="stat-icon">👆</div>
+      <div class="stat-value" id="statClicks">0</div>
+      <div class="stat-label">Clics sur ton lien</div>
+    </div>
+    <div class="stat-card convs">
+      <div class="stat-icon">✅</div>
+      <div class="stat-value" id="statConvs">0</div>
+      <div class="stat-label">Conversions</div>
+      <div class="stat-note">Abonnés 29€/mois</div>
+    </div>
+    <div class="stat-card pending">
+      <div class="stat-icon">⏳</div>
+      <div class="stat-value" id="statPending">0€</div>
+      <div class="stat-label">En attente</div>
+      <div class="stat-note">À virer</div>
+    </div>
+    <div class="stat-card paid">
+      <div class="stat-icon">💸</div>
+      <div class="stat-value" id="statPaid">0€</div>
+      <div class="stat-label">Déjà reçu</div>
+      <div class="stat-note">Total versé</div>
+    </div>
+  </div>
+
+  <!-- STRIPE CONNECT -->
+  <div class="stripe-card">
+    <div class="stripe-head">
+      <div class="stripe-logo">
+        <svg width="20" height="20" viewBox="0 0 24 24"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
+      </div>
+      <div>
+        <div class="stripe-info-title">Stripe Connect — Paiements automatiques</div>
+        <div class="stripe-info-sub">Connecte ton compte Stripe pour recevoir tes commissions automatiquement</div>
+      </div>
+    </div>
+    <div class="stripe-status disconnected" id="stripeStatus">
+      <div class="status-dot"></div>
+      <span id="stripeStatusText">Compte Stripe non connecté</span>
+    </div>
+    <button class="btn-stripe" id="stripeBtn" onclick="connectStripe()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/></svg>
+      Connecter mon compte Stripe
+    </button>
+    <div class="stripe-note">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="6"/><path d="M8 7v4M8 5.5v.5"/></svg>
+      Une fois connecté, chaque commission de 25€ est virée automatiquement sur ton compte Stripe dans les 2 jours ouvrés après la conversion.
+    </div>
+  </div>
+
+  <!-- HISTORIQUE -->
+  <div class="history-card">
+    <div class="history-head">
+      <div class="history-title">Historique des commissions</div>
+    </div>
+    <div id="historyBody">
+      <div class="history-empty">Pas encore de commissions — partage ton lien pour commencer ! 🚀</div>
+    </div>
+  </div>
+
+  <!-- COMMENT CA MARCHE -->
+  <div class="how-card">
+    <div style="font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:4px">Comment ça marche</div>
+    <div style="font-size:1rem;font-weight:500">Simple, automatique, sans limite</div>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-emoji">🔗</div>
+        <div class="how-step-title">1. Partage ton lien</div>
+        <div class="how-step-desc">Envoie ton lien unique sur WhatsApp, réseaux sociaux, ou à tes contacts qui veulent se lancer en business.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-emoji">🎯</div>
+        <div class="how-step-title">2. Ton filleul s'abonne</div>
+        <div class="how-step-desc">Il clique, découvre le Club SBW, s'inscrit à 1€/mois. Quand il passe en 29€/mois, la commission se déclenche.</div>
+      </div>
+      <div class="how-step">
+        <div class="how-emoji">💸</div>
+        <div class="how-step-title">3. Tu reçois 25€</div>
+        <div class="how-step-desc">25€ virés automatiquement sur ton Stripe. Plus tu recommandes, plus tu gagnes. Sans limite de temps ni de montant.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast-notif" id="toastNotif"></div>
+
+<script>
+var SB = supabase.createClient(
+  "https://grwimhqsthcmfwblwdwg.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+);
+
+var user = null;
+var affData = null;
+
+async function init() {
+  var s = await SB.auth.getSession();
+  if (!s.data.session) { window.location.href = "client-login.html"; return; }
+  user = s.data.session.user;
+
+  document.getElementById("logoutBtn").onclick = async function() {
+    await SB.auth.signOut(); window.location.href = "client-login.html";
+  };
+
+  await loadAffiliation();
+}
+
+async function loadAffiliation() {
+  var res = await SB.from("affiliations").select("*").eq("user_id", user.id).single();
+
+  if (!res.data) {
+    // Créer le compte affiliation
+    var code = generateCode(user.email);
+    var insert = await SB.from("affiliations").insert({
+      user_id: user.id,
+      user_name: user.email.split("@")[0],
+      ref_code: code,
+      clicks: 0, conversions: 0, pending_euros: 0, paid_euros: 0
+    }).select().single();
+    affData = insert.data;
+  } else {
+    affData = res.data;
+  }
+
+  renderAffiliation();
+}
+
+function generateCode(email) {
+  var base = email.split("@")[0].replace(/[^a-z0-9]/gi, "").toLowerCase().slice(0, 8);
+  var rand = Math.random().toString(36).slice(2, 5);
+  return base + rand;
+}
+
+function renderAffiliation() {
+  if (!affData) return;
+
+  var baseUrl = window.location.origin;
+  var link = baseUrl + "/club.html?ref=" + affData.ref_code;
+  document.getElementById("refLink").value = link;
+
+  document.getElementById("statClicks").textContent = affData.clicks || 0;
+  document.getElementById("statConvs").textContent = affData.conversions || 0;
+  document.getElementById("statPending").textContent = (affData.pending_euros || 0) + "€";
+  document.getElementById("statPaid").textContent = (affData.paid_euros || 0) + "€";
+
+  // Stripe status
+  if (affData.stripe_account_id) {
+    var st = document.getElementById("stripeStatus");
+    st.className = "stripe-status connected";
+    st.innerHTML = '<div class="status-dot"></div><span>Stripe connecté — ✓ ' + affData.stripe_account_id.slice(0,12) + '...</span>';
+    document.getElementById("stripeBtn").textContent = "✓ Compte connecté";
+    document.getElementById("stripeBtn").disabled = true;
+    document.getElementById("stripeBtn").style.opacity = ".5";
+    document.getElementById("stripeBtn").style.cursor = "default";
+  }
+
+  // Historique (simulé — sera connecté via webhooks Stripe)
+  renderHistory();
+}
+
+function renderHistory() {
+  var body = document.getElementById("historyBody");
+  if (!affData.conversions || affData.conversions === 0) {
+    body.innerHTML = '<div class="history-empty">Pas encore de commissions — partage ton lien pour commencer ! 🚀</div>';
+    return;
+  }
+  // Les vraies conversions viendront des webhooks Stripe
+  body.innerHTML = '<div class="history-empty">Les détails des conversions apparaîtront ici.</div>';
+}
+
+function copyLink() {
+  var link = document.getElementById("refLink").value;
+  navigator.clipboard.writeText(link).then(function() {
+    var btn = document.getElementById("copyBtn");
+    btn.textContent = "✓ Copié !";
+    btn.className = "btn-copy copied";
+    setTimeout(function() {
+      btn.textContent = "Copier";
+      btn.className = "btn-copy";
+    }, 2000);
+    showToast("Lien copié dans le presse-papiers !");
+  }).catch(function() {
+    // Fallback pour mobile
+    document.getElementById("refLink").select();
+    document.execCommand("copy");
+    showToast("Lien copié !");
+  });
+}
+
+function shareWhatsApp() {
+  var link = document.getElementById("refLink").value;
+  var text = encodeURIComponent("👋 Je suis membre du Club SBW — des formations business et une communauté d'entrepreneurs. Tu peux rejoindre avec mon lien : " + link);
+  window.open("https://wa.me/?text=" + text, "_blank");
+}
+
+function shareX() {
+  var link = document.getElementById("refLink").value;
+  var text = encodeURIComponent("Je viens de rejoindre le Club SBW — formations business, mindset & stratégies pour entrepreneurs. Rejoins-nous : " + link + " #business #entrepreneur");
+  window.open("https://x.com/intent/tweet?text=" + text, "_blank");
+}
+
+async function connectStripe() {
+  // Stripe Connect OAuth — nécessite une Edge Function Supabase
+  // Pour l'instant on affiche les instructions
+  showToast("Stripe Connect arrive bientôt — contacte le support pour l'activer.");
+
+  // Quand l'Edge Function sera prête :
+  // window.location.href = await getStripeConnectUrl();
+}
+
+function showToast(msg) {
+  var t = document.getElementById("toastNotif");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(function() { t.classList.remove("show"); }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>
