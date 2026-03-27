@@ -552,12 +552,21 @@
           <div class="right-sidebar">
 
             <!-- ABONNEMENT -->
-            <div class="sub-card">
-              <div class="sub-label">Mon abonnement</div>
-              <div class="sub-plan">Club <i>SBW</i></div>
-              <div class="sub-price" id="subPrice">1€<small>/mois</small></div>
-              <div class="sub-renewal" id="subRenewal">Période d'essai · 3 mois</div>
-              <div class="sub-btn" onclick="showSection('compte', this)">Gérer mon abonnement</div>
+            <div class="sub-card" style="cursor:pointer" onclick="window.location.href='membre-prestige.html'">
+              <div class="sub-label">Mon Prestige</div>
+              <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+                <div id="dashLevelBadge" style="font-size:1.8rem;width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.06);display:flex;align-items:center;justify-content:center;flex-shrink:0">⚪</div>
+                <div>
+                  <div style="font-size:.62rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Niveau <span id="dashLevelNum">1</span></div>
+                  <div style="font-family:'DM Serif Display',serif;font-size:1.1rem;color:#fff" id="dashLevelTitle">Débutant</div>
+                  <div style="font-size:.72rem;color:var(--gold)" id="dashXP">0 XP</div>
+                </div>
+              </div>
+              <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:5px">
+                <div id="dashXpBar" style="height:100%;border-radius:2px;width:0%;transition:width 1s ease;background:linear-gradient(90deg,#A67C3A,#C9A84C)"></div>
+              </div>
+              <div style="font-size:.68rem;color:rgba(255,255,255,.25)" id="dashXpNext">Encore 100 XP pour Apprenti</div>
+              <div class="sub-btn" style="margin-top:14px">Voir mon prestige →</div>
             </div>
 
             <!-- COMMUNAUTÉ -->
@@ -693,6 +702,54 @@
   let currentUser = null
   let currentMember = null
 
+
+  var DASH_LEVELS = [
+    { num:1, title:"Débutant",  badge:"⚪", xp:0 },
+    { num:2, title:"Apprenti",  badge:"🟢", xp:100 },
+    { num:3, title:"Confirmé",  badge:"🔵", xp:300 },
+    { num:4, title:"Expert",    badge:"🟣", xp:700 },
+    { num:5, title:"Légende",   badge:"🌟", xp:1500 }
+  ];
+
+  async function loadDashPrestige() {
+    try {
+      var prog = {};
+      try { prog = JSON.parse(localStorage.getItem("sbw_p_" + currentUser.id) || "{}"); } catch(e) {}
+      var leconsCount = Object.values(prog).filter(Boolean).length;
+
+      var msgRes = await sb.from("messages").select("id", { count:"exact", head:true }).eq("user_id", currentUser.id);
+      var msgCount = msgRes.count || 0;
+
+      var xp = (leconsCount * 10) + (msgCount * 2);
+      var level = 1;
+      for (var i = DASH_LEVELS.length - 1; i >= 0; i--) {
+        if (xp >= DASH_LEVELS[i].xp) { level = DASH_LEVELS[i].num; break; }
+      }
+      var l = DASH_LEVELS[level - 1];
+      var nextL = DASH_LEVELS[level] || null;
+
+      var badge = document.getElementById("dashLevelBadge");
+      if (badge) badge.textContent = l.badge;
+      var num = document.getElementById("dashLevelNum");
+      if (num) num.textContent = level;
+      var title = document.getElementById("dashLevelTitle");
+      if (title) title.textContent = l.title;
+      var xpEl = document.getElementById("dashXP");
+      if (xpEl) xpEl.textContent = xp + " XP";
+
+      var bar = document.getElementById("dashXpBar");
+      var next = document.getElementById("dashXpNext");
+      if (bar && nextL) {
+        var pct = Math.min(100, Math.round((xp - l.xp) / (nextL.xp - l.xp) * 100));
+        setTimeout(function() { bar.style.width = pct + "%"; }, 200);
+        if (next) next.textContent = "Encore " + (nextL.xp - xp) + " XP pour " + nextL.title;
+      } else if (bar) {
+        bar.style.width = "100%";
+        if (next) next.textContent = "🌟 Niveau maximum atteint !";
+      }
+    } catch(e) { console.log("Prestige error:", e); }
+  }
+
   async function init() {
     const { data: { session } } = await sb.auth.getSession()
     if (!session) {
@@ -712,6 +769,7 @@
 
     renderUser()
     renderStats()
+    loadDashPrestige()
   }
 
   function renderUser() {
