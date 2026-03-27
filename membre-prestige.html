@@ -151,7 +151,7 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
 
 @media(max-width:768px){
   .page{padding:1rem}
-  .stats-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .stats-grid{grid-template-columns:repeat(2,1fr) !important;gap:8px}
   .hero-top{flex-direction:row;align-items:center}
   .level-badge{width:60px;height:60px;font-size:1.8rem}
   .hero-name{font-size:1.3rem}
@@ -198,7 +198,7 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
   </div>
 
   <!-- STATS -->
-  <div class="stats-grid">
+  <div class="stats-grid" style="grid-template-columns:repeat(5,1fr)">
     <div class="stat-card">
       <div class="stat-emoji">🎓</div>
       <div class="stat-value" id="statLecons">0</div>
@@ -222,6 +222,12 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
       <div class="stat-value" id="statStreak">0</div>
       <div class="stat-label">Jours consécutifs</div>
       <div class="stat-xp">+15 XP / jour</div>
+    </div>
+    <div class="stat-card" style="border-color:rgba(166,124,58,.3);background:rgba(166,124,58,.04)">
+      <div class="stat-emoji">🤝</div>
+      <div class="stat-value" id="statFilleuls" style="color:var(--gold)">0</div>
+      <div class="stat-label">Filleuls parrainés</div>
+      <div class="stat-xp" style="color:var(--gold)">+50 XP chacun</div>
     </div>
   </div>
 
@@ -315,8 +321,12 @@ async function loadMyXp() {
   var streak = 0;
   try { streak = parseInt(localStorage.getItem("sbw_streak_" + user.id) || "0"); } catch(e) {}
 
+  // Filleuls parrainés
+  var affRes = await SB.from("affiliations").select("conversions").eq("user_id", user.id).single();
+  var filleuls = affRes.data ? (affRes.data.conversions || 0) : 0;
+
   // Calculer XP total
-  var xp = (leconsCount * 10) + (msgCount * 2) + (articlesRead * 5) + (streak * 15);
+  var xp = (leconsCount * 10) + (msgCount * 2) + (articlesRead * 5) + (streak * 15) + (filleuls * 50);
   var level = 1;
   for (var i = LEVELS.length - 1; i >= 0; i--) {
     if (xp >= LEVELS[i].xp) { level = LEVELS[i].num; break; }
@@ -328,6 +338,7 @@ async function loadMyXp() {
     messages_sent: msgCount,
     articles_read: articlesRead,
     streak: streak,
+    filleuls: filleuls,
     user_name: user.email.split("@")[0]
   };
 
@@ -342,6 +353,7 @@ async function loadMyXp() {
     streak: streak,
     updated_at: new Date().toISOString()
   }, { onConflict: "user_id" });
+  // Mettre à jour le compteur filleuls dans affiliations (déjà dans la table)
 }
 
 function renderHero() {
@@ -381,6 +393,7 @@ function renderHero() {
   document.getElementById("statMessages").textContent = myXp.messages_sent;
   document.getElementById("statArticles").textContent = myXp.articles_read;
   document.getElementById("statStreak").textContent = myXp.streak;
+  document.getElementById("statFilleuls").textContent = myXp.filleuls || 0;
 
   // Récompense Légende
   if (myXp.level >= 5) {
