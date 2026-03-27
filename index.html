@@ -349,6 +349,7 @@
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       border-bottom: 1px solid var(--subtle);
+      min-height: 200px;
     }
 
     .article {
@@ -895,7 +896,8 @@
 
       .themes-row { padding: 0; }
 
-      .articles { grid-template-columns: 1fr; }
+      .articles { display:grid; grid-template-columns: 1fr; }
+      .article { display:flex; border-right:none; border-bottom: 1px solid var(--subtle); padding:1.5rem 1.2rem; }
       .article.featured { grid-column: span 1; }
       .article { padding: 1.5rem; }
 
