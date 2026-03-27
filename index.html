@@ -1238,7 +1238,7 @@
         if (!container) return;
 
         if (shorts.length === 0) {
-          container.innerHTML = '<p style="color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%">Aucun short pour l'instant.</p>';
+          container.innerHTML = "<p style='color:rgba(240,237,228,0.35);font-size:0.82rem;padding:2rem;text-align:center;width:100%'>Aucun short.</p>";
           return;
         }
 
@@ -1305,7 +1305,7 @@
       });
 
       if (!filtered.length) {
-        container.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem;grid-column:1/-1">Aucun article dans cette catégorie pour l'instant.</div>';
+        container.innerHTML = "<div style='text-align:center;padding:3rem;color:var(--muted);font-size:0.85rem;grid-column:1/-1'>Aucun article pour cette categorie.</div>";
         return;
       }
 
