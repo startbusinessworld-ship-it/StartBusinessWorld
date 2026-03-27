@@ -945,6 +945,11 @@
     }
 
     /* ARTICLE À LA UNE */
+    .ft-inner { display:flex; align-items:center; gap:2rem; }
+    .ft-text { flex:1; }
+    .ft-video { flex:0 0 280px; height:160px; border-radius:8px; overflow:hidden; position:relative; background:#000; }
+    @media(max-width:768px) { .ft-inner { flex-direction:column; } .ft-video { flex:none; width:100%; height:180px; } }
+
     .featured-top {
       padding: 2.5rem 2rem;
       border-bottom: 1px solid var(--subtle);
@@ -1099,14 +1104,24 @@
 
   <!-- THÈMES -->
   <!-- ARTICLE À LA UNE -->
-  <div class="featured-top" id="featuredTop" style="display:none">
-    <div class="ft-cat" id="ftCat">À la une</div>
-    <h2 class="ft-title" id="ftTitle"></h2>
-    <p class="ft-desc" id="ftDesc"></p>
-    <div class="ft-footer">
-      <span class="ft-time" id="ftTime"></span>
-      <span class="ft-yt" id="ftYt" style="display:none">▶ Vidéo YouTube incluse</span>
-      <a href="#" class="ft-link" id="ftLink">Lire l'article →</a>
+  <div class="featured-top" id="featuredTop" style="display:none;cursor:pointer" onclick="window.location.href=document.getElementById('ftLink').href">
+    <div class="ft-inner">
+      <div class="ft-text">
+        <div class="ft-cat" id="ftCat">À la une</div>
+        <h2 class="ft-title" id="ftTitle"></h2>
+        <p class="ft-desc" id="ftDesc"></p>
+        <div class="ft-footer">
+          <span class="ft-time" id="ftTime"></span>
+          <span class="ft-yt" id="ftYt" style="display:none">▶ Vidéo YouTube incluse</span>
+          <a href="#" class="ft-link" id="ftLink" onclick="event.stopPropagation()">Lire l'article →</a>
+        </div>
+      </div>
+      <div class="ft-video" id="ftVideo" style="display:none">
+        <img id="ftVideoThumb" src="" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:8px;display:block">
+        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;background:#C0392B;border-radius:50%;display:flex;align-items:center;justify-content:center;pointer-events:none">
+          <div style="width:0;height:0;border-style:solid;border-width:9px 0 9px 16px;border-color:transparent transparent transparent #fff;margin-left:3px"></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1312,9 +1327,22 @@
         var words = (a.deck || "").split(" ").length;
         document.getElementById("ftTime").textContent = Math.max(3, Math.round(words / 200) + 5) + " min de lecture";
 
-        if (a.youtube_id) document.getElementById("ftYt").style.display = "inline-flex";
+        var articleLink = "article.html?id=" + a.id;
+        document.getElementById("ftLink").href = articleLink;
 
-        document.getElementById("ftLink").href = "article.html?id=" + a.id;
+        if (a.youtube_id) {
+          document.getElementById("ftYt").style.display = "inline-flex";
+          var ftVideo = document.getElementById("ftVideo");
+          var ftThumb = document.getElementById("ftVideoThumb");
+          if (ftVideo && ftThumb) {
+            ftThumb.src = "https://i.ytimg.com/vi/" + a.youtube_id + "/hqdefault.jpg";
+            ftVideo.style.display = "block";
+            ftVideo.onclick = function(e) {
+              e.stopPropagation();
+              window.location.href = articleLink;
+            };
+          }
+        }
 
         box.style.display = "block";
       } catch(e) {
