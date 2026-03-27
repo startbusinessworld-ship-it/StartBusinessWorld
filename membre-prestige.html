@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mon Prestige — Club SBW</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);--muted:#888;--gold:#A67C3A;--red:#C0392B;--dark:#0E0D0B}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+a{text-decoration:none;color:inherit}
+
+nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:1.1rem}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-back{font-size:.78rem;color:rgba(255,255,255,.5);transition:color .15s}
+.nav-back:hover{color:#fff}
+.btn-sm{background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:4px 12px;border-radius:4px;font-size:.72rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-sm:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+
+.page{max-width:900px;margin:0 auto;padding:2rem}
+
+/* ── HERO PRESTIGE ── */
+.prestige-hero{
+  background:var(--dark);border-radius:16px;padding:2.5rem;
+  position:relative;overflow:hidden;margin-bottom:24px;
+}
+.prestige-hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 80% at 80% 50%,rgba(166,124,58,.15),transparent 70%);
+  pointer-events:none;
+}
+.hero-top{display:flex;align-items:center;gap:20px;margin-bottom:24px;position:relative}
+.level-badge{
+  width:80px;height:80px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:2.2rem;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.06);
+  position:relative;
+}
+.level-badge.l1{border-color:rgba(200,200,200,.3);background:rgba(200,200,200,.08)}
+.level-badge.l2{border-color:rgba(34,197,94,.4);background:rgba(34,197,94,.1)}
+.level-badge.l3{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.1)}
+.level-badge.l4{border-color:rgba(168,85,247,.4);background:rgba(168,85,247,.1)}
+.level-badge.l5{border-color:rgba(166,124,58,.6);background:rgba(166,124,58,.15);animation:legendGlow 2s ease-in-out infinite alternate}
+@keyframes legendGlow{from{box-shadow:0 0 10px rgba(166,124,58,.3)}to{box-shadow:0 0 24px rgba(166,124,58,.6)}}
+.hero-info{flex:1}
+.hero-level-label{font-size:.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:4px}
+.hero-name{font-family:"DM Serif Display",serif;font-size:1.8rem;color:#fff;letter-spacing:-.02em;margin-bottom:2px}
+.hero-title{font-size:.88rem;color:var(--gold);font-weight:500;display:flex;align-items:center;gap:6px}
+.hero-xp{font-size:.78rem;color:rgba(255,255,255,.35);margin-top:4px}
+
+/* XP Bar */
+.xp-section{position:relative}
+.xp-labels{display:flex;justify-content:space-between;margin-bottom:6px}
+.xp-label{font-size:.7rem;color:rgba(255,255,255,.4)}
+.xp-label.current{color:#fff;font-weight:500}
+.xp-bar-wrap{height:8px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;position:relative}
+.xp-bar-fill{height:100%;border-radius:4px;transition:width 1s cubic-bezier(.4,0,.2,1);position:relative}
+.xp-bar-fill.l1{background:linear-gradient(90deg,#aaa,#ccc)}
+.xp-bar-fill.l2{background:linear-gradient(90deg,#16a34a,#22c55e)}
+.xp-bar-fill.l3{background:linear-gradient(90deg,#2563eb,#3b82f6)}
+.xp-bar-fill.l4{background:linear-gradient(90deg,#7c3aed,#a855f7)}
+.xp-bar-fill.l5{background:linear-gradient(90deg,#a67c3a,#c9a84c);animation:goldShimmer 2s linear infinite}
+@keyframes goldShimmer{0%{background-position:0% 50%}100%{background-position:200% 50%}}
+.xp-next{font-size:.7rem;color:rgba(255,255,255,.3);margin-top:6px;text-align:right}
+
+/* ── STATS XP ── */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{
+  background:#fff;border:.5px solid var(--subtle);
+  border-radius:12px;padding:16px;text-align:center;
+  position:relative;overflow:hidden;
+}
+.stat-card::after{content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s}
+.stat-card:hover::after{opacity:1}
+.stat-emoji{font-size:1.6rem;margin-bottom:6px}
+.stat-value{font-size:1.5rem;font-weight:500;line-height:1;margin-bottom:3px}
+.stat-label{font-size:.7rem;color:var(--muted)}
+.stat-xp{font-size:.65rem;color:var(--gold);margin-top:3px;font-weight:500}
+
+/* ── NIVEAUX ── */
+.levels-section{margin-bottom:24px}
+.section-title{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px}
+.levels-list{display:flex;flex-direction:column;gap:8px}
+.level-row{
+  background:#fff;border:.5px solid var(--subtle);border-radius:12px;
+  padding:16px 20px;display:flex;align-items:center;gap:14px;
+  transition:all .15s;position:relative;overflow:hidden;
+}
+.level-row.current-level{border-color:var(--gold);background:rgba(166,124,58,.04)}
+.level-row.current-level::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--gold);border-radius:2px 0 0 2px}
+.level-row.locked{opacity:.5}
+.level-row.unlocked .level-icon{filter:none}
+.level-icon{font-size:1.6rem;flex-shrink:0;width:44px;text-align:center}
+.level-info{flex:1}
+.level-name{font-size:.92rem;font-weight:500;margin-bottom:2px;display:flex;align-items:center;gap:8px}
+.level-xp-req{font-size:.72rem;color:var(--muted)}
+.level-reward{margin-top:6px;display:inline-flex;align-items:center;gap:5px;font-size:.75rem;background:rgba(166,124,58,.08);color:var(--gold);padding:3px 10px;border-radius:20px;border:.5px solid rgba(166,124,58,.2)}
+.badge-current{font-size:.6rem;font-weight:500;background:var(--gold);color:#fff;padding:2px 7px;border-radius:10px}
+.badge-done{font-size:.6rem;font-weight:500;background:rgba(39,80,10,.1);color:#27500A;padding:2px 7px;border-radius:10px}
+.level-progress-mini{width:100px;flex-shrink:0}
+.level-progress-bar{height:3px;background:var(--surface);border-radius:2px;overflow:hidden;margin-bottom:3px}
+.level-progress-fill{height:100%;background:var(--gold);border-radius:2px}
+.level-progress-pct{font-size:.62rem;color:var(--muted);text-align:right}
+
+/* ── RÉCOMPENSE LÉGENDE ── */
+.legend-reward{
+  background:var(--dark);border-radius:14px;padding:24px;
+  margin-bottom:24px;position:relative;overflow:hidden;
+  border:.5px solid rgba(166,124,58,.3);
+}
+.legend-reward::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;background:radial-gradient(circle,rgba(166,124,58,.15),transparent 60%);pointer-events:none}
+.reward-badge{font-size:2rem;margin-bottom:10px}
+.reward-title{font-family:"DM Serif Display",serif;font-size:1.2rem;color:#fff;margin-bottom:6px}
+.reward-desc{font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.6;margin-bottom:16px;max-width:480px}
+.reward-btn{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:9px 20px;border-radius:7px;font-size:.85rem;font-weight:500;cursor:pointer;border:none;font-family:inherit;transition:opacity .15s}
+.reward-btn:hover{opacity:.88}
+.reward-btn:disabled{opacity:.4;cursor:not-allowed}
+.reward-locked{display:flex;align-items:center;gap:8px;font-size:.8rem;color:rgba(255,255,255,.35);margin-top:8px}
+.reward-locked svg{opacity:.4}
+
+/* ── HALL OF FAME ── */
+.hof-section{margin-bottom:24px}
+.hof-list{display:flex;flex-direction:column;gap:4px}
+.hof-row{
+  background:#fff;border:.5px solid var(--subtle);border-radius:10px;
+  padding:12px 16px;display:flex;align-items:center;gap:12px;
+  transition:background .12s;
+}
+.hof-row:hover{background:var(--surface)}
+.hof-rank{width:28px;text-align:center;font-size:.8rem;font-weight:500;color:var(--muted);flex-shrink:0}
+.hof-rank.top1{font-size:1rem}
+.hof-rank.top2{font-size:.9rem}
+.hof-rank.top3{font-size:.85rem}
+.hof-av{width:32px;height:32px;border-radius:50%;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:500;flex-shrink:0;border:.5px solid var(--subtle)}
+.hof-info{flex:1}
+.hof-name{font-size:.85rem;font-weight:500}
+.hof-title{font-size:.7rem;color:var(--muted)}
+.hof-xp{font-size:.78rem;font-weight:500;color:var(--gold)}
+.hof-badge{font-size:1rem}
+.hof-me{border-color:var(--gold);background:rgba(166,124,58,.04)}
+.hof-me .hof-name::after{content:' (toi)';font-size:.65rem;color:var(--gold);font-weight:400}
+
+/* Spinner */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--subtle);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:768px){
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .hero-top{flex-direction:column;text-align:center}
+  .level-progress-mini{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">Start Business World</a>
+  <div class="nav-right">
+    <a href="client-dashboard.html" class="nav-back">← Dashboard</a>
+    <button class="btn-sm" id="logoutBtn">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="prestige-hero">
+    <div class="hero-top">
+      <div class="level-badge" id="levelBadge">⚪</div>
+      <div class="hero-info">
+        <div class="hero-level-label">Niveau <span id="levelNum">1</span> — Prestige</div>
+        <div class="hero-name" id="heroName">—</div>
+        <div class="hero-title"><span id="levelTitle">Débutant</span></div>
+        <div class="hero-xp"><span id="heroXP">0</span> XP total</div>
+      </div>
+    </div>
+    <div class="xp-section">
+      <div class="xp-labels">
+        <span class="xp-label current"><span id="xpCurrent">0</span> XP</span>
+        <span class="xp-label" id="xpNextLabel">Prochain niveau : 100 XP</span>
+      </div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-fill l1" id="xpBarFill" style="width:0%"></div>
+      </div>
+      <div class="xp-next" id="xpNextMsg">Encore <span id="xpMissing">100</span> XP pour passer Apprenti</div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-emoji">🎓</div>
+      <div class="stat-value" id="statLecons">0</div>
+      <div class="stat-label">Leçons terminées</div>
+      <div class="stat-xp">+10 XP chacune</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-emoji">💬</div>
+      <div class="stat-value" id="statMessages">0</div>
+      <div class="stat-label">Messages envoyés</div>
+      <div class="stat-xp">+2 XP chacun</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-emoji">📰</div>
+      <div class="stat-value" id="statArticles">0</div>
+      <div class="stat-label">Articles lus</div>
+      <div class="stat-xp">+5 XP chacun</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-emoji">🔥</div>
+      <div class="stat-value" id="statStreak">0</div>
+      <div class="stat-label">Jours consécutifs</div>
+      <div class="stat-xp">+15 XP / jour</div>
+    </div>
+  </div>
+
+  <!-- NIVEAUX -->
+  <div class="levels-section">
+    <div class="section-title">Les 5 niveaux</div>
+    <div class="levels-list" id="levelsList"></div>
+  </div>
+
+  <!-- RÉCOMPENSE LÉGENDE -->
+  <div class="legend-reward">
+    <div class="reward-badge">🌟</div>
+    <div class="reward-title">Récompense Légende — RDV Privé 1-on-1</div>
+    <div class="reward-desc">
+      Atteins le niveau Légende et obtiens un rendez-vous privé de 30 minutes avec Ayoub.
+      Analyse de ton business, conseils personnalisés, questions sans filtre.
+      Réservé uniquement aux membres qui ont tout donné.
+    </div>
+    <button class="reward-btn" id="rewardBtn" disabled onclick="claimReward()">
+      🏆 Réclamer mon RDV
+    </button>
+    <div class="reward-locked" id="rewardLocked">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
+      Débloque le niveau Légende (1500 XP) pour accéder à cette récompense
+    </div>
+  </div>
+
+  <!-- HALL OF FAME -->
+  <div class="hof-section">
+    <div class="section-title">🏆 Hall of Fame — Top membres</div>
+    <div class="hof-list" id="hofList">
+      <div style="padding:1.5rem;text-align:center;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px">
+        <div class="spinner"></div> Chargement...
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+var SB = supabase.createClient(
+  "https://grwimhqsthcmfwblwdwg.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+);
+
+var user = null;
+var myXp = null;
+
+var LEVELS = [
+  { num:1, title:"Débutant",  badge:"⚪", class:"l1", xp:0,    color:"#aaa" },
+  { num:2, title:"Apprenti",  badge:"🟢", class:"l2", xp:100,  color:"#22c55e" },
+  { num:3, title:"Confirmé",  badge:"🔵", class:"l3", xp:300,  color:"#3b82f6" },
+  { num:4, title:"Expert",    badge:"🟣", class:"l4", xp:700,  color:"#a855f7" },
+  { num:5, title:"Légende",   badge:"🌟", class:"l5", xp:1500, color:"#A67C3A" }
+];
+
+var REWARDS = [
+  { level:5, text:"RDV privé 1-on-1 avec Ayoub (30 min)" }
+];
+
+async function init() {
+  var s = await SB.auth.getSession();
+  if (!s.data.session) { window.location.href = "client-login.html"; return; }
+  user = s.data.session.user;
+
+  document.getElementById("logoutBtn").onclick = async function() {
+    await SB.auth.signOut(); window.location.href = "client-login.html";
+  };
+
+  await loadMyXp();
+  renderHero();
+  renderLevels();
+  await loadHallOfFame();
+}
+
+async function loadMyXp() {
+  // Compter les messages envoyés
+  var msgRes = await SB.from("messages").select("id", { count:"exact", head:true }).eq("user_id", user.id);
+  var msgCount = msgRes.count || 0;
+
+  // Compter les leçons terminées depuis localStorage
+  var prog = {};
+  try { prog = JSON.parse(localStorage.getItem("sbw_p_" + user.id) || "{}"); } catch(e) {}
+  var leconsCount = Object.values(prog).filter(Boolean).length;
+
+  // Compter les articles lus
+  var articlesRead = 0;
+  try { articlesRead = parseInt(localStorage.getItem("sbw_articles_" + user.id) || "0"); } catch(e) {}
+
+  // Streak (jours consécutifs)
+  var streak = 0;
+  try { streak = parseInt(localStorage.getItem("sbw_streak_" + user.id) || "0"); } catch(e) {}
+
+  // Calculer XP total
+  var xp = (leconsCount * 10) + (msgCount * 2) + (articlesRead * 5) + (streak * 15);
+  var level = 1;
+  for (var i = LEVELS.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS[i].xp) { level = LEVELS[i].num; break; }
+  }
+
+  myXp = {
+    xp: xp, level: level,
+    lecons_done: leconsCount,
+    messages_sent: msgCount,
+    articles_read: articlesRead,
+    streak: streak,
+    user_name: user.email.split("@")[0]
+  };
+
+  // Upsert dans Supabase pour le Hall of Fame
+  await SB.from("user_xp").upsert({
+    user_id: user.id,
+    user_name: myXp.user_name,
+    xp: xp, level: level,
+    lecons_done: leconsCount,
+    messages_sent: msgCount,
+    articles_read: articlesRead,
+    streak: streak,
+    updated_at: new Date().toISOString()
+  }, { onConflict: "user_id" });
+}
+
+function renderHero() {
+  var l = LEVELS[myXp.level - 1];
+  var nextL = LEVELS[myXp.level] || null;
+
+  // Badge
+  var badge = document.getElementById("levelBadge");
+  badge.textContent = l.badge;
+  badge.className = "level-badge " + l.class;
+
+  document.getElementById("levelNum").textContent = myXp.level;
+  document.getElementById("heroName").textContent = myXp.user_name;
+  document.getElementById("levelTitle").textContent = l.title;
+  document.getElementById("heroXP").textContent = myXp.xp.toLocaleString("fr-FR");
+  document.getElementById("xpCurrent").textContent = myXp.xp.toLocaleString("fr-FR");
+
+  // Barre XP
+  var fill = document.getElementById("xpBarFill");
+  fill.className = "xp-bar-fill " + l.class;
+
+  if (nextL) {
+    var pct = Math.min(100, Math.round((myXp.xp - l.xp) / (nextL.xp - l.xp) * 100));
+    fill.style.width = "0%";
+    setTimeout(function() { fill.style.width = pct + "%"; }, 100);
+    document.getElementById("xpNextLabel").textContent = "Prochain : " + nextL.xp.toLocaleString("fr-FR") + " XP";
+    document.getElementById("xpMissing").textContent = (nextL.xp - myXp.xp).toLocaleString("fr-FR");
+    document.getElementById("xpNextMsg").textContent = "Encore " + (nextL.xp - myXp.xp) + " XP pour devenir " + nextL.title;
+  } else {
+    fill.style.width = "100%";
+    document.getElementById("xpNextLabel").textContent = "Niveau maximum atteint !";
+    document.getElementById("xpNextMsg").textContent = "🌟 Tu es une Légende du Club SBW !";
+  }
+
+  // Stats
+  document.getElementById("statLecons").textContent = myXp.lecons_done;
+  document.getElementById("statMessages").textContent = myXp.messages_sent;
+  document.getElementById("statArticles").textContent = myXp.articles_read;
+  document.getElementById("statStreak").textContent = myXp.streak;
+
+  // Récompense Légende
+  if (myXp.level >= 5) {
+    document.getElementById("rewardBtn").disabled = false;
+    document.getElementById("rewardLocked").style.display = "none";
+  }
+}
+
+function renderLevels() {
+  var list = document.getElementById("levelsList");
+  list.innerHTML = "";
+  LEVELS.forEach(function(l) {
+    var isUnlocked = myXp.xp >= l.xp;
+    var isCurrent = myXp.level === l.num;
+    var nextL = LEVELS[l.num] || null;
+    var pct = 0;
+    if (isCurrent && nextL) {
+      pct = Math.min(100, Math.round((myXp.xp - l.xp) / (nextL.xp - l.xp) * 100));
+    } else if (isUnlocked) { pct = 100; }
+
+    var reward = REWARDS.find(function(r) { return r.level === l.num; });
+
+    var row = document.createElement("div");
+    row.className = "level-row" + (isCurrent ? " current-level" : "") + (!isUnlocked ? " locked" : " unlocked");
+
+    row.innerHTML =
+      '<div class="level-icon">' + l.badge + '</div>' +
+      '<div class="level-info">' +
+        '<div class="level-name">' + l.title +
+          (isCurrent ? ' <span class="badge-current">Niveau actuel</span>' : '') +
+          (isUnlocked && !isCurrent ? ' <span class="badge-done">✓ Débloqué</span>' : '') +
+        '</div>' +
+        '<div class="level-xp-req">' + l.xp.toLocaleString("fr-FR") + ' XP requis</div>' +
+        (reward ? '<div class="level-reward">🏆 ' + reward.text + '</div>' : '') +
+      '</div>' +
+      '<div class="level-progress-mini">' +
+        '<div class="level-progress-bar"><div class="level-progress-fill" style="width:' + pct + '%;background:' + l.color + '"></div></div>' +
+        '<div class="level-progress-pct">' + pct + '%</div>' +
+      '</div>';
+
+    list.appendChild(row);
+  });
+}
+
+async function loadHallOfFame() {
+  var res = await SB.from("user_xp").select("*").order("xp", { ascending: false }).limit(10);
+  var list = res.data || [];
+  var el = document.getElementById("hofList");
+
+  if (!list.length) {
+    el.innerHTML = '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:.85rem">Sois le premier à apparaître ! 🏆</div>';
+    return;
+  }
+
+  var ranks = ["🥇","🥈","🥉","4","5","6","7","8","9","10"];
+  el.innerHTML = "";
+  list.forEach(function(u, i) {
+    var l = LEVELS[Math.min(u.level - 1, 4)];
+    var isMe = u.user_id === user.id;
+    var row = document.createElement("div");
+    row.className = "hof-row" + (isMe ? " hof-me" : "");
+    row.innerHTML =
+      '<div class="hof-rank ' + (i < 3 ? "top" + (i+1) : "") + '">' + ranks[i] + '</div>' +
+      '<div class="hof-av">' + (u.user_name || "?").slice(0,2).toUpperCase() + '</div>' +
+      '<div class="hof-info">' +
+        '<div class="hof-name">' + escHtml(u.user_name) + '</div>' +
+        '<div class="hof-title">' + l.title + '</div>' +
+      '</div>' +
+      '<div class="hof-xp">' + (u.xp || 0).toLocaleString("fr-FR") + ' XP</div>' +
+      '<div class="hof-badge">' + l.badge + '</div>';
+    el.appendChild(row);
+  });
+}
+
+function claimReward() {
+  if (myXp.level < 5) return;
+  var btn = document.getElementById("rewardBtn");
+  btn.disabled = true;
+  btn.textContent = "✅ Demande envoyée !";
+  // Ici tu peux envoyer un email via Supabase Edge Function
+  alert("Félicitations Légende ! 🌟\n\nTon RDV privé avec Ayoub va être organisé.\nTu vas recevoir un email sous 48h pour choisir ton créneau.");
+}
+
+function escHtml(t) {
+  return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+
+init();
+</script>
+</body>
+</html>

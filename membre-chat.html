@@ -469,6 +469,14 @@ function appendMsgEl(msg, container, isNew) {
   div.id = "msg_" + msg.id;
   div.setAttribute("data-id", msg.id);
 
+  // Badge prestige async
+  getUserBadge(msg.user_id).then(function(badge) {
+    var nameEl = div.querySelector(".msg-name");
+    if (nameEl && badge !== "⚪") {
+      nameEl.innerHTML = nameEl.innerHTML.replace(/<span[^>]*>.*?<\/span>/, "") + ' <span style="font-size:.65rem">' + badge + '</span>';
+    }
+  });
+
   // Reply quote
   var replyHtml = "";
   if (msg.reply_to && msg.reply_preview) {
@@ -735,6 +743,28 @@ function scrollToBottom(smooth) {
   var w = document.getElementById("messagesWrap");
   w.scrollTo({ top: w.scrollHeight, behavior: smooth ? "smooth" : "auto" });
 }
+// Badge prestige
+var LEVELS_CHAT = [
+  { num:1, badge:"⚪", xp:0 },
+  { num:2, badge:"🟢", xp:100 },
+  { num:3, badge:"🔵", xp:300 },
+  { num:4, badge:"🟣", xp:700 },
+  { num:5, badge:"🌟", xp:1500 }
+];
+var xpCache = {};
+
+async function getUserBadge(userId) {
+  if (xpCache[userId] !== undefined) return xpCache[userId];
+  var res = await SB.from("user_xp").select("xp").eq("user_id", userId).single();
+  var xp = res.data ? res.data.xp : 0;
+  var level = 1;
+  for (var i = LEVELS_CHAT.length - 1; i >= 0; i--) {
+    if (xp >= LEVELS_CHAT[i].xp) { level = LEVELS_CHAT[i].num; break; }
+  }
+  xpCache[userId] = LEVELS_CHAT[level-1].badge;
+  return xpCache[userId];
+}
+
 function escHtml(t) { return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function escAttr(t) { return (t||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;"); }
 function showRules() { document.getElementById("rulesOverlay").classList.add("on"); }
