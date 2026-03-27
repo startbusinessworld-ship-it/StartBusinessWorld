@@ -1253,8 +1253,19 @@
           .select("id,title,category,youtube_id,deck")
           .eq("status","published")
           .order("created_at",{ascending:false})
-          .limit(3);
-        var articles = res.data || [];
+          .limit(20);
+        var all = res.data || [];
+
+        // 1 article par catégorie, max 3
+        var seen = {};
+        var articles = [];
+        for (var i = 0; i < all.length; i++) {
+          var cat = (all[i].category || "").split(",")[0].trim();
+          if (cat && !seen[cat] && articles.length < 3) {
+            seen[cat] = true;
+            articles.push(all[i]);
+          }
+        }
         var container = document.getElementById("sideCards");
         if (!container || !articles.length) return;
 
