@@ -272,7 +272,7 @@ textarea#msgInput::placeholder{color:var(--muted)}
   .mob-bottom-nav{display:block}
 
   /* Layout */
-  .app{height:calc(100vh - 50px)}
+  .app{height:calc(100vh - 50px);padding-bottom:calc(52px + env(safe-area-inset-bottom))}
   .channels-sidebar{display:none}
   .chat-zone{height:100%}
 
@@ -290,14 +290,10 @@ textarea#msgInput::placeholder{color:var(--muted)}
   .msg-av{width:26px;height:26px;font-size:.6rem}
   .msg-name{font-size:.6rem}
 
-  /* Input — au dessus de la bottom nav */
+  /* Input */
   .input-bar{
     padding:8px 10px;
     gap:7px;
-    position:sticky;
-    bottom:calc(52px + env(safe-area-inset-bottom));
-    background:#fff;
-    z-index:99;
   }
   textarea#msgInput{font-size:.87rem}
   .send-btn{width:32px;height:32px}
@@ -324,7 +320,7 @@ textarea#msgInput::placeholder{color:var(--muted)}
   .search-input{font-size:.83rem}
 
   /* Scroll messages — espace pour input + bottom nav */
-  .messages-wrap{padding-bottom:calc(110px + env(safe-area-inset-bottom)) !important}
+  .messages-wrap{padding-bottom:16px !important}
 }
 
 @media(max-width:768px) and (hover:none){
@@ -346,23 +342,17 @@ textarea#msgInput::placeholder{color:var(--muted)}
 
 <!-- TOPBAR MOBILE -->
 <div class="mob-topbar">
-  <div style="display:flex;flex-direction:column;gap:1px">
-    <div style="font-size:.58rem;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em">Canal actif</div>
-    <div style="display:flex;align-items:center;gap:4px;position:relative">
-      <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="rgba(166,124,58,0.8)" stroke-width="1.5"><circle cx="8" cy="8" r="6"/><path d="M8 5v4M8 11v.5"/></svg>
-      <select class="mob-channel-selector" id="mobChannelSelect" onchange="onMobChannelChange(this.value)">
-        <option value="general"># général</option>
-        <option value="chine"># business-chine</option>
-        <option value="fiscalite"># fiscalité</option>
-        <option value="ecommerce"># e-commerce</option>
-        <option value="expatriation"># expatriation</option>
-        <option value="victoires">🏆 victoires</option>
-      </select>
-    </div>
-  </div>
+  <a href="index.html" style="font-family:'DM Serif Display',serif;color:#fff;font-size:1.05rem;text-decoration:none">Start Business World</a>
   <div style="display:flex;align-items:center;gap:8px">
-    <button onclick="showRules()" style="background:none;border:none;color:rgba(255,255,255,.5);font-size:.85rem;cursor:pointer;padding:4px" title="Règles">📋</button>
-    <button id="logoutBtnMob" style="background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);padding:3px 9px;border-radius:4px;font-size:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif">Quitter</button>
+    <select class="mob-channel-selector" id="mobChannelSelect" onchange="onMobChannelChange(this.value)">
+      <option value="general"># général</option>
+      <option value="chine"># b. chine</option>
+      <option value="fiscalite"># fiscalité</option>
+      <option value="ecommerce"># e-commerce</option>
+      <option value="expatriation"># expat</option>
+      <option value="victoires">🏆 victoires</option>
+    </select>
+    <button id="logoutBtnMob" style="background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);padding:3px 9px;border-radius:4px;font-size:.7rem;cursor:pointer;font-family:'DM Sans',sans-serif">✕</button>
   </div>
 </div>
 
