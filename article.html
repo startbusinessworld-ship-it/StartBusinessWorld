@@ -301,6 +301,9 @@
     }
 
     .prose strong { font-weight: 600; color: var(--ink); }
+    .prose figure { margin: 2rem 0; border-radius: 10px; overflow: hidden; border: 0.5px solid var(--subtle); }
+    .prose figure img { width: 100%; display: block; }
+    .prose figure figcaption { font-size: 0.75rem; color: var(--muted); text-align: center; padding: 8px; background: var(--surface); }
     .prose em { font-style: italic; color: var(--ink); }
 
     .prose > p:first-child {
@@ -1079,6 +1082,25 @@
             clp.innerHTML = fmtInline(para.slice(2));
             callout.appendChild(clp);
             body.appendChild(callout);
+
+          } else if (para.startsWith("[IMAGE:") && para.endsWith("]")) {
+            var imgParts = para.slice(7, -1).split("|");
+            var imgSrc = imgParts[0] || "";
+            var imgAlt = imgParts[1] || "";
+            var figure = document.createElement("figure");
+            figure.style.cssText = "margin:2rem 0;border-radius:10px;overflow:hidden;border:0.5px solid var(--subtle)";
+            var imgEl = document.createElement("img");
+            imgEl.src = imgSrc;
+            imgEl.alt = imgAlt;
+            imgEl.style.cssText = "width:100%;display:block;max-height:500px;object-fit:cover";
+            figure.appendChild(imgEl);
+            if (imgAlt) {
+              var figcap = document.createElement("figcaption");
+              figcap.textContent = imgAlt;
+              figcap.style.cssText = "font-size:0.75rem;color:var(--muted);text-align:center;padding:8px;background:var(--surface)";
+              figure.appendChild(figcap);
+            }
+            body.appendChild(figure);
 
           } else if (para.startsWith("[OUTIL:") && para.endsWith("]")) {
             var parts = para.slice(7, -1).split("|");

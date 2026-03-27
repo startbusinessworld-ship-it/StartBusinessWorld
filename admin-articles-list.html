@@ -223,6 +223,7 @@
           <div class="tb-sep"></div>
           <button onclick="openLinkModal()" title="Insérer un lien">🔗 Lien</button>
           <button onclick="insertOutil()" title="Insérer une card outil affilié">🛠️ Outil</button>
+          <button onclick="openImageModal()" title="Insérer une image">🖼️ Image</button>
         </div>
         <textarea id="inContent" rows="14" class="editor-textarea" placeholder="## Introduction&#10;&#10;Texte du paragraphe...&#10;&#10;## Section suivante&#10;&#10;**Mot en gras**, *mot en italique*&#10;&#10;- Élément 1&#10;- Élément 2&#10;&#10;> Conseil important à mettre en avant"></textarea>
       </div>
@@ -256,6 +257,34 @@
     <div class="link-modal-title" style="margin-bottom:14px">🛠️ Choisir un outil à insérer</div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:380px;overflow-y:auto;margin-bottom:12px" id="outilGrid"></div>
     <button class="btn-ghost" style="width:100%" onclick="closeOutilModal()">Annuler</button>
+  </div>
+</div>
+
+<!-- MODALE IMAGE -->
+<div class="link-modal" id="imageModal">
+  <div class="link-modal-box" style="max-width:460px">
+    <div class="link-modal-title">🖼️ Insérer une image</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button id="tabUpload" onclick="switchImageTab('upload')" class="btn-primary" style="flex:1;justify-content:center;font-size:0.78rem">📁 Uploader</button>
+      <button id="tabUrl" onclick="switchImageTab('url')" class="btn-ghost" style="flex:1;font-size:0.78rem">🔗 URL</button>
+    </div>
+    <div id="uploadZone" style="border:2px dashed var(--subtle);border-radius:8px;padding:2rem;text-align:center;cursor:pointer;margin-bottom:10px;transition:border-color 0.15s" onclick="document.getElementById('imgFileInput').click()" ondragover="event.preventDefault();this.style.borderColor='var(--gold)'" ondragleave="this.style.borderColor='var(--subtle)'" ondrop="handleImgDrop(event)">
+      <div style="font-size:1.5rem;margin-bottom:6px">📁</div>
+      <div style="font-size:0.82rem;color:var(--muted)">Clique ou glisse une image ici</div>
+      <div style="font-size:0.7rem;color:var(--subtle);margin-top:4px">JPG, PNG, GIF — max 2MB</div>
+      <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="handleImgFile(this)">
+    </div>
+    <div id="urlZone" style="display:none;margin-bottom:10px">
+      <input type="url" id="imgUrl" placeholder="https://exemple.com/image.jpg" style="width:100%;padding:8px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.85rem;font-family:DM Sans,sans-serif;outline:none">
+    </div>
+    <div id="imgPreviewWrap" style="display:none;margin-bottom:10px;border-radius:8px;overflow:hidden;border:0.5px solid var(--subtle)">
+      <img id="imgPreview" src="" style="width:100%;max-height:200px;object-fit:contain;display:block;background:var(--surface)">
+    </div>
+    <input type="text" id="imgAlt" placeholder="Description de l'image (optionnel)" style="width:100%;padding:8px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.85rem;font-family:DM Sans,sans-serif;outline:none;margin-bottom:10px">
+    <div class="link-modal-btns">
+      <button class="btn-ghost" style="flex:1" onclick="closeImageModal()">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="confirmImage()">Insérer</button>
+    </div>
   </div>
 </div>
 
@@ -590,6 +619,86 @@ function insertOutil() {
 
 function closeOutilModal() {
   document.getElementById("outilModal").classList.remove("open");
+}
+
+var _imgBase64 = null;
+var _imgMode = "upload";
+
+function openImageModal() {
+  var ta = document.getElementById("inContent");
+  _savedStart = ta.selectionStart;
+  _savedEnd = ta.selectionEnd;
+  _imgBase64 = null;
+  document.getElementById("imgUrl").value = "";
+  document.getElementById("imgAlt").value = "";
+  document.getElementById("imgPreviewWrap").style.display = "none";
+  document.getElementById("imgFileInput").value = "";
+  switchImageTab("upload");
+  document.getElementById("imageModal").classList.add("open");
+}
+
+function closeImageModal() {
+  document.getElementById("imageModal").classList.remove("open");
+  _imgBase64 = null;
+}
+
+function switchImageTab(tab) {
+  _imgMode = tab;
+  if (tab === "upload") {
+    document.getElementById("uploadZone").style.display = "block";
+    document.getElementById("urlZone").style.display = "none";
+    document.getElementById("tabUpload").className = "btn-primary";
+    document.getElementById("tabUrl").className = "btn-ghost";
+  } else {
+    document.getElementById("uploadZone").style.display = "none";
+    document.getElementById("urlZone").style.display = "block";
+    document.getElementById("tabUpload").className = "btn-ghost";
+    document.getElementById("tabUrl").className = "btn-primary";
+  }
+}
+
+function handleImgFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+  if (file.size > 2 * 1024 * 1024) { showToast("Image trop lourde (max 2MB).", "error"); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    _imgBase64 = e.target.result;
+    document.getElementById("imgPreview").src = _imgBase64;
+    document.getElementById("imgPreviewWrap").style.display = "block";
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleImgDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = "var(--subtle)";
+  var file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith("image/")) {
+    document.getElementById("imgFileInput").files = e.dataTransfer.files;
+    handleImgFile(document.getElementById("imgFileInput"));
+  }
+}
+
+function confirmImage() {
+  var alt = document.getElementById("imgAlt").value.trim() || "image";
+  var src = "";
+
+  if (_imgMode === "upload" && _imgBase64) {
+    src = _imgBase64;
+  } else if (_imgMode === "url") {
+    src = document.getElementById("imgUrl").value.trim();
+  }
+
+  if (!src) { showToast("Ajoute une image ou une URL.", "error"); return; }
+
+  var ta = document.getElementById("inContent");
+  var insert = "\n\n[IMAGE:" + src + "|" + alt + "]\n\n";
+  var val = ta.value;
+  ta.value = val.substring(0, _savedStart) + insert + val.substring(_savedEnd);
+  ta.focus();
+  closeImageModal();
+  showToast("Image insérée !", "success");
 }
 
 function fmtDate(str) {
