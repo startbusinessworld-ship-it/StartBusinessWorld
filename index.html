@@ -1312,8 +1312,19 @@
           }
         }
 
-        // 4 suivants → ticker
+        // 4 pour le ticker — on reprend depuis le début avec les catégories restantes
+        // Si pas assez de catégories distinctes, on prend ce qu'il y a
         var tickerArticles = byCategory.slice(3, 7);
+        // Si moins de 4, compléter avec d'autres articles même catégorie répétée
+        if (tickerArticles.length < 4) {
+          var extras = all.filter(function(a) {
+            return !tickerArticles.find(function(t) { return t.id === a.id; }) &&
+                   !sideArticles.find(function(s) { return s.id === a.id; });
+          });
+          for (var k = 0; k < extras.length && tickerArticles.length < 4; k++) {
+            tickerArticles.push(extras[k]);
+          }
+        }
         var track = document.getElementById("tickerTrack");
         if (track && tickerArticles.length) {
           track.innerHTML = "";
