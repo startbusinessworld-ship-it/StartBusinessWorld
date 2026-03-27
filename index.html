@@ -469,7 +469,15 @@
     }
     .tools-all:hover { color: var(--ink); }
 
-    .tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+    
+    .tool-category-label {
+      font-size: 0.58rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.6rem;
+      padding: 2px 6px; background: rgba(166,124,58,0.08);
+      border-radius: 3px; display: inline-block;
+    }
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
 
     .tool {
       padding: 1.5rem;
@@ -479,8 +487,7 @@
       transition: background 0.12s;
       background: var(--bg);
     }
-    .tool:nth-child(3), .tool:nth-child(6) { border-right: none; }
-    .tool:nth-child(4), .tool:nth-child(5), .tool:nth-child(6) { border-bottom: none; }
+    .tool:nth-child(4n) { border-right: none; }
     .tool:hover { background: var(--surface); }
     .tool.recommended { background: var(--gold); }
     .tool.recommended:hover { background: #96712F; }
@@ -489,6 +496,24 @@
     .tool.recommended .tool-desc { color: rgba(255,255,255,0.75); }
     .tool.recommended .tool-link { color: #fff; font-weight:600; }
 
+
+
+    .tool-category-label {
+      grid-column: 1 / -1;
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      padding: 1rem 1.5rem 0.5rem;
+      border-top: 0.5px solid var(--subtle);
+      background: var(--surface);
+    }
+    .tool-category-label:first-child { border-top: none; }
+    .tool-logo {
+      width: auto; height: 28px;
+      object-fit: contain; object-position: left;
+      margin-bottom: 0.8rem;
+      display: block;
+    }
     .tool-name { font-size: 0.92rem; font-weight: 500; margin-bottom: 0.1rem; }
     .tool-cat {
       font-size: 0.62rem;
@@ -851,7 +876,7 @@
 
       .tools-section { grid-template-columns: 1fr; }
       .tools-header { border-right: none; border-bottom: 1px solid var(--subtle); padding: 1.5rem; }
-      .tools-grid { grid-template-columns: 1fr; }
+      .tools-grid { grid-template-columns: 1fr 1fr; }
       .tool { border-right: none; }
       .tool:nth-child(n) { border-right: none; }
 
@@ -1112,44 +1137,1355 @@
       <a href="#" class="tools-all">Tous les outils →</a>
     </div>
     <div class="tools-grid">
+
+      <!-- CRÉATION D'ENTREPRISE -->
       <div class="tool">
-        <div class="tool-name">Airwallex</div>
-        <div class="tool-cat">Paiements internationaux</div>
-        <div class="tool-desc">Compte multi-devises à frais réduits. Indispensable pour le business avec la Chine et l'e-commerce global.</div>
-        <a href="#" class="tool-link">Ouvrir un compte →</a>
+        <div class="tool-category-label">Création d'entreprise</div>
+        <img src="logos/legalplace.png" alt="LegalPlace" class="tool-logo">
+        <div class="tool-name">LegalPlace</div>
+        <div class="tool-cat">Création de société en France</div>
+        <div class="tool-desc">SASU, SAS, SARL en ligne. Rapide, moins cher qu'un notaire, fiable.</div>
+        <a href="https://c3po.link/QP9duxvAkg" target="_blank" class="tool-link">Créer ma société →</a>
       </div>
       <div class="tool">
+        <div class="tool-category-label">Création d'entreprise</div>
+        <img src="logos/luminos.png" alt="Luminos" class="tool-logo">
+        <div class="tool-name">Luminos Corp</div>
+        <div class="tool-cat">Création de société à Hong Kong</div>
+        <div class="tool-desc">Crée ta société à Hong Kong simplement. Expertise locale et accompagnement complet.</div>
+        <a href="https://www.luminoscorp.com" target="_blank" class="tool-link">Découvrir →</a>
+      </div>
+
+      <!-- E-COMMERCE -->
+      <div class="tool">
+        <div class="tool-category-label">E-commerce</div>
+        <img src="logos/shopify.png" alt="Shopify" class="tool-logo">
+        <div class="tool-name">Shopify</div>
+        <div class="tool-cat">Boutique en ligne</div>
+        <div class="tool-desc">La plateforme numéro un pour lancer ta boutique. 14 jours d'essai gratuit.</div>
+        <a href="https://shopify.pxf.io/c/5645860/1061744/13624" target="_blank" class="tool-link">Essai gratuit →</a>
+      </div>
+      <div class="tool">
+        <div class="tool-category-label">E-commerce</div>
+        <img src="logos/wix.png" alt="Wix" class="tool-logo">
+        <div class="tool-name">Wix</div>
+        <div class="tool-cat">Création de site web</div>
+        <div class="tool-desc">Crée ton site web professionnel sans coder. Simple, rapide et efficace.</div>
+        <a href="https://wix.pxf.io/c/5645860/2049257/25616" target="_blank" class="tool-link">Créer mon site →</a>
+      </div>
+
+      <!-- VIDÉO -->
+      <div class="tool">
+        <div class="tool-category-label">Vidéo</div>
+        <img src="logos/capcut.png" alt="CapCut" class="tool-logo">
+        <div class="tool-name">CapCut</div>
+        <div class="tool-cat">Montage vidéo</div>
+        <div class="tool-desc">L'outil de montage vidéo pour créer du contenu pro pour tes réseaux sociaux.</div>
+        <a href="https://capcutaffiliateprogram.pxf.io/jeK1EP" target="_blank" class="tool-link">Essayer CapCut →</a>
+      </div>
+
+      <!-- BANQUES -->
+      <div class="tool">
+        <div class="tool-category-label">Banque</div>
+        <img src="logos/wise.png" alt="Wise" class="tool-logo">
         <div class="tool-name">Wise</div>
         <div class="tool-cat">Transferts & compte pro</div>
         <div class="tool-desc">Le standard pour envoyer de l'argent à l'international. Taux réel, frais transparents.</div>
-        <a href="#" class="tool-link">Essayer Wise →</a>
+        <a href="https://wise.com/invite/ihpc/ayoubhassanr2" target="_blank" class="tool-link">Essayer Wise →</a>
       </div>
       <div class="tool">
-        <div class="tool-name">LegalPlace</div>
-        <div class="tool-cat">Création de société</div>
-        <div class="tool-desc">SASU, SAS, SARL en ligne. Rapide, moins cher qu'un notaire, fiable.</div>
-        <a href="#" class="tool-link">Créer ma société →</a>
+        <div class="tool-category-label">Banque</div>
+        <img src="logos/airwallex.png" alt="Airwallex" class="tool-logo">
+        <div class="tool-name">Airwallex</div>
+        <div class="tool-cat">Paiements internationaux</div>
+        <div class="tool-desc">Compte multi-devises à frais réduits. Indispensable pour le business avec la Chine.</div>
+        <a href="https://www.airwallex.com/app/signup?utm_source=agent_referral&utm_medium=partner_referral&utm_campaign=cn&utm_term=hongkongwinchine&utm_content=1" target="_blank" class="tool-link">Ouvrir un compte →</a>
       </div>
       <div class="tool">
+        <div class="tool-category-label">Banque</div>
+        <img src="logos/xtransfer.png" alt="XTransfer" class="tool-logo">
+        <div class="tool-name">XTransfer</div>
+        <div class="tool-cat">Paiements Chine & international</div>
+        <div class="tool-desc">La solution de paiement B2B dédiée aux importateurs et exportateurs avec la Chine.</div>
+        <a href="https://www.xtransfer.cn/register?campaign=partner&businessSource=partner-leads&code=165698" target="_blank" class="tool-link">S'inscrire →</a>
+      </div>
+
+      <!-- VOYAGE -->
+      <div class="tool">
+        <div class="tool-category-label">Voyage</div>
+        <img src="logos/airalo.png" alt="Airalo" class="tool-logo">
+        <div class="tool-name">Airalo</div>
+        <div class="tool-cat">eSIM internationale</div>
+        <div class="tool-desc">La meilleure solution eSIM pour voyager et rester connecté partout dans le monde.</div>
+        <a href="https://airalo.pxf.io/c/5645860/1268485/15608" target="_blank" class="tool-link">Obtenir une eSIM →</a>
+      </div>
+      <div class="tool">
+        <div class="tool-category-label">Voyage</div>
+        <img src="logos/kiwi.png" alt="Kiwi.com" class="tool-logo">
+        <div class="tool-name">Kiwi.com</div>
+        <div class="tool-cat">Vols & voyages</div>
+        <div class="tool-desc">Trouve les meilleurs vols au meilleur prix. Idéal pour les entrepreneurs nomades.</div>
+        <a href="https://kiwi.com/user/refer-friend/" target="_blank" class="tool-link">Trouver un vol →</a>
+      </div>
+
+      <!-- ASSURANCE -->
+      <div class="tool">
+        <div class="tool-category-label">Assurance</div>
+        <img src="logos/orus.png" alt="Orus" class="tool-logo">
         <div class="tool-name">Orus</div>
         <div class="tool-cat">Assurance pro</div>
         <div class="tool-desc">RC Pro en ligne en quelques minutes. Indispensable pour les entrepreneurs français.</div>
-        <a href="#" class="tool-link">Obtenir un devis →</a>
+        <a href="https://www.orus.eu/?utm_campaign=Affilae&utm_medium=partner&utm_source=Riahi#ae155" target="_blank" class="tool-link">Obtenir un devis →</a>
       </div>
       <div class="tool">
-        <div class="tool-name">Shopify</div>
-        <div class="tool-cat">E-commerce</div>
-        <div class="tool-desc">La plateforme numéro un pour lancer sa boutique en ligne. 14 jours d'essai gratuit.</div>
-        <a href="#" class="tool-link">Essai gratuit →</a>
+        <div class="tool-category-label">Assurance</div>
+        <img src="logos/acs.png" alt="ACS" class="tool-logo">
+        <div class="tool-name">ACS Assurance</div>
+        <div class="tool-cat">Assurance expatriation</div>
+        <div class="tool-desc">La référence pour l'assurance des expatriés. Couverture mondiale adaptée à tes besoins.</div>
+        <a href="https://wa.me/66630830047?text=Bonjour%2C%20je%20viens%20de%20la%20part%20de%20Start%20Business%20World" target="_blank" class="tool-link">Contacter →</a>
       </div>
-      <div class="tool">
-        <div class="tool-name">Amazon FBA</div>
-        <div class="tool-cat">Marketplace & logistique</div>
-        <div class="tool-desc">Vendre sur Amazon avec logistique gérée. Notre guide complet pour démarrer sans erreurs.</div>
-        <a href="#" class="tool-link">Lire le guide →</a>
+
+    </div>E html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Start Business World — Média business international. Fiscalité, sourcing Chine, création de société, e-commerce et expatriation.">
+  <title>Start Business World — Le business mondial, décrypté.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================
+       RESET & ROOT
+    ============================================= */
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:       #FAFAF8;
+      --ink:      #111110;
+      --muted:    #888884;
+      --subtle:   #DDDDD8;
+      --surface:  #F2F2EF;
+      --gold:     #A67C3A;
+      --red:      #C0392B;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    img { display: block; max-width: 100%; }
+
+    /* =============================================
+       NAVIGATION
+    ============================================= */
+    nav {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      padding: 0 2rem;
+      height: 56px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--ink);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .nav-left { display: flex; gap: 0.15rem; align-items: center; }
+
+    .nav-item {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      padding: 0.35rem 0.8rem;
+      border-radius: 4px;
+      transition: all 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+    .nav-logo {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem;
+      text-align: center;
+      letter-spacing: -0.01em;
+      white-space: nowrap;
+      user-select: none;
+      color: #fff;
+    }
+
+    .nav-right {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .nav-login {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.5);
+      padding: 0.35rem 0.8rem;
+      cursor: pointer;
+      transition: color 0.15s;
+      text-decoration: none;
+    }
+    .nav-login:hover { color: #fff; }
+
+    .nav-join {
+      font-size: 0.75rem;
+      font-weight: 500;
+      background: var(--gold);
+      color: #fff;
+      padding: 0.42rem 1.1rem;
+      border-radius: 5px;
+      transition: opacity 0.15s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .nav-join:hover { opacity: 0.85; }
+
+    /* =============================================
+       TICKER
+    ============================================= */
+    .ticker {
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--subtle);
+      border-top: 2px solid var(--red);
+      height: 34px;
+      overflow: hidden;
+    }
+
+    .ticker-label {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0 1rem;
+      color: #fff;
+      background: var(--red);
+      height: 100%;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .ticker-track {
+      display: flex;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .ticker-item {
+      font-size: 0.75rem;
+      color: var(--muted);
+      padding: 0 1.5rem;
+      border-right: 1px solid var(--subtle);
+      height: 34px;
+      display: flex;
+      align-items: center;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+    .ticker-item:hover { background: var(--surface); color: var(--ink); }
+    .ticker-item b { color: var(--ink); font-weight: 500; }
+
+    /* =============================================
+       HERO
+    ============================================= */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      border-bottom: 1px solid var(--subtle);
+      min-height: 420px;
+    }
+
+    .hero-main {
+      padding: 3rem 2.5rem;
+      border-right: 1px solid var(--subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .hero-eyebrow span {
+      width: 20px;
+      height: 1px;
+      background: var(--muted);
+      display: block;
+    }
+
+    h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(2.8rem, 5.5vw, 4.8rem);
+      line-height: 1.06;
+      letter-spacing: -0.025em;
+      margin-bottom: 1.2rem;
+    }
+    h1 i { color: var(--gold); font-style: italic; }
+
+    .hero-deck {
+      font-size: 0.98rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.78;
+      font-weight: 300;
+      margin-bottom: 2rem;
+    }
+
+    .hero-ctas { display: flex; gap: 0.8rem; align-items: center; }
+
+    .cta-primary {
+      background: var(--ink);
+      color: var(--bg);
+      padding: 0.72rem 1.5rem;
+      border-radius: 5px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+      cursor: pointer;
+    }
+    .cta-primary:hover { opacity: 0.8; }
+
+    .cta-sec {
+      font-size: 0.8rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--subtle);
+      padding-bottom: 1px;
+      transition: all 0.15s;
+      cursor: pointer;
+    }
+    .cta-sec:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* Hero sidebar cards */
+    .hero-side { display: flex; flex-direction: column; }
+
+    .side-card {
+      padding: 1.4rem 1.5rem;
+      border-bottom: 1px solid var(--subtle);
+      cursor: pointer;
+      transition: background 0.12s;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .side-card:hover { background: var(--surface); }
+    .side-card:last-child { border-bottom: none; }
+
+    .sc-cat {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 0.5rem;
+    }
+
+    .sc-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 0.93rem;
+      line-height: 1.35;
+      margin-bottom: 0.6rem;
+    }
+
+    .sc-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .sc-yt {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--subtle);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+    }
+
+    /* =============================================
+       STATS BAR
+    ============================================= */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid var(--subtle);
+    }
+
+    .stat {
+      padding: 1.5rem 2rem;
+      border-right: 1px solid var(--subtle);
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-n {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      color: var(--ink);
+      line-height: 1;
+      margin-bottom: 0.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .stat-l { font-size: 0.72rem; color: var(--muted); }
+
+    /* =============================================
+       THEMES ROW
+    ============================================= */
+    .themes-row {
+      display: flex;
+      border-bottom: 1px solid var(--subtle);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .themes-row::-webkit-scrollbar { display: none; }
+
+    .theme {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.8rem 1.3rem;
+      border-right: 1px solid var(--subtle);
+      font-size: 0.78rem;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.12s;
+      white-space: nowrap;
+    }
+    .theme:hover { background: var(--surface); color: var(--ink); }
+    .theme.active-theme { background: var(--red); color: #fff; font-weight: 500; }
+
+    /* =============================================
+       ARTICLES GRID
+    ============================================= */
+    .articles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--subtle);
+    }
+
+    .article {
+      padding: 2rem;
+      border-right: 1px solid var(--subtle);
+      cursor: pointer;
+      transition: background 0.12s;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+    }
+    .article:last-child { border-right: none; }
+    .article:hover { background: var(--surface); }
+
+    .article.featured {
+      grid-column: span 2;
+      background: var(--red);
+      color: #fff;
+    }
+    .article.featured:hover { background: #A93226; }
+
+    .art-cat {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    .article.featured .art-cat { color: rgba(255,255,255,0.55); }
+    .article:not(.featured) .art-cat { color: var(--red); }
+
+    .article h3 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 0.95rem;
+      line-height: 1.35;
+    }
+    .article.featured h3 { font-size: 1.45rem; color: #fff; }
+
+    .article p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.65;
+      font-weight: 300;
+    }
+    .article.featured p { color: rgba(255,255,255,0.58); }
+
+    .art-footer {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: auto;
+    }
+
+    .art-time { font-size: 0.68rem; color: var(--muted); }
+    .article.featured .art-time { color: rgba(255,255,255,0.38); }
+
+    .yt-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      background: rgba(255,255,255,0.15);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 0.6rem;
+      font-weight: 500;
+      padding: 0.15rem 0.5rem;
+      border-radius: 3px;
+    }
+    .article:not(.featured) .yt-pill {
+      background: var(--surface);
+      color: var(--ink);
+      border-color: var(--subtle);
+    }
+
+    /* =============================================
+       OUTILS
+    ============================================= */
+    .tools-section {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      border-bottom: 1px solid var(--subtle);
+      background: var(--bg);
+    }
+
+    .tools-header {
+      padding: 2rem;
+      border-right: 1px solid rgba(166,124,58,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #FBF6EB;
+    }
+
+    .tools-header h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.8rem;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .tools-header p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.6;
+      font-weight: 300;
+      margin-top: 0.8rem;
+    }
+
+    .tools-all {
+      font-size: 0.72rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--subtle);
+      padding-bottom: 1px;
+      width: fit-content;
+      cursor: pointer;
+      transition: color 0.12s;
+    }
+    .tools-all:hover { color: var(--ink); }
+
+    
+    .tool-category-label {
+      font-size: 0.58rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.6rem;
+      padding: 2px 6px; background: rgba(166,124,58,0.08);
+      border-radius: 3px; display: inline-block;
+    }
+    .tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+
+    .tool {
+      padding: 1.5rem;
+      border-right: 1px solid rgba(166,124,58,0.15);
+      border-bottom: 1px solid rgba(166,124,58,0.15);
+      cursor: pointer;
+      transition: background 0.12s;
+      background: var(--bg);
+    }
+    .tool:nth-child(4n) { border-right: none; }
+    .tool:hover { background: var(--surface); }
+    .tool.recommended { background: var(--gold); }
+    .tool.recommended:hover { background: #96712F; }
+    .tool.recommended .tool-name { color: #fff; }
+    .tool.recommended .tool-cat { color: rgba(255,255,255,0.65); }
+    .tool.recommended .tool-desc { color: rgba(255,255,255,0.75); }
+    .tool.recommended .tool-link { color: #fff; font-weight:600; }
+
+
+
+    .tool-category-label {
+      grid-column: 1 / -1;
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--muted);
+      padding: 1rem 1.5rem 0.5rem;
+      border-top: 0.5px solid var(--subtle);
+      background: var(--surface);
+    }
+    .tool-category-label:first-child { border-top: none; }
+    .tool-logo {
+      width: auto; height: 28px;
+      object-fit: contain; object-position: left;
+      margin-bottom: 0.8rem;
+      display: block;
+    }
+    .tool-name { font-size: 0.92rem; font-weight: 500; margin-bottom: 0.1rem; }
+    .tool-cat {
+      font-size: 0.62rem;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.7rem;
+    }
+    .tool-desc {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.55;
+      font-weight: 300;
+      margin-bottom: 0.8rem;
+    }
+    .tool-link { font-size: 0.7rem; color: var(--ink); font-weight: 500; }
+
+    /* =============================================
+       LE CLUB SBW
+    ============================================= */
+    .club {
+      margin: 2.5rem 2rem;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--ink);
+      color: var(--bg);
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+    }
+
+    .club-sep { background: rgba(255,255,255,0.07); }
+
+    .club-left {
+      padding: 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    /* liseré rouge */
+    .club-left::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+    }
+
+    .club-eyebrow {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.32);
+      margin-bottom: 1.5rem;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .club-eyebrow::before {
+      content: '';
+      width: 16px;
+      height: 1px;
+      background: rgba(250,250,248,0.2);
+    }
+
+    .club-left h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.8rem;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+    }
+    .club-left h2 i { color: var(--gold); font-style: italic; }
+
+    .club-left p {
+      font-size: 0.88rem;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.8;
+      font-weight: 300;
+      max-width: 400px;
+      margin-bottom: 2.5rem;
+    }
+
+    .pricing { display: flex; gap: 0.8rem; margin-bottom: 2rem; }
+
+    .pc {
+      flex: 1;
+      padding: 1.2rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+    .pc.hi { border-color: rgba(255,255,255,0.22); }
+
+    .pc-tag {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.3);
+      margin-bottom: 0.45rem;
+    }
+
+    .pc-price {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .pc-price small {
+      font-family: 'DM Sans';
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: rgba(250,250,248,0.28);
+    }
+
+    .pc-sub {
+      font-size: 0.63rem;
+      color: rgba(250,250,248,0.28);
+      margin-top: 0.3rem;
+      line-height: 1.45;
+    }
+
+    .club-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--gold);
+      color: #fff;
+      padding: 0.8rem 1.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+      cursor: pointer;
+    }
+    .club-cta:hover { opacity: 0.88; }
+
+    .club-note {
+      margin-top: 0.7rem;
+      font-size: 0.63rem;
+      color: rgba(250,250,248,0.18);
+    }
+
+    .club-right { padding: 3.5rem; }
+
+    .club-right h3 {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.28);
+      margin-bottom: 1.5rem;
+    }
+
+    .perk {
+      display: flex;
+      gap: 0.9rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .perk:last-child { border-bottom: none; }
+
+    .perk-i {
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .perk h4 { font-size: 0.83rem; font-weight: 400; margin-bottom: 0.15rem; }
+    .perk p { font-size: 0.72rem; color: rgba(250,250,248,0.3); font-weight: 300; line-height: 1.5; }
+
+    /* =============================================
+       MODULES
+    ============================================= */
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin: 0 2rem 2.5rem;
+      border: 1px solid var(--subtle);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .mod {
+      padding: 1.5rem;
+      background: var(--surface);
+      border-right: 1px solid var(--subtle);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .mod:hover { background: #EAEAE5; }
+    .mod:last-child { border-right: none; }
+
+    .mod-n {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--subtle);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+    }
+
+    .mod h4 { font-size: 0.8rem; font-weight: 500; margin-bottom: 0.2rem; }
+    .mod p { font-size: 0.68rem; color: var(--muted); font-weight: 300; line-height: 1.5; }
+    .mod-c { margin-top: 0.6rem; font-size: 0.62rem; color: var(--muted); }
+
+    /* =============================================
+       SHORTS
+    ============================================= */
+    .shorts-section { padding: 3rem 2rem 2rem; border-bottom: 1px solid rgba(255,255,255,0.07); background: var(--ink); color: var(--bg); }
+    .shorts-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; }
+    .shorts-eyebrow { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.68rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: var(--red); margin-bottom: 0.6rem; }
+    .shorts-title { font-family: 'DM Serif Display', serif; font-size: 2.2rem; line-height: 1.05; letter-spacing: -0.025em; color: var(--bg); }
+    .shorts-title i { color: var(--gold); font-style: italic; }
+    .shorts-yt-link { font-size: 0.75rem; color: rgba(250,250,248,0.35); border-bottom: 1px solid rgba(250,250,248,0.12); padding-bottom: 1px; transition: all 0.15s; }
+    .shorts-yt-link:hover { color: var(--bg); }
+    .shorts-track { display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; padding-bottom: 0.5rem; cursor: grab; }
+    .shorts-track::-webkit-scrollbar { display: none; }
+    .shorts-track:active { cursor: grabbing; }
+    .short-card { flex: 0 0 180px; scroll-snap-align: start; cursor: pointer; }
+    .short-thumb { width: 180px; height: 320px; background: #1C1C1A; border-radius: 10px; border: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; position: relative; transition: border-color 0.15s; margin-bottom: 0.8rem; }
+    .short-card:hover .short-thumb { border-color: rgba(255,255,255,0.18); }
+    .short-card:hover .short-play { opacity: 1; transform: scale(1.1); }
+    .short-play { width: 44px; height: 44px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.95rem; color: #fff; opacity: 0.65; transition: all 0.2s; padding-left: 3px; }
+    .short-duration { position: absolute; bottom: 0.6rem; right: 0.6rem; font-size: 0.62rem; font-weight: 500; background: rgba(0,0,0,0.65); color: #fff; padding: 0.15rem 0.45rem; border-radius: 3px; }
+    .short-tag { font-size: 0.6rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--red); margin-bottom: 0.3rem; }
+    .short-title { font-family: 'DM Serif Display', serif; font-size: 0.82rem; line-height: 1.35; color: rgba(250,250,248,0.7); }
+    .shorts-nav { display: flex; gap: 0.5rem; margin-top: 1.5rem; }
+    .snav-btn { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.12); background: transparent; color: rgba(250,250,248,0.45); font-size: 0.9rem; cursor: pointer; transition: all 0.15s; display: flex; align-items: center; justify-content: center; }
+    .snav-btn:hover { border-color: rgba(255,255,255,0.3); color: var(--bg); }
+
+    /* =============================================
+       FOOTER
+    ============================================= */
+    footer { background: var(--ink); color: var(--bg); padding: 3rem 2rem 1.5rem; }
+    .f-top { display: grid; grid-template-columns: 260px 1fr; gap: 4rem; margin-bottom: 2.5rem; padding-bottom: 2.5rem; border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .f-logo { font-family: 'DM Serif Display', serif; font-size: 1.1rem; margin-bottom: 0.4rem; }
+    .f-tagline { font-size: 0.75rem; color: rgba(250,250,248,0.28); font-weight: 300; margin-bottom: 1.5rem; }
+    .f-socials { display: flex; flex-direction: column; gap: 0.6rem; }
+    .f-social { display: inline-flex; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: rgba(250,250,248,0.4); transition: color 0.15s; }
+    .f-social:hover { color: var(--bg); }
+    .f-nav-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; }
+    .f-col { display: flex; flex-direction: column; gap: 0.55rem; }
+    .f-col-title { font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(250,250,248,0.25); margin-bottom: 0.4rem; }
+    .f-col a { font-size: 0.78rem; color: rgba(250,250,248,0.4); transition: color 0.15s; }
+    .f-col a:hover { color: var(--bg); }
+    .f-bottom { display: flex; justify-content: space-between; align-items: center; }
+    .f-copy { font-size: 0.67rem; color: rgba(250,250,248,0.18); }
+
+    /* =============================================
+       RESPONSIVE — MOBILE
+    ============================================= */
+    /* ===== MENU MOBILE ===== */
+    .hamburger {
+      display: none;
+      flex-direction: column; gap: 5px;
+      cursor: pointer; padding: 6px; border-radius: 4px;
+      transition: background 0.15s;
+    }
+    .hamburger:hover { background: rgba(255,255,255,0.08); }
+    .hamburger span {
+      display: block; width: 22px; height: 2px;
+      background: #fff; border-radius: 2px;
+      transition: all 0.25s;
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+
+    .mobile-menu {
+      display: none;
+      position: fixed; inset: 0; top: 54px;
+      background: var(--bg); z-index: 99;
+      flex-direction: column;
+      border-top: 1px solid var(--subtle);
+      overflow-y: auto;
+    }
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu-top {
+      padding: 1.5rem;
+      display: flex; flex-direction: column; gap: 0.3rem;
+      border-bottom: 1px solid var(--subtle);
+    }
+    .mobile-nav-link {
+      display: flex; align-items: center;
+      padding: 0.85rem 1rem; border-radius: 8px;
+      font-size: 0.95rem; color: var(--ink);
+      font-weight: 400; cursor: pointer;
+      transition: background 0.12s;
+    }
+    .mobile-nav-link:hover { background: var(--surface); }
+    .mobile-nav-link.highlight {
+      background: var(--ink); color: var(--bg);
+      font-weight: 500; margin-top: 0.5rem;
+      justify-content: center;
+    }
+    .mobile-nav-link.highlight:hover { opacity: 0.88; background: var(--ink); }
+    .mobile-nav-link.outline {
+      border: 0.5px solid var(--subtle);
+      justify-content: center;
+      font-weight: 500;
+    }
+
+    .mobile-menu-themes {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--subtle);
+    }
+    .mobile-menu-label {
+      font-size: 0.65rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted);
+      margin-bottom: 0.8rem;
+    }
+    .mobile-themes-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 0.4rem;
+    }
+    .mobile-theme-btn {
+      padding: 0.65rem 0.8rem; border-radius: 6px;
+      background: var(--surface); font-size: 0.8rem;
+      color: var(--ink); cursor: pointer; text-align: left;
+      border: 0.5px solid var(--subtle);
+      transition: background 0.12s;
+    }
+    .mobile-theme-btn:hover { background: var(--subtle); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      nav {
+        grid-template-columns: 1fr auto auto;
+        padding: 0 1.2rem; gap: 0;
+      }
+      .nav-left { display: none; }
+      .nav-right { display: none; }
+      .nav-logo { text-align: left; font-size: 1rem; color:#fff; }
+      .hamburger { display: flex; }
+
+      .hero-grid { grid-template-columns: 1fr; }
+      .hero-main { padding: 2.5rem 1.2rem 2rem; border-right: none; border-bottom: 1px solid var(--subtle); }
+      .hero-side { display: none; }
+      .hero-deck { font-size: 0.92rem; }
+      h1 { font-size: 2.6rem; }
+
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .stat:nth-child(2) { border-right: none; }
+      .stat:nth-child(3), .stat:nth-child(4) { border-top: 1px solid var(--subtle); }
+      .stat { padding: 1.2rem; }
+      .stat-n { font-size: 1.6rem; }
+
+      .themes-row { padding: 0; }
+
+      .articles { grid-template-columns: 1fr; }
+      .article.featured { grid-column: span 1; }
+      .article { padding: 1.5rem; }
+
+      .tools-section { grid-template-columns: 1fr; }
+      .tools-header { border-right: none; border-bottom: 1px solid var(--subtle); padding: 1.5rem; }
+      .tools-grid { grid-template-columns: 1fr 1fr; }
+      .tool { border-right: none; }
+      .tool:nth-child(n) { border-right: none; }
+
+      .club { grid-template-columns: 1fr; margin: 1.5rem 1rem; }
+      .club-sep { display: none; }
+      .club-left { padding: 2rem 1.5rem; }
+      .club-right { border-top: 1px solid rgba(255,255,255,0.07); padding: 2rem 1.5rem; }
+      .pricing { flex-direction: column; }
+
+      .modules { grid-template-columns: 1fr 1fr; margin: 0 1rem 1.5rem; }
+      .mod:nth-child(2) { border-right: none; }
+      .mod:nth-child(3), .mod:nth-child(4) { border-top: 1px solid var(--subtle); }
+
+      .bons-plans { padding: 2rem 1rem; }
+      .bp-grid { grid-template-columns: 1fr; }
+      .bp-card { border-right: none; border-bottom: 1px solid var(--subtle); }
+
+      .shorts-section { padding: 2rem 1rem 1.5rem; }
+      .short-thumb { width: 150px; height: 266px; }
+      .short-card { flex: 0 0 150px; }
+
+      footer { padding: 2rem 1rem 1rem; }
+      .f-top { grid-template-columns: 1fr; gap: 2rem; }
+      .f-nav-cols { grid-template-columns: repeat(2, 1fr); }
+      .f-bottom { flex-direction: column; gap: 0.5rem; text-align: center; }
+
+      .ticker { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 2.1rem; }
+      .hero-main { padding: 2rem 1rem; }
+      .club-left { padding: 1.5rem 1rem; }
+      .club-left h2 { font-size: 2.2rem; }
+      .modules { grid-template-columns: 1fr; }
+      .mod:nth-child(n) { border-right: none; border-bottom: 1px solid var(--subtle); }
+      .f-nav-cols { grid-template-columns: 1fr; }
+    }
+
+    /* ARTICLE À LA UNE */
+    .featured-top {
+      padding: 2.5rem 2rem;
+      border-bottom: 1px solid var(--subtle);
+      background: var(--ink);
+      color: #F0EDE4;
+      position: relative;
+      overflow: hidden;
+    }
+    .featured-top::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px; background: var(--gold);
+    }
+    .ft-cat {
+      font-size: 0.65rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--gold); margin-bottom: 0.8rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .ft-cat::before { content: '★'; font-size: 0.55rem; }
+    .ft-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: clamp(1.4rem, 3vw, 2.2rem);
+      line-height: 1.15; letter-spacing: -0.02em;
+      margin-bottom: 0.8rem; max-width: 700px;
+    }
+    .ft-desc {
+      font-size: 0.9rem; color: rgba(240,237,228,0.5);
+      line-height: 1.7; font-weight: 300;
+      max-width: 600px; margin-bottom: 1.5rem;
+    }
+    .ft-footer {
+      display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    }
+    .ft-time { font-size: 0.72rem; color: rgba(240,237,228,0.35); }
+    .ft-yt {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      font-size: 0.68rem; font-weight: 500;
+      background: rgba(192,57,43,0.2); color: #F09595;
+      border: 1px solid rgba(192,57,43,0.3);
+      padding: 0.2rem 0.6rem; border-radius: 4px;
+    }
+    .ft-link {
+      font-size: 0.78rem; font-weight: 500;
+      color: var(--gold); border-bottom: 1px solid rgba(166,124,58,0.3);
+      padding-bottom: 1px; margin-left: auto;
+      transition: border-color 0.15s;
+    }
+    .ft-link:hover { border-color: var(--gold); }
+    @media(max-width:768px){
+      .featured-top { padding: 1.8rem 1.2rem; }
+      .ft-link { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <!-- Desktop gauche -->
+    <div class="nav-left">
+      <a href="blog.html" class="nav-item">Blog</a>
+      <a href="#" class="nav-item">Chine</a>
+      <a href="#" class="nav-item">Expat</a>
+      <a href="#" class="nav-item">Fiscalité</a>
+      <a href="#" class="nav-item">Outils</a>
+    </div>
+    <!-- Logo centré -->
+    <a href="index.html" class="nav-logo">Start Business World</a>
+    <!-- Desktop droite -->
+    <div class="nav-right">
+      <a href="client-login.html" class="nav-login">Se connecter</a>
+      <a href="club.html" class="nav-join">Le Club SBW</a>
+    </div>
+    <!-- Hamburger mobile uniquement -->
+    <div class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- MENU MOBILE -->
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mobile-menu-top">
+      <a href="client-login.html" class="mobile-nav-link outline">Se connecter</a>
+      <a href="club.html" class="mobile-nav-link highlight">Rejoindre le Club SBW →</a>
+    </div>
+    <div class="mobile-menu-themes">
+      <div class="mobile-menu-label">Thèmes</div>
+      <div class="mobile-themes-grid">
+        <div class="mobile-theme-btn">🇨🇳 Business Chine</div>
+        <div class="mobile-theme-btn">🏛️ Fiscalité</div>
+        <div class="mobile-theme-btn">✈️ Expatriation</div>
+        <div class="mobile-theme-btn">📦 E-commerce</div>
+        <div class="mobile-theme-btn">🧠 Mindset</div>
+        <div class="mobile-theme-btn">💰 Finance</div>
+        <div class="mobile-theme-btn">🔗 Import-Export</div>
+        <div class="mobile-theme-btn">🛠️ Outils</div>
+      </div>
+    </div>
+    <div class="mobile-menu-top">
+      <a href="blog.html" class="mobile-nav-link">📝 Blog</a>
+      <a href="club.html" class="mobile-nav-link">⭐ Le Club SBW</a>
+      <a href="#" class="mobile-nav-link">📞 Contact</a>
+    </div>
+  </div>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-label">À lire</div>
+    <div class="ticker-track">
+      <div class="ticker-item"><b>Chine</b> — Sourcer sans se faire arnaquer</div>
+      <div class="ticker-item"><b>HK vs France</b> — Quel statut choisir ?</div>
+      <div class="ticker-item"><b>Dubai 2026</b> — Résidence fiscale, coût réel</div>
+      <div class="ticker-item"><b>Amazon FBA</b> — Encore rentable en 2026 ?</div>
+      <div class="ticker-item"><b>Wise vs Airwallex</b> — Comparatif complet</div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero-grid">
+    <div class="hero-main">
+      <div class="hero-eyebrow"><span></span>Média business international</div>
+      <h1>Le business<br>mondial,<br><i>décrypté.</i></h1>
+      <p class="hero-deck">Fiscalité, sourcing en Chine, création de société, e-commerce et expatriation. Des articles approfondis, des vidéos et une communauté — pour entrepreneurs qui pensent global.</p>
+      <div class="hero-ctas">
+        <a href="club.html" class="cta-primary">Rejoindre le Club SBW</a>
+        <a href="#articles" class="cta-sec">Lire le blog →</a>
+      </div>
+    </div>
+    <div class="hero-side">
+      <div class="side-card">
+        <div>
+          <div class="sc-cat">À la une — Business Chine</div>
+          <div class="sc-title">Sourcer en Chine en 2026 sans se faire arnaquer : le guide complet</div>
+        </div>
+        <div class="sc-meta"><span>18 min</span><span class="sc-yt">▶ YouTube</span></div>
+      </div>
+      <div class="side-card">
+        <div>
+          <div class="sc-cat">Fiscalité</div>
+          <div class="sc-title">Société Hong Kong vs France : comparatif honnête</div>
+        </div>
+        <div class="sc-meta"><span>12 min</span></div>
+      </div>
+      <div class="side-card">
+        <div>
+          <div class="sc-cat">Expatriation</div>
+          <div class="sc-title">S'installer à Dubai : visa, résidence fiscale, coût de vie réel</div>
+        </div>
+        <div class="sc-meta"><span>10 min</span><span class="sc-yt">▶ YouTube</span></div>
       </div>
     </div>
   </div>
+
+  <!-- STATS -->
+
+
+  <!-- THÈMES -->
+  <!-- ARTICLE À LA UNE -->
+  <div class="featured-top">
+    <div class="ft-cat">À la une — Business Chine</div>
+    <h2 class="ft-title">Sourcer en Chine sans se faire arnaquer : Alibaba, Yiwu, agents, contrôle qualité</h2>
+    <p class="ft-desc">Tout ce qu'il faut savoir avant de passer sa première commande import. Le guide que j'aurais voulu avoir à mes débuts.</p>
+    <div class="ft-footer">
+      <span class="ft-time">18 min de lecture</span>
+      <span class="ft-yt">▶ Vidéo YouTube incluse</span>
+      <a href="article.html" class="ft-link">Lire l'article →</a>
+    </div>
+  </div>
+
+  <div class="themes-row">
+    <div class="theme active-theme" onclick="filterTheme('all', this)">✦ Tous</div>
+    <div class="theme" onclick="filterTheme('Mindset', this)">🧠 Mindset</div>
+    <div class="theme" onclick="filterTheme('Fiscalité', this)">🏛️ Fiscalité</div>
+    <div class="theme" onclick="filterTheme('Création de société', this)">🏢 Création de société</div>
+    <div class="theme" onclick="filterTheme('Business Chine', this)">🇨🇳 Business Chine</div>
+    <div class="theme" onclick="filterTheme('Expatriation', this)">✈️ Expatriation</div>
+    <div class="theme" onclick="filterTheme('E-commerce', this)">📦 E-commerce</div>
+    <div class="theme" onclick="filterTheme('Finance', this)">💰 Finance</div>
+    <div class="theme" onclick="filterTheme('Import-Export', this)">🔗 Import-Export</div>
+    <div class="theme" onclick="filterTheme('Outils', this)">🛠️ Outils</div>
+  </div>
+
+  <!-- ARTICLES -->
+  <div class="articles" id="articles">
+    <div class="article" data-cat="Fiscalité">
+      <div class="art-cat">Fiscalité</div>
+      <h3>Société Hong Kong vs France : comparatif complet</h3>
+      <div class="art-footer"><span class="art-time">12 min</span></div>
+    </div>
+    <div class="article" data-cat="E-commerce">
+      <div class="art-cat">E-commerce</div>
+      <h3>Amazon FBA en 2026 : toujours rentable ?</h3>
+      <div class="art-footer"><span class="art-time">9 min</span></div>
+    </div>
+    <div class="article" data-cat="Expatriation">
+      <div class="art-cat">Expatriation</div>
+      <h3>Dubai 2026 : visa, résidence fiscale, coût de vie réel</h3>
+      <div class="art-footer">
+        <span class="art-time">10 min</span>
+        <span class="yt-pill">▶ YouTube</span>
+      </div>
+    </div>
+    <div class="article" data-cat="Mindset">
+      <div class="art-cat">Mindset</div>
+      <h3>Les 7 erreurs mentales qui tuent ton business</h3>
+      <div class="art-footer"><span class="art-time">7 min</span></div>
+    </div>
+  </div>
+
+  <!-- OUTILS -->
+  <div class="tools-section">
+    <div class="tools-header">
+      <div>
+        <h2>Outils<br>recommandés</h2>
+        <p>Les meilleurs outils testés pour ton business international. Liens d'affiliation sélectionnés.</p>
+      </div>
+      <a href="#" class="tools-all">Tous les outils →</a>
+    </div>
+    <div class="tools-grid">
+
+      <!-- CRÉATION D'ENTREPRISE -->
+      <div class="tool-category-label">Création d'entreprise</div>
+      <div class="tool">
+        <img src="logos/legalplace.png" alt="LegalPlace" class="tool-logo">
+        <div class="tool-name">LegalPlace</div>
+        <div class="tool-cat">Création de société en France</div>
+        <div class="tool-desc">SASU, SAS, SARL en ligne. Rapide, moins cher qu'un notaire.</div>
+        <a href="https://c3po.link/QP9duxvAkg" target="_blank" class="tool-link">Créer ma société →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/luminos.png" alt="Luminos" class="tool-logo">
+        <div class="tool-name">Luminos Corp</div>
+        <div class="tool-cat">Création société Hong Kong</div>
+        <div class="tool-desc">Crée ta société à Hong Kong facilement et rapidement.</div>
+        <a href="https://www.luminoscorp.com" target="_blank" class="tool-link">Créer ma société HK →</a>
+      </div>
+
+      <!-- E-COMMERCE -->
+      <div class="tool-category-label">E-commerce</div>
+      <div class="tool">
+        <img src="logos/shopify.png" alt="Shopify" class="tool-logo">
+        <div class="tool-name">Shopify</div>
+        <div class="tool-cat">Boutique en ligne</div>
+        <div class="tool-desc">La plateforme numéro un pour lancer ta boutique. 14 jours gratuits.</div>
+        <a href="https://shopify.pxf.io/c/5645860/1061744/13624" target="_blank" class="tool-link">Essai gratuit →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/wix.png" alt="Wix" class="tool-logo">
+        <div class="tool-name">Wix</div>
+        <div class="tool-cat">Création de site web</div>
+        <div class="tool-desc">Crée ton site professionnel sans coder. Simple et efficace.</div>
+        <a href="https://wix.pxf.io/c/5645860/2049257/25616" target="_blank" class="tool-link">Créer mon site →</a>
+      </div>
+
+      <!-- VIDÉO -->
+      <div class="tool-category-label">Vidéo</div>
+      <div class="tool">
+        <img src="logos/capcut.png" alt="CapCut" class="tool-logo">
+        <div class="tool-name">CapCut</div>
+        <div class="tool-cat">Montage vidéo</div>
+        <div class="tool-desc">L'outil de montage vidéo pour créer du contenu pro pour tes réseaux.</div>
+        <a href="https://capcutaffiliateprogram.pxf.io/jeK1EP" target="_blank" class="tool-link">Essayer CapCut →</a>
+      </div>
+
+      <!-- BANQUES -->
+      <div class="tool-category-label">Banques & Paiements</div>
+      <div class="tool">
+        <img src="logos/wise.png" alt="Wise" class="tool-logo">
+        <div class="tool-name">Wise</div>
+        <div class="tool-cat">Transferts internationaux</div>
+        <div class="tool-desc">Taux réel, frais transparents. Le standard pour payer à l'international.</div>
+        <a href="https://wise.com/invite/ihpc/ayoubhassanr2" target="_blank" class="tool-link">Essayer Wise →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/airwallex.png" alt="Airwallex" class="tool-logo">
+        <div class="tool-name">Airwallex</div>
+        <div class="tool-cat">Compte multi-devises</div>
+        <div class="tool-desc">Paiements internationaux à frais réduits. Indispensable pour le business Chine.</div>
+        <a href="https://www.airwallex.com/app/signup?utm_source=agent_referral&utm_medium=partner_referral&utm_campaign=cn&utm_term=hongkongwinchine&utm_content=1" target="_blank" class="tool-link">Ouvrir un compte →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/xtransfer.png" alt="XTransfer" class="tool-logo">
+        <div class="tool-name">XTransfer</div>
+        <div class="tool-cat">Paiements Chine</div>
+        <div class="tool-desc">La solution spécialisée pour payer tes fournisseurs chinois sans frais excessifs.</div>
+        <a href="https://www.xtransfer.cn/register?campaign=partner&businessSource=partner-leads&code=165698" target="_blank" class="tool-link">S'inscrire →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/orus.png" alt="Orus" class="tool-logo">
+        <div class="tool-name">Orus</div>
+        <div class="tool-cat">Assurance pro</div>
+        <div class="tool-desc">RC Pro en ligne en quelques minutes. Indispensable pour les entrepreneurs français.</div>
+        <a href="#" target="_blank" class="tool-link">Obtenir un devis →</a>
+      </div>
+
+      <!-- VOYAGE -->
+      <div class="tool-category-label">Voyage</div>
+      <div class="tool">
+        <img src="logos/airalo.png" alt="Airalo" class="tool-logo">
+        <div class="tool-name">Airalo</div>
+        <div class="tool-cat">eSIM internationale</div>
+        <div class="tool-desc">La meilleure eSIM pour rester connecté partout dans le monde sans frais de roaming.</div>
+        <a href="https://airalo.pxf.io/c/5645860/1268485/15608" target="_blank" class="tool-link">Obtenir une eSIM →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/kiwi.png" alt="Kiwi.com" class="tool-logo">
+        <div class="tool-name">Kiwi.com</div>
+        <div class="tool-cat">Billets d'avion</div>
+        <div class="tool-desc">Trouve les meilleurs vols au meilleur prix. Idéal pour les entrepreneurs qui voyagent.</div>
+        <a href="https://kiwi.com/user/refer-friend/" target="_blank" class="tool-link">Chercher un vol →</a>
+      </div>
+      <div class="tool">
+        <img src="logos/acs.png" alt="ACS" class="tool-logo">
+        <div class="tool-name">ACS</div>
+        <div class="tool-cat">Assurance voyage</div>
+        <div class="tool-desc">Assurance voyage et santé internationale pour expatriés et voyageurs fréquents.</div>
+        <a href="#" target="_blank" class="tool-link">Obtenir un devis →</a>
+      </div>
+
+    </div>
 
   <!-- CLUB SBW -->
   <div class="club" id="club">
