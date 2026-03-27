@@ -262,6 +262,14 @@ function closeModal() {
   selectedCats = [];
 }
 
+function extractYtId(val) {
+  if (!val) return null;
+  var m = val.match(/[a-zA-Z0-9_-]{11}(?=[?&\s]|$)/);
+  if (m) return m[0];
+  if (val.length === 11) return val;
+  return null;
+}
+
 async function saveArticle() {
   var title = document.getElementById('inTitle').value.trim();
   if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
@@ -273,7 +281,7 @@ async function saveArticle() {
     status: document.getElementById('inStatus').value,
     deck: document.getElementById('inDeck').value.trim(),
     content: document.getElementById('inContent').value.trim(),
-    youtube_id: document.getElementById('inYoutube').value.trim() || null,
+    youtube_id: extractYtId(document.getElementById('inYoutube').value.trim()),
     slug: title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
     updated_at: new Date().toISOString()
   };
