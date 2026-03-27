@@ -21,28 +21,39 @@
 .field textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
 .editor-toolbar {
   display: flex; flex-wrap: wrap; gap: 4px;
-  padding: 8px; background: var(--surface);
+  padding: 8px 10px; background: var(--surface);
   border: 0.5px solid var(--subtle);
   border-bottom: none;
   border-radius: 6px 6px 0 0;
+  align-items: center;
 }
 .editor-toolbar button {
-  padding: 4px 10px; border-radius: 4px;
+  padding: 5px 10px; border-radius: 4px;
   border: 0.5px solid var(--subtle);
   background: var(--bg); color: var(--ink);
-  font-size: 0.75rem; font-family: "DM Sans", sans-serif;
+  font-size: 0.78rem; font-family: "DM Sans", sans-serif;
   cursor: pointer; transition: all 0.12s;
   display: flex; align-items: center; gap: 4px;
+  white-space: nowrap;
 }
 .editor-toolbar button:hover { background: var(--ink); color: var(--bg); border-color: var(--ink); }
-.editor-toolbar .tb-sep { width: 1px; background: var(--subtle); margin: 0 2px; align-self: stretch; }
+.editor-toolbar button:active { transform: scale(0.96); }
+.editor-toolbar .tb-sep { width: 1px; height: 20px; background: var(--subtle); margin: 0 3px; flex-shrink: 0; }
 .editor-textarea {
   border-radius: 0 0 6px 6px !important;
   font-family: "DM Mono", "Courier New", monospace !important;
   font-size: 0.85rem !important;
-  line-height: 1.7 !important;
-  min-height: 300px !important;
+  line-height: 1.75 !important;
+  min-height: 320px !important;
 }
+/* Modale lien */
+.link-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center; }
+.link-modal.open { display:flex; }
+.link-modal-box { background:var(--bg); border-radius:10px; padding:20px; width:100%; max-width:400px; border:0.5px solid var(--subtle); }
+.link-modal-title { font-size:0.9rem; font-weight:500; margin-bottom:12px; }
+.link-modal-box input { width:100%; padding:8px 12px; border:0.5px solid var(--subtle); border-radius:6px; font-size:0.85rem; font-family:"DM Sans",sans-serif; outline:none; margin-bottom:8px; }
+.link-modal-box input:focus { border-color:var(--ink); }
+.link-modal-btns { display:flex; gap:8px; margin-top:4px; }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .full { grid-column: 1 / -1; }
 .btn-row { display: flex; gap: 8px; margin-top: 16px; }
@@ -201,16 +212,17 @@
       <div class="field full">
         <label>Contenu de l'article</label>
         <div class="editor-toolbar" id="editorToolbar">
-          <button onclick="tbInsert('## ', '', true)" title="Titre H2">H2</button>
-          <button onclick="tbInsert('### ', '', true)" title="Titre H3">H3</button>
+          <button onclick="tbWrap('## ', '')" title="Titre de section">H2</button>
+          <button onclick="tbWrap('### ', '')" title="Sous-titre">H3</button>
           <div class="tb-sep"></div>
-          <button onclick="tbInsert('**', '**')" title="Gras"><b>G</b></button>
-          <button onclick="tbInsert('*', '*')" title="Italique"><i>I</i></button>
+          <button onclick="tbWrap('**', '**')" title="Gras — sélectionne du texte puis clique"><b>Gras</b></button>
+          <button onclick="tbWrap('*', '*')" title="Italique — sélectionne du texte puis clique"><i>Italique</i></button>
           <div class="tb-sep"></div>
-          <button onclick="tbInsert('- ', '', true)" title="Liste">— Liste</button>
-          <button onclick="tbInsert('> ', '', true)" title="Callout">💡 Callout</button>
+          <button onclick="tbWrap('- ', '')" title="Liste à puces">· Liste</button>
+          <button onclick="tbWrap('> ', '')" title="Callout encadré">💡 Callout</button>
           <div class="tb-sep"></div>
-          <button onclick="tbInsert('', '', false, '\n\n')" title="Saut de paragraphe">¶ Para</button>
+          <button onclick="openLinkModal()" title="Insérer un lien">🔗 Lien</button>
+          <button onclick="insertOutil()" title="Insérer une card outil affilié">🛠️ Outil</button>
         </div>
         <textarea id="inContent" rows="14" class="editor-textarea" placeholder="## Introduction&#10;&#10;Texte du paragraphe...&#10;&#10;## Section suivante&#10;&#10;**Mot en gras**, *mot en italique*&#10;&#10;- Élément 1&#10;- Élément 2&#10;&#10;> Conseil important à mettre en avant"></textarea>
       </div>
@@ -224,6 +236,45 @@
 </div>
 
 <div class="toast" id="toast"></div>
+
+<!-- MODALE LIEN -->
+<div class="link-modal" id="linkModal">
+  <div class="link-modal-box">
+    <div class="link-modal-title">Insérer un lien</div>
+    <input type="text" id="linkText" placeholder="Texte du lien (ex: Airwallex)">
+    <input type="url" id="linkUrl" placeholder="URL (ex: https://airwallex.com)">
+    <div class="link-modal-btns">
+      <button class="btn-ghost" style="flex:1" onclick="closeLinkModal()">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="confirmLink()">Insérer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE OUTIL -->
+<div class="link-modal" id="outilModal">
+  <div class="link-modal-box">
+    <div class="link-modal-title">🛠️ Insérer un outil affilié</div>
+    <select id="outilSelect" style="width:100%;padding:8px 10px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.85rem;font-family:DM Sans,sans-serif;background:var(--bg);color:var(--ink);outline:none;margin-bottom:6px">
+      <option value="">Choisir un outil...</option>
+      <option value="LegalPlace|Création de société en France|https://c3po.link/QP9duxvAkg">LegalPlace — Création de société</option>
+      <option value="Luminos Corp|Création de société à Hong Kong|https://www.luminoscorp.com">Luminos Corp — Hong Kong</option>
+      <option value="Airwallex|Compte multi-devises et paiements internationaux|https://www.airwallex.com/app/signup?utm_source=agent_referral&utm_medium=partner_referral&utm_campaign=cn&utm_term=hongkongwinchine&utm_content=1">Airwallex — Paiements internationaux</option>
+      <option value="Wise|Transferts et compte pro international|https://wise.com/invite/ihpc/ayoubhassanr2">Wise — Transferts internationaux</option>
+      <option value="XTransfer|Paiements B2B avec la Chine|https://www.xtransfer.cn/register?campaign=partner&businessSource=partner-leads&code=165698">XTransfer — Paiements Chine</option>
+      <option value="Shopify|Lancer sa boutique en ligne|https://shopify.pxf.io/c/5645860/1061744/13624">Shopify — E-commerce</option>
+      <option value="Wix|Créer son site web facilement|https://wix.pxf.io/c/5645860/2049257/25616">Wix — Création de site</option>
+      <option value="CapCut|Montage vidéo pour les réseaux sociaux|https://capcutaffiliateprogram.pxf.io/jeK1EP">CapCut — Montage vidéo</option>
+      <option value="Airalo|eSIM internationale pour voyageurs|https://airalo.pxf.io/c/5645860/1268485/15608">Airalo — eSIM internationale</option>
+      <option value="Kiwi.com|Trouver les meilleurs vols|https://kiwi.com/user/refer-friend/">Kiwi.com — Vols & voyages</option>
+      <option value="Orus|Assurance RC Pro en ligne|https://www.orus.eu/?utm_campaign=Affilae&utm_medium=partner&utm_source=Riahi#ae155">Orus — Assurance pro</option>
+      <option value="ACS Assurance|Assurance pour expatriés|https://wa.me/66630830047?text=Bonjour%2C%20je%20viens%20de%20la%20part%20de%20Start%20Business%20World">ACS — Assurance expatriation</option>
+    </select>
+    <div class="link-modal-btns">
+      <button class="btn-ghost" style="flex:1" onclick="closeOutilModal()">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" onclick="confirmOutil()">Insérer</button>
+    </div>
+  </div>
+</div>
 
 <script src="admin-auth.js"></script>
 <script>
@@ -439,7 +490,7 @@ async function deleteArticle(id) {
   loadArticles();
 }
 
-function tbInsert(before, after, newLine, custom) {
+function tbWrap(before, after) {
   var ta = document.getElementById("inContent");
   var start = ta.selectionStart;
   var end = ta.selectionEnd;
@@ -447,24 +498,83 @@ function tbInsert(before, after, newLine, custom) {
   var val = ta.value;
   var insert;
 
-  if (custom) {
-    insert = custom;
-  } else if (newLine) {
-    // Si on est en début de ligne, insérer directement
+  // Si pas de sélection et préfixe de ligne (H2, H3, liste, callout)
+  if (!selected && (after === "" || after === undefined)) {
     var lineStart = val.lastIndexOf("\n", start - 1) + 1;
-    if (start === lineStart) {
-      insert = before + selected;
-    } else {
-      insert = "\n\n" + before + selected;
-    }
+    var alreadyAtStart = (start === lineStart);
+    insert = (alreadyAtStart ? "" : "\n\n") + before;
+  } else if (selected) {
+    // Sélection : wrapper le texte sélectionné
+    insert = before + selected + (after || "");
   } else {
-    insert = before + (selected || "texte") + after;
+    insert = before + "texte" + (after || "");
   }
 
   ta.value = val.substring(0, start) + insert + val.substring(end);
   var newPos = start + insert.length;
   ta.focus();
   ta.setSelectionRange(newPos, newPos);
+}
+
+var _savedStart = 0;
+var _savedEnd = 0;
+
+function openLinkModal() {
+  var ta = document.getElementById("inContent");
+  _savedStart = ta.selectionStart;
+  _savedEnd = ta.selectionEnd;
+  var selected = ta.value.substring(_savedStart, _savedEnd);
+  document.getElementById("linkText").value = selected || "";
+  document.getElementById("linkUrl").value = "";
+  document.getElementById("linkModal").classList.add("open");
+  document.getElementById(selected ? "linkUrl" : "linkText").focus();
+}
+
+function closeLinkModal() {
+  document.getElementById("linkModal").classList.remove("open");
+}
+
+function confirmLink() {
+  var text = document.getElementById("linkText").value.trim();
+  var url = document.getElementById("linkUrl").value.trim();
+  if (!text || !url) return;
+  var ta = document.getElementById("inContent");
+  var insert = "[" + text + "](" + url + ")";
+  var val = ta.value;
+  ta.value = val.substring(0, _savedStart) + insert + val.substring(_savedEnd);
+  ta.focus();
+  ta.setSelectionRange(_savedStart + insert.length, _savedStart + insert.length);
+  closeLinkModal();
+}
+
+function insertOutil() {
+  var ta = document.getElementById("inContent");
+  _savedStart = ta.selectionStart;
+  _savedEnd = ta.selectionEnd;
+  document.getElementById("outilNom").value = "";
+  document.getElementById("outilDesc").value = "";
+  document.getElementById("outilUrl").value = "";
+  document.getElementById("outilModal").classList.add("open");
+  document.getElementById("outilNom").focus();
+}
+
+function closeOutilModal() {
+  document.getElementById("outilModal").classList.remove("open");
+}
+
+function confirmOutil() {
+  var sel = document.getElementById("outilSelect").value;
+  if (!sel) return;
+  var parts = sel.split("|");
+  var nom = parts[0];
+  var desc = parts[1];
+  var url = parts[2];
+  var ta = document.getElementById("inContent");
+  var insert = "\n\n[OUTIL:" + nom + "|" + desc + "|" + url + "]\n\n";
+  var val = ta.value;
+  ta.value = val.substring(0, _savedStart) + insert + val.substring(_savedEnd);
+  ta.focus();
+  closeOutilModal();
 }
 
 function fmtDate(str) {
