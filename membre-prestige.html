@@ -149,8 +149,34 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
 .spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--subtle);border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 
+.mob-bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--dark);border-top:1px solid rgba(255,255,255,.08);
+  padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:200;
+}
+.mob-nav-items{display:flex;justify-content:space-around}
+.mob-nav-btn{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:3px 6px;cursor:pointer;border:none;background:none;
+  color:rgba(255,255,255,.3);font-family:inherit;
+  font-size:.52rem;font-weight:500;text-transform:uppercase;letter-spacing:.03em;
+}
+.mob-nav-btn.act{color:var(--gold)}
+.mob-nav-btn .ico{font-size:1.15rem}
+
+.mob-topbar{
+  display:none;background:var(--dark);height:50px;
+  padding:0 16px;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;
+}
+.mob-topbar-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:1rem}
+
 @media(max-width:768px){
-  .page{padding:1rem}
+  nav{display:none}
+  .mob-topbar{display:flex}
+  .mob-bottom-nav{display:block}
+  .page{padding:1rem 14px 90px}
+
   .stats-grid{grid-template-columns:repeat(2,1fr) !important;gap:8px}
   .hero-top{flex-direction:row;align-items:center}
   .level-badge{width:60px;height:60px;font-size:1.8rem}
@@ -171,6 +197,12 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <button class="btn-sm" id="logoutBtn">Déconnexion</button>
   </div>
 </nav>
+
+<!-- TOPBAR MOBILE -->
+<div class="mob-topbar">
+  <a href="index.html" class="mob-topbar-logo">Start Business World</a>
+  <button id="logoutBtnMob" style="background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);padding:3px 10px;border-radius:4px;font-size:.7rem;cursor:pointer;font-family:inherit">✕</button>
+</div>
 
 <div class="page">
 
@@ -289,6 +321,9 @@ var REWARDS = [
 ];
 
 async function init() {
+  var lbm = document.getElementById("logoutBtnMob");
+  if (lbm) lbm.onclick = async function() { await SB.auth.signOut(); window.location.href = "client-login.html"; };
+
   var s = await SB.auth.getSession();
   if (!s.data.session) { window.location.href = "client-login.html"; return; }
   user = s.data.session.user;
@@ -483,5 +518,26 @@ function escHtml(t) {
 
 init();
 </script>
+<!-- BOTTOM NAV MOBILE -->
+<div class="mob-bottom-nav">
+  <div class="mob-nav-items">
+    <button class="mob-nav-btn" onclick="window.location.href='client-dashboard.html'">
+      <span class="ico">🏠</span><span>Accueil</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-formations.html'">
+      <span class="ico">🎓</span><span>Formations</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-chat.html'">
+      <span class="ico">💬</span><span>Chat</span>
+    </button>
+    <button class="mob-nav-btn act">
+      <span class="ico">⭐</span><span>Prestige</span>
+    </button>
+    <button class="mob-nav-btn" onclick="window.location.href='membre-affiliation.html'">
+      <span class="ico">💸</span><span>Affil.</span>
+    </button>
+  </div>
+</div>
+
 </body>
 </html>
