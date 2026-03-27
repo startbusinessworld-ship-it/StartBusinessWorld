@@ -1371,7 +1371,7 @@
         var a = filtered[i];
         var isFeatured = (i === 0 && currentTheme === "all");
         var firstCat = (a.category || "").split(",")[0].trim();
-        var link = a.slug ? a.slug + ".html" : "article.html";
+        var link = "article.html?id=" + a.id;
 
         var card = document.createElement("div");
         card.className = "article" + (isFeatured ? " featured" : "");

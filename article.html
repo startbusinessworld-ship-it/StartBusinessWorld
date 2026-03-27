@@ -1063,5 +1063,79 @@
       });
     })();
   </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    var SB = supabase.createClient(
+      "https://grwimhqsthcmfwblwdwg.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+    );
+
+    async function loadArticle() {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get("id");
+      if (!id) return;
+
+      var res = await SB.from("articles").select("*").eq("id", id).single();
+      var a = res.data;
+      if (!a) return;
+
+      // Titre
+      var h1 = document.querySelector(".article-header h1");
+      if (h1) h1.textContent = a.title;
+
+      // Catégorie
+      var cat = document.querySelector(".article-cat");
+      if (cat) cat.textContent = (a.category || "").split(",")[0].trim();
+
+      // Deck
+      var deck = document.querySelector(".article-deck");
+      if (deck) deck.textContent = a.deck || "";
+
+      // Contenu
+      var body = document.querySelector(".prose");
+      if (body && a.content) {
+        // Convertir les sauts de ligne en paragraphes
+        var paragraphs = a.content.split("\n\n");
+        body.innerHTML = "";
+        for (var i = 0; i < paragraphs.length; i++) {
+          if (paragraphs[i].trim()) {
+            var p = document.createElement("p");
+            p.textContent = paragraphs[i].trim();
+            body.appendChild(p);
+          }
+        }
+      }
+
+      // Vidéo YouTube
+      var ytWrap = document.querySelector(".video-embed");
+      if (ytWrap) {
+        if (a.youtube_id) {
+          ytWrap.innerHTML = "";
+          var iframe = document.createElement("iframe");
+          iframe.src = "https://www.youtube.com/embed/" + a.youtube_id;
+          iframe.style.cssText = "width:100%;aspect-ratio:16/9;border:none;border-radius:8px;display:block";
+          iframe.setAttribute("allowfullscreen", "");
+          iframe.setAttribute("allow", "autoplay; encrypted-media");
+          ytWrap.appendChild(iframe);
+        } else {
+          ytWrap.style.display = "none";
+        }
+      }
+
+      // Date
+      var dateEl = document.querySelector(".article-date");
+      if (dateEl && a.created_at) {
+        var d = new Date(a.created_at);
+        dateEl.textContent = d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+      }
+
+      // Meta title
+      document.title = a.title + " — Start Business World";
+    }
+
+    loadArticle();
+  </script>
+
 </body>
 </html>
