@@ -340,7 +340,7 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-label">Mon espace</div>
-      <div class="nav-item active" onclick="showSection('dashboard')">
+      <div class="nav-item active" onclick="showSection('dashboard', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
         Tableau de bord
       </div>
@@ -349,21 +349,21 @@
         Formations
         <span class="nav-badge-new">30</span>
       </div>
-      <div class="nav-item" onclick="showSection('articles')">
+      <div class="nav-item" onclick="showSection('articles', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
         Articles & Ressources
       </div>
       <div class="nav-label">Communauté</div>
-      <div class="nav-item" onclick="showSection('communaute')">
+      <div class="nav-item" onclick="showSection('communaute', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/><path d="M11 3c1.5.5 2.5 1.9 2.5 3.5S12.5 9.5 11 10"/><path d="M13 14c1-1 2-2 2-4"/></svg>
         Groupe d'entraide
       </div>
-      <div class="nav-item" onclick="showSection('bonsplans')">
+      <div class="nav-item" onclick="showSection('bonsplans', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
         Bons Plans membres
       </div>
       <div class="nav-label">Mon compte</div>
-      <div class="nav-item" onclick="showSection('compte')">
+      <div class="nav-item" onclick="showSection('compte', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
         Profil & Abonnement
       </div>
@@ -553,7 +553,7 @@
               <div class="sub-plan">Club <i>SBW</i></div>
               <div class="sub-price" id="subPrice">1€<small>/mois</small></div>
               <div class="sub-renewal" id="subRenewal">Période d'essai · 3 mois</div>
-              <div class="sub-btn" onclick="showSection('compte')">Gérer mon abonnement</div>
+              <div class="sub-btn" onclick="showSection('compte', this)">Gérer mon abonnement</div>
             </div>
 
             <!-- COMMUNAUTÉ -->
@@ -579,7 +579,7 @@
             <div class="card">
               <div class="card-head">
                 <div class="card-title">Bons Plans du moment</div>
-                <div class="card-link" onclick="showSection('bonsplans')">Voir tout →</div>
+                <div class="card-link" onclick="showSection('bonsplans', this)">Voir tout →</div>
               </div>
               <div class="deal-row">
                 <div class="deal-icon">💳</div>
@@ -750,23 +750,23 @@
     document.getElementById('statPlan').textContent = currentMember?.plan === 'trial' ? 'Période d\'essai' : 'Membre actif'
   }
 
-  function showSection(name) {
+  function showSection(name, el) {
     const sections = ['Dashboard', 'Formations', 'Articles', 'Communaute', 'Bonsplans', 'Compte']
     sections.forEach(s => {
-      const el = document.getElementById('section' + s)
-      if (el) el.style.display = 'none'
+      const elem = document.getElementById('section' + s)
+      if (elem) elem.style.display = 'none'
     })
     const target = document.getElementById('section' + name.charAt(0).toUpperCase() + name.slice(1))
     if (target) target.style.display = 'block'
 
-    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'))
-    event?.currentTarget?.classList.add('active')
+    document.querySelectorAll('.nav-item').forEach(e => e.classList.remove('active'))
+    if (el) el.classList.add('active')
 
     const titles = {
       dashboard: ['Tableau de bord', 'Bienvenue dans le Club SBW'],
       formations: ['Formations', 'Tous tes modules vidéo'],
       articles: ['Articles & Ressources', 'Le blog Start Business World'],
-      communaute: ['Groupe d\'entraide', 'La communauté des membres'],
+      communaute: ["Groupe d'entraide", 'La communauté des membres'],
       bonsplans: ['Bons Plans', 'Offres exclusives membres'],
       compte: ['Mon compte', 'Profil & abonnement']
     }
