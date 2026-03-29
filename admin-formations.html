@@ -3,93 +3,79 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formations — SBW Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Formations \u2014 SBW Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>const PAGE_ID = 'articles'</script>
 <link rel="stylesheet" href="admin.css">
 <style>
-.f-layout {
-  display: grid;
-  grid-template-columns: 260px 1fr 380px;
-  height: calc(100vh - 109px);
-  overflow: hidden;
-}
-.f-col { overflow-y: auto; }
-.f-col-border { border-right: 0.5px solid var(--subtle); }
+.formations-layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; height: calc(100vh - 54px); overflow: hidden; }
+.formations-sidebar { border-right: 0.5px solid var(--subtle); overflow-y: auto; }
+.formations-main { overflow-y: auto; padding: 0; }
 
-/* COL 1 */
-.f-col1-head { padding: 12px 16px; border-bottom: 0.5px solid var(--subtle); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--bg); z-index: 2; }
-.f-col1-label { font-size: 0.68rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
-.f-item { padding: 12px 16px; cursor: pointer; border-bottom: 0.5px solid var(--subtle); transition: background 0.1s; }
+/* Sidebar formations */
+.f-sidebar-head { padding: 16px; border-bottom: 0.5px solid var(--subtle); display: flex; align-items: center; justify-content: space-between; }
+.f-sidebar-title { font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
+.f-list { padding: 8px; }
+.f-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.12s; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .f-item:hover { background: var(--surface); }
-.f-item.active { background: var(--ink); }
-.f-item-name { font-size: 0.85rem; font-weight: 500; margin-bottom: 3px; }
-.f-item.active .f-item-name { color: #fff; }
-.f-item-sub { font-size: 0.7rem; color: var(--muted); display: flex; gap: 6px; }
-.f-item.active .f-item-sub { color: rgba(255,255,255,0.4); }
-.pill-pub { background: rgba(39,80,10,0.12); color: #27500A; padding: 1px 7px; border-radius: 20px; font-size: 0.62rem; font-weight: 500; }
-.pill-draft { background: var(--surface); color: var(--muted); padding: 1px 7px; border-radius: 20px; font-size: 0.62rem; }
+.f-item.active { background: var(--ink); color: #fff; }
+.f-item-name { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.f-item-meta { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
+.f-item.active .f-item-meta { color: rgba(255,255,255,0.45); }
+.f-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
 
-/* COL 2 */
-.f-col2-head { padding: 16px 20px 12px; border-bottom: 0.5px solid var(--subtle); position: sticky; top: 0; background: var(--bg); z-index: 2; }
-.f-formation-title { font-size: 1rem; font-weight: 500; margin-bottom: 2px; }
-.f-formation-meta { font-size: 0.72rem; color: var(--muted); display: flex; gap: 10px; }
-.f-col2-empty, .f-col3-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 80%; color: var(--muted); gap: 8px; font-size: 0.85rem; text-align: center; padding: 2rem; }
-.f-col2-empty svg, .f-col3-empty svg { opacity: 0.15; }
+/* Main panel */
+.f-main-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 1rem; color: var(--muted); }
+.f-main-empty svg { opacity: 0.2; }
 
-/* MODULES */
-.module-block { border-bottom: 0.5px solid var(--subtle); }
-.module-header { padding: 12px 20px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; background: var(--surface); }
-.module-header:hover { background: #EDEDEB; }
-.mod-arrow { font-size: 0.65rem; color: var(--muted); transition: transform 0.2s; width: 12px; flex-shrink: 0; }
-.mod-arrow.open { transform: rotate(90deg); }
-.mod-num { font-size: 0.68rem; font-weight: 500; color: var(--muted); width: 28px; flex-shrink: 0; }
-.mod-title { font-size: 0.88rem; font-weight: 500; flex: 1; }
-.mod-count { font-size: 0.7rem; color: var(--muted); flex-shrink: 0; }
-.mod-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
-.module-header:hover .mod-actions { opacity: 1; }
-.module-lessons { display: none; }
-.module-lessons.open { display: block; }
-.lecon-row { padding: 9px 20px 9px 50px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.1s; border-bottom: 0.5px solid rgba(0,0,0,0.04); }
-.lecon-row:hover { background: var(--surface); }
-.lecon-row.selected { background: rgba(192,57,43,0.06); border-left: 2px solid var(--red); }
-.lecon-num2 { font-size: 0.68rem; color: var(--muted); width: 20px; flex-shrink: 0; }
-.lecon-title2 { font-size: 0.83rem; flex: 1; }
-.lecon-badge { font-size: 0.62rem; padding: 2px 6px; border-radius: 3px; background: rgba(192,57,43,0.1); color: var(--red); flex-shrink: 0; }
-.lecon-dur2 { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
-.lecon-actions { display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
-.lecon-row:hover .lecon-actions { opacity: 1; }
-.add-lecon-btn { padding: 8px 20px 8px 50px; font-size: 0.78rem; color: var(--muted); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: background 0.1s; border: none; background: none; width: 100%; text-align: left; }
-.add-lecon-btn:hover { background: var(--surface); color: var(--ink); }
+/* Formation editor */
+.f-editor { padding: 24px; }
+.f-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--subtle); }
+.f-editor-title-row { flex: 1; }
+.f-editor-title { font-size: 1.1rem; font-weight: 500; }
+.f-editor-status { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
 
-/* COL 3 EDITEUR */
-.lecon-editor { padding: 20px; }
-.lecon-editor-head { margin-bottom: 16px; padding-bottom: 12px; border-bottom: 0.5px solid var(--subtle); display: flex; align-items: center; justify-content: space-between; }
-.lecon-editor-title { font-size: 0.9rem; font-weight: 500; }
-.video-player { width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden; background: #1C1C1A; margin-bottom: 16px; position: relative; cursor: pointer; }
-.video-player img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); }
-.play-btn-big { width: 52px; height: 52px; background: #C0392B; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
-.play-btn-big div { width: 0; height: 0; border-style: solid; border-width: 10px 0 10px 18px; border-color: transparent transparent transparent #fff; margin-left: 4px; }
-.no-video { width: 100%; aspect-ratio: 16/9; border-radius: 8px; background: var(--surface); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; margin-bottom: 16px; color: var(--muted); font-size: 0.8rem; border: 1px dashed var(--subtle); }
+/* Modules */
+.modules-section { margin-bottom: 24px; }
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.section-label { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
 
-.field { margin-bottom: 12px; }
-.field label { display: block; font-size: 0.68rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
-.field input, .field select, .field textarea { width: 100%; padding: 8px 10px; border: 0.5px solid var(--subtle); border-radius: 6px; font-size: 0.83rem; font-family: "DM Sans", sans-serif; background: var(--bg); color: var(--ink); outline: none; }
-.field input:focus, .field textarea:focus { border-color: var(--ink); }
-.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+.module-card { border: 0.5px solid var(--subtle); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
+.module-head { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--surface); transition: background 0.12s; }
+.module-head:hover { background: var(--subtle); }
+.module-chevron { transition: transform 0.2s; font-size: 0.7rem; color: var(--muted); }
+.module-chevron.open { transform: rotate(90deg); }
+.module-name { font-size: 0.88rem; font-weight: 500; flex: 1; }
+.module-count { font-size: 0.7rem; color: var(--muted); }
+.module-actions { display: flex; gap: 4px; }
+.module-body { display: none; padding: 8px; background: var(--bg); }
+.module-body.open { display: block; }
 
-.editor-toolbar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 6px; }
-.editor-toolbar button { padding: 4px 9px; border-radius: 4px; border: 0.5px solid var(--subtle); background: var(--bg); color: var(--ink); font-size: 0.72rem; cursor: pointer; font-family: "DM Sans", sans-serif; transition: all 0.1s; }
-.editor-toolbar button:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+/* Le\u00e7ons */
+.lecon-item { padding: 10px 12px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.12s; }
+.lecon-item:hover { background: var(--surface); }
+.lecon-num { font-size: 0.68rem; color: var(--muted); width: 20px; flex-shrink: 0; }
+.lecon-title { font-size: 0.83rem; flex: 1; }
+.lecon-yt { font-size: 0.68rem; color: var(--red); }
+.lecon-dur { font-size: 0.68rem; color: var(--muted); }
+.lecon-add { padding: 8px 12px; font-size: 0.78rem; color: var(--muted); cursor: pointer; border-radius: 6px; border: none; background: none; width: 100%; text-align: left; transition: background 0.12s; }
+.lecon-add:hover { background: var(--surface); color: var(--ink); }
 
 /* MODALES */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
-.overlay.on { display: flex; align-items: center; justify-content: center; padding: 20px; }
-.modal-box { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 460px; border: 0.5px solid var(--subtle); }
-.modal-head { font-size: 0.95rem; font-weight: 500; margin-bottom: 16px; }
+.overlay.on { display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
+.modal-box { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 540px; border: 0.5px solid var(--subtle); margin: auto; }
+.modal-head { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
+.field { margin-bottom: 12px; }
+.field label { display: block; font-size: 0.7rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.field input, .field select, .field textarea { width: 100%; padding: 8px 12px; border: 0.5px solid var(--subtle); border-radius: 6px; font-size: 0.85rem; font-family: "DM Sans", sans-serif; background: var(--bg); color: var(--ink); outline: none; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
+.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
 .btn-row { display: flex; gap: 8px; margin-top: 16px; }
+
+/* Le\u00e7on editor panel */
+.lecon-panel { border-left: 0.5px solid var(--subtle); }
 </style>
 </head>
 <body>
@@ -120,12 +106,12 @@
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
         Newsletter
       </a>
-      <div class="nav-section">Communauté</div>
+      <div class="nav-section">Communaut\u00e9</div>
       <a href="admin-members.html" class="nav-item" data-access="members">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
         Membres Club
       </a>
-      <div class="nav-section">Monétisation</div>
+      <div class="nav-section">Mon\u00e9tisation</div>
       <a href="admin-revenue.html" class="nav-item" data-access="revenue">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
         Revenus
@@ -137,54 +123,42 @@
       <div class="nav-section">Admin</div>
       <a href="admin-team.html" class="nav-item" data-access="team">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
-        Équipe
+        \u00c9quipe
       </a>
       <a href="admin-settings.html" class="nav-item" data-access="settings">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
-        Paramètres
+        Param\u00e8tres
       </a>
     </nav>
   </div>
   <div id="userInfo"></div>
 </aside>
 
-<main class="main-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
-  <div class="topbar" style="padding:0 24px;flex-shrink:0">
+<main class="main-content" style="padding:0;overflow:hidden">
+  <div class="topbar" style="padding:0 24px">
     <div>
-      <h1 class="page-title">Formations Club SBW</h1>
-      <div class="page-date" id="countLine">—</div>
+      <h1 class="page-title">Formations</h1>
+      <div class="page-date" id="countLine">\u2014</div>
     </div>
     <div class="topbar-actions">
       <button class="btn-primary" id="addFormationBtn">+ Nouvelle formation</button>
     </div>
   </div>
 
-  <div class="f-layout">
-    <!-- COL 1 : LISTE FORMATIONS -->
-    <div class="f-col f-col-border">
-      <div class="f-col1-head">
-        <span class="f-col1-label">Mes formations</span>
-      </div>
-      <div id="formationsList">
-        <div style="padding:1.5rem;color:var(--muted);font-size:0.82rem">Chargement...</div>
+  <div class="formations-layout">
+    <!-- SIDEBAR FORMATIONS -->
+    <div class="formations-sidebar">
+      <div class="f-list" id="formationsList">
+        <div class="f-empty">Chargement...</div>
       </div>
     </div>
 
-    <!-- COL 2 : MODULES & LEÇONS -->
-    <div class="f-col f-col-border" id="col2">
-      <div class="f-col2-empty">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
-        <div>Sélectionne une formation</div>
-        <div style="font-size:0.75rem">pour gérer ses modules et leçons</div>
-      </div>
-    </div>
-
-    <!-- COL 3 : ÉDITEUR LEÇON -->
-    <div class="f-col" id="col3">
-      <div class="f-col3-empty">
-        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <div>Clique sur une leçon</div>
-        <div style="font-size:0.75rem">pour l'éditer ici</div>
+    <!-- PANEL PRINCIPAL -->
+    <div class="formations-main" id="formationsMain">
+      <div class="f-main-empty">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
+        <div>S\u00e9lectionne une formation</div>
+        <div style="font-size:0.78rem">ou cr\u00e9e-en une nouvelle</div>
       </div>
     </div>
   </div>
@@ -194,19 +168,25 @@
 <!-- MODAL FORMATION -->
 <div class="overlay" id="overlayFormation">
   <div class="modal-box">
-    <div class="modal-head" id="mfHead">Nouvelle formation</div>
-    <div class="field"><label>Titre *</label><input type="text" id="fTitle" placeholder="Ex: Sourcer en Chine — Masterclass"></div>
-    <div class="field"><label>Description</label><textarea id="fDesc" rows="3" placeholder="Ce que les membres vont apprendre..."></textarea></div>
+    <div class="modal-head" id="modalFormationHead">Nouvelle formation</div>
+    <div class="field">
+      <label>Titre *</label>
+      <input type="text" id="fTitle" placeholder="Ex: Sourcer en Chine \u2014 Masterclass compl\u00e8te">
+    </div>
+    <div class="field">
+      <label>Description</label>
+      <textarea id="fDesc" rows="3" placeholder="Ce que les membres vont apprendre..."></textarea>
+    </div>
     <div class="field">
       <label>Statut</label>
       <select id="fStatus">
-        <option value="draft">Brouillon</option>
-        <option value="published">Publié — visible aux membres</option>
+        <option value="draft">Brouillon \u2014 non visible</option>
+        <option value="published">Publi\u00e9 \u2014 visible aux membres</option>
       </select>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" style="flex:1" onclick="closeModal('overlayFormation')">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" id="saveFormationBtn">Créer</button>
+      <button class="btn-ghost" style="flex:1" id="cancelFormationBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveFormationBtn">Cr\u00e9er</button>
     </div>
   </div>
 </div>
@@ -214,11 +194,64 @@
 <!-- MODAL MODULE -->
 <div class="overlay" id="overlayModule">
   <div class="modal-box">
-    <div class="modal-head" id="mmHead">Nouveau module</div>
-    <div class="field"><label>Titre du module *</label><input type="text" id="mTitle" placeholder="Ex: Les bases du sourcing"></div>
+    <div class="modal-head" id="modalModuleHead">Nouveau module</div>
+    <div class="field">
+      <label>Titre du module *</label>
+      <input type="text" id="mTitle" placeholder="Ex: Les bases du sourcing">
+    </div>
     <div class="btn-row">
-      <button class="btn-ghost" style="flex:1" onclick="closeModal('overlayModule')">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" id="saveModuleBtn">Créer</button>
+      <button class="btn-ghost" style="flex:1" id="cancelModuleBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveModuleBtn">Cr\u00e9er</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LEÇON -->
+<div class="overlay" id="overlayLecon">
+  <div class="modal-box" style="max-width:600px">
+    <div class="modal-head" id="modalLeconHead">Nouvelle leçon</div>
+    <div class="field">
+      <label>Titre *</label>
+      <input type="text" id="lTitle" placeholder="Ex: Trouver un fournisseur sur Alibaba">
+    </div>
+    <div class="field">
+      <label>Type de contenu</label>
+      <div style="display:flex;gap:6px;margin-top:4px">
+        <button id="typebtn_youtube" onclick="switchLeconType('youtube')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.78rem;font-family:inherit;cursor:pointer;font-weight:500">&#9654; Vidéo YouTube</button>
+        <button id="typebtn_html" onclick="switchLeconType('html')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#9889; Animation HTML</button>
+        <button id="typebtn_text" onclick="switchLeconType('text')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#128221; Texte seulement</button>
+      </div>
+    </div>
+    <div class="field" id="fieldYoutube">
+      <label>URL ou ID YouTube</label>
+      <input type="text" id="lYoutube" placeholder="https://youtu.be/ABC123 ou ABC123">
+    </div>
+    <div class="field" id="fieldHtml" style="display:none">
+      <label>Code HTML de l'animation</label>
+      <div style="display:flex;gap:6px;margin-bottom:6px">
+        <button onclick="document.getElementById('lHtmlFile').click()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">Importer .html</button>
+        <input type="file" id="lHtmlFile" accept=".html" style="display:none" onchange="importHtmlFile(this)">
+        <button onclick="previewHtmlModal()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">Prévisualiser</button>
+      </div>
+      <textarea id="lHtmlContent" rows="7" placeholder="Colle ici le code HTML complet..." style="font-family:monospace;font-size:.72rem"></textarea>
+      <div id="htmlPreviewBox" style="display:none;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin-top:8px;border:.5px solid var(--subtle)">
+        <iframe id="htmlPreviewFrame" style="width:100%;height:100%;border:none" sandbox="allow-scripts"></iframe>
+      </div>
+    </div>
+    <div id="fieldTextOnly" style="display:none;padding:8px 12px;background:var(--surface);border-radius:6px;font-size:.78rem;color:var(--muted);margin-bottom:4px">
+      Cette leçon ne contiendra que du texte. Utilise la zone Notes ci-dessous.
+    </div>
+    <div class="field">
+      <label>Durée (minutes)</label>
+      <input type="number" id="lDuration" placeholder="10" min="1">
+    </div>
+    <div class="field">
+      <label>Notes & Ressources</label>
+      <textarea id="lContent" rows="5" placeholder="Texte de la leçon, notes, ressources..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn-ghost" style="flex:1" id="cancelLeconBtn">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="saveLeconBtn">Enregistrer</button>
     </div>
   </div>
 </div>
@@ -230,71 +263,80 @@
 var formations = [];
 var currentFormation = null;
 var modules = [];
-var currentLecon = null;
 var editFormationId = null;
 var editModuleId = null;
+var editLeconId = null;
 var currentModuleId = null;
-var openModules = {};
 
+// =====================
+// INIT
+// =====================
 initAuth().then(function(profile) {
   if (!profile) return;
   loadFormations();
+
   document.getElementById('addFormationBtn').addEventListener('click', function() { openFormationModal(null); });
+  document.getElementById('cancelFormationBtn').addEventListener('click', function() { closeOverlay('overlayFormation'); });
   document.getElementById('saveFormationBtn').addEventListener('click', saveFormation);
+  document.getElementById('cancelModuleBtn').addEventListener('click', function() { closeOverlay('overlayModule'); });
   document.getElementById('saveModuleBtn').addEventListener('click', saveModule);
-  document.querySelectorAll('.overlay').forEach(function(el) {
-    el.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+  document.getElementById('cancelLeconBtn').addEventListener('click', function() { closeOverlay('overlayLecon'); });
+  document.getElementById('saveLeconBtn').addEventListener('click', saveLecon);
+
+  ['overlayFormation','overlayModule','overlayLecon'].forEach(function(id) {
+    document.getElementById(id).addEventListener('click', function(e) {
+      if (e.target === this) closeOverlay(id);
+    });
   });
 });
 
-// ── FORMATIONS ──
+// =====================
+// FORMATIONS
+// =====================
 async function loadFormations() {
   var res = await sb.from('formations').select('*').order('position').order('created_at');
   formations = res.data || [];
-  var n = formations.length;
-  document.getElementById('countLine').textContent = n + ' formation' + (n > 1 ? 's' : '');
+  document.getElementById('countLine').textContent = formations.length + ' formation' + (formations.length > 1 ? 's' : '');
   renderFormationsList();
 }
 
 function renderFormationsList() {
   var el = document.getElementById('formationsList');
   if (!formations.length) {
-    el.innerHTML = '<div style="padding:2rem;color:var(--muted);font-size:0.82rem;text-align:center">Aucune formation.<br>Crée-en une !</div>';
+    el.innerHTML = '<div class="f-empty">Aucune formation.<br>Cr\u00e9e-en une !</div>';
     return;
   }
   el.innerHTML = '';
   formations.forEach(function(f) {
-    var div = document.createElement('div');
-    div.className = 'f-item' + (currentFormation && currentFormation.id === f.id ? ' active' : '');
-    var pill = f.status === 'published' ? '<span class="pill-pub">Publié</span>' : '<span class="pill-draft">Brouillon</span>';
-    div.innerHTML = '<div class="f-item-name">' + f.title + '</div><div class="f-item-sub">' + pill + '</div>';
-    div.addEventListener('click', function() { selectFormation(f); });
-    el.appendChild(div);
+    var item = document.createElement('div');
+    item.className = 'f-item' + (currentFormation && currentFormation.id === f.id ? ' active' : '');
+    var pill = f.status === 'published' ? '\ud83d\udfe2' : '\u26aa';
+    item.innerHTML = '<span class="f-item-name">' + f.title + '</span><span class="f-item-meta">' + pill + '</span>';
+    item.addEventListener('click', function() { selectFormation(f); });
+    el.appendChild(item);
   });
 }
 
 function selectFormation(f) {
   currentFormation = f;
-  currentLecon = null;
   renderFormationsList();
   loadModules(f.id);
-  renderCol3Empty();
 }
 
 function openFormationModal(f) {
   editFormationId = f ? f.id : null;
-  document.getElementById('mfHead').textContent = f ? 'Modifier la formation' : 'Nouvelle formation';
+  document.getElementById('modalFormationHead').textContent = f ? 'Modifier la formation' : 'Nouvelle formation';
   document.getElementById('fTitle').value = f ? f.title : '';
   document.getElementById('fDesc').value = f ? (f.description || '') : '';
   document.getElementById('fStatus').value = f ? f.status : 'draft';
-  document.getElementById('saveFormationBtn').textContent = f ? 'Mettre à jour' : 'Créer';
-  openModal('overlayFormation');
-  setTimeout(function() { document.getElementById('fTitle').focus(); }, 100);
+  document.getElementById('saveFormationBtn').textContent = f ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
+  openOverlay('overlayFormation');
+  document.getElementById('fTitle').focus();
 }
 
 async function saveFormation() {
   var title = document.getElementById('fTitle').value.trim();
-  if (!title) { showToast('Titre obligatoire.', 'error'); return; }
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
   var data = {
     title: title,
     description: document.getElementById('fDesc').value.trim(),
@@ -303,109 +345,113 @@ async function saveFormation() {
   var res;
   if (editFormationId) {
     res = await sb.from('formations').update(data).eq('id', editFormationId);
-    if (currentFormation && currentFormation.id === editFormationId) currentFormation = Object.assign({}, currentFormation, data);
   } else {
     data.position = formations.length;
-    res = await sb.from('formations').insert(data).select();
+    res = await sb.from('formations').insert(data);
   }
   if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(editFormationId ? 'Formation mise à jour !' : 'Formation créée !', 'success');
-  closeModal('overlayFormation');
+  showToast(editFormationId ? 'Formation mise \u00e0 jour !' : 'Formation cr\u00e9\u00e9e !', 'success');
+  closeOverlay('overlayFormation');
   await loadFormations();
-  if (!editFormationId && res.data && res.data[0]) selectFormation(res.data[0]);
+  if (!editFormationId && formations.length) {
+    selectFormation(formations[formations.length - 1]);
+  }
 }
 
 async function deleteFormation(id) {
   if (!confirm('Supprimer cette formation et tous ses modules ?')) return;
   await sb.from('formations').delete().eq('id', id);
   currentFormation = null;
-  document.getElementById('col2').innerHTML = '<div class="f-col2-empty"><div>Supprimée.</div></div>';
-  renderCol3Empty();
+  document.getElementById('formationsMain').innerHTML = '<div class="f-main-empty"><div>Formation supprim\u00e9e</div></div>';
   loadFormations();
-  showToast('Supprimée.', 'success');
+  showToast('Supprim\u00e9e.', 'success');
 }
 
-// ── MODULES ──
+// =====================
+// MODULES
+// =====================
 async function loadModules(formationId) {
   var res = await sb.from('modules').select('*, lecons(*)').eq('formation_id', formationId).order('position');
   modules = res.data || [];
-  modules.forEach(function(m) {
-    m.lecons = (m.lecons || []).sort(function(a, b) { return a.position - b.position; });
-    if (openModules[m.id] === undefined) openModules[m.id] = true;
-  });
-  renderCol2();
+  renderEditor();
 }
 
-function renderCol2() {
+function renderEditor() {
   if (!currentFormation) return;
   var f = currentFormation;
-  var totalL = modules.reduce(function(s, m) { return s + (m.lecons || []).length; }, 0);
+  var html = '<div class="f-editor">';
 
-  var html = '<div class="f-col2-head"><div style="display:flex;align-items:center;justify-content:space-between;gap:8px"><div>';
-  html += '<div class="f-formation-title">' + f.title + '</div>';
-  html += '<div class="f-formation-meta"><span>' + modules.length + ' module' + (modules.length > 1 ? 's' : '') + '</span><span>·</span><span>' + totalL + ' leçon' + (totalL > 1 ? 's' : '') + '</span></div>';
-  html += '</div><div style="display:flex;gap:5px">';
-  html += '<button class="row-action" onclick="openFormationModal(currentFormation)">✏️</button>';
-  html += '<button class="row-action" style="color:var(--red)" onclick="deleteFormation(\'' + f.id + '\')">Suppr.</button>';
-  html += '</div></div></div>';
+  // Header
+  html += '<div class="f-editor-head">';
+  html += '<div class="f-editor-title-row">';
+  html += '<div class="f-editor-title">' + f.title + '</div>';
+  html += '<div class="f-editor-status">' + (f.status === 'published' ? '\ud83d\udfe2 Publi\u00e9e' : '\u26aa Brouillon') + ' \u00b7 ' + modules.length + ' module' + (modules.length > 1 ? 's' : '') + '</div>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:6px">';
+  html += '<button class="row-action" onclick="openFormationModal(currentFormation)">\u270f\ufe0f Modifier</button>';
+  html += '<button class="row-action" style="color:var(--red)" onclick="deleteFormation(\'' + f.id + '\')">Supprimer</button>';
+  html += '</div></div>';
+
+  // Modules
+  html += '<div class="modules-section">';
+  html += '<div class="section-head"><span class="section-label">Modules</span>';
+  html += '<button class="btn-primary" style="font-size:0.75rem;padding:5px 12px" onclick="openModuleModal(null)">+ Module</button>';
+  html += '</div>';
 
   if (!modules.length) {
-    html += '<div style="padding:3rem;text-align:center;font-size:0.85rem"><div style="font-weight:500;margin-bottom:6px">Formation créée !</div><div style="color:var(--muted);margin-bottom:16px;font-size:0.78rem">Ajoute maintenant ton premier module</div><button class="btn-primary" onclick="openModuleModal(null)" style="justify-content:center">+ Créer le premier module</button></div>';
+    html += '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;border:1px dashed var(--subtle);border-radius:8px">Aucun module \u2014 commence par en cr\u00e9er un</div>';
   } else {
     modules.forEach(function(m, mi) {
       var lecons = m.lecons || [];
-      var isOpen = openModules[m.id] !== false;
-      html += '<div class="module-block">';
-      html += '<div class="module-header" onclick="toggleMod(\'' + m.id + '\')">';
-      html += '<span class="mod-arrow' + (isOpen ? ' open' : '') + '" id="arr_' + m.id + '">▶</span>';
-      html += '<span class="mod-num">M' + String(mi + 1).padStart(2, '0') + '</span>';
-      html += '<span class="mod-title">' + m.title + '</span>';
-      html += '<span class="mod-count">' + lecons.length + ' leçon' + (lecons.length > 1 ? 's' : '') + '</span>';
-      html += '<div class="mod-actions" onclick="event.stopPropagation()">';
-      html += '<button class="row-action" onclick="openModuleModal(' + JSON.stringify(m).replace(/"/g, '&quot;') + ')">✏️</button>';
-      html += '<button class="row-action" style="color:var(--red)" onclick="deleteModule(\'' + m.id + '\')">✕</button>';
+      html += '<div class="module-card">';
+      html += '<div class="module-head" onclick="toggleModule(\'mod' + mi + '\')">';
+      html += '<span class="module-chevron" id="chev' + mi + '">\u25b6</span>';
+      html += '<span class="module-name">' + m.title + '</span>';
+      html += '<span class="module-count">' + lecons.length + ' le\u00e7on' + (lecons.length > 1 ? 's' : '') + '</span>';
+      html += '<div class="module-actions" onclick="event.stopPropagation()">';
+      html += '<button class="row-action" onclick="openModuleModal(' + JSON.stringify(m).replace(/"/g, '&quot;') + ')">\u270f\ufe0f</button>';
+      html += '<button class="row-action" style="color:var(--red)" onclick="deleteModule(\'' + m.id + '\')">\u2715</button>';
       html += '</div></div>';
-      html += '<div class="module-lessons' + (isOpen ? ' open' : '') + '" id="mles_' + m.id + '">';
-      lecons.forEach(function(l, li) {
-        var sel = currentLecon && currentLecon.id === l.id;
-        html += '<div class="lecon-row' + (sel ? ' selected' : '') + '" onclick="selectLecon(' + JSON.stringify(l).replace(/"/g, '&quot;') + ', \'' + m.id + '\')">';
-        html += '<span class="lecon-num2">' + String(li + 1).padStart(2, '0') + '</span>';
-        html += '<span class="lecon-title2">' + l.title + '</span>';
-        if (l.youtube_id) html += '<span class="lecon-badge">▶ YT</span>';
-        if (l.duration_min) html += '<span class="lecon-dur2">' + l.duration_min + ' min</span>';
-        html += '<div class="lecon-actions" onclick="event.stopPropagation()">';
-        html += '<button class="row-action" style="color:var(--red)" onclick="deleteLecon(\'' + l.id + '\')">✕</button>';
-        html += '</div></div>';
+      html += '<div class="module-body" id="mod' + mi + '">';
+      lecons.sort(function(a,b) { return a.position - b.position; }).forEach(function(l, li) {
+        html += '<div class="lecon-item" onclick="openLeconModal(' + JSON.stringify(l).replace(/"/g, '&quot;') + ', \'' + m.id + '\')">';
+        html += '<span class="lecon-num">' + String(li+1).padStart(2,'0') + '</span>';
+        html += '<span class="lecon-title">' + l.title + '</span>';
+        if (l.lecon_type === 'html') html += '<span class="lecon-yt" style="color:#635BFF">&#9889; HTML</span>'; else if (l.youtube_id) html += '<span class="lecon-yt">&#9654; YouTube</span>';
+        if (l.duration_min) html += '<span class="lecon-dur">' + l.duration_min + ' min</span>';
+        html += '</div>';
       });
-      html += '<button class="add-lecon-btn" onclick="newLecon(\'' + m.id + '\')">+ Ajouter une leçon</button>';
+      html += '<button class="lecon-add" onclick="openLeconModal(null, \'' + m.id + '\')">+ Ajouter une le\u00e7on</button>';
       html += '</div></div>';
     });
-    html += '<div style="padding:12px 20px;border-top:0.5px solid var(--subtle)"><button class="btn-primary" onclick="openModuleModal(null)" style="width:100%;justify-content:center">+ Ajouter un module</button></div>';
   }
+  html += '</div></div>';
 
-  document.getElementById('col2').innerHTML = html;
+  document.getElementById('formationsMain').innerHTML = html;
 }
 
-function toggleMod(id) {
-  openModules[id] = !openModules[id];
-  var body = document.getElementById('mles_' + id);
-  var arr = document.getElementById('arr_' + id);
-  if (body) body.classList.toggle('open', openModules[id]);
-  if (arr) arr.classList.toggle('open', openModules[id]);
+function toggleModule(id) {
+  var body = document.getElementById(id);
+  var idx = id.replace('mod','');
+  var chev = document.getElementById('chev' + idx);
+  if (body) {
+    body.classList.toggle('open');
+    if (chev) chev.style.transform = body.classList.contains('open') ? 'rotate(90deg)' : '';
+  }
 }
 
 function openModuleModal(m) {
   editModuleId = m ? m.id : null;
-  document.getElementById('mmHead').textContent = m ? 'Modifier le module' : 'Nouveau module';
+  document.getElementById('modalModuleHead').textContent = m ? 'Modifier le module' : 'Nouveau module';
   document.getElementById('mTitle').value = m ? m.title : '';
-  document.getElementById('saveModuleBtn').textContent = m ? 'Mettre à jour' : 'Créer';
-  openModal('overlayModule');
-  setTimeout(function() { document.getElementById('mTitle').focus(); }, 100);
+  document.getElementById('saveModuleBtn').textContent = m ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
+  openOverlay('overlayModule');
+  document.getElementById('mTitle').focus();
 }
 
 async function saveModule() {
   var title = document.getElementById('mTitle').value.trim();
-  if (!title) { showToast('Titre obligatoire.', 'error'); return; }
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
   var res;
   if (editModuleId) {
     res = await sb.from('modules').update({ title: title }).eq('id', editModuleId);
@@ -413,153 +459,122 @@ async function saveModule() {
     res = await sb.from('modules').insert({ title: title, formation_id: currentFormation.id, position: modules.length });
   }
   if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(editModuleId ? 'Module mis à jour !' : 'Module créé !', 'success');
-  closeModal('overlayModule');
+  showToast(editModuleId ? 'Module mis \u00e0 jour !' : 'Module cr\u00e9\u00e9 !', 'success');
+  closeOverlay('overlayModule');
   loadModules(currentFormation.id);
 }
 
 async function deleteModule(id) {
-  if (!confirm('Supprimer ce module et ses leçons ?')) return;
+  if (!confirm('Supprimer ce module et ses le\u00e7ons ?')) return;
   await sb.from('modules').delete().eq('id', id);
   loadModules(currentFormation.id);
-  showToast('Module supprimé.', 'success');
+  showToast('Module supprim\u00e9.', 'success');
 }
 
-// ── LEÇONS ──
-function selectLecon(l, moduleId) {
-  currentLecon = l;
+// =====================
+// LE\u00c7ONS
+// =====================
+function openLeconModal(l, moduleId) {
+  editLeconId = l ? l.id : null;
   currentModuleId = moduleId;
-  renderCol2();
-  renderLeconEditor(l);
+  document.getElementById('modalLeconHead').textContent = l ? 'Modifier la leçon' : 'Nouvelle leçon';
+  document.getElementById('lTitle').value = l ? l.title : '';
+  document.getElementById('lYoutube').value = l ? (l.youtube_id || '') : '';
+  document.getElementById('lDuration').value = l ? (l.duration_min || '') : '';
+  document.getElementById('lContent').value = l ? (l.content || '') : '';
+  document.getElementById('lHtmlContent').value = l ? (l.html_content || '') : '';
+  document.getElementById('htmlPreviewBox').style.display = 'none';
+  document.getElementById('saveLeconBtn').textContent = l ? 'Mettre à jour' : 'Ajouter';
+  switchLeconType(l ? (l.lecon_type || 'youtube') : 'youtube');
+  openOverlay('overlayLecon');
+  document.getElementById('lTitle').focus();
 }
 
-function newLecon(moduleId) {
-  currentModuleId = moduleId;
-  currentLecon = null;
-  renderLeconEditor(null);
+function switchLeconType(type) {
+  ['youtube','html','text'].forEach(function(t) {
+    var btn = document.getElementById('typebtn_' + t);
+    if (!btn) return;
+    btn.style.background = t === type ? 'var(--ink)' : 'var(--bg)';
+    btn.style.color = t === type ? '#fff' : 'var(--muted)';
+    btn.style.borderColor = t === type ? 'var(--ink)' : 'var(--subtle)';
+    btn.style.fontWeight = t === type ? '500' : '400';
+  });
+  document.getElementById('fieldYoutube').style.display = type === 'youtube' ? 'block' : 'none';
+  document.getElementById('fieldHtml').style.display = type === 'html' ? 'block' : 'none';
+  document.getElementById('fieldTextOnly').style.display = type === 'text' ? 'block' : 'none';
 }
 
-function renderLeconEditor(l) {
-  var ytId = l ? (l.youtube_id || '') : '';
-  var html = '<div class="lecon-editor">';
-  html += '<div class="lecon-editor-head"><div class="lecon-editor-title">' + (l ? 'Modifier la leçon' : 'Nouvelle leçon') + '</div>';
-  if (l) html += '<button class="row-action" style="color:var(--red)" onclick="deleteLecon(\'' + l.id + '\')">Supprimer</button>';
-  html += '</div>';
-
-  if (ytId) {
-    html += '<div class="video-player" id="vplayer"><img src="https://i.ytimg.com/vi/' + ytId + '/hqdefault.jpg" alt=""><div class="play-overlay"><div class="play-btn-big"><div></div></div></div></div>';
-  } else {
-    html += '<div class="no-video"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg><span>Aucune vidéo</span></div>';
-  }
-
-  html += '<div class="field"><label>Titre *</label><input type="text" id="lTitle" value="' + (l ? l.title.replace(/"/g, '&quot;') : '') + '" placeholder="Titre de la leçon"></div>';
-  html += '<div class="field"><label>Vidéo YouTube — URL ou ID</label><input type="text" id="lYoutube" value="' + ytId + '" placeholder="https://youtu.be/ABC123" oninput="previewYt(this.value)"></div>';
-  html += '<div class="field"><label>Durée (minutes)</label><input type="number" id="lDuration" value="' + (l && l.duration_min ? l.duration_min : '') + '" placeholder="10" min="0"></div>';
-  html += '<div class="field"><label>Notes & Ressources</label>';
-  html += '<div class="editor-toolbar">';
-  html += '<button onclick="leconTb(\'## \',\'\')">H2</button>';
-  html += '<button onclick="leconTb(\'### \',\'\')">H3</button>';
-  html += '<button onclick="leconTb(\'**\',\'**\')"><b>G</b></button>';
-  html += '<button onclick="leconTb(\'*\',\'*\')"><i>I</i></button>';
-  html += '<button onclick="leconTb(\'- \',\'\')">· Liste</button>';
-  html += '<button onclick="leconTb(\'> \',\'\')">💡</button>';
-  html += '</div>';
-  html += '<textarea id="lContent" rows="7" placeholder="Notes, ressources, transcription...">' + (l && l.content ? l.content : '') + '</textarea></div>';
-  html += '<div style="display:flex;gap:8px;margin-top:4px">';
-  html += '<button class="btn-ghost" style="flex:1" onclick="renderCol3Empty()">Annuler</button>';
-  html += '<button class="btn-primary" style="flex:1;justify-content:center" onclick="saveLecon()">💾 Enregistrer</button>';
-  html += '</div></div>';
-
-  document.getElementById('col3').innerHTML = html;
-
-  if (ytId) {
-    var vp = document.getElementById('vplayer');
-    if (vp) {
-      vp.addEventListener('click', function() {
-        var id = ytId;
-        this.innerHTML = '<iframe src="https://www.youtube.com/embed/' + id + '?autoplay=1" style="width:100%;height:100%;border:none;display:block" allowfullscreen allow="autoplay; encrypted-media"></iframe>';
-        this.style.cursor = 'default';
-      });
-    }
-  }
+function importHtmlFile(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    document.getElementById('lHtmlContent').value = e.target.result;
+    previewHtmlModal();
+  };
+  reader.readAsText(file);
 }
 
-function previewYt(val) {
-  var id = extractYtId2(val);
-  var player = document.getElementById('vplayer');
-  if (id && player) {
-    player.innerHTML = '<img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg" alt="" style="width:100%;height:100%;object-fit:cover;display:block"><div class="play-overlay"><div class="play-btn-big"><div></div></div></div>';
-  }
-}
-
-function leconTb(before, after) {
-  var ta = document.getElementById('lContent');
-  if (!ta) return;
-  var s = ta.selectionStart, e = ta.selectionEnd;
-  var sel = ta.value.substring(s, e);
-  var ins = before + (sel || 'texte') + after;
-  ta.value = ta.value.substring(0, s) + ins + ta.value.substring(e);
-  ta.focus();
-  ta.setSelectionRange(s + ins.length, s + ins.length);
+function previewHtmlModal() {
+  var html = document.getElementById('lHtmlContent').value.trim();
+  if (!html) return;
+  var box = document.getElementById('htmlPreviewBox');
+  box.style.display = 'block';
+  document.getElementById('htmlPreviewFrame').srcdoc = html;
 }
 
 async function saveLecon() {
   var title = document.getElementById('lTitle').value.trim();
-  if (!title) { showToast('Titre obligatoire.', 'error'); return; }
-  var ytId = extractYtId2(document.getElementById('lYoutube').value.trim());
+  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
+
+  // Déterminer le type actif
+  var leconType = 'youtube';
+  if (document.getElementById('typebtn_html').style.background.includes('ink') || document.getElementById('typebtn_html').style.background === 'var(--ink)') leconType = 'html';
+  if (document.getElementById('typebtn_text').style.background.includes('ink') || document.getElementById('typebtn_text').style.background === 'var(--ink)') leconType = 'text';
+
+  // YouTube ID
+  var ytId = null;
+  if (leconType === 'youtube') {
+    var ytRaw = document.getElementById('lYoutube').value.trim();
+    if (ytRaw) {
+      var m = ytRaw.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([a-zA-Z0-9_-]{11})/);
+      ytId = m ? m[1] : (ytRaw.length === 11 ? ytRaw : null);
+    }
+  }
+
+  var htmlContent = leconType === 'html' ? document.getElementById('lHtmlContent').value.trim() : null;
+
   var data = {
     title: title,
-    youtube_id: ytId,
+    lecon_type: leconType,
+    youtube_id: ytId || null,
+    html_content: htmlContent || null,
     duration_min: parseInt(document.getElementById('lDuration').value) || 0,
     content: document.getElementById('lContent').value.trim()
   };
-  var leconId = currentLecon ? currentLecon.id : null;
+
   var res;
-  if (leconId) {
-    res = await sb.from('lecons').update(data).eq('id', leconId);
+  if (editLeconId) {
+    res = await sb.from('lecons').update(data).eq('id', editLeconId);
   } else {
+    // Compter les le\u00e7ons existantes pour la position
     var mod = modules.find(function(m) { return m.id === currentModuleId; });
     data.module_id = currentModuleId;
     data.position = mod ? (mod.lecons || []).length : 0;
-    res = await sb.from('lecons').insert(data).select();
+    res = await sb.from('lecons').insert(data);
   }
+
   if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(leconId ? 'Leçon mise à jour !' : 'Leçon ajoutée !', 'success');
-  if (!leconId && res.data && res.data[0]) currentLecon = res.data[0];
-  await loadModules(currentFormation.id);
-  renderLeconEditor(Object.assign({}, currentLecon || {}, data, { id: currentLecon ? currentLecon.id : (res.data && res.data[0] ? res.data[0].id : null) }));
-}
-
-async function deleteLecon(id) {
-  if (!confirm('Supprimer cette leçon ?')) return;
-  await sb.from('lecons').delete().eq('id', id);
-  currentLecon = null;
-  renderCol3Empty();
+  showToast(editLeconId ? 'Le\u00e7on mise \u00e0 jour !' : 'Le\u00e7on ajout\u00e9e !', 'success');
+  closeOverlay('overlayLecon');
   loadModules(currentFormation.id);
-  showToast('Supprimée.', 'success');
 }
 
-function extractYtId2(val) {
-  if (!val) return null;
-  val = val.trim();
-  if (/^[a-zA-Z0-9_-]{11}$/.test(val)) return val;
-  var m = val.match(/youtu\.be\/([a-zA-Z0-9_-]{11})/);
-  if (m) return m[1];
-  m = val.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-  if (m) return m[1];
-  m = val.match(/shorts\/([a-zA-Z0-9_-]{11})/);
-  if (m) return m[1];
-  return null;
-}
-
-function renderCol3Empty() {
-  currentLecon = null;
-  document.getElementById('col3').innerHTML = '<div class="f-col3-empty"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><div>Clique sur une leçon</div><div style="font-size:0.75rem">pour l\'éditer ici</div></div>';
-  if (currentFormation) renderCol2();
-}
-
-function openModal(id) { document.getElementById(id).classList.add('on'); }
-function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+// =====================
+// HELPERS
+// =====================
+function openOverlay(id) { document.getElementById(id).classList.add('on'); }
+function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
 
 function showToast(msg, type) {
   var t = document.getElementById('toast');
@@ -570,3 +585,12 @@ function showToast(msg, type) {
 </script>
 </body>
 </html>
+"
+    },
+    "message": "Page admin formations",
+    "integration_name": null,
+    "integration_icon_url": null,
+    "icon_name": "file",
+    "context": null,
+    "display_content": {
+      "type": "json_block
