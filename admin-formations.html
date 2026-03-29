@@ -217,9 +217,9 @@
     <div class="field">
       <label>Type de contenu</label>
       <div style="display:flex;gap:6px;margin-top:4px">
-        <button id="typebtn_youtube" onclick="switchLeconType('youtube')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.78rem;font-family:inherit;cursor:pointer;font-weight:500">&#9654; Vidéo YouTube</button>
-        <button id="typebtn_html" onclick="switchLeconType('html')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#9889; Animation HTML</button>
-        <button id="typebtn_text" onclick="switchLeconType('text')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#128221; Texte seulement</button>
+        <button id="typebtn_youtube" data-type="youtube" data-active="1" onclick="switchLeconType('youtube')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.78rem;font-family:inherit;cursor:pointer;font-weight:500">&#9654; Vidéo YouTube</button>
+        <button id="typebtn_html" data-type="html" data-active="0" onclick="switchLeconType('html')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#9889; Animation HTML</button>
+        <button id="typebtn_text" data-type="text" data-active="0" onclick="switchLeconType('text')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#128221; Texte seulement</button>
       </div>
     </div>
     <div class="field" id="fieldYoutube">
@@ -494,10 +494,12 @@ function switchLeconType(type) {
   ['youtube','html','text'].forEach(function(t) {
     var btn = document.getElementById('typebtn_' + t);
     if (!btn) return;
-    btn.style.background = t === type ? 'var(--ink)' : 'var(--bg)';
-    btn.style.color = t === type ? '#fff' : 'var(--muted)';
-    btn.style.borderColor = t === type ? 'var(--ink)' : 'var(--subtle)';
-    btn.style.fontWeight = t === type ? '500' : '400';
+    var active = t === type;
+    btn.style.background = active ? 'var(--ink)' : 'var(--bg)';
+    btn.style.color = active ? '#fff' : 'var(--muted)';
+    btn.style.borderColor = active ? 'var(--ink)' : 'var(--subtle)';
+    btn.style.fontWeight = active ? '500' : '400';
+    btn.setAttribute('data-active', active ? '1' : '0');
   });
   document.getElementById('fieldYoutube').style.display = type === 'youtube' ? 'block' : 'none';
   document.getElementById('fieldHtml').style.display = type === 'html' ? 'block' : 'none';
@@ -527,10 +529,8 @@ async function saveLecon() {
   var title = document.getElementById('lTitle').value.trim();
   if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
 
-  // Déterminer le type actif
-  var leconType = 'youtube';
-  if (document.getElementById('typebtn_html').style.background.includes('ink') || document.getElementById('typebtn_html').style.background === 'var(--ink)') leconType = 'html';
-  if (document.getElementById('typebtn_text').style.background.includes('ink') || document.getElementById('typebtn_text').style.background === 'var(--ink)') leconType = 'text';
+  // Déterminer le type actif via data-active
+  var leconType = document.querySelector('[data-active="1"]') ? document.querySelector('[data-active="1"]').getAttribute('data-type') : 'youtube';
 
   // YouTube ID
   var ytId = null;
