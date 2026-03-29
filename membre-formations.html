@@ -674,7 +674,7 @@ function renderModules() {
       btn.innerHTML =
         '<span class="l-check ' + cc + '">' + (isDone ? "✓" : "") + '</span>' +
         '<span class="l-title">' + l.title + '</span>' +
-        (l.youtube_id ? '<span class="l-yt">▶ YT</span>' : "") +
+        (l.lecon_type === "html" ? '<span class="l-yt" style="color:#635BFF">⚡</span>' : l.youtube_id ? '<span class="l-yt">▶</span>' : "") +
         (l.duration_min ? '<span class="l-dur">' + l.duration_min + "m</span>" : "");
       btn.onclick = (function(lc) { return function() { playLecon(lc); }; })(l);
       list.appendChild(btn);
@@ -690,8 +690,13 @@ function renderModules() {
 function playLecon(l) {
   curLecon = l;
   var box = document.getElementById("videoBox");
+  var type = l.lecon_type || (l.youtube_id ? "youtube" : "text");
 
-  if (l.youtube_id) {
+  if (type === "html" && l.html_content) {
+    // Animation HTML dans iframe
+    box.innerHTML = '<iframe srcdoc="' + l.html_content.replace(/"/g, '&quot;').replace(/
+/g, ' ') + '" style="width:100%;height:100%;border:none;display:block" sandbox="allow-scripts allow-same-origin"></iframe>';
+  } else if (type === "youtube" && l.youtube_id) {
     var cleanId = l.youtube_id.split("?")[0];
     box.innerHTML =
       '<div class="vthumb" onclick="launchVideo(\'' + cleanId + '\', this)">' +
@@ -699,7 +704,7 @@ function playLecon(l) {
         '<div class="vthumb-overlay"><div class="vplay-big"><div class="vplay-tri"></div></div></div>' +
       '</div>';
   } else {
-    box.innerHTML = '<div class="no-video"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg><span>Pas de vidéo pour cette leçon</span></div>';
+    box.innerHTML = '<div class="no-video"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg><span>' + (type === "text" ? "Leçon texte" : "Pas de contenu vidéo") + '</span></div>';
   }
 
   document.getElementById("leconTitleH").textContent = l.title;
