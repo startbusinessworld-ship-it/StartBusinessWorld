@@ -321,15 +321,13 @@ function renderFormationsList() {
     var pill = f.status === 'published' ? '\ud83d\udfe2' : '\u26aa';
     item.setAttribute('draggable', 'true');
     item.setAttribute('data-id', f.id);
-    item.setAttribute('data-pos', f.position || i);
     item.innerHTML = '<span class="drag-handle" title="Déplacer">⠿</span><span class="f-item-name">' + f.title + '</span><span class="f-item-meta">' + pill + '</span>';
     item.addEventListener('click', function(e) { if (!e.target.classList.contains('drag-handle')) selectFormation(f); });
-    item.addEventListener('dragstart', onDragStart);
-    item.addEventListener('dragover', onDragOver);
-    item.addEventListener('drop', function(e) { onDropFormation(e, f.id); });
-    item.addEventListener('dragend', onDragEnd);
     el.appendChild(item);
   });
+
+  // Délégation drag sur le container
+  initDragFormations(el);
 }
 
 function selectFormation(f) {
@@ -389,63 +387,6 @@ async function loadModules(formationId) {
   var res = await sb.from('modules').select('*, lecons(*)').eq('formation_id', formationId).order('position');
   modules = res.data || [];
   renderEditor();
-}
-
-function renderEditor() {
-  if (!currentFormation) return;
-  var f = currentFormation;
-  var html = '<div class="f-editor">';
-
-  // Header
-  html += '<div class="f-editor-head">';
-  html += '<div class="f-editor-title-row">';
-  html += '<div class="f-editor-title">' + f.title + '</div>';
-  html += '<div class="f-editor-status">' + (f.status === 'published' ? '\ud83d\udfe2 Publi\u00e9e' : '\u26aa Brouillon') + ' \u00b7 ' + modules.length + ' module' + (modules.length > 1 ? 's' : '') + '</div>';
-  html += '</div>';
-  html += '<div style="display:flex;gap:6px">';
-  html += '<button class="row-action" onclick="openFormationModal(currentFormation)">\u270f\ufe0f Modifier</button>';
-  html += '<button class="row-action" style="color:var(--red)" onclick="deleteFormation(\'' + f.id + '\')">Supprimer</button>';
-  html += '</div></div>';
-
-  // Modules
-  html += '<div class="modules-section">';
-  html += '<div class="section-head"><span class="section-label">Modules</span>';
-  html += '<button class="btn-primary" style="font-size:0.75rem;padding:5px 12px" onclick="openModuleModal(null)">+ Module</button>';
-  html += '</div>';
-
-  if (!modules.length) {
-    html += '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;border:1px dashed var(--subtle);border-radius:8px">Aucun module \u2014 commence par en cr\u00e9er un</div>';
-  } else {
-    modules.forEach(function(m, mi) {
-      var lecons = m.lecons || [];
-      html += '<div class="module-card">';
-      html += '<div class="module-card-wrap" draggable="true" data-module-id="' + m.id + '" data-module-pos="' + (m.position || mi) + '" ondragstart="onDragStartModule(event,\'' + m.id + '\')" ondragover="onDragOverModule(event)" ondrop="onDropModule(event,\'' + m.id + '\')" ondragend="onDragEnd(event)">';
-      html += '<div class="module-head" onclick="toggleModule(\'mod' + mi + '\')">';
-      html += '<span class="drag-handle" onclick="event.stopPropagation()" title="Déplacer">⠿</span>';
-      html += '<span class="module-chevron" id="chev' + mi + '">\u25b6</span>';
-      html += '<span class="module-name">' + m.title + '</span>';
-      html += '<span class="module-count">' + lecons.length + ' le\u00e7on' + (lecons.length > 1 ? 's' : '') + '</span>';
-      html += '<div class="module-actions" onclick="event.stopPropagation()">';
-      html += '<button class="row-action" onclick="openModuleModal(' + JSON.stringify(m).replace(/"/g, '&quot;') + ')">\u270f\ufe0f</button>';
-      html += '<button class="row-action" style="color:var(--red)" onclick="deleteModule(\'' + m.id + '\')">\u2715</button>';
-      html += '</div></div>';
-      html += '<div class="module-body" id="mod' + mi + '">';
-      lecons.sort(function(a,b) { return a.position - b.position; }).forEach(function(l, li) {
-                html += '<div class="lecon-item" draggable="true" data-lecon-id="' + l.id + '" data-module-id="' + m.id + '" ondragstart="onDragStartLecon(event,\'' + l.id + '\')" ondragover="onDragOverLecon(event)" ondrop="onDropLecon(event,\'' + l.id + '\',\'' + m.id + '\')" ondragend="onDragEnd(event)" onclick="openLeconModal(' + JSON.stringify(l).replace(/"/g, '&quot;') + ', \'' + m.id + '\')">';
-        html += '<span class="drag-handle" onclick="event.stopPropagation()" title="Déplacer">⠿</span>';
-        html += '<span class="lecon-num">' + String(li+1).padStart(2,'0') + '</span>';
-        html += '<span class="lecon-title">' + l.title + '</span>';
-        if (l.lecon_type === 'html') html += '<span class="lecon-yt" style="color:#635BFF">&#9889; HTML</span>'; else if (l.youtube_id) html += '<span class="lecon-yt">&#9654; YouTube</span>';
-        if (l.duration_min) html += '<span class="lecon-dur">' + l.duration_min + ' min</span>';
-        html += '</div>';
-      });
-      html += '<button class="lecon-add" onclick="openLeconModal(null, \'' + m.id + '\')">+ Ajouter une le\u00e7on</button>';
-      html += '</div></div></div>';
-    });
-  }
-  html += '</div></div>';
-
-  document.getElementById('formationsMain').innerHTML = html;
 }
 
 function toggleModule(id) {
@@ -589,169 +530,261 @@ async function saveLecon() {
 }
 
 // =====================
-// DRAG & DROP
+// DRAG & DROP — Délégation d'événements
 // =====================
 var dragSrcId = null;
-var dragType = null; // 'formation' | 'module' | 'lecon'
+var dragModuleId = null;
+var dragLeconId = null;
+var dragLeconSrcModuleId = null;
 
-function onDragStart(e) {
-  dragSrcId = e.currentTarget.getAttribute('data-id');
-  dragType = 'formation';
-  e.currentTarget.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
+// ── FORMATIONS ──
+function renderEditor() {
+  if (!currentFormation) return;
+  var f = currentFormation;
+  var html = '<div class="f-editor">';
+
+  html += '<div class="f-editor-head">';
+  html += '<div class="f-editor-title-row">';
+  html += '<div class="f-editor-title">' + f.title + '</div>';
+  html += '<div class="f-editor-status">' + (f.status === 'published' ? '\ud83d\udfe2 Publi\u00e9e' : '\u26aa Brouillon') + ' \u00b7 ' + modules.length + ' module' + (modules.length > 1 ? 's' : '') + '</div>';
+  html += '</div>';
+  html += '<div style="display:flex;gap:6px">';
+  html += '<button class="row-action" onclick="openFormationModal(currentFormation)">\u270f\ufe0f Modifier</button>';
+  html += '<button class="row-action" style="color:var(--red)" onclick="deleteFormation(\'' + f.id + '\')">Supprimer</button>';
+  html += '</div></div>';
+
+  html += '<div class="modules-section">';
+  html += '<div class="section-head"><span class="section-label">Modules</span>';
+  html += '<button class="btn-primary" style="font-size:0.75rem;padding:5px 12px" onclick="openModuleModal(null)">+ Module</button>';
+  html += '</div>';
+
+  if (!modules.length) {
+    html += '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;border:1px dashed var(--subtle);border-radius:8px">Aucun module \u2014 commence par en cr\u00e9er un</div>';
+  } else {
+    modules.forEach(function(m, mi) {
+      var lecons = (m.lecons || []).sort(function(a,b){return a.position-b.position;});
+      html += '<div class="module-card" data-module-id="' + m.id + '" draggable="true">';
+      html += '<div class="module-head" onclick="toggleModule(\'mod' + mi + '\')">';
+      html += '<span class="drag-handle" onclick="event.stopPropagation()" title="D\u00e9placer">\u2807</span>';
+      html += '<span class="module-chevron" id="chev' + mi + '">\u25b6</span>';
+      html += '<span class="module-name">' + m.title + '</span>';
+      html += '<span class="module-count">' + lecons.length + ' le\u00e7on' + (lecons.length > 1 ? 's' : '') + '</span>';
+      html += '<div class="module-actions" onclick="event.stopPropagation()">';
+      html += '<button class="row-action" onclick="openModuleModal(' + JSON.stringify(m).replace(/"/g, '&quot;') + ')">\u270f\ufe0f</button>';
+      html += '<button class="row-action" style="color:var(--red)" onclick="deleteModule(\'' + m.id + '\')">\u2715</button>';
+      html += '</div></div>';
+      html += '<div class="module-body" id="mod' + mi + '">';
+      lecons.forEach(function(l, li) {
+        html += '<div class="lecon-item" draggable="true" data-lecon-id="' + l.id + '" data-module-id="' + m.id + '" onclick="openLeconModal(' + JSON.stringify(l).replace(/"/g, '&quot;') + ', \'' + m.id + '\')">';
+        html += '<span class="drag-handle" onclick="event.stopPropagation()" title="D\u00e9placer">\u2807</span>';
+        html += '<span class="lecon-num">' + String(li+1).padStart(2,'0') + '</span>';
+        html += '<span class="lecon-title">' + l.title + '</span>';
+        if (l.lecon_type === 'html') html += '<span class="lecon-yt" style="color:#635BFF">\u26a1 HTML</span>';
+        else if (l.youtube_id) html += '<span class="lecon-yt">\u25b6 YouTube</span>';
+        if (l.duration_min) html += '<span class="lecon-dur">' + l.duration_min + ' min</span>';
+        html += '</div>';
+      });
+      html += '<button class="lecon-add" onclick="openLeconModal(null, \'' + m.id + '\')">+ Ajouter une le\u00e7on</button>';
+      html += '</div></div>';
+    });
+  }
+  html += '</div></div>';
+
+  document.getElementById('formationsMain').innerHTML = html;
+  initDragModules();
+  initDragLecons();
 }
 
-function onDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'move';
-  var el = e.currentTarget;
-  el.classList.remove('drag-over-top','drag-over-bottom');
-  var rect = el.getBoundingClientRect();
-  if (e.clientY < rect.top + rect.height / 2) el.classList.add('drag-over-top');
-  else el.classList.add('drag-over-bottom');
-}
+function initDragFormations(container) {
+  var dragging = null;
 
-function onDropFormation(e, targetId) {
-  e.preventDefault();
-  if (dragSrcId === targetId) return;
-  var srcEl = document.querySelector('[data-id="' + dragSrcId + '"]');
-  var tgtEl = document.querySelector('[data-id="' + targetId + '"]');
-  if (!srcEl || !tgtEl) return;
-  tgtEl.classList.remove('drag-over-top','drag-over-bottom');
+  container.addEventListener('dragstart', function(e) {
+    var item = e.target.closest('.f-item[draggable]');
+    if (!item) return;
+    dragging = item;
+    dragSrcId = item.getAttribute('data-id');
+    setTimeout(function() { item.classList.add('dragging'); }, 0);
+    e.dataTransfer.effectAllowed = 'move';
+  });
 
-  var srcF = formations.find(function(f){return f.id===dragSrcId;});
-  var tgtF = formations.find(function(f){return f.id===targetId;});
-  if (!srcF || !tgtF) return;
+  container.addEventListener('dragover', function(e) {
+    e.preventDefault();
+    var item = e.target.closest('.f-item[draggable]');
+    if (!item || item === dragging) return;
+    container.querySelectorAll('.drag-over-top,.drag-over-bottom').forEach(function(el){
+      el.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    var rect = item.getBoundingClientRect();
+    item.classList.add(e.clientY < rect.top + rect.height/2 ? 'drag-over-top' : 'drag-over-bottom');
+  });
 
-  var rect = tgtEl.getBoundingClientRect();
-  var insertAfter = e.clientY >= rect.top + rect.height / 2;
-  var srcIdx = formations.indexOf(srcF);
-  formations.splice(srcIdx, 1);
-  var tgtIdx = formations.indexOf(tgtF);
-  formations.splice(insertAfter ? tgtIdx + 1 : tgtIdx, 0, srcF);
+  container.addEventListener('drop', function(e) {
+    e.preventDefault();
+    var item = e.target.closest('.f-item[draggable]');
+    if (!item || !dragging || item === dragging) return;
+    var rect = item.getBoundingClientRect();
+    var insertAfter = e.clientY >= rect.top + rect.height/2;
+    var targetId = item.getAttribute('data-id');
 
-  // Mettre à jour positions
-  formations.forEach(function(f, i) { f.position = i; });
-  renderFormationsList();
-  saveFormationsOrder();
-}
+    var srcF = formations.find(function(f){return f.id===dragSrcId;});
+    var tgtF = formations.find(function(f){return f.id===targetId;});
+    if (!srcF || !tgtF) return;
 
-function onDragEnd(e) {
-  e.currentTarget.classList.remove('dragging','drag-over-top','drag-over-bottom');
-  document.querySelectorAll('.drag-over-top,.drag-over-bottom,.dragging').forEach(function(el){
-    el.classList.remove('drag-over-top','drag-over-bottom','dragging');
+    var srcIdx = formations.indexOf(srcF);
+    formations.splice(srcIdx, 1);
+    var tgtIdx = formations.indexOf(tgtF);
+    formations.splice(insertAfter ? tgtIdx+1 : tgtIdx, 0, srcF);
+    formations.forEach(function(f,i){ f.position=i; });
+
+    renderFormationsList();
+    saveFormationsOrder();
+  });
+
+  container.addEventListener('dragend', function() {
+    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){
+      el.classList.remove('dragging','drag-over-top','drag-over-bottom');
+    });
+    dragging = null;
   });
 }
 
 async function saveFormationsOrder() {
-  for (var i = 0; i < formations.length; i++) {
-    await sb.from('formations').update({position: i}).eq('id', formations[i].id);
+  for (var i=0; i<formations.length; i++) {
+    await sb.from('formations').update({position:i}).eq('id',formations[i].id);
   }
   showToast('Ordre sauvegardé !', 'success');
 }
 
 // ── MODULES ──
-var dragModuleId = null;
+function initDragModules() {
+  var container = document.getElementById('formationsMain');
+  if (!container) return;
+  var dragging = null;
 
-function onDragStartModule(e, moduleId) {
-  dragModuleId = moduleId;
-  e.currentTarget.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-  e.stopPropagation();
-}
+  container.addEventListener('dragstart', function(e) {
+    var item = e.target.closest('.module-card[draggable]');
+    if (!item) return;
+    dragging = item;
+    dragModuleId = item.getAttribute('data-module-id');
+    setTimeout(function() { item.classList.add('dragging'); }, 0);
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
+  });
 
-function onDragOverModule(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  var el = e.currentTarget;
-  el.classList.remove('drag-over-top','drag-over-bottom');
-  var rect = el.getBoundingClientRect();
-  if (e.clientY < rect.top + rect.height / 2) el.classList.add('drag-over-top');
-  else el.classList.add('drag-over-bottom');
-}
+  container.addEventListener('dragover', function(e) {
+    var item = e.target.closest('.module-card[draggable]');
+    if (!item || item === dragging) return;
+    e.preventDefault();
+    container.querySelectorAll('.module-card.drag-over-top,.module-card.drag-over-bottom').forEach(function(el){
+      el.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    var rect = item.getBoundingClientRect();
+    item.classList.add(e.clientY < rect.top + rect.height/2 ? 'drag-over-top' : 'drag-over-bottom');
+  });
 
-function onDropModule(e, targetModuleId) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (dragModuleId === targetModuleId) return;
-  var el = e.currentTarget;
-  var rect = el.getBoundingClientRect();
-  var insertAfter = e.clientY >= rect.top + rect.height / 2;
-  el.classList.remove('drag-over-top','drag-over-bottom');
+  container.addEventListener('drop', function(e) {
+    var item = e.target.closest('.module-card[draggable]');
+    if (!item || !dragging || item === dragging) return;
+    e.preventDefault();
+    var rect = item.getBoundingClientRect();
+    var insertAfter = e.clientY >= rect.top + rect.height/2;
+    var targetModId = item.getAttribute('data-module-id');
 
-  var srcMod = modules.find(function(m){return m.id===dragModuleId;});
-  var tgtMod = modules.find(function(m){return m.id===targetModuleId;});
-  if (!srcMod || !tgtMod) return;
+    var srcMod = modules.find(function(m){return m.id===dragModuleId;});
+    var tgtMod = modules.find(function(m){return m.id===targetModId;});
+    if (!srcMod || !tgtMod) return;
 
-  var srcIdx = modules.indexOf(srcMod);
-  modules.splice(srcIdx, 1);
-  var tgtIdx = modules.indexOf(tgtMod);
-  modules.splice(insertAfter ? tgtIdx + 1 : tgtIdx, 0, srcMod);
+    var srcIdx = modules.indexOf(srcMod);
+    modules.splice(srcIdx, 1);
+    var tgtIdx = modules.indexOf(tgtMod);
+    modules.splice(insertAfter ? tgtIdx+1 : tgtIdx, 0, srcMod);
+    modules.forEach(function(m,i){ m.position=i; });
 
-  modules.forEach(function(m, i) { m.position = i; });
-  renderEditor();
-  saveModulesOrder();
+    renderEditor();
+    saveModulesOrder();
+  });
+
+  container.addEventListener('dragend', function() {
+    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){
+      el.classList.remove('dragging','drag-over-top','drag-over-bottom');
+    });
+    dragging = null;
+  });
 }
 
 async function saveModulesOrder() {
-  for (var i = 0; i < modules.length; i++) {
-    await sb.from('modules').update({position: i}).eq('id', modules[i].id);
+  for (var i=0; i<modules.length; i++) {
+    await sb.from('modules').update({position:i}).eq('id',modules[i].id);
   }
   showToast('Ordre sauvegardé !', 'success');
 }
 
 // ── LEÇONS ──
-var dragLeconId = null;
-var dragLeconModuleId = null;
+function initDragLecons() {
+  var container = document.getElementById('formationsMain');
+  if (!container) return;
+  var dragging = null;
 
-function onDragStartLecon(e, leconId) {
-  dragLeconId = leconId;
-  var el = e.currentTarget;
-  dragLeconModuleId = el.getAttribute('data-module-id');
-  el.classList.add('dragging');
-  e.dataTransfer.effectAllowed = 'move';
-  e.stopPropagation();
-}
+  container.addEventListener('dragstart', function(e) {
+    var item = e.target.closest('.lecon-item[draggable]');
+    if (!item) return;
+    dragging = item;
+    dragLeconId = item.getAttribute('data-lecon-id');
+    dragLeconSrcModuleId = item.getAttribute('data-module-id');
+    setTimeout(function() { item.classList.add('dragging'); }, 0);
+    e.dataTransfer.effectAllowed = 'move';
+    e.stopPropagation();
+  });
 
-function onDragOverLecon(e) {
-  e.preventDefault();
-  e.stopPropagation();
-  var el = e.currentTarget;
-  el.classList.remove('drag-over-top','drag-over-bottom');
-  var rect = el.getBoundingClientRect();
-  if (e.clientY < rect.top + rect.height / 2) el.classList.add('drag-over-top');
-  else el.classList.add('drag-over-bottom');
-}
+  container.addEventListener('dragover', function(e) {
+    var item = e.target.closest('.lecon-item[draggable]');
+    if (!item || item === dragging) return;
+    e.preventDefault();
+    container.querySelectorAll('.lecon-item.drag-over-top,.lecon-item.drag-over-bottom').forEach(function(el){
+      el.classList.remove('drag-over-top','drag-over-bottom');
+    });
+    var rect = item.getBoundingClientRect();
+    item.classList.add(e.clientY < rect.top + rect.height/2 ? 'drag-over-top' : 'drag-over-bottom');
+  });
 
-function onDropLecon(e, targetLeconId, targetModuleId) {
-  e.preventDefault();
-  e.stopPropagation();
-  if (dragLeconId === targetLeconId) return;
-  var el = e.currentTarget;
-  var rect = el.getBoundingClientRect();
-  var insertAfter = e.clientY >= rect.top + rect.height / 2;
-  el.classList.remove('drag-over-top','drag-over-bottom');
+  container.addEventListener('drop', function(e) {
+    var item = e.target.closest('.lecon-item[draggable]');
+    if (!item || !dragging || item === dragging) return;
+    e.preventDefault();
+    var rect = item.getBoundingClientRect();
+    var insertAfter = e.clientY >= rect.top + rect.height/2;
+    var targetLeconId = item.getAttribute('data-lecon-id');
+    var targetModuleId = item.getAttribute('data-module-id');
 
-  var srcMod = modules.find(function(m){return m.id===dragLeconModuleId;});
-  var tgtMod = modules.find(function(m){return m.id===targetModuleId;});
-  if (!srcMod || !tgtMod) return;
+    var srcMod = modules.find(function(m){return m.id===dragLeconSrcModuleId;});
+    var tgtMod = modules.find(function(m){return m.id===targetModuleId;});
+    if (!srcMod || !tgtMod) return;
 
-  var srcLecon = (srcMod.lecons||[]).find(function(l){return l.id===dragLeconId;});
-  if (!srcLecon) return;
+    var srcLecon = (srcMod.lecons||[]).find(function(l){return l.id===dragLeconId;});
+    if (!srcLecon) return;
 
-  // Retirer de son module source
-  srcMod.lecons = srcMod.lecons.filter(function(l){return l.id!==dragLeconId;});
+    // Retirer de la source
+    srcMod.lecons = (srcMod.lecons||[]).filter(function(l){return l.id!==dragLeconId;});
 
-  // Insérer dans le module cible
-  var tgtIdx = (tgtMod.lecons||[]).findIndex(function(l){return l.id===targetLeconId;});
-  tgtMod.lecons.splice(insertAfter ? tgtIdx + 1 : tgtIdx, 0, srcLecon);
+    // Insérer dans la cible
+    if (!tgtMod.lecons) tgtMod.lecons = [];
+    var tgtIdx = tgtMod.lecons.findIndex(function(l){return l.id===targetLeconId;});
+    tgtMod.lecons.splice(insertAfter ? tgtIdx+1 : tgtIdx, 0, srcLecon);
 
-  // Mettre à jour positions + module_id si changé
-  tgtMod.lecons.forEach(function(l, i) { l.position = i; l.module_id = tgtMod.id; });
-  if (srcMod.id !== tgtMod.id) srcMod.lecons.forEach(function(l, i) { l.position = i; });
+    // Mise à jour positions
+    tgtMod.lecons.forEach(function(l,i){ l.position=i; l.module_id=tgtMod.id; });
+    srcMod.lecons.forEach(function(l,i){ l.position=i; });
 
-  renderEditor();
-  saveLeçonsOrder(srcMod, tgtMod);
+    renderEditor();
+    saveLeçonsOrder(srcMod, tgtMod);
+  });
+
+  container.addEventListener('dragend', function() {
+    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){
+      el.classList.remove('dragging','drag-over-top','drag-over-bottom');
+    });
+    dragging = null;
+  });
 }
 
 async function saveLeçonsOrder(srcMod, tgtMod) {
@@ -760,7 +793,7 @@ async function saveLeçonsOrder(srcMod, tgtMod) {
   if (srcMod.id !== tgtMod.id) {
     (srcMod.lecons||[]).forEach(function(l,i){ toUpdate.push({id:l.id,position:i,module_id:srcMod.id}); });
   }
-  for (var i = 0; i < toUpdate.length; i++) {
+  for (var i=0; i<toUpdate.length; i++) {
     await sb.from('lecons').update({position:toUpdate[i].position,module_id:toUpdate[i].module_id}).eq('id',toUpdate[i].id);
   }
   showToast('Ordre sauvegardé !', 'success');
