@@ -255,7 +255,17 @@
     </div>
     <div class="field">
       <label>Notes & Ressources</label>
-      <textarea id="lContent" rows="5" placeholder="Texte de la leçon, notes, ressources..."></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
+        <button type="button" onclick="leconTb('## ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">H2</button>
+        <button type="button" onclick="leconTb('### ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">H3</button>
+        <button type="button" onclick="leconTb('**','**')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit"><b>G</b></button>
+        <button type="button" onclick="leconTb('*','*')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit"><i>I</i></button>
+        <button type="button" onclick="leconTb('- ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">· Liste</button>
+        <button type="button" onclick="leconTb('> ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">💡 Note</button>
+        <button type="button" onclick="leconTb('[texte](https://)' ,'')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">🔗 Lien</button>
+        <button type="button" onclick="insertOutil()" style="padding:3px 8px;border:.5px solid var(--gold);border-radius:4px;font-size:.72rem;cursor:pointer;background:rgba(166,124,58,.08);color:var(--gold);font-family:inherit;font-weight:500">🛠 Outil</button>
+      </div>
+      <textarea id="lContent" rows="6" placeholder="Texte de la leçon&#10;[texte](https://lien.com) pour les liens&#10;[OUTIL:Nom|Description|https://url.com] pour les outils"></textarea>
     </div>
     <div class="btn-row">
       <button class="btn-ghost" style="flex:1" id="cancelLeconBtn">Annuler</button>
@@ -527,6 +537,34 @@ async function saveLecon() {
   showToast(editLeconId ? 'Le\u00e7on mise \u00e0 jour !' : 'Le\u00e7on ajout\u00e9e !', 'success');
   closeOverlay('overlayLecon');
   loadModules(currentFormation.id);
+}
+
+// Insérer un outil d'affiliation dans le contenu de la leçon
+function leconTb(before, after) {
+  var ta = document.getElementById('lContent');
+  if (!ta) return;
+  var s = ta.selectionStart, e = ta.selectionEnd;
+  var sel = ta.value.substring(s, e);
+  var ins = before + (sel || 'texte') + after;
+  ta.value = ta.value.substring(0, s) + ins + ta.value.substring(e);
+  ta.focus();
+  ta.setSelectionRange(s + ins.length, s + ins.length);
+}
+
+function insertOutil() {
+  var nom = prompt("Nom de l'outil (ex: LegalPlace) :");
+  if (!nom) return;
+  var desc = prompt("Description courte :");
+  if (desc === null) return;
+  var url = prompt("URL d'affiliation :");
+  if (!url) return;
+  var ta = document.getElementById('lContent');
+  if (!ta) return;
+  var insert = '\n\n[OUTIL:' + nom + '|' + desc + '|' + url + ']\n\n';
+  var pos = ta.selectionStart;
+  ta.value = ta.value.substring(0, pos) + insert + ta.value.substring(pos);
+  ta.focus();
+  ta.setSelectionRange(pos + insert.length, pos + insert.length);
 }
 
 // =====================

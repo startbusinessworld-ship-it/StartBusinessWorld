@@ -120,6 +120,27 @@ nav{
 .vthumb:hover .vplay-big{transform:scale(1.08)}
 .vplay-tri{width:0;height:0;border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent #fff;margin-left:4px}
 .no-video{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,.25);font-size:.82rem}
+.lecon-body a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
+.lecon-body a:hover{opacity:.8}
+.tool-card-lecon{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:14px 18px;border:1px solid var(--subtle);border-radius:10px;
+  margin:1.2rem 0;text-decoration:none;color:inherit;
+  background:#fff;transition:border-color .15s;
+}
+.tool-card-lecon:hover{border-color:var(--gold)}
+.tool-card-lecon-name{font-weight:600;font-size:.9rem;margin-bottom:3px}
+.tool-card-lecon-desc{font-size:.75rem;color:var(--muted)}
+.tool-card-lecon-cta{
+  font-size:.78rem;font-weight:500;color:var(--gold);white-space:nowrap;
+  border:1px solid rgba(166,124,58,.3);padding:5px 12px;border-radius:5px;
+  flex-shrink:0;
+}
+.lecon-body blockquote{
+  border-left:3px solid var(--gold);padding:8px 14px;
+  background:rgba(166,124,58,.06);border-radius:0 6px 6px 0;
+  margin:1rem 0;font-size:.88rem;color:#555;
+}
 
 .lecon-title-h{font-size:1.1rem;font-weight:500;margin-bottom:10px}
 .lecon-body{font-size:.88rem;line-height:1.78;color:#444}
@@ -710,16 +731,72 @@ function playLecon(l) {
   document.getElementById("leconTitleH").textContent = l.title;
   var body = document.getElementById("leconBody");
   if (l.content) {
-    var html = "";
+    body.innerHTML = "";
     l.content.split("\n\n").forEach(function(p) {
       p = p.trim();
       if (!p) return;
-      if (p.startsWith("## ")) html += "<h2>" + p.slice(3) + "</h2>";
-      else if (p.startsWith("### ")) html += "<h3>" + p.slice(4) + "</h3>";
-      else if (p.startsWith("- ")) html += "<ul>" + p.split("\n").filter(function(x){return x.startsWith("- ");}).map(function(x){return "<li>" + x.slice(2) + "</li>";}).join("") + "</ul>";
-      else html += "<p>" + p.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>").replace(/\*([^*]+)\*/g, "<em>$1</em>") + "</p>";
+
+      // ── OUTIL CARD ──
+      if (p.startsWith("[OUTIL:") && p.endsWith("]")) {
+        var parts = p.slice(7, -1).split("|");
+        var nom = parts[0] || "";
+        var desc = parts[1] || "";
+        var ourl = parts[2] || "#";
+        var card = document.createElement("a");
+        card.href = ourl;
+        card.target = "_blank";
+        card.rel = "noopener";
+        card.className = "tool-card-lecon";
+        var left = document.createElement("div");
+        var nameEl = document.createElement("div");
+        nameEl.className = "tool-card-lecon-name";
+        nameEl.textContent = nom;
+        left.appendChild(nameEl);
+        if (desc) {
+          var descEl = document.createElement("div");
+          descEl.className = "tool-card-lecon-desc";
+          descEl.textContent = desc;
+          left.appendChild(descEl);
+        }
+        var cta = document.createElement("div");
+        cta.className = "tool-card-lecon-cta";
+        cta.textContent = "Découvrir →";
+        card.appendChild(left);
+        card.appendChild(cta);
+        body.appendChild(card);
+        return;
+      }
+
+      // ── TITRES ──
+      if (p.startsWith("## ")) { var h = document.createElement("h2"); h.textContent = p.slice(3); body.appendChild(h); return; }
+      if (p.startsWith("### ")) { var h = document.createElement("h3"); h.textContent = p.slice(4); body.appendChild(h); return; }
+
+      // ── CALLOUT ──
+      if (p.startsWith("> ")) {
+        var bq = document.createElement("blockquote");
+        bq.textContent = p.slice(2);
+        body.appendChild(bq);
+        return;
+      }
+
+      // ── LISTE ──
+      if (p.startsWith("- ")) {
+        var ul = document.createElement("ul");
+        p.split("\n").forEach(function(line) {
+          if (!line.startsWith("- ")) return;
+          var li = document.createElement("li");
+          li.innerHTML = fmtLecon(line.slice(2));
+          ul.appendChild(li);
+        });
+        body.appendChild(ul);
+        return;
+      }
+
+      // ── PARAGRAPHE ──
+      var el = document.createElement("p");
+      el.innerHTML = fmtLecon(p);
+      body.appendChild(el);
     });
-    body.innerHTML = html;
   } else {
     body.innerHTML = "";
   }
@@ -733,6 +810,22 @@ function playLecon(l) {
   btnNext.style.display = findNext() ? "flex" : "none";
 
   renderModules();
+}
+
+function fmtLecon(text) {
+  // Liens [texte](url)
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, t, u) {
+    return '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>';
+  });
+  // Liens nus https://...
+  text = text.replace(/(https?:\/\/[^\s<"]+)/g, function(m, url) {
+    return '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
+  });
+  // Gras
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  // Italique
+  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  return text;
 }
 
 function launchVideo(id, el) {
