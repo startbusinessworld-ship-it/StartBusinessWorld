@@ -612,19 +612,28 @@ function renderGrid() {
         '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>' : '') +
         '<div style="margin-top:10px">' +
           (hasUrl
-            ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:600;text-decoration:none">▶ Lancer la formation</a>'
-            : '<button onclick="openFormation(' + JSON.stringify(f).replace(/"/g,"&quot;") + ')" style="display:inline-flex;align-items:center;gap:6px;background:var(--dark);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
+            ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:600;text-decoration:none">&#9654; Lancer la formation</a>'
+            : '<button class="btn-open-formation" data-fid="' + f.id + '" style="display:inline-flex;align-items:center;gap:6px;background:var(--dark);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
           ) +
         '</div>' +
       '</div>';
     if (!hasUrl) {
       card.style.cursor = "pointer";
-      card.addEventListener("click", function(e) {
+      card.addEventListener("click", (function(fm) { return function(e) {
         if (e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
-        openFormation(f);
-      });
+        openFormation(fm);
+      }; })(f));
     }
     grid.appendChild(card);
+
+    // Bouton "Voir le contenu" sans JSON inline
+    var btnOpen = card.querySelector(".btn-open-formation");
+    if (btnOpen) {
+      btnOpen.addEventListener("click", (function(fm) { return function(e) {
+        e.stopPropagation();
+        openFormation(fm);
+      }; })(f));
+    }
   });
 
   allFormations.forEach(function(f) {
