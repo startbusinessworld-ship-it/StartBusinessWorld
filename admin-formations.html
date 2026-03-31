@@ -235,15 +235,29 @@
       <input type="text" id="lYoutube" placeholder="https://youtu.be/ABC123 ou ABC123">
     </div>
     <div class="field" id="fieldHtml" style="display:none">
-      <label>Code HTML de l'animation</label>
-      <div style="display:flex;gap:6px;margin-bottom:6px">
-        <button onclick="document.getElementById('lHtmlFile').click()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">Importer .html</button>
-        <input type="file" id="lHtmlFile" accept=".html" style="display:none" onchange="importHtmlFile(this)">
-        <button onclick="previewHtmlModal()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">Prévisualiser</button>
+      <!-- Onglets URL / Code -->
+      <div style="display:flex;gap:6px;margin-bottom:10px">
+        <button id="htmlTabUrl" onclick="switchHtmlTab('url')" style="flex:1;padding:6px;border-radius:6px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.75rem;font-family:inherit;cursor:pointer">🔗 URL du fichier</button>
+        <button id="htmlTabCode" onclick="switchHtmlTab('code')" style="flex:1;padding:6px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.75rem;font-family:inherit;cursor:pointer">💻 Code HTML</button>
       </div>
-      <textarea id="lHtmlContent" rows="7" placeholder="Colle ici le code HTML complet..." style="font-family:monospace;font-size:.72rem"></textarea>
-      <div id="htmlPreviewBox" style="display:none;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin-top:8px;border:.5px solid var(--subtle)">
-        <iframe id="htmlPreviewFrame" style="width:100%;height:100%;border:none" sandbox="allow-scripts"></iframe>
+      <!-- Panel URL -->
+      <div id="htmlPanelUrl">
+        <label style="display:block;font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">URL du fichier .html</label>
+        <input type="text" id="lHtmlUrl" placeholder="https://start-business-world.vercel.app/shopify-module.html" style="width:100%;padding:8px 10px;border:.5px solid var(--subtle);border-radius:6px;font-size:.8rem;font-family:inherit;background:var(--bg);color:var(--ink);outline:none">
+        <div style="font-size:.7rem;color:var(--muted);margin-top:5px">📁 Dépose le fichier dans ton repo GitHub → Vercel le servira automatiquement à cette URL</div>
+      </div>
+      <!-- Panel Code -->
+      <div id="htmlPanelCode" style="display:none">
+        <label style="display:block;font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Code HTML</label>
+        <div style="display:flex;gap:6px;margin-bottom:6px">
+          <button onclick="document.getElementById('lHtmlFile').click()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">Importer .html</button>
+          <input type="file" id="lHtmlFile" accept=".html" style="display:none" onchange="importHtmlFile(this)">
+          <button onclick="previewHtmlModal()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">👁 Prévisualiser</button>
+        </div>
+        <textarea id="lHtmlContent" rows="6" placeholder="Colle ici le code HTML complet..." style="font-family:monospace;font-size:.72rem"></textarea>
+        <div id="htmlPreviewBox" style="display:none;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin-top:8px;border:.5px solid var(--subtle)">
+          <iframe id="htmlPreviewFrame" style="width:100%;height:100%;border:none" sandbox="allow-scripts"></iframe>
+        </div>
       </div>
     </div>
     <div id="fieldTextOnly" style="display:none;padding:8px 12px;background:var(--surface);border-radius:6px;font-size:.78rem;color:var(--muted);margin-bottom:4px">
@@ -451,8 +465,23 @@ function openLeconModal(l, moduleId) {
   document.getElementById('lYoutube').value = l ? (l.youtube_id || '') : '';
   document.getElementById('lDuration').value = l ? (l.duration_min || '') : '';
   document.getElementById('lContent').value = l ? (l.content || '') : '';
-  document.getElementById('lHtmlContent').value = l ? (l.html_content || '') : '';
+  var hcRaw = l ? (l.html_content || '') : '';
+  var isUrl = hcRaw.startsWith('URL:');
+  document.getElementById('lHtmlUrl').value = isUrl ? hcRaw.slice(4) : '';
+  document.getElementById('lHtmlContent').value = isUrl ? '' : hcRaw;
   document.getElementById('htmlPreviewBox').style.display = 'none';
+  // Init onglet
+  if (isUrl) {
+    document.getElementById('htmlTabUrl').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.75rem;font-family:inherit;cursor:pointer';
+    document.getElementById('htmlTabCode').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.75rem;font-family:inherit;cursor:pointer';
+    document.getElementById('htmlPanelUrl').style.display = 'block';
+    document.getElementById('htmlPanelCode').style.display = 'none';
+  } else {
+    document.getElementById('htmlTabCode').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.75rem;font-family:inherit;cursor:pointer';
+    document.getElementById('htmlTabUrl').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.75rem;font-family:inherit;cursor:pointer';
+    document.getElementById('htmlPanelCode').style.display = 'block';
+    document.getElementById('htmlPanelUrl').style.display = 'none';
+  }
   document.getElementById('saveLeconBtn').textContent = l ? 'Mettre à jour' : 'Ajouter';
   switchLeconType(l ? (l.lecon_type || 'youtube') : 'youtube');
   openOverlay('overlayLecon');
@@ -473,6 +502,23 @@ function switchLeconType(type) {
   document.getElementById('fieldYoutube').style.display = type === 'youtube' ? 'block' : 'none';
   document.getElementById('fieldHtml').style.display = type === 'html' ? 'block' : 'none';
   document.getElementById('fieldTextOnly').style.display = type === 'text' ? 'block' : 'none';
+}
+
+function switchHtmlTab(tab) {
+  var btnUrl = document.getElementById('htmlTabUrl');
+  var btnCode = document.getElementById('htmlTabCode');
+  var panelUrl = document.getElementById('htmlPanelUrl');
+  var panelCode = document.getElementById('htmlPanelCode');
+  if (!btnUrl) return;
+  if (tab === 'url') {
+    btnUrl.style.background = 'var(--ink)'; btnUrl.style.color = '#fff'; btnUrl.style.borderColor = 'var(--ink)';
+    btnCode.style.background = 'var(--bg)'; btnCode.style.color = 'var(--muted)'; btnCode.style.borderColor = 'var(--subtle)';
+    panelUrl.style.display = 'block'; panelCode.style.display = 'none';
+  } else {
+    btnCode.style.background = 'var(--ink)'; btnCode.style.color = '#fff'; btnCode.style.borderColor = 'var(--ink)';
+    btnUrl.style.background = 'var(--bg)'; btnUrl.style.color = 'var(--muted)'; btnUrl.style.borderColor = 'var(--subtle)';
+    panelCode.style.display = 'block'; panelUrl.style.display = 'none';
+  }
 }
 
 function importHtmlFile(input) {
@@ -511,7 +557,14 @@ async function saveLecon() {
     }
   }
 
-  var htmlContent = leconType === 'html' ? document.getElementById('lHtmlContent').value.trim() : null;
+  var htmlContent = null;
+  if (leconType === 'html') {
+    var urlEl = document.getElementById('lHtmlUrl');
+    var codeEl = document.getElementById('lHtmlContent');
+    var urlVal = urlEl ? urlEl.value.trim() : '';
+    var codeVal = codeEl ? codeEl.value.trim() : '';
+    htmlContent = urlVal ? 'URL:' + urlVal : (codeVal || null);
+  }
 
   var data = {
     title: title,
