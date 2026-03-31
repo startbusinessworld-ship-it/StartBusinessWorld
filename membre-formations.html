@@ -714,10 +714,16 @@ function playLecon(l) {
   var type = l.lecon_type || (l.youtube_id ? "youtube" : "text");
 
   if (type === "html" && l.html_content) {
-    // URL externe ou code inline
+    // URL externe → bouton nouvel onglet
     if (l.html_content.startsWith('URL:')) {
       var url = l.html_content.slice(4);
-      box.innerHTML = '<iframe src="' + url + '" style="width:100%;height:100%;border:none;display:block" allowfullscreen></iframe>';
+      box.innerHTML =
+        '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0C0C0A">' +
+          '<div style="font-size:2.5rem">⚡</div>' +
+          '<div style="font-size:1rem;font-weight:600;color:#F0ECE4">' + l.title + '</div>' +
+          '<div style="font-size:.82rem;color:#5A564E;max-width:320px;text-align:center">Cette formation interactive s'ouvre en plein écran dans un nouvel onglet.</div>' +
+          '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#A67C3A;color:#fff;padding:12px 28px;border-radius:8px;font-size:.88rem;font-weight:600;text-decoration:none;margin-top:4px">▶ Lancer la formation</a>' +
+        '</div>';
     } else {
       var safeHtml = l.html_content.replace(/"/g, '&quot;').replace(/\n/g, ' ');
       box.innerHTML = '<iframe srcdoc="' + safeHtml + '" style="width:100%;height:100%;border:none;display:block" sandbox="allow-scripts allow-same-origin"></iframe>';
