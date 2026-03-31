@@ -530,7 +530,7 @@ function saveProgress() {
 
 // ── FORMATIONS ──
 async function loadFormations() {
-  var res = await SB.from("formations").select("*").eq("status", "published").order("position");
+  var res = await SB.from("formations").select("id,title,description,cover_url,formation_url,status,position").eq("status", "published").order("position");
   allFormations = res.data || [];
 
   // Charger les stats de progression pour chaque formation
@@ -593,20 +593,40 @@ function renderGrid() {
     var badge = f._pct === 100
       ? '<span class="badge-done">✓ Terminée</span>'
       : f._pct > 0 ? '<span class="badge-prog">En cours</span>' : "";
+
+    var hasUrl = !!f.formation_url;
+    var coverBg = f.cover_url
+      ? 'background:url(' + f.cover_url + ') center/cover no-repeat;'
+      : 'background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:2.2rem;';
+    var coverContent = f.cover_url ? '' : EMOJIS[i % EMOJIS.length];
+
     var card = document.createElement("div");
     card.className = "f-card";
     card.innerHTML =
-      '<div class="f-card-cover">' + EMOJIS[i % EMOJIS.length] + '</div>' +
+      '<div class="f-card-cover" style="' + coverBg + '">' + coverContent + '</div>' +
       '<div class="f-card-body">' +
         '<div class="f-card-top"><div class="f-card-title">' + f.title + '</div>' + badge + '</div>' +
+        (f.description ? '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>' : '') +
         '<div class="f-card-meta"><span id="fmeta_' + f.id + '">—</span></div>' +
-        '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
-        '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>' +
+        (!hasUrl ? '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
+        '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>' : '') +
+        '<div style="margin-top:10px">' +
+          (hasUrl
+            ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:600;text-decoration:none">▶ Lancer la formation</a>'
+            : '<button onclick="openFormation(' + JSON.stringify(f).replace(/"/g,"&quot;") + ')" style="display:inline-flex;align-items:center;gap:6px;background:var(--dark);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
+          ) +
+        '</div>' +
       '</div>';
-    card.onclick = (function(fm) { return function() { openFormation(fm); }; })(f);
+    if (!hasUrl) {
+      card.style.cursor = "pointer";
+      card.addEventListener("click", function(e) {
+        if (e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
+        openFormation(f);
+      });
+    }
     grid.appendChild(card);
   });
-  // Charger le nb de modules pour l'affichage
+
   allFormations.forEach(function(f) {
     SB.from("modules").select("id", { count: "exact" }).eq("formation_id", f.id).then(function(r) {
       var el = document.getElementById("fmeta_" + f.id);

@@ -186,6 +186,15 @@
       <textarea id="fDesc" rows="3" placeholder="Ce que les membres vont apprendre..."></textarea>
     </div>
     <div class="field">
+      <label>URL de la formation (optionnel)</label>
+      <input type="text" id="fUrl" placeholder="https://start-business-world.vercel.app/shopify.html">
+      <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Si renseignee, les membres seront rediriges directement vers cette page.</div>
+    </div>
+    <div class="field">
+      <label>Image de couverture (URL)</label>
+      <input type="text" id="fCover" placeholder="https://images.unsplash.com/...">
+    </div>
+    <div class="field">
       <label>Statut</label>
       <select id="fStatus">
         <option value="draft">Brouillon \u2014 non visible</option>
@@ -365,6 +374,8 @@ function openFormationModal(f) {
   document.getElementById('modalFormationHead').textContent = f ? 'Modifier la formation' : 'Nouvelle formation';
   document.getElementById('fTitle').value = f ? f.title : '';
   document.getElementById('fDesc').value = f ? (f.description || '') : '';
+  document.getElementById('fUrl').value = f ? (f.formation_url || '') : '';
+  document.getElementById('fCover').value = f ? (f.cover_url || '') : '';
   document.getElementById('fStatus').value = f ? f.status : 'draft';
   document.getElementById('saveFormationBtn').textContent = f ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
   openOverlay('overlayFormation');
@@ -377,6 +388,8 @@ async function saveFormation() {
   var data = {
     title: title,
     description: document.getElementById('fDesc').value.trim(),
+    formation_url: document.getElementById('fUrl').value.trim() || null,
+    cover_url: document.getElementById('fCover').value.trim() || null,
     status: document.getElementById('fStatus').value
   };
   var res;
