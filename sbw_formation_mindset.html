@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBW — Formation Mindset</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0C0A;--gold:#A67C3A;--gl:#C9A05A;--white:#F0ECE4;
+  --muted:#5A564E;--dim:#1C1A16;--line:rgba(166,124,58,.18);
+  --red:#E05555;--green:#5DBE7A;--blue:#5B9BD5;
+}
+html,body{height:100%;overflow:hidden;background:#080806;font-family:'DM Sans',sans-serif}
+
+/* ══ LANDING ══════════════════════════════════ */
+#landing{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;z-index:999;transition:opacity .6s ease}
+#landing.out{opacity:0;pointer-events:none}
+.landing-brand{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:32px}
+.landing-title{font-family:'Cormorant Garamond',serif;font-size:clamp(36px,6vw,72px);font-weight:700;color:var(--white);text-align:center;line-height:1.05;margin-bottom:16px}
+.landing-title em{color:var(--gold);font-style:normal;display:block}
+.landing-sub{font-size:15px;color:var(--muted);text-align:center;max-width:480px;line-height:1.7;margin-bottom:48px}
+.landing-meta{display:flex;gap:32px;margin-bottom:48px}
+.lm{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lm-num{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:700;color:var(--gl)}
+.lm-label{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.start-btn{padding:18px 52px;background:var(--gold);color:#0C0C0A;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 0 40px rgba(166,124,58,.2)}
+.start-btn:hover{background:var(--gl);transform:translateY(-2px);box-shadow:0 4px 60px rgba(166,124,58,.3)}
+
+/* ══ APP ══════════════════════════════════════ */
+#app{display:flex;height:100vh;opacity:0;transition:opacity .6s ease}
+#app.in{opacity:1}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:#0A0A08;border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.sb-brand{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--gold)}
+.sb-module{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+.sb-list{flex:1;overflow-y:auto;padding:6px}
+.sb-list::-webkit-scrollbar{width:3px}
+.sb-list::-webkit-scrollbar-thumb{background:var(--line)}
+.sb-item{padding:9px 11px;border-radius:7px;cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:3px}
+.sb-item:hover{background:rgba(255,255,255,.025);border-color:var(--line)}
+.sb-item.active{background:rgba(166,124,58,.08);border-color:rgba(166,124,58,.3)}
+.sb-item.done .sb-num{color:var(--green)}
+.sb-num{font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:2px}
+.sb-title{font-size:10px;color:var(--white);font-weight:500;line-height:1.35}
+.sb-item.active .sb-title{color:var(--gl)}
+.sb-prog{margin-top:5px;height:2px;background:var(--dim);border-radius:2px;overflow:hidden}
+.sb-progbar{height:100%;background:var(--gold);border-radius:2px;transition:width .4s}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOP BAR */
+.topbar{height:46px;background:#080806;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0}
+.tb-lesson{font-size:11px;color:var(--gl);font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-voice{padding:5px 14px;background:rgba(166,124,58,.08);border:1px solid rgba(166,124,58,.2);border-radius:20px;color:var(--gl);font-size:10px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;letter-spacing:.08em}
+.tb-voice:hover,.tb-voice.on{background:rgba(166,124,58,.2);border-color:var(--gold)}
+
+/* SLIDE AREA */
+.slide-area{flex:1;display:flex;align-items:center;justify-content:center;padding:16px;background:#080806;overflow:hidden}
+.slide-wrap{position:relative;width:100%;max-width:calc((100vh - 130px) * 16/9);aspect-ratio:16/9;background:var(--bg);border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.8),0 0 30px rgba(166,124,58,.06)}
+.prog-bar{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gl));z-index:50;transition:width .1s linear}
+
+/* SLIDES */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease;display:flex;overflow:hidden}
+.slide.active{opacity:1;pointer-events:all}
+.logo-tag{position:absolute;top:16px;left:20px;font-family:'Cormorant Garamond',serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);opacity:.55;z-index:5}
+.slide-tag{position:absolute;top:16px;right:20px;font-size:8px;color:var(--muted);letter-spacing:.1em;z-index:5}
+
+/* CAPTION */
+.caption{position:absolute;bottom:0;left:0;right:0;padding:16px 24px 12px;background:linear-gradient(transparent,rgba(0,0,0,.65));z-index:30;min-height:50px;display:flex;align-items:flex-end}
+.caption-txt{font-size:11px;color:rgba(255,255,255,.82);line-height:1.5;width:100%;text-align:center;transition:opacity .3s}
+.caption-txt.off{opacity:0}
+
+/* CONTROLS */
+.controls{height:56px;background:#0A0A08;border-top:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.ctrl{width:36px;height:36px;border-radius:50%;background:rgba(166,124,58,.06);border:1px solid rgba(166,124,58,.2);color:var(--gl);font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif}
+.ctrl:hover{background:rgba(166,124,58,.18)}
+.ctrl.play{width:44px;height:44px;background:var(--gold);color:#0C0C0A;font-size:16px}
+.ctrl.play:hover{background:var(--gl)}
+.slide-ctr{font-size:10px;color:var(--muted);letter-spacing:.08em;min-width:36px}
+.lesson-ctr{font-size:10px;color:var(--muted);flex:1;text-align:right}
+
+/* ══ SLIDE TYPES ══════════════════════════════ */
+
+/* INTRO — split layout */
+.s-intro{display:flex;width:100%;height:100%}
+.s-intro-left{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 40px 40px 52px}
+.s-intro-right{width:45%;display:flex;align-items:center;justify-content:center;position:relative;background:rgba(166,124,58,.03)}
+.s-intro-right::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.s-intro-num-bg{font-family:'Cormorant Garamond',serif;font-size:180px;font-weight:700;color:rgba(166,124,58,.08);line-height:1;position:relative;z-index:1}
+.s-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(166,124,58,.1);border:1px solid rgba(166,124,58,.25);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.s-intro-title{font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3.5vw,44px);font-weight:700;color:var(--white);line-height:1.1;margin-bottom:14px}
+.s-intro-title em{color:var(--gold);font-style:normal}
+.s-intro-sub{font-size:12px;color:#9A9690;line-height:1.7;max-width:360px}
+
+/* CONCEPT — centered */
+.s-center{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 80px;text-align:center}
+.s-concept-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3vw,38px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:20px}
+.s-body{font-size:13px;color:#B8B4AC;line-height:1.8;max-width:600px}
+.s-body strong{color:var(--white);font-weight:600}
+
+/* LIST — horizontal cards */
+.s-list-wrap{width:100%;height:100%;display:flex;flex-direction:column;padding:36px 40px 36px 52px}
+.s-list-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:20px}
+.s-list-grid{display:flex;gap:14px;flex:1}
+.s-card{flex:1;background:rgba(166,124,58,.04);border:1px solid rgba(166,124,58,.12);border-radius:10px;padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+.s-card-icon{font-size:24px}
+.s-card-name{font-size:13px;font-weight:700;color:var(--white);line-height:1.3}
+.s-card-sub{font-size:11px;color:var(--muted);line-height:1.5;flex:1}
+
+/* STAT — big number */
+.s-stat-wrap{width:100%;height:100%;display:flex;gap:0}
+.s-stat-left{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px}
+.s-stat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(60px,10vw,120px);font-weight:700;color:var(--gl);line-height:1}
+.s-stat-label{font-size:12px;color:var(--muted);letter-spacing:.1em;margin-top:8px;text-align:center}
+.s-stat-right{flex:1.2;display:flex;flex-direction:column;justify-content:center;padding:40px 40px 40px 20px;border-left:1px solid var(--line)}
+.s-stat-body{font-size:13px;color:#B8B4AC;line-height:1.8}
+.s-stat-body strong{color:var(--white)}
+
+/* QUOTE */
+.s-quote-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:40px 80px;flex-direction:column;gap:20px}
+.s-quote-mark{font-family:'Cormorant Garamond',serif;font-size:80px;color:rgba(166,124,58,.2);line-height:.7}
+.s-quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,30px);font-style:italic;color:var(--white);text-align:center;line-height:1.5;max-width:680px}
+.s-quote-auth{font-size:11px;color:var(--gl);letter-spacing:.12em;text-align:center}
+
+/* ACTION */
+.s-action-wrap{width:100%;height:100%;display:flex;gap:0}
+.s-action-left{width:280px;display:flex;flex-direction:column;justify-content:center;padding:40px;border-right:1px solid var(--line);flex-shrink:0}
+.s-action-badge{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);background:rgba(93,190,122,.08);border:1px solid rgba(93,190,122,.2);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:16px}
+.s-action-title{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,30px);font-weight:700;color:var(--white);line-height:1.2}
+.s-action-right{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px;gap:12px}
+.s-step{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;border-radius:8px;background:rgba(93,190,122,.04);border:1px solid rgba(93,190,122,.1)}
+.s-step-n{width:24px;height:24px;border-radius:50%;background:rgba(93,190,122,.12);border:1px solid rgba(93,190,122,.3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:1px}
+.s-step-txt{font-size:12px;color:var(--white);line-height:1.5}
+
+/* RECAP */
+.s-recap-wrap{width:100%;height:100%;display:flex;gap:0}
+.s-recap-left{width:260px;display:flex;flex-direction:column;justify-content:center;padding:40px;border-right:1px solid var(--line);flex-shrink:0}
+.s-recap-tag{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.s-recap-title{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,28px);font-weight:700;color:var(--white);line-height:1.2}
+.s-recap-right{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px;gap:10px}
+.s-recap-pt{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:7px;background:rgba(166,124,58,.04);border-left:2px solid var(--gold)}
+.s-recap-dot{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:6px}
+.s-recap-txt{font-size:12px;color:var(--white);line-height:1.4}
+
+/* ANIMATIONS */
+.af{opacity:0}
+.afb{opacity:0;transform:translateY(16px)}
+.afs{opacity:0;transform:scale(.88)}
+.afl{opacity:0;transform:translateX(-14px)}
+.afr{opacity:0;transform:translateX(14px)}
+.slide.active .af,.slide.active .afb,.slide.active .afs,.slide.active .afl,.slide.active .afr{transition:all .55s cubic-bezier(.34,1.3,.64,1)}
+.slide.active .af{opacity:1;transition:opacity .55s ease}
+.slide.active .afb{opacity:1;transform:none}
+.slide.active .afs{opacity:1;transform:none}
+.slide.active .afl{opacity:1;transform:none}
+.slide.active .afr{opacity:1;transform:none}
+.d1{transition-delay:.15s!important}.d2{transition-delay:.35s!important}.d3{transition-delay:.55s!important}
+.d4{transition-delay:.75s!important}.d5{transition-delay:.95s!important}.d6{transition-delay:1.15s!important}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING ══ -->
+<div id="landing">
+  <div class="landing-brand">Start Business World</div>
+  <div class="landing-title">Formation<em>Mindset</em></div>
+  <div class="landing-sub">La formation que personne te donne à l'école. Tout ce que tu dois changer dans ta tête pour construire quelque chose de réel.</div>
+  <div class="landing-meta">
+    <div class="lm"><div class="lm-num">15</div><div class="lm-label">Leçons</div></div>
+    <div class="lm"><div class="lm-num">105</div><div class="lm-label">Slides</div></div>
+    <div class="lm"><div class="lm-num">~90</div><div class="lm-label">Minutes</div></div>
+  </div>
+  <button class="start-btn" onclick="startApp()">▶ Commencer la formation</button>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-brand">SBW</div>
+      <div class="sb-module">Module Mindset</div>
+    </div>
+    <div class="sb-list" id="sbList"></div>
+  </div>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="tb-lesson" id="tbLesson">—</div>
+      <button class="tb-voice" id="voiceBtn" onclick="toggleVoice()">🔊 Voix ON</button>
+    </div>
+    <div class="slide-area">
+      <div class="slide-wrap" id="slideWrap">
+        <div class="prog-bar" id="progBar" style="width:0%"></div>
+        <div id="slidesCont"></div>
+        <div class="caption"><div class="caption-txt off" id="capTxt"></div></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrl" onclick="prevSlide()">←</button>
+      <button class="ctrl play" id="playBtn" onclick="togglePlay()">⏸</button>
+      <button class="ctrl" onclick="nextSlide()">→</button>
+      <div class="slide-ctr" id="slideCtr">-</div>
+      <div class="lesson-ctr" id="lessonCtr">-</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════════
+   DONNÉES — 15 LEÇONS
+══════════════════════════════════════════════════════ */
+const LESSONS = [
+
+{id:1, title:"T'as pas un problème de talent", slides:[
+  {type:'intro', num:'01', title:"T'as pas un\nproblème de <em>talent</em>",
+   sub:"95% des entrepreneurs qui échouent ont les compétences pour réussir. Ce qui leur manque, c'est dans la tête.",
+   vo:"Écoute bien ce que je vais te dire parce que ça va changer ta façon de voir les choses. T'as pas un problème de talent. T'as pas un problème de réseau, ni de capital, ni d'opportunités. T'as un problème de mindset. Et c'est une excellente nouvelle. Parce que le mindset, contrairement au talent, ça se travaille. Dans cette formation, je vais pas te faire de discours. Je vais te donner les vrais outils pour reconstruire ta façon de penser de zéro. Reste avec moi."},
+  {type:'concept', tag:'Le vrai problème', title:"Pourquoi les compétences ne suffisent pas",
+   body:"T'imagines deux entrepreneurs avec les mêmes compétences, la même idée, le même marché. L'un réussit, l'autre abandonne au premier obstacle. <strong>La seule différence, c'est comment ils ont interprété cet obstacle.</strong> Pas les compétences. La façon de penser.",
+   vo:"Je vais pas te la faire à l'envers. On a tous croisé des gens ultra-compétents qui galèrent, et des gens moins doués qui cartonnent. Pourquoi ? Parce que les compétences te donnent les outils. Le mindset décide si tu les utilises ou si tu les ranges dans un tiroir. Un entrepreneur avec des compétences moyennes et un mindset solide va systématiquement battre un entrepreneur brillant qui se sabotera au premier coup dur. C'est ça la réalité du terrain."},
+  {type:'stat', num:'80%', label:"des startups échouent à cause du fondateur", body:"Pas à cause du marché, pas à cause de la concurrence, pas à cause du financement. Les études sont claires : <strong>80% des échecs viennent de décisions liées à l'état d'esprit du fondateur.</strong> Peur, ego, perfectionnisme, manque de résilience.",
+   vo:"Voilà le chiffre que les incubateurs et accélérateurs cachent un peu. Quatre-vingts pourcent des échecs de startups viennent du fondateur lui-même. Pas du marché. Pas de la concurrence. Du fondateur. De sa peur de prendre des décisions. De son perfectionnisme qui lui fait retarder le lancement. De son ego qui lui fait ignorer les retours clients. De son incapacité à se relever après un échec. C'est brutal, mais c'est la vérité. Et c'est ce qu'on va travailler."},
+  {type:'list', title:"Les 3 blocages principaux", items:[
+    {icon:'🧠', name:"La voix du doute", sub:"Cette petite voix dans ta tête qui dit 'qui tu crois être pour faire ça ?'"},
+    {icon:'😰', name:"La peur de l'échec", sub:"Qui te fait rester immobile plutôt que d'avancer et risquer de te planter"},
+    {icon:'🔄', name:"Les croyances limitantes", sub:"Des histoires que tu te racontes depuis l'enfance et qui gouvernent tes décisions"}],
+   vo:"Trois blocages reviennent chez presque tous les entrepreneurs que j'ai rencontrés. Un : la voix du doute. Cette petite voix dans ta tête qui dit 'qui tu crois être pour faire ça, t'as pas les épaules, les autres sont meilleurs.' Deux : la peur de l'échec. Qui te paralyse et te fait rester dans le flou plutôt que de prendre une décision qui pourrait mal tourner. Trois : les croyances limitantes. Des histoires que tu te racontes depuis l'enfance sur l'argent, le succès, ce que tu mérites ou pas. On va démonter tout ça."},
+  {type:'quote', text:"Le succès ne dépend pas des ressources que vous avez. Il dépend de l'usage que vous en faites.", auth:"— Tony Robbins",
+   vo:"Tony Robbins a passé quarante ans à analyser ce qui différencie ceux qui réussissent de ceux qui échouent. Et il revient toujours au même point. Deux personnes avec les mêmes ressources vont produire des résultats radicalement différents. Pas à cause de la chance. Pas à cause des contacts. À cause de comment elles utilisent ce qu'elles ont. Et ça commence par la tête. Toujours par la tête."},
+  {type:'action', badge:"Exercice d'intro", title:"Ton auto-diagnostic",
+   steps:[{txt:"Prends une feuille. Note 3 moments où tu t'es retenu par peur de ce qui pourrait mal tourner."},{txt:"Pour chacun : quel aurait été le vrai risque réel si tu avais foncé ?"},{txt:"Qu'est-ce que ça te dit sur tes blocages principaux ?"}],
+   vo:"Avant de passer à la suite, je veux que tu fasses quelque chose de concret. Prends une feuille maintenant, pas dans une heure. Note trois moments dans les douze derniers mois où tu t'es retenu de faire quelque chose à cause de la peur. Une décision que tu as repoussée. Un projet que tu as pas lancé. Une conversation que t'as évitée. Pour chacun, demande-toi : quel était le vrai risque réel si j'avais foncé ? Dans la plupart des cas, tu vas voir que le danger était dans ta tête, pas dans la réalité."},
+  {type:'recap', title:"Ce qu'on a posé ici", points:["Le talent sans mindset ne produit rien de durable","80% des échecs viennent de l'état d'esprit du fondateur","Tes 3 ennemis principaux : le doute, la peur, les croyances limitantes","Le mindset ça se travaille — c'est l'objet de toute cette formation"],
+   vo:"Ce qu'on a posé dans cette première leçon. Le talent sans mindset, ça donne rien de durable. La preuve par les chiffres : quatre-vingts pourcent des échecs viennent du fondateur lui-même. Tes trois ennemis principaux sont le doute, la peur et les croyances limitantes. Et la bonne nouvelle, c'est que le mindset ça se construit. T'es pas né avec ou sans. Tu le développes. C'est ce qu'on fait ensemble dans les quatorze leçons qui suivent."}
+]},
+
+{id:2, title:"Ton cerveau te sabote", slides:[
+  {type:'intro', num:'02', title:"Ton cerveau\nte <em>sabote</em>",
+   sub:"Ton cerveau est ton meilleur allié et ton pire ennemi en même temps. Comprendre comment il marche, c'est ton avantage compétitif.",
+   vo:"Leçon deux. Je vais te parler de quelque chose que personne t'explique jamais dans les formations business classiques. Comment ton cerveau fonctionne vraiment. Et pourquoi il est câblé pour te maintenir là où tu es plutôt que pour te faire avancer. Comprendre ça, c'est comme avoir la notice de la machine. T'es plus à la merci de tes réactions automatiques. T'as le contrôle."},
+  {type:'concept', tag:'La neurologie', title:"Le cerveau reptilien et l'amygdale",
+   body:"T'as deux cerveaux qui se battent en permanence. Le cerveau reptilien, vieux de millions d'années, est programmé pour <strong>ta survie</strong>. Il voit une menace partout. Et pour lui, lancer ton business, c'est une menace.",
+   vo:"Voilà ce qui se passe dans ta tête quand tu t'apprêtes à prendre un risque entrepreneurial. Ton amygdale, la partie la plus primitive de ton cerveau, déclenche une alarme. La même alarme que si tu étais menacé par un prédateur. Tu ressens de l'anxiété, tu procrastines, tu cherches des raisons de pas le faire. C'est pas de la lâcheté. C'est de la biologie. Ton cerveau confond inconfort et danger. Et tant que tu comprends pas ça, tu vas te laisser gouverner par cette alarme sans le savoir."},
+  {type:'list', title:"Les 4 biais qui te plombent", items:[
+    {icon:'📎', name:"Le biais de confirmation", sub:"Tu retiens les infos qui confirment tes peurs et ignores celles qui les contredisent"},
+    {icon:'🔮', name:"L'effet Dunning-Kruger", sub:"Tu te sous-estimes dans les domaines que tu connais, et tu sais pas ce que tu sais pas"},
+    {icon:'😱', name:"L'aversion à la perte", sub:"La douleur de perdre 100€ est deux fois plus forte que le plaisir d'en gagner 100"},
+    {icon:'🧊', name:"Le biais du statu quo", sub:"Ton cerveau préfère l'inconfort connu à la possibilité inconnue, même si elle est meilleure"}],
+   vo:"Quatre biais cognitifs que tu dois connaître parce qu'ils gouvernent tes décisions en ce moment même. Le biais de confirmation : tu cherches inconsciemment des preuves que tu vas échouer. L'effet Dunning-Kruger : tu sais pas à quel point tu sous-estimes tes propres compétences. L'aversion à la perte : tu évites de prendre des risques parce que ton cerveau surpondère les pertes potentielles. Et le biais du statu quo : ton cerveau préfère rester dans une situation merdique connue plutôt que d'aller vers quelque chose de meilleur mais incertain."},
+  {type:'concept', tag:"Le hack", title:"Nommer pour désarmer",
+   body:"Quand tu ressens de l'anxiété avant de prendre une décision, ton cerveau est en mode survie. <strong>Le simple fait de nommer ce qui se passe réduit l'activité de l'amygdale de 50%.</strong> Les neurosciences l'ont mesuré.",
+   vo:"Voilà un truc simple mais puissant. Les recherches de Matthew Lieberman à UCLA ont montré que quand tu mets des mots sur une émotion difficile, l'activité de ton amygdale, le centre de la peur dans ton cerveau, diminue de moitié. Juste en nommant. 'Là je ressens de la peur parce que je vais appeler ce grand client.' 'Là je procrastine parce que j'ai peur de pas être prêt.' Le simple fait de nommer te remet dans le siège du conducteur. Essaie, c'est bluffant."},
+  {type:'stat', num:'95%', label:"de nos décisions sont inconscientes", body:"La recherche en neurosciences montre que <strong>95% de nos décisions sont prises de manière automatique</strong>, avant même que notre conscience en soit informée. Tu crois décider. Tu réagis.",
+   vo:"Ça va peut-être te déranger, mais c'est la réalité. Quatre-vingt-quinze pourcent de tes décisions sont automatiques. Prises avant même que ton cerveau conscient soit dans la boucle. Ce que tu interprètes comme une réflexion, c'est souvent une justification après coup de ce que ton cerveau inconscient avait déjà décidé. C'est pour ça que comprendre tes biais et tes automatismes, c'est pas optionnel. Si tu les connais pas, ils te pilotent. Si tu les connais, tu peux commencer à en reprendre le contrôle."},
+  {type:'action', badge:"Pratique", title:"Observer ton saboteur intérieur",
+   steps:[{txt:"Cette semaine, quand tu procrastines sur une tâche importante, note ce qui se passe dans ta tête"},{txt:"Identifie le biais en jeu : peur ? aversion à la perte ? biais du statu quo ?"},{txt:"Nomme-le à voix haute et reprends ta tâche. C'est tout."}],
+   vo:"L'exercice pratique de cette leçon est simple. Cette semaine, à chaque fois que tu procrastines sur quelque chose d'important, stop. Observe ce qui se passe dans ta tête. Est-ce que c'est la peur de pas bien faire ? L'aversion à la perte ? Le biais du statu quo ? Nomme le biais exactement. Dis-le à voix haute si tu peux. 'C'est mon aversion à la perte qui parle.' Puis reprends ta tâche. Tu vas voir que ça devient plus facile avec la pratique. Ton cerveau peut pas se saboter aussi facilement quand tu sais ce qu'il fait."},
+  {type:'recap', title:"Les points clés", points:["Ton cerveau confond inconfort entrepreneurial et danger réel","4 biais principaux : confirmation, Dunning-Kruger, aversion à la perte, statu quo","95% des décisions sont inconscientes — donc automatiques","Nommer tes émotions réduit l'activité de l'amygdale de 50%"],
+   vo:"Ce qu'il faut retenir de cette leçon. Ton cerveau primitif voit une menace là où il y a juste de l'inconfort. Quatre biais cognitifs gouvernent la plupart de tes mauvaises décisions entrepreneuriales. Quatre-vingt-quinze pourcent de tes décisions sont inconscientes, et donc automatiques si tu travailles pas à en reprendre le contrôle. Et nommer tes émotions, juste les nommer, c'est l'outil le plus simple et le plus efficace pour désarmer ton saboteur intérieur."}
+]},
+
+{id:3, title:"L'esprit de croissance", slides:[
+  {type:'intro', num:'03', title:"L'esprit de\n<em>croissance</em>",
+   sub:"T'es pas limité par tes capacités actuelles. T'es limité par ce que tu crois de tes capacités. La nuance est énorme.",
+   vo:"Leçon trois. L'esprit de croissance. C'est le concept de Carol Dweck, professeur à Stanford, et c'est probablement la découverte la plus importante en psychologie de la performance des trente dernières années. L'idée de base est simple : ce que tu crois sur ton intelligence et tes capacités détermine tout ce que tu feras ou ne feras pas. Pas tes capacités réelles. Tes croyances sur tes capacités. Et ça, ça se change."},
+  {type:'concept', tag:'Fixed vs Growth', title:"Deux façons de voir le monde",
+   body:"L'esprit fixe croit que t'es né avec un certain niveau d'intelligence et que ça change pas. <strong>L'esprit de croissance comprend que le cerveau est un muscle.</strong> Plus tu l'utilises correctement, plus il se développe. Tout s'apprend.",
+   vo:"Deux croyances fondamentalement différentes. L'esprit fixe, c'est croire que t'es comme t'es, que ton intelligence est fixée à la naissance, que si tu sais pas faire quelque chose naturellement c'est que c'est pas pour toi. L'esprit de croissance, c'est comprendre que les neurosciences modernes ont prouvé une chose : le cerveau est plastique. Il se reconfigure avec l'usage. Ce qu'on appelle le talent, c'est souvent juste quelqu'un qui a commencé plus tôt et qui a plus pratiqué. Le terrain de jeu est plus égal qu'on ne le pense."},
+  {type:'list', title:"Comment l'esprit fixe se manifeste", items:[
+    {icon:'😶', name:"T'évites les défis", sub:"Si c'est dur, c'est signe que c'est pas pour toi — alors t'essaies pas"},
+    {icon:'😤', name:"T'es sur la défensive", sub:"Une critique devient une attaque contre ce que tu es, pas contre ce que tu fais"},
+    {icon:'😟', name:"Le succès des autres te dérange", sub:"Voir quelqu'un réussir là où tu as échoué confirme que t'es pas assez bon"}],
+   vo:"Comment reconnaître ton esprit fixe dans le quotidien. D'abord, tu évites les défis. Si quelque chose est difficile, ton cerveau traduit : 'je suis pas fait pour ça' plutôt que 'je suis pas encore prêt'. Ensuite, tu deviens défensif face aux critiques. Parce que si ton intelligence est fixe, une critique de ton travail devient une critique de ce que t'es. Et enfin, le succès des autres te pèse. Parce que dans l'esprit fixe, leurs réussites réduisent les tiennes. Ces trois signes, note-les. Ils te coûtent cher."},
+  {type:'stat', num:'40%', label:"de performance en plus avec l'esprit de croissance", body:"À niveau de départ identique, les élèves et entrepreneurs avec un état d'esprit de croissance performent <strong>en moyenne 40% mieux</strong> sur le long terme. Pas parce qu'ils sont plus intelligents. Parce qu'ils arrêtent pas.",
+   vo:"Le chiffre qui devrait te convaincre si l'argument théorique suffisait pas. Quarante pourcent de performance en plus. À niveau de départ équivalent. La seule variable : la croyance sur la nature des compétences. Ceux qui croient que ça s'apprend, apprennent effectivement plus. Ils cherchent plus de feedback. Ils essaient plus longtemps. Ils voient les obstacles comme des étapes et pas comme des preuves de leur incompétence. Et sur le long terme, cet avantage composé devient massif."},
+  {type:'quote', text:"Je ne suis pas plus intelligent que les autres. Je reste juste plus longtemps avec les problèmes.", auth:"— Albert Einstein",
+   vo:"Einstein a dit ça et c'est l'une des citations les plus importantes pour un entrepreneur. Il remet les pendules à l'heure sur ce qu'on appelle le génie. Le génie, c'est souvent juste de la persistance habillée. Les gens qui réussissent durent plus longtemps avec les problèmes. Ils lâchent pas. Pas parce qu'ils ont un QI supérieur. Parce qu'ils ont une relation différente avec la difficulté. Pour eux, la difficulté n'est pas un signal d'arrêt. C'est un signal de travail."},
+  {type:'action', badge:"Exercice", title:"Le journal 'pas encore'",
+   steps:[{txt:"Identifie 3 domaines où tu te dis souvent 'je suis pas fait pour ça'"},{txt:"Réécris chaque phrase avec 'je suis pas encore arrivé à maîtriser ça, mais...'"},{txt:"Identifie une action concrète pour chacun. Juste une."}],
+   vo:"Exercice pratique. Prends les trois domaines où tu te brides le plus. Les trucs que tu te dis que c'est pas pour toi. La comptabilité, la vente, le management, peu importe. Réécris chaque phrase avec la formule : je suis pas encore arrivé à maîtriser ça, mais. Ce mot encore, il change tout neurologiquement. Il bascule ton cerveau de l'état fixe à l'état de progression. Et pour chaque domaine, identifie une seule action pour avancer. Un livre. Une formation. Une personne à appeler."},
+  {type:'recap', title:"Ce qu'il faut garder", points:["Esprit fixe = tes capacités sont fixes. Esprit de croissance = tout s'apprend","40% de performance en plus pour ceux qui croient que ça s'apprend","Le talent, c'est souvent juste plus de pratique et plus tôt","Le mot 'encore' est le plus puissant de ton vocabulaire"],
+   vo:"Les points à retenir. L'esprit fixe te dit que t'es limité par ce que t'es. L'esprit de croissance te dit que t'es limité par ce que t'as encore appris. Quarante pourcent de performance supplémentaire pour ceux qui ont compris ça. Le talent, c'est souvent juste une avance de pratique. Et le mot encore, il transforme 'je suis pas capable' en 'je suis pas encore capable'. Change un mot, change une trajectoire."}
+]},
+
+{id:4, title:"La peur : info, pas stop", slides:[
+  {type:'intro', num:'04', title:"La peur :\n<em>info, pas stop</em>",
+   sub:"La peur est le signal le plus mal interprété dans la vie d'un entrepreneur. Elle te dit pas d'arrêter. Elle te dit que t'es sur quelque chose d'important.",
+   vo:"Leçon quatre. La peur. On va y aller direct. La peur est la force qui paralyse le plus d'entrepreneurs talentueux. Pas le manque de compétences. Pas le manque d'argent. La peur. Mais voilà ce que personne t'a dit : la peur est une information, pas une instruction. Elle te dit pas quoi faire. Elle te signale que quelque chose compte pour toi. Et comprendre ça change tout."},
+  {type:'concept', tag:'La vérité', title:"Ce que la peur te dit vraiment",
+   body:"Ton cerveau génère de la peur pour deux raisons : un danger réel ou un désir fort. <strong>La peur que tu ressens avant de lancer ton projet, c'est la deuxième catégorie.</strong> C'est ton cerveau qui confirme que c'est important pour toi.",
+   vo:"Il y a deux types de peur. La peur fonctionnelle : elle te signale un vrai danger physique. Tu vois un camion fonce sur toi, t'as peur, tu sautes. C'est utile. Et la peur dysfonctionnelle : elle se déclenche face à quelque chose d'important pour toi. Avant de passer un appel crucial. Avant de signer un contrat. Avant de lancer ton produit. Cette peur-là te dit pas de t'arrêter. Elle te dit que tu tiens à quelque chose. Et si tu t'arrêtes à chaque fois que tu ressens cette peur, tu te priveras de tout ce qui compte vraiment pour toi."},
+  {type:'list', title:"Comment la peur se déguise", items:[
+    {icon:'🕐', name:"La procrastination", sub:"T'attends le bon moment, d'être prêt, d'avoir plus d'infos — c'est de la peur déguisée en préparation"},
+    {icon:'🔍', name:"Le perfectionnisme", sub:"T'as jamais fini parce que c'est jamais parfait — c'est de la peur du jugement déguisée en standards élevés"},
+    {icon:'📚', name:"La sur-formation", sub:"T'accumules les formations et les livres mais tu lances rien — c'est de la peur déguisée en investissement"}],
+   vo:"La peur est rarement honnête. Elle se déguise. Sous la procrastination : je suis pas encore prêt, j'attends le bon moment. En réalité : j'ai peur de me lancer et de me planter. Sous le perfectionnisme : mon produit est pas encore assez bon. En réalité : j'ai peur que les gens jugent mon travail. Sous la sur-formation : je lis encore un livre avant de démarrer. En réalité : tant que je lance pas, je peux pas échouer. Reconnais ces masques. Ils te coûtent des mois, parfois des années."},
+  {type:'stat', num:'5%', label:"des peurs entrepreneuriales se réalisent vraiment", body:"Les études sur la prise de décision montrent que <strong>moins de 5% des scénarios catastrophes imaginés se réalisent effectivement</strong>. Ton cerveau est un générateur de fictions anxiogènes. La réalité est presque toujours moins dure.",
+   vo:"Voilà le chiffre qui devrait te libérer. Moins de cinq pourcent des catastrophes que tu imagines se réalisent. Ton cerveau est un générateur d'histoires. Il prend un risque réel de deux sur dix et l'amplifie en scénario catastrophe de dix sur dix. Ce n'est pas de la mauvaise volonté, c'est de la biologie. Ton cerveau surpondère les pertes potentielles pour te protéger. Mais ça te coûte énormément. La réalité de l'entrepreneuriat est presque toujours récupérable. Presque toujours."},
+  {type:'quote', text:"Agis malgré la peur. Le courage n'est pas l'absence de peur. C'est décider que quelque chose est plus important qu'elle.", auth:"— Ambrose Redmoon",
+   vo:"Le courage, c'est pas être sans peur. C'est décider d'avancer malgré elle. Susan Jeffers a écrit un bouquin entier là-dessus avec l'idée simple : feel the fear and do it anyway. Ressens la peur et fonce quand même. Parce que la peur disparaît pas avec la préparation. Elle disparaît avec l'action. Tu verras que les entrepreneurs qui ont l'air courageux ont autant peur que toi. Ils ont juste appris à avancer avec."},
+  {type:'action', badge:"Pratique", title:"L'inventaire de peur",
+   steps:[{txt:"Note ta plus grande peur entrepreneuriale en ce moment — sois honnête"},{txt:"Décris le pire scénario possible dans les détails. Vraiment."},{txt:"Évalue : probabilité réelle ? Et si ça arrivait, tu pourrais t'en remettre dans 2 ans ?"}],
+   vo:"L'exercice de la worst case analysis. Note ta plus grande peur entrepreneuriale en ce moment. Pas une peur vague, une peur précise. Décris le pire scénario possible dans tous les détails. Vraiment. Vas au bout. Puis pose-toi deux questions. Quelle est la probabilité réelle que ça arrive, sur dix ? Et si ça arrivait quand même, est-ce que tu pourrais t'en remettre dans deux ans ? Quatre-vingt-dix pourcent du temps, la réponse à la deuxième question est oui. Et ça suffit pour avancer."},
+  {type:'recap', title:"L'essentiel", points:["La peur est une info, pas une instruction d'arrêt","Elle se déguise en procrastination, perfectionnisme et sur-formation","Moins de 5% de tes scénarios catastrophes se réalisent","Le courage = avancer malgré la peur, pas l'absence de peur"],
+   vo:"Ce qu'il faut retenir. La peur est une information, pas un stop. Elle te dit que quelque chose compte pour toi. Elle se déguise sous des formes qui ont l'air légitimes : préparation, perfectionnisme, formation. Moins de cinq pourcent de tes scénarios catastrophes se réalisent. Et le courage, c'est pas l'absence de peur. C'est décider qu'avancer est plus important que rester confortable. Prochaine leçon : comment sortir de ta zone de confort sans te cramer."}
+]},
+
+{id:5, title:"Ta zone de confort", slides:[
+  {type:'intro', num:'05', title:"Ta zone\nde <em>confort</em>",
+   sub:"Ta zone de confort ne te protège pas. Elle t'emprisonne dans une version appauvrie de ce que tu pourrais être.",
+   vo:"Leçon cinq. La zone de confort. Tout le monde te dit d'en sortir. Personne t'explique vraiment comment. Dans cette leçon, on va aller au fond du truc. Comprendre pourquoi c'est si difficile biologiquement. Et avoir un protocole concret pour l'élargir progressivement, sans te brûler les ailes."},
+  {type:'concept', tag:'La biologie', title:"Pourquoi le confort est un piège évolutif",
+   body:"Ton cerveau a une règle simple héritée de millions d'années : <strong>le connu est sûr, l'inconnu est potentiellement mortel</strong>. Cette règle te sauvait la vie dans la savane. Elle te plombe en business.",
+   vo:"Il faut comprendre quelque chose. Ton cerveau ne te permet pas de sortir de ta zone de confort facilement parce qu'il veut pas te voir mourir. Pendant des millions d'années, l'inconnu voulait dire potentiellement un prédateur, une falaise, un clan ennemi. Donc ton cerveau a appris à éviter l'inconnu par défaut. Le problème, c'est que ce mécanisme s'applique aussi à appeler un grand client, lancer ton premier produit ou demander une augmentation. Ton cerveau voit pas la différence. Il voit juste : inconnu, danger."},
+  {type:'list', title:"Les 3 zones que tu dois connaître", items:[
+    {icon:'🟢', name:"Zone de confort", sub:"Zéro effort, zéro stress, zéro croissance. T'as la maîtrise totale. Tu stagneras ici."},
+    {icon:'🟡', name:"Zone d'apprentissage", sub:"Inconfort gérable. C'est ici que tu grandis. C'est ici que tu dois passer le plus de temps."},
+    {icon:'🔴', name:"Zone de panique", sub:"Stress paralysant. Aucun apprentissage possible. Les sauts trop grands t'amènent ici."}],
+   vo:"Trois zones que tu dois connaître par coeur. La zone de confort : t'es à l'aise, tout est prévisible, tu maîtrises. Mais il se passe rien. Zéro croissance. La zone d'apprentissage : c'est inconfortable mais gérable. Tu peux pas encore faire ça naturellement, mais tu peux t'y mettre. C'est là que la magie opère. Et la zone de panique : le défi est trop grand, le stress trop intense, tu peux plus apprendre. Les sauts trop importants t'amènent là et te font regretter d'avoir essayé. L'objectif, c'est de passer le maximum de temps en zone d'apprentissage."},
+  {type:'concept', tag:'Le principe', title:"L'expansion progressive, pas le saut",
+   body:"La zone de confort s'élargit. Elle ne s'abandonne pas. <strong>Chaque petite action légèrement inconfortable agrandit ton territoire de ce qui est possible.</strong> C'est cumulatif.",
+   vo:"L'erreur classique, c'est de vouloir se jeter dans le grand bain directement. Quitter son job du jour au lendemain, lancer un produit sans test, tout miser sur une seule décision. Dans quatre-vingt pourcent des cas, ça aboutit à la zone de panique et à l'abandon. La vraie méthode, c'est l'expansion progressive. Un micro-challenge par jour. Un truc légèrement inconfortable chaque semaine. Et lentement, ce qui te faisait peur devient normal. Ce qui était dans ta zone d'apprentissage entre dans ta zone de confort. Et ta zone de confort s'agrandit."},
+  {type:'stat', num:'2min', label:"c'est tout ce qu'il faut pour démarrer", body:"La règle des deux minutes de James Clear : <strong>si une habitude prend moins de deux minutes à démarrer, tu n'as aucune excuse valable pour ne pas la faire.</strong> Commence ridiculement petit. Grandis ensuite.",
+   vo:"La règle des deux minutes de James Clear est l'une des plus efficaces que j'ai appliquées. Quand t'as une nouvelle habitude à construire ou un défi à relever, commence par quelque chose qui prend deux minutes maximum. Pas pour rester à deux minutes. Pour que tu n'aies plus d'excuse pour ne pas commencer. Parce que le plus dur, c'est toujours de commencer. Une fois lancé, tu continues naturellement. La taille de la marche détermine si tu la franchis ou pas."},
+  {type:'action', badge:"Défi hebdo", title:"Le protocole de la semaine",
+   steps:[{txt:"Identifie quelque chose que tu repousses depuis plus d'un mois"},{txt:"Découpe-le en 5 micro-actions de 10 minutes max chacune"},{txt:"Engage-toi sur la première micro-action aujourd'hui — pas demain"}],
+   vo:"Le protocole concret. Identifie quelque chose que tu repousses depuis plus d'un mois. Ce truc qui traîne dans ta liste et que tu fais toujours glisser au lendemain. Découpe-le en cinq micro-actions de dix minutes maximum chacune. Pas une grosse action. Cinq petites. Et engage-toi sur la première aujourd'hui. Pas demain. Aujourd'hui. Parce que demain, c'est le pays où vivent les perdants. Aujourd'hui, c'est là où les choses se font."},
+  {type:'recap', title:"Ce qu'il faut retenir", points:["Le cerveau confond inconfort entrepreneur et danger de mort","Zone de confort = stagnation, zone d'apprentissage = croissance, zone de panique = burnout","On élargit la zone de confort progressivement — on l'abandonne pas","Commence ridiculement petit. Deux minutes. Grandis ensuite."],
+   vo:"Ce qu'on retient. Ton cerveau confond inconfort et danger, c'est de la biologie, pas de la faiblesse. La zone d'apprentissage est ta zone de croissance cible. T'essaies pas d'aller directement dans la zone de panique. Tu élargis progressivement ta zone de confort avec des micro-challenges. Et tu commences ridiculement petit pour ne jamais avoir d'excuse pour ne pas démarrer."}
+]},
+
+{id:6, title:"Ton identité d'entrepreneur", slides:[
+  {type:'intro', num:'06', title:"Ton identité\nd'<em>entrepreneur</em>",
+   sub:"Tu changeras tes habitudes le jour où tu changeras l'histoire que tu te racontes sur toi-même. L'identité précède l'action.",
+   vo:"Leçon six. L'identité. C'est probablement le levier le plus puissant et le plus sous-estimé de tout le mindset. Parce qu'on peut changer ses habitudes par la force brute pendant quelques semaines. Mais les vrais changements durables, ils viennent quand tu changes l'histoire que tu te racontes sur qui tu es. L'identité précède l'action. Toujours."},
+  {type:'concept', tag:'Le principe fondateur', title:"Tu agis selon qui tu crois être",
+   body:"Si tu te vois comme quelqu'un qui lutte avec l'argent, tu trouveras des façons de confirmer ça. Si tu te vois comme un entrepreneur, tu prendrais des décisions d'entrepreneur. <strong>Tes actions suivent ton identité, pas l'inverse.</strong>",
+   vo:"Voilà le truc que peu de gens comprennent. Tes comportements suivent ton identité, pas l'inverse. Si tu te vois comme quelqu'un d'organisé, tu rangeras naturellement. Si tu te vois comme quelqu'un qui lutte en vente, tu trouveras des raisons d'éviter les appels commerciaux. Ton cerveau cherche en permanence la cohérence entre qui tu penses être et comment tu agis. Si tu veux changer tes comportements durablement, change d'abord ton identité. Commence à te voir différemment."},
+  {type:'list', title:"Les identités qui te limitent", items:[
+    {icon:'💸', name:"'Je suis pas bon avec l'argent'", sub:"Cette histoire que tu te racontes justifie chaque mauvaise décision financière"},
+    {icon:'😰', name:"'Je suis pas un vendeur'", sub:"Alors tu sous-estimes tes services, tu prospectes pas, tu perds des clients potentiels"},
+    {icon:'😔', name:"'Je suis pas assez légitime'", sub:"Cette histoire t'empêche de te positionner au bon niveau et d'aller chercher les bons clients"}],
+   vo:"Trois identités limitantes que j'entends tout le temps. 'Je suis pas bon avec l'argent.' Cette histoire justifie chaque décision financière hasardeuse. Chaque fois que tu valides pas tes prix, chaque fois que tu donnes des remises gratuites. 'Je suis pas un vendeur.' Alors tu prospectes pas, tu sous-tarifies, tu te retrouves avec des clients qui te respectent pas. 'Je suis pas encore légitime.' Alors tu vas jamais chercher les gros clients, les gros projets, les vraies opportunités. Ces trois phrases te coûtent cher."},
+  {type:'concept', tag:'Le changement', title:"Comment changer ton identité",
+   body:"L'identité se construit par les preuves. <strong>Chaque action alignée avec ta nouvelle identité est une preuve.</strong> Accumuler des preuves, c'est construire une nouvelle identité. Pas le contraire.",
+   vo:"Alors comment tu changes une identité ? Pas en te répétant des affirmations positives dans le miroir. En accumulant des preuves que tu es déjà cette nouvelle personne. Tu veux être quelqu'un qui livre toujours ce qu'il promet ? Commence à toujours livrer ce que tu promets, même sur des petites choses. Chaque action est une preuve. Cinq preuves dans une semaine commencent à construire une nouvelle vision de toi-même. Cent preuves en un mois, et ton identité a changé. C'est de la neuroplasticité, pas de la magie."},
+  {type:'quote', text:"La façon dont tu fais une chose est la façon dont tu fais tout.", auth:"— Tom Waits",
+   vo:"Cette phrase est l'une de mes préférées parce qu'elle touche directement l'identité. La façon dont tu traites un petit client est la façon dont tu traites tous les clients. La façon dont tu gères un petit projet est la façon dont tu géreras les grands. Parce que ton identité s'exprime dans chaque action, petite ou grande. Si tu veux être quelqu'un d'excellent, sois excellent dans les petites choses. Les grandes suivront naturellement."},
+  {type:'action', badge:"Exercice d'identité", title:"Ta déclaration d'identité",
+   steps:[{txt:"Écris : 'Je suis le type d'entrepreneur qui...' — complète avec 5 qualités que tu veux incarner"},{txt:"Pour chacune, identifie une action de cette semaine qui prouve cette identité"},{txt:"Lis cette déclaration chaque matin pendant 30 jours"}],
+   vo:"L'exercice d'identité. Prends une feuille et complète cette phrase : je suis le type d'entrepreneur qui. Et complète avec cinq qualités que tu veux vraiment incarner. Pas ce que t'es aujourd'hui. Ce que tu choisis de devenir. Pour chacune, identifie une action concrète de cette semaine qui prouve cette identité. Et lis cette déclaration chaque matin pendant trente jours. Pas pour te raconter des histoires. Pour commencer à agir en cohérence avec cette nouvelle identité, et accumuler les preuves."},
+  {type:'recap', title:"L'essentiel", points:["L'identité précède l'action — change ton identité pour changer tes comportements","Tes croyances sur toi-même gouvernent tes décisions quotidiennes","L'identité se construit par les preuves, pas les affirmations","Choisis qui tu veux être et commence à agir en cohérence aujourd'hui"],
+   vo:"Ce qu'il faut retenir. L'identité précède l'action. Si tu veux changer durablement, change d'abord l'histoire que tu te racontes sur toi. Tes croyances identitaires gouvernent chaque décision quotidienne en arrière-plan. L'identité se construit par les preuves accumulées, pas par les affirmations positives. Et tu peux choisir qui tu veux être, dès aujourd'hui, en commençant à agir en cohérence avec cette nouvelle identité."}
+]},
+
+{id:7, title:"La discipline, ta seule liberté", slides:[
+  {type:'intro', num:'07', title:"La discipline,\nta seule <em>liberté</em>",
+   sub:"La plupart des gens voient la discipline comme une cage. Les entrepreneurs qui réussissent l'ont compris : c'est la clé.",
+   vo:"Leçon sept. La discipline. Je sais ce que tu penses. Encore un cours sur la discipline, les routines matinales, se lever à cinq heures. C'est pas ça. Je vais te parler de quelque chose de beaucoup plus fondamental. Pourquoi la discipline est la forme de liberté la plus totale qui existe pour un entrepreneur. Et pourquoi attendre la motivation est l'une des erreurs les plus coûteuses que tu peux faire."},
+  {type:'concept', tag:'Le paradoxe', title:"Plus de discipline = plus de liberté",
+   body:"Ça paraît contre-intuitif. Mais réfléchis. <strong>Quelqu'un de discipliné sur sa santé est libre de tout manger sans culpabilité. Quelqu'un de discipliné financièrement est libre de dépenser sans stress.</strong> La discipline crée l'espace.",
+   vo:"Le paradoxe de la discipline. Plus tu es discipliné, plus tu es libre. Parce que la discipline élimine les décisions. Un entrepreneur qui a des routines claires ne passe pas chaque matin à décider quoi faire en premier. Il exécute. Il est libéré de la charge mentale des décisions. Un entrepreneur discipliné sur ses finances ne passe pas ses nuits à stresser sur sa trésorerie. Il a le système. Jocko Willink, ancien commando Navy SEAL, a popularisé cette idée : discipline equals freedom. La discipline crée la liberté."},
+  {type:'list', title:"Motivation vs Discipline", items:[
+    {icon:'🌊', name:"La motivation", sub:"Émotionnelle, fluctuante, liée à l'humeur. Elle monte et descend. Tu peux pas compter dessus."},
+    {icon:'⚙️', name:"La discipline", sub:"Structurelle, stable, indépendante de l'humeur. Elle s'exécute que t'aies envie ou pas."},
+    {icon:'🏆', name:"Les résultats durables", sub:"Viennent systématiquement de la discipline, jamais de la motivation seule. Sans exception."}],
+   vo:"La motivation, c'est utile pour démarrer. Elle est émotionnelle, elle monte quand t'es inspiré, après une conférence, après un podcast motivant. Mais elle descend aussi. Et le lendemain matin quand t'as pas envie, quand c'est gris dehors, quand les résultats tardent, la motivation est partie. La discipline, elle, s'en fout de ton humeur. Elle s'exécute. Elle est structurelle. Et tous les résultats durables que t'as vus chez les entrepreneurs qui réussissent sur le long terme viennent de la discipline. Sans exception."},
+  {type:'concept', tag:'La science', title:"L'épuisement de la volonté",
+   body:"La volonté est une ressource limitée. Elle se dépense. <strong>C'est pour ça que les grandes décisions se prennent le matin et que les nuits de doute sont toujours plus intenses.</strong> Les systèmes automatisent ce qui ne doit plus dépendre de la volonté.",
+   vo:"Roy Baumeister a montré dans ses recherches que la volonté s'épuise comme un muscle. Chaque décision que tu prends dans la journée consomme une partie de ta réserve de volonté. C'est pour ça que les juges rendent des décisions plus clémentes le matin que l'après-midi. C'est pour ça que tes nuits de doute sont toujours plus intenses. C'est pour ça que Mark Zuckerberg portait toujours la même tenue : éliminer une décision inutile pour préserver la volonté pour ce qui compte. Tes systèmes et routines sont là pour ça : automatiser ce qui ne doit plus dépendre de ta volonté."},
+  {type:'stat', num:'3', label:"non-négociables suffisent pour changer", body:"Tu n'as pas besoin d'une routine matinale de deux heures. <strong>3 comportements non-négociables par jour, maintenus 90 jours, suffisent à transformer ton niveau d'énergie et de productivité.</strong>",
+   vo:"On overcomplique la discipline. T'as pas besoin de te lever à quatre heures, de méditer quarante-cinq minutes, de faire une heure de sport, de journaliser et de préparer ton planning de la semaine avant sept heures. Trois comportements non-négociables. Maintenus sans exception pendant quatre-vingt-dix jours. C'est tout ce qu'il faut pour transformer ta productivité. Parce que la clé, c'est pas la quantité de discipline. C'est la cohérence. Trois choses que tu fais tous les jours, même quand t'as pas envie, changent tout."},
+  {type:'action', badge:"Pratique immédiate", title:"Tes 3 non-négociables",
+   steps:[{txt:"Identifie 3 comportements qui auraient le plus d'impact sur ton business si tu les faisais chaque jour"},{txt:"Rends-les assez courts pour être faisables même les mauvais jours (15-30 min max)"},{txt:"Engage-toi pour 30 jours, sans exception. 30 jours, pas plus."}],
+   vo:"L'exercice de cette leçon. Identifie tes trois non-négociables. Trois comportements qui auraient le plus d'impact sur ton business si tu les faisais chaque jour. Rends-les courts : quinze à trente minutes maximum chacun. Parce que si un non-négociable prend deux heures, tu le feras pas les jours difficiles. Et engage-toi pour trente jours seulement, pas pour la vie. Trente jours, sans exception. Pas d'excuses. Aucune. Après trente jours, réévalue."},
+  {type:'recap', title:"Ce qu'il faut retenir", points:["La discipline crée la liberté, elle ne la supprime pas","La motivation fluctue — la discipline, elle, s'exécute","La volonté est limitée — les systèmes automatisent pour la préserver","3 non-négociables maintenus 90 jours changent une trajectoire"],
+   vo:"Ce qu'il faut retenir de cette leçon. La discipline crée la liberté, c'est pas une cage. La motivation est utile pour démarrer, la discipline est nécessaire pour durer. Ta volonté est une ressource limitée qui s'épuise dans la journée — tes systèmes existent pour la préserver. Et trois non-négociables maintenus quatre-vingt-dix jours, c'est tout ce qu'il faut pour changer une trajectoire."}
+]},
+
+{id:8, title:"Les habitudes qui font les grands", slides:[
+  {type:'intro', num:'08', title:"Les habitudes\nqui font les <em>grands</em>",
+   sub:"Tu n'es pas le résultat de ce que tu décides. Tu es le résultat de ce que tu fais automatiquement, chaque jour.",
+   vo:"Leçon huit. Les habitudes. James Clear a passé des années à analyser la science derrière les habitudes pour écrire Atomic Habits, le livre le plus vendu sur le sujet. Et la conclusion principale, c'est celle-ci : tu n'es pas le résultat de tes grandes décisions. Tu es le résultat de tes petites actions quotidiennes automatiques. Et ça, ça change complètement l'approche."},
+  {type:'concept', tag:'La mécanique', title:"La boucle des habitudes",
+   body:"Toute habitude suit un cycle : <strong>déclencheur → envie → comportement → récompense</strong>. Pour créer une nouvelle habitude, tu joues sur ces quatre variables. Pour en casser une mauvaise, tu fais pareil en sens inverse.",
+   vo:"Chaque habitude que tu as fonctionne sur un cycle en quatre temps. Le déclencheur : un signal qui active le comportement. Une heure, un lieu, une émotion, ce que quelqu'un dit. L'envie : le désir que le déclencheur génère. Le comportement : l'action elle-même. Et la récompense : ce que tu obtiens, qui grave l'habitude dans ton cerveau. Pour créer une nouvelle habitude, tu dois créer un déclencheur clair, réduire l'effort du comportement et rendre la récompense immédiate. Pour casser une mauvaise habitude, tu fais l'inverse."},
+  {type:'list', title:"Les habitudes des entrepreneurs qui performent", items:[
+    {icon:'🌅', name:"La routine matinale", sub:"Pas forcément à 5h. Mais un premier bloc sans téléphone, sans email, sans réseaux sociaux."},
+    {icon:'📝', name:"La journalisation", sub:"5 minutes par jour pour clarifier ses pensées, ses priorités et prendre du recul."},
+    {icon:'🎯', name:"La planification hebdo", sub:"30 minutes chaque dimanche ou lundi pour aligner ses actions sur ses objectifs réels."}],
+   vo:"Les habitudes que je retrouve chez pratiquement tous les entrepreneurs qui performent durablement. D'abord, la routine matinale. Pas forcément à cinq heures. Mais un premier bloc sans téléphone, sans email, sans réseaux. Un moment pour toi, avant que le monde t'envahisse. La journalisation ensuite. Cinq minutes par jour pour écrire ce qui compte, ce qui bloque, ce qu'on va faire. Ça clarifie comme rien d'autre. Et la planification hebdo. Trente minutes le dimanche ou le lundi pour vérifier que ce que tu vas faire cette semaine est bien aligné sur ce qui compte vraiment."},
+  {type:'concept', tag:'Le principe des 1%', title:"L'intérêt composé des comportements",
+   body:"<strong>1% d'amélioration chaque jour = 37 fois meilleur en un an.</strong> 1% de régression chaque jour = quasi zéro. Les habitudes sont le mécanisme de l'intérêt composé appliqué à ta vie.",
+   vo:"Le principe le plus puissant d'Atomic Habits. Un pourcent d'amélioration par jour. Ça paraît insignifiant. Mais si t'améliores d'un pourcent chaque jour pendant un an, tu es trente-sept fois meilleur qu'au départ. Trente-sept fois. Pas trente-sept pourcent. Trente-sept fois. C'est la puissance de la composition. Et ça marche dans l'autre sens aussi. Un pourcent de régression chaque jour pendant un an, tu es à zéro virgule zéro quelque chose de ce que t'étais. C'est pour ça que les petites habitudes quotidiennes sont la chose la plus sérieuse dans ta vie d'entrepreneur."},
+  {type:'stat', num:'66j', label:"pour automatiser une habitude", body:"L'étude de Phillippa Lally à l'UCL a mesuré <strong>66 jours en moyenne</strong> pour qu'un comportement devienne automatique — pas 21 jours comme le mythe populaire. Sois patient avec toi-même.",
+   vo:"Soixante-six jours. Pas vingt-et-un. L'étude de Phillippa Lally à University College London a mesuré ça sur plusieurs centaines de participants. Soixante-six jours en moyenne pour qu'un comportement devienne vraiment automatique. Avec une fourchette de dix-huit à deux cent cinquante-quatre jours selon la complexité du comportement. Ce que ça signifie pour toi : sois patient. Les premières semaines, l'habitude demande un effort conscient. C'est normal. Continue. À partir du soixantième jour environ, ça commence à tourner tout seul."},
+  {type:'action', badge:"Conception d'habitude", title:"Ta première keystone habit",
+   steps:[{txt:"Identifie l'habitude qui, si tu la maintenais, en générerait automatiquement d'autres (sport, méditation, planification)"},{txt:"Attache-la à un déclencheur existant dans ta journée — 'après mon café du matin, je...' "},{txt:"Rends-la ridiculement petite pour commencer. 5 minutes. Augmente après 2 semaines."}],
+   vo:"La keystone habit, c'est l'habitude maîtresse. Celle qui en génère d'autres automatiquement. Le sport du matin génère une meilleure alimentation, moins d'alcool, plus d'énergie. La méditation génère plus de calme, de meilleures décisions, moins de réactions impulsives. Identifie ta keystone habit. Attache-la à un déclencheur qui existe déjà dans ta journée. Et rends-la ridiculement petite au départ. Cinq minutes. Augmente après deux semaines. La clé, c'est pas la durée. C'est la cohérence."},
+  {type:'recap', title:"Ce qu'il faut retenir", points:["Toute habitude : déclencheur → envie → comportement → récompense","1% par jour = 37x meilleur en un an. Les habitudes, c'est l'intérêt composé","66 jours pour automatiser, pas 21 — sois patient","Commence ridiculement petit pour ne jamais rater un jour"],
+   vo:"Ce qu'on retient. La boucle des habitudes en quatre temps : déclencheur, envie, comportement, récompense. Le principe des un pourcent : trente-sept fois meilleur en un an. Soixante-six jours pour automatiser, pas vingt et un. Et commence toujours ridiculement petit, pour ne jamais avoir l'excuse de rater un jour. Une habitude imparfaite exécutée chaque jour bat une habitude parfaite exécutée deux fois par semaine."}
+]},
+
+{id:9, title:"Apprivoiser l'échec", slides:[
+  {type:'intro', num:'09', title:"Apprivoiser\n<em>l'échec</em>",
+   sub:"T'as pas le choix de te planter. La vraie question, c'est ce que tu fais avec.",
+   vo:"Leçon neuf. L'échec. Soyons honnêtes. T'as pas le choix de te planter dans ta vie d'entrepreneur. C'est pas une possibilité, c'est une certitude. Les entrepreneurs que tu admires, ceux qui ont des grosses boîtes, ceux qui cartonnent, ils se sont tous planté plusieurs fois. La vraie différence entre eux et ceux qui ont abandonné, c'est pas d'avoir évité l'échec. C'est ce qu'ils ont fait avec."},
+  {type:'concept', tag:'La redéfinition', title:"L'échec comme données",
+   body:"L'échec n'est pas le contraire du succès. C'est <strong>une étape sur le chemin du succès.</strong> Chaque échec est un retour d'information que la réalité te donne gratuitement. Les entrepreneurs qui apprennent vite progressent vite.",
+   vo:"La première chose à faire, c'est changer la définition. L'échec n'est pas le contraire du succès. C'est une donnée. Une information que la réalité te donne. Ton produit n'a pas trouvé son marché ? Donnée. Ton associé et toi étiez pas alignés ? Donnée. Tu t'es planté sur les coûts ? Donnée. Les entrepreneurs qui progressent le plus vite sont ceux qui traitent leurs échecs le plus rapidement. Pas ceux qui en font le moins. Ceux qui en font le plus d'apprentissage dans le moins de temps."},
+  {type:'list', title:"Les 3 façons malsaines de gérer l'échec", items:[
+    {icon:'🚫', name:"L'évitement", sub:"Tu fuis tout ce qui pourrait te faire échouer — donc tu fuis aussi tout ce qui pourrait te faire réussir"},
+    {icon:'😢', name:"La victimisation", sub:"'C'est la faute du marché, des clients, des associés.' Ça te prive de l'apprentissage."},
+    {icon:'🔁', name:"La rumination", sub:"T'y repenses en boucle sans en tirer de conclusion concrète — la pire forme de souffrance inutile"}],
+   vo:"Trois manières malsaines de gérer un échec que j'observe tout le temps. L'évitement : tu protèges tellement ton ego que tu prends plus de risques. Tu stagneras là. La victimisation : c'était la faute du marché, des associés, du timing. C'est peut-être vrai. Mais tant que t'es dans ce mode, tu peux rien apprendre parce que t'es pas responsable. Et la rumination : tu y repenses en boucle, tu rejoues le film, sans jamais en tirer une conclusion qui te fait avancer. C'est la forme de souffrance la plus inutile qui existe."},
+  {type:'concept', tag:"L'outil", title:"Le post-mortem d'échec",
+   body:"Les meilleures équipes tech font un post-mortem après chaque incident majeur. <strong>Pas pour trouver un coupable. Pour comprendre ce qui s'est passé et s'assurer que ça n'arrive plus.</strong> Fais pareil avec tes échecs.",
+   vo:"Les meilleures équipes tech du monde, chez Google, Amazon, Netflix, ont une pratique systématique : le post-mortem. Quand quelque chose merde, ils font une réunion structurée. Pas pour trouver un coupable. Pour comprendre exactement ce qui s'est passé, pourquoi, et comment s'assurer que ça n'arrive plus. Et surtout, ils ont une règle : pendant le post-mortem, y'a pas de coupable. Y'a que des causes systémiques. Fais pareil avec tes échecs entrepreneuriaux. Analyse, apprends, applique. Passe à autre chose."},
+  {type:'quote', text:"J'ai raté plus de 9000 tirs dans ma carrière. J'ai perdu presque 300 matchs. 26 fois, on m'a fait confiance pour prendre le tir de la victoire et j'ai raté. C'est pour ça que je réussis.", auth:"— Michael Jordan",
+   vo:"Michael Jordan est considéré comme le meilleur basketteur de tous les temps. Et il est connu pour ses succès. Mais ce qu'il décrit dans cette citation, c'est ses échecs. Neuf mille tirs ratés. Trois cents matchs perdus. Vingt-six tirs décisifs manqués. Et sa conclusion : c'est pour ça qu'il a réussi. Pas malgré ça. À cause de ça. Chaque raté l'a rendu meilleur. C'est ça la relation saine avec l'échec."},
+  {type:'action', badge:"Exercice", title:"Ton post-mortem personnel",
+   steps:[{txt:"Prends un échec récent que t'as pas encore digéré"},{txt:"Pose-toi 3 questions : Qu'est-ce qui s'est passé exactement ? Pourquoi ? Qu'est-ce que je fais différemment la prochaine fois ?"},{txt:"Écris les réponses. Ferme le dossier. Passe à autre chose."}],
+   vo:"L'exercice pratique. Prends un échec récent que t'as pas encore vraiment digéré. Quelque chose qui traîne encore. Pose-toi trois questions et écris les réponses. Qu'est-ce qui s'est passé exactement, en faits, pas en émotions ? Pourquoi c'est arrivé, les vraies causes ? Et qu'est-ce que tu feras différemment la prochaine fois ? Trois questions. Réponses écrites. Puis ferme le dossier. Littéralement. T'as tiré l'apprentissage. C'est fait. Passe à autre chose."},
+  {type:'recap', title:"L'essentiel", points:["L'échec est une donnée, pas un verdict sur ta valeur","Évitement, victimisation et rumination sont les 3 façons malsaines","Le post-mortem : causes systémiques, pas coupables","Rater vite et apprendre vite, c'est la vraie compétence"],
+   vo:"Ce qu'il faut retenir. L'échec est une donnée, pas un verdict sur ta valeur en tant que personne ou entrepreneur. Évitement, victimisation et rumination te priven de l'apprentissage. Le post-mortem est ton outil pour extraire de la valeur de chaque échec. Et rater vite et apprendre vite, c'est probablement la compétence entrepreneuriale la plus importante qui soit."}
+]},
+
+{id:10, title:"Ta vision : pourquoi tu te lèves", slides:[
+  {type:'intro', num:'10', title:"Ta vision :\npourquoi tu te lèves",
+   sub:"Un entrepreneur sans vision travaille beaucoup et avance peu. Une vision claire transforme l'effort en direction.",
+   vo:"Leçon dix. La vision. La moitié des chemin est fait. Dans cette leçon, on va parler de quelque chose de fondamental. Pourquoi tu fais tout ça. Pas le pourquoi officiel que tu balances en réunion. Le vrai pourquoi. Celui qui te ferait avancer même si plus rien ne marchait. Parce que les entrepreneurs qui construisent quelque chose de durable ont tous ce fil conducteur. Et ceux qui abandonnent au premier gros obstacle, souvent, ils l'avaient pas."},
+  {type:'concept', tag:'La différence', title:"Vision vs Objectifs",
+   body:"Un objectif te dit quoi faire. Une vision te dit pourquoi le faire. <strong>Les objectifs sans vision sont des tâches. Les objectifs ancrés dans une vision sont des missions.</strong> Et personne n'abandonne sa mission.",
+   vo:"La différence entre un objectif et une vision, c'est fondamental. Un objectif, c'est faire dix mille euros de chiffre d'affaires ce mois-ci. Une vision, c'est aider les entrepreneurs qui démarrent à construire des entreprises solides et vivre librement. Les objectifs te disent quoi faire. La vision te dit pourquoi le faire. Et quand les objectifs sont reliés à une vision forte, ils ont une autre dimension. T'es plus en train d'exécuter des tâches. T'es en train d'avancer vers quelque chose qui compte pour toi."},
+  {type:'list', title:"Les 3 couches de la vision", items:[
+    {icon:'🔭', name:"Dans 10 ans", sub:"Qui es-tu ? Qu'as-tu construit ? Quel impact as-tu sur les gens autour de toi ?"},
+    {icon:'🗺️', name:"Dans 3 ans", sub:"Quelles étapes majeures doivent être franchies pour atteindre la vision à 10 ans ?"},
+    {icon:'⚡', name:"Dans 90 jours", sub:"Qu'est-ce que tu fais maintenant pour t'approcher de l'étape à 3 ans ?"}],
+   vo:"La vision se construit en trois couches. La vision à dix ans d'abord. Ferme les yeux. Tu es dix ans plus vieux. Décris ta vie en détail. Où tu vis. Avec qui. Ce que tu fais. L'impact que tu as. Les gens que tu as aidés. Ensuite les étapes à trois ans. Qu'est-ce qui doit être vrai dans trois ans pour que dans dix ans tu sois là où tu veux être ? Et enfin les quatre-vingt-dix jours. Qu'est-ce que tu fais maintenant, concrètement, pour t'approcher de l'étape à trois ans ? C'est comme ça qu'on connecte le quotidien à la vision."},
+  {type:'concept', tag:"Le moteur", title:"Connecter les tâches du quotidien à la vision",
+   body:"Quand tu réponds à un email chiant, tu travailles sur ta vision. Quand tu prospectes un client ingrat, tu travailles sur ta vision. <strong>Tout prend une autre dimension quand tu vois le fil.</strong>",
+   vo:"Voilà ce que ça change concrètement. Quand tu réponds à un email difficile, t'es pas en train de répondre à un email. T'es en train de construire la réputation d'un entrepreneur qui prend soin de ses clients. Quand tu prospectes un client qui te répond pas, t'es pas en train de perdre ton temps. T'es en train de développer la compétence commerciale qui va alimenter ta vision. Voir le fil entre les tâches du quotidien et la vision à dix ans, ça transforme la façon dont tu travailles."},
+  {type:'stat', num:'10x', label:"la règle de la vision ambitieuse", body:"Les études sur la motivation montrent que <strong>les objectifs 10 fois plus ambitieux que ce que tu penses possible génèrent plus d'engagement</strong> que des objectifs raisonnables. Penser grand libère une énergie que penser petit ne génère pas.",
+   vo:"Il y a un phénomène contre-intuitif dans la recherche sur la motivation. Les objectifs dix fois plus grands que ce que tu penses possible génèrent plus d'engagement et plus d'énergie que les objectifs raisonnables. Pourquoi ? Parce que l'objectif raisonnable, ton cerveau sait comment l'atteindre. Il va donc procéder prudemment, sans vraiment s'emballer. L'objectif dix fois plus grand, ton cerveau ne sait pas comment l'atteindre dans les sentiers habituels. Alors il cherche des voies nouvelles. Il se mobilise autrement."},
+  {type:'action', badge:"Exercice de vision", title:"La lettre de ton futur",
+   steps:[{txt:"Écris une lettre de toi dans 10 ans à toi aujourd'hui. 20 minutes. Sois précis."},{txt:"Décris ce que tu as accompli, qui tu es devenu, ce que tu as laissé."},{txt:"Note 1 seule action que ce futur toi te conseille de faire cette semaine."}],
+   vo:"L'exercice le plus puissant de cette leçon et peut-être de toute la formation. Prends vingt minutes. Écris une lettre. De toi dans dix ans, à toi aujourd'hui. Écris à la première personne du présent, comme si t'y étais déjà. Décris ce que tu as construit. Les décisions que tu as prises. Les peurs que tu as surmontées. Les gens que tu as aidés. Et à la fin, note une seule action que ce futur toi te conseille de faire cette semaine. Une seule. Et fais-la."},
+  {type:'recap', title:"Ce qu'il faut retenir", points:["Un objectif sans vision = une tâche. Avec vision = une mission","Vision 10 ans → étapes 3 ans → actions 90 jours","Les objectifs 10x ambitieux génèrent plus d'énergie que les raisonnables","Connecte chaque tâche du quotidien à ta vision — tout change"],
+   vo:"Ce qu'il faut retenir. Un objectif sans vision, c'est une tâche. Avec une vision, c'est une mission. La structure est vision dix ans, étapes trois ans, actions quatre-vingt-dix jours. Les objectifs dix fois plus ambitieux génèrent plus d'énergie que les objectifs raisonnables. Et connecter les tâches du quotidien à la vision, ça transforme comment tu travailles au jour le jour."}
+]},
+
+{id:11, title:"Le focus, ton arme ultime", slides:[
+  {type:'intro', num:'11', title:"Le focus,\nton <em>arme ultime</em>",
+   sub:"Dans un monde d'entrepreneurs dispersés, celui qui sait concentrer son attention gagne.",
+   vo:"Leçon onze. Le focus. On vit dans l'économie de l'attention. Tout autour de toi est conçu pour la capturer. Ton téléphone, tes notifications, les réseaux sociaux, les chaînes YouTube, les podcasts. Et dans cet environnement, l'entrepreneur qui sait concentrer son attention sur ce qui compte vraiment a un avantage compétitif massif sur tous ceux qui se dispersent."},
+  {type:'concept', tag:'Le problème', title:"La dispersion coûte plus que tu ne penses",
+   body:"Chaque interruption te coûte <strong>en moyenne 23 minutes</strong> de reconcentration. Une heure de travail avec dix interruptions = moins de vingt minutes de travail réel. Tu travailles dur. Mais sur quoi ?",
+   vo:"Une recherche de l'université de Californie à Irvine a mesuré ça : après une interruption, il faut en moyenne vingt-trois minutes pour retrouver son niveau de concentration. Vingt-trois minutes. Pour une notification. Ton téléphone qui vibre pendant que tu travailles, c'est vingt-trois minutes perdues. Fais le calcul. Si t'as dix interruptions dans ta journée de travail, tu as peut-être moins de deux heures de vraie concentration sur une journée de huit heures. Tu travailles dur. Mais sur quoi ?"},
+  {type:'list', title:"Deep work vs Shallow work", items:[
+    {icon:'🧠', name:"Deep work", sub:"Concentration totale, tâche cognitive difficile, valeur irremplaçable. 2-4h par jour maximum."},
+    {icon:'📧', name:"Shallow work", sub:"Emails, réunions, admin, réseaux sociaux. Utile mais remplaçable. À regrouper et limiter."},
+    {icon:'⚡', name:"La règle d'or", sub:"Fais ton deep work en premier, avant toute notification. Le reste après."}],
+   vo:"Cal Newport a popularisé cette distinction dans son livre Deep Work. Le travail profond, c'est la concentration totale sur une tâche cognitive difficile. Écrire, coder, strategiser, créer. C'est là que tu produis de la valeur irremplaçable. Deux à quatre heures par jour, c'est le maximum que la plupart des gens peuvent soutenir à haute intensité. Le travail superficiel, emails, réunions, admin, réseaux, c'est utile mais remplaçable, souvent délégable. La règle d'or : fais ton deep work en premier chaque matin, avant d'ouvrir le moindre outil de communication. Le reste après."},
+  {type:'concept', tag:'La règle', title:"Apprendre à dire non",
+   body:"Non est la phrase la plus stratégique d'un entrepreneur. <strong>Chaque oui à quelque chose qui compte pas est un non à quelque chose qui compte.</strong> Ton attention est ta ressource la plus rare.",
+   vo:"Warren Buffett a dit quelque chose d'important : la différence entre les gens qui réussissent et ceux qui réussissent vraiment, c'est que ces derniers disent non à presque tout. Ton attention est ta ressource la plus rare. Pas le temps. L'attention. Parce que le temps peut être récupéré. L'attention dépensée sur quelque chose qui compte pas, elle te revient pas. Chaque oui que tu donnes à quelque chose, c'est un non à autre chose. Être stratégique sur tes oui, c'est être stratégique sur ta trajectoire."},
+  {type:'stat', num:'4h', label:"de deep work par jour, c'est le seuil des performeurs", body:"Les études sur les violonistes d'élite, les romanciers, les mathématiciens : <strong>4 heures de concentration profonde par jour est le maximum soutenable</strong> sur le long terme pour produire du travail d'excellence.",
+   vo:"Quatre heures. C'est le seuil mesuré par les chercheurs sur les performers d'élite dans tous les domaines. Les violonistes virtuoses à l'académie de Berlin. Les romanciers les plus prolifiques. Les mathématiciens primés. Quatre heures de concentration profonde par jour, c'est le maximum qu'on peut soutenir sur le long terme sans dégrader la qualité. Pas huit heures. Quatre heures. Ce qui veut dire que si t'as quatre heures de deep work par jour, t'es déjà dans l'élite de la productivité."},
+  {type:'action', badge:"Protocole focus", title:"Ton bloc de deep work",
+   steps:[{txt:"Identifie la tâche qui aurait le plus d'impact sur ton business cette semaine"},{txt:"Bloque 2h demain matin : téléphone en mode avion, notifications off, une seule tâche"},{txt:"Travaille dessus sans interruption. Ensuite seulement, ouvre tes emails."}],
+   vo:"L'exercice de cette leçon est simple et immédiatement applicable. Identifie la tâche qui aurait le plus d'impact sur ton business cette semaine. Une seule. Bloque deux heures demain matin. Téléphone en mode avion. Notifications coupées. Porte fermée si t'as un bureau. Une seule tâche devant toi. Et travaille dessus sans interruption pendant deux heures. Ensuite seulement, ouvre tes emails et tes messages. Fais ça pendant une semaine et dis-moi si ta productivité a pas doublé."},
+  {type:'recap', title:"L'essentiel du focus", points:["Chaque interruption = 23 minutes de reconcentration perdue","Deep work (4h/j max) = valeur irremplaçable. Shallow work = à regrouper.","Non est ta phrase la plus stratégique","Ton attention est ta ressource la plus rare — protège-la comme telle"],
+   vo:"Ce qu'on retient. Chaque interruption te coûte vingt-trois minutes. Le deep work, concentration totale sur une tâche difficile, est limité à quatre heures par jour maximum. Non est ta phrase stratégique. Et ton attention est ta ressource la plus rare. Plus rare que le temps, plus rare que l'argent. Protège-la comme telle. La prochaine leçon, on parle d'énergie et de performance mentale."}
+]},
+
+{id:12, title:"Énergie et performance mentale", slides:[
+  {type:'intro', num:'12', title:"Énergie et\nperformance <em>mentale</em>",
+   sub:"Tu gères ton temps. Mais gères-tu ton énergie ? La plupart des entrepreneurs épuisent leur batterie et se demandent pourquoi ils performent pas.",
+   vo:"Leçon douze. L'énergie. On parle tout le temps de gestion du temps. Mais le vrai sujet, c'est l'énergie. Parce que deux heures de travail avec une énergie maximale valent dix heures de travail épuisé. L'énergie est la ressource sous-jacente à tout. Et la plupart des entrepreneurs la gèrent très mal."},
+  {type:'concept', tag:'La réalité', title:"T'as pas un problème de temps, t'as un problème d'énergie",
+   body:"Un entrepreneur avec 6h de haute énergie produit plus qu'un autre avec 12h de basse énergie. <strong>Gérer son énergie n'est pas optionnel. C'est la compétence de performance la plus sous-estimée.</strong>",
+   vo:"Tony Schwartz a bossé pendant vingt ans avec les meilleurs athlètes et PDG du monde, et il est arrivé à une conclusion simple. Les performers d'exception ne gèrent pas leur temps mieux que les autres. Ils gèrent leur énergie mieux. Ils savent quand ils sont au pic. Ils protègent ce pic. Ils récupèrent délibérément entre les efforts intenses. Ils ne courent pas à vide. Et ça se construit. L'énergie, contrairement à ce qu'on croit, ça se manage."},
+  {type:'list', title:"Les 4 sources d'énergie à maîtriser", items:[
+    {icon:'😴', name:"Le sommeil", sub:"7-8h min. La récupération cognitive et émotionnelle se fait uniquement pendant le sommeil."},
+    {icon:'🏃', name:"L'activité physique", sub:"30 min/jour augmentent la concentration et réduisent l'anxiété mieux que n'importe quel stimulant."},
+    {icon:'🥗', name:"La nutrition", sub:"La glycémie instable = concentration instable. Ce que tu manges au déjeuner décide tes après-midis."},
+    {icon:'🔁', name:"La récupération", sub:"Les pauses délibérées ne sont pas du temps perdu. Elles rechargent la batterie entre les sprints."}],
+   vo:"Quatre sources d'énergie que tu dois maîtriser. Le sommeil : sept à huit heures minimum. La récupération cognitive se fait uniquement là. C'est pas négociable si tu veux performer. L'activité physique : trente minutes par jour. Les recherches montrent que c'est plus efficace que n'importe quel stimulant pour la concentration et la gestion de l'anxiété. La nutrition : ta glycémie instable donne une concentration instable. Ce que tu manges au déjeuner décide de tes après-midis. Et la récupération délibérée : les pauses ne sont pas du temps perdu. Elles rechargent la batterie."},
+  {type:'concept', tag:"La science", title:"Tes pics de performance dans la journée",
+   body:"Ton énergie mentale suit un rythme circadien. <strong>Tu as 2 à 4 heures de pic cognitif par jour.</strong> Identifier quand ils tombent et les protéger pour tes tâches les plus importantes est l'optimisation la plus rentable possible.",
+   vo:"Ton cerveau fonctionne par cycles d'environ quatre-vingt-dix minutes. Ultradian rhythms. Sur une journée, tu as deux à quatre heures de pic cognitif où ta concentration, ta créativité et ta capacité de décision sont au maximum. Pour la plupart des gens, c'est le matin, deux à quatre heures après le réveil. Identifier quand tes pics tombent dans ta journée et les réserver pour tes tâches les plus importantes, c'est l'optimisation la plus rentable que tu puisses faire. C'est ce que font tous les performers d'exception."},
+  {type:'quote', text:"Prends soin de ton corps. C'est le seul endroit où tu aies à vivre.", auth:"— Jim Rohn",
+   vo:"Jim Rohn a dit ça dans les années 1980 et c'est encore plus vrai aujourd'hui dans un monde où on passe des journées entières assis devant un écran. Ton business vit dans ta tête. Et ta tête vit dans un corps. Si le corps est épuisé, mal nourri, sans mouvement, le business s'en ressent directement. Les décisions sont moins bonnes. L'énergie pour prospecter et créer diminue. La résistance au stress baisse. Prendre soin de ton corps, c'est pas une activité annexe à ton business. C'en est le fondement."},
+  {type:'action', badge:"Audit d'énergie", title:"Trouve tes pics",
+   steps:[{txt:"Pendant 3 jours, note toutes les heures ton niveau d'énergie de 1 à 10"},{txt:"Identifie les patterns : quand es-tu au max ? Quand es-tu à plat ?"},{txt:"Réorganise ton agenda pour que tes tâches importantes tombent dans tes pics"}],
+   vo:"L'exercice de cette leçon. Pendant trois jours, note toutes les heures ton niveau d'énergie sur dix. Juste un chiffre dans une note sur ton téléphone. Après trois jours, les patterns deviennent évidents. T'as des pics à certaines heures, des creux à d'autres. Et une fois que t'as identifié tes pics, réorganise ton agenda pour que tes tâches importantes, tes deep work, tes décisions stratégiques, tombent dans ces fenêtres. Le reste, admin, emails, appels routiniers, dans les creux."},
+  {type:'recap', title:"Ce qu'il faut retenir", points:["6h de haute énergie > 12h de basse énergie","Les 4 sources : sommeil, sport, nutrition, récupération","Tu as 2-4h de pic cognitif par jour — protège-les","Gérer son énergie est plus rentable que gérer son temps"],
+   vo:"Ce qu'il faut retenir. Six heures de haute énergie produisent plus que douze heures de basse énergie. Les quatre leviers : sommeil, sport quotidien, nutrition qui stabilise la glycémie, et récupération délibérée. Tu as deux à quatre heures de pic cognitif par jour, identifie-les et protège-les. Et gérer ton énergie est plus rentable que gérer ton temps. L'énergie est le multiplicateur de tout le reste."}
+]},
+
+{id:13, title:"Ton entourage : arme ou poison", slides:[
+  {type:'intro', num:'13', title:"Ton entourage :\n<em>arme ou poison</em>",
+   sub:"Tu es la moyenne des cinq personnes que tu fréquentes le plus. C'est pas poétique, c'est neurologique.",
+   vo:"Leçon treize. L'entourage. Jim Rohn a dit : tu es la moyenne des cinq personnes que tu fréquentes le plus. Beaucoup l'ont entendu. Peu ont vraiment regardé leurs cinq personnes en face et tiré les conclusions qui s'imposent. Dans cette leçon, on va être honnêtes là-dessus."},
+  {type:'concept', tag:'La science', title:"La contagion comportementale",
+   body:"Les neurones miroirs de ton cerveau <strong>imitent inconsciemment les comportements, les attitudes et les émotions de ceux qui t'entourent.</strong> Côtoyer des gens ambitieux te rend ambitieux. L'inverse est vrai aussi.",
+   vo:"La contagion sociale est réelle et mesurée. Les neurones miroirs de ton cerveau imitent inconsciemment les comportements et les attitudes des personnes avec qui tu passes du temps. C'est pour ça que tu te mets à parler comme tes amis proches. À avoir les mêmes blagues, les mêmes réflexes. Et les mêmes limites. Si t'es entouré de gens qui trouvent que c'est pas pour eux de gagner bien leur vie, qui voient les riches comme des exploiteurs, qui abandonnent au premier obstacle, ce n'est qu'une question de temps avant que ces croyances s'installent aussi dans ta tête."},
+  {type:'list', title:"Les profils toxiques à identifier", items:[
+    {icon:'🦀', name:"Le crabe dans le seau", sub:"Tire les autres vers le bas dès qu'ils essaient de s'élever. Souvent inconscient."},
+    {icon:'😒', name:"Le réaliste pessimiste", sub:"Pour chaque projet que t'amènes, il a une liste de pourquoi ça va pas marcher."},
+    {icon:'😱', name:"Le catastrophiste", sub:"Amplifie chaque risque jusqu'à te paralyser. Souvent bien intentionné mais dévastateur."}],
+   vo:"Trois profils toxiques que tu dois identifier dans ton entourage. Le crabe dans le seau : dès que tu veux t'élever, il te tire vers le bas. Souvent sous des apparences de 'je veux juste que tu sois réaliste'. Le réaliste pessimiste : pour chaque idée que t'amènes, il a cinq raisons pour lesquelles ça va pas marcher. Il se croit utile. Il est destructeur. Et le catastrophiste : il amplifie chaque risque jusqu'à te faire rester immobile. Souvent bien intentionné, généralement dévastateur."},
+  {type:'concept', tag:'La construction', title:"Construire ton cercle de croissance",
+   body:"Tu n'as pas à attendre que les bonnes personnes arrivent dans ta vie. <strong>Tu vas les chercher.</strong> Meetups, mastermind, formations, mentors. Les gens qui t'élèvent existent. Ils sont juste pas dans ton canapé.",
+   vo:"La bonne nouvelle, c'est que tu n'as pas à attendre que les bonnes personnes arrivent dans ta vie. Tu vas les chercher. Les meetups d'entrepreneurs dans ta ville. Les groupes Slack de ta niche. Les masterminds. Les formations en présentiel où tu croises des gens qui avancent. Les réseaux d'anciens d'incubateurs. Les gens qui t'élèvent existent. En grand nombre. Ils sont juste pas dans ton réseau actuel parce que tu les as pas encore cherchés. La prochaine fois que t'hésites à aller à un événement networking, pense à ça."},
+  {type:'stat', num:'5', label:"personnes qui changent une trajectoire", body:"Selon une étude Stanford sur les entrepreneurs, avoir <strong>5 connexions clés avec des personnes plus avancées que soi</strong> dans sa carrière est l'un des meilleurs prédicteurs de succès entrepreneurial à long terme.",
+   vo:"Une étude de Stanford sur les trajectoires entrepreneuriales a mis en évidence un chiffre précis. Cinq connexions clés. Pas cinq cents. Cinq. Cinq personnes plus avancées que toi dans les domaines qui comptent pour ton business. Un mentor. Un pair qui t'emmène vers le haut. Un expert dans une compétence que t'as pas. Un investisseur ou quelqu'un qui connaît le capital. Et quelqu'un qui t'a déjà fait le chemin que tu veux faire. Ces cinq connexions sont des multiplicateurs de ta trajectoire."},
+  {type:'action', badge:"Audit relationnel", title:"Fais le bilan honnête",
+   steps:[{txt:"Liste les 10 personnes avec qui tu passes le plus de temps. Note leur état d'esprit général."},{txt:"Identifie : qui te tire vers le haut ? Qui te tire vers le bas ? Qui est neutre ?"},{txt:"Décide d'une action pour rapprocher les premiers et distancier les seconds."}],
+   vo:"L'exercice de cette leçon est peut-être le plus inconfortable de la formation. Prends dix minutes. Liste les dix personnes avec qui tu passes le plus de temps. Pour chacune, note honnêtement : est-ce que cette personne me tire vers le haut, vers le bas, ou est neutre pour mon développement ? Tu vas peut-être voir des choses qui font mal. Et ensuite, décide d'une action pour rapprocher les personnes qui t'élèvent et créer une distance saine avec celles qui te plombent."},
+  {type:'recap', title:"Ce qu'il faut retenir", points:["Tu es la moyenne de tes 5 proches — c'est neurologique","La contagion sociale est réelle et automatique","Identifie les profils toxiques : crabe, pessimiste, catastrophiste","Cherche activement 5 connexions clés qui t'élèvent"],
+   vo:"Ce qu'il faut retenir. T'es la moyenne des cinq personnes que tu fréquentes le plus. C'est pas une métaphore, c'est neurologique. La contagion sociale est réelle et automatique via les neurones miroirs. Identifie les profils toxiques dans ton entourage, le crabe, le pessimiste, le catastrophiste. Et cherche activement cinq connexions clés qui t'élèvent. Ça se construit, ça ne se trouve pas par hasard."}
+]},
+
+{id:14, title:"La résilience : tomber et se relever", slides:[
+  {type:'intro', num:'14', title:"La résilience :\ntomber et <em>se relever</em>",
+   sub:"T'as pas le choix de traverser des crises. T'as le choix de ce que tu en fais.",
+   vo:"Leçon quatorze. La résilience. On arrive vers la fin de cette formation. Et je voulais garder ce sujet pour l'avant-dernière leçon parce qu'il intègre beaucoup de ce qu'on a vu. La résilience, c'est la capacité à encaisser, à traverser, et à se relever plus fort. C'est pas une qualité qu'on a ou qu'on a pas. C'est une compétence qui se développe. Et dans cette leçon, je vais te donner les outils pour la construire."},
+  {type:'concept', tag:'La définition réelle', title:"La résilience, c'est pas l'absence de douleur",
+   body:"Un entrepreneur résilient souffre autant que les autres face à une crise. Il <strong>traite cette douleur différemment.</strong> Il ne la nie pas. Il ne la laisse pas non plus s'installer et gouverner ses décisions.",
+   vo:"Définissons ça correctement d'emblée parce qu'il y a un mythe là-dessus. La résilience, c'est pas être blindé, sans émotions, imperturbable. Les entrepreneurs les plus résilients que je connais ont pleuré, ont douté, ont eu des nuits blanches. La différence, c'est pas qu'ils souffrent moins. C'est qu'ils traitent cette douleur différemment. Ils la reconnaissent, ils la traversent, et ils prennent quand même les décisions qui s'imposent. Ils laissent pas la douleur du moment décider de leur trajectoire à long terme."},
+  {type:'list', title:"Les 3 piliers de la résilience", items:[
+    {icon:'🎯', name:"La dichotomie du contrôle", sub:"Séparer ce qui dépend de toi de ce qui n'en dépend pas. Agir sur le premier. Accepter le second."},
+    {icon:'🔄', name:"Le recadrage", sub:"Changer la signification donnée aux événements. Pas les nier. Les voir différemment."},
+    {icon:'🤝', name:"Le soutien", sub:"Les entrepreneurs seuls s'effondrent. Ceux avec un réseau de soutien traversent les crises."}],
+   vo:"Trois piliers qui reviennent systématiquement chez les entrepreneurs résilients. La dichotomie du contrôle d'abord. Séparer ce qui dépend de toi et ce qui n'en dépend pas. Le marché qui se retourne ? Pas ton contrôle. Comment t'y réponds ? Ton contrôle total. Le recadrage ensuite. Changer la signification que tu donnes aux événements difficiles. Le projet qui est tombé, c'était peut-être la leçon dont t'avais besoin pour réussir le suivant. Et le soutien. Les données sont claires : les entrepreneurs avec un réseau de soutien traversent les crises. Les solitaires s'effondrent."},
+  {type:'concept', tag:'Le stoïcisme', title:"Marcus Aurelius avait tout compris",
+   body:"Il y a deux mille ans, l'Empereur romain Marcus Aurelius écrivait dans son journal : <strong>'L'obstacle sur le chemin devient le chemin.'</strong> Ce qui te résiste est exactement ce dont tu as besoin pour grandir.",
+   vo:"Marcus Aurelius était l'un des hommes les plus puissants de son temps. Empereur romain, commandant en chef, il avait tout le pouvoir du monde. Et dans ses carnets personnels, jamais destinés à être publiés, il travaillait son mindset tous les jours. Il réfléchissait à comment traverser l'adversité. Sa conclusion principale : l'obstacle sur le chemin devient le chemin. Ce qui te résiste est précisément ce dont tu as besoin pour grandir. C'est pas de la philosophie de salon. C'est une façon de transformer chaque crise en carburant."},
+  {type:'stat', num:'70%', label:"des fondateurs avec mentor traversent les crises", body:"70% des fondateurs avec un mentor ou un réseau de pairs traversent les crises sans abandonner, contre <strong>30% pour ceux qui sont seuls</strong>. La solitude entrepreneuriale est un facteur de risque majeur.",
+   vo:"Ce chiffre devrait te faire réfléchir immédiatement sur ton niveau de solitude entrepreneuriale. Soixante-dix pourcent des fondateurs avec un mentor ou un réseau de pairs traversent les crises existentielles sans abandonner. Trente pourcent pour ceux qui sont seuls. La différence entre résilier et continuer est souvent aussi simple qu'avoir quelqu'un à appeler à trois heures du matin quand tout semble s'effondrer. Quelqu'un qui comprend. Quelqu'un qui a déjà traversé ça. La prochaine fois que tu penses que demander de l'aide est une faiblesse, rappelle-toi ce chiffre."},
+  {type:'action', badge:"Outil de résilience", title:"Le journal d'adversité",
+   steps:[{txt:"Chaque soir cette semaine, note : quel obstacle as-tu traversé aujourd'hui ?"},{txt:"Ce qui était hors de ton contrôle. Ce qui était dans ton contrôle."},{txt:"Ce que tu as appris. Ce que tu feras différemment."}],
+   vo:"L'exercice de cette leçon est un rituel quotidien simple. Chaque soir cette semaine, prends cinq minutes. Note l'obstacle principal de la journée. Puis distingue clairement : qu'est-ce qui était hors de ton contrôle dans cette situation ? Et qu'est-ce qui était dans ton contrôle ? Qu'est-ce que tu as appris, même si c'est juste que t'aurais dû faire autrement ? Et qu'est-ce que tu feras différemment ? Cinq questions. Cinq minutes. Et progressivement, tu transformes chaque journée difficile en données exploitables."},
+  {type:'recap', title:"L'essentiel de la résilience", points:["La résilience = traverser la douleur, pas l'éviter","3 piliers : dichotomie du contrôle, recadrage, soutien social","L'obstacle devient le chemin — Marcus Aurelius","70% vs 30% : le réseau fait la différence entre tenir et abandonner"],
+   vo:"Ce qu'il faut retenir. La résilience c'est pas l'absence de douleur, c'est traverser la douleur sans la laisser gouverner tes décisions. Trois piliers : dichotomie du contrôle, recadrage, réseau de soutien. L'obstacle sur le chemin devient le chemin si tu le vois ainsi. Et soixante-dix pourcent contre trente pourcent : le réseau fait une différence décisive entre tenir et abandonner. Dernière leçon : le passage à l'action."}
+]},
+
+{id:15, title:"L'action : le seul truc qui compte", slides:[
+  {type:'intro', num:'15', title:"L'action :\nle seul truc <em>qui compte</em>",
+   sub:"T'as les outils. T'as la compréhension. Maintenant il reste le seul truc qui change vraiment les choses : agir.",
+   vo:"Dernière leçon. Leçon quinze. On est au bout du chemin de cette formation. T'as maintenant quatorze leçons de mindset. Le cerveau, la peur, l'esprit de croissance, la discipline, les habitudes, la vision, le focus, l'énergie, l'entourage, la résilience. C'est beaucoup. Mais tout ça ne vaut rien sans l'action. Et dans cette dernière leçon, on va parler de pourquoi l'action est la seule chose qui compte vraiment, et comment lever les blocages finaux."},
+  {type:'concept', tag:'Le piège final', title:"La paralysie par l'analyse",
+   body:"Plus tu en sais, plus tu peux trouver des raisons de pas agir. <strong>La connaissance sans action est juste de la procrastination sophistiquée.</strong> Le moment parfait n'arrive jamais. La condition parfaite non plus.",
+   vo:"Voilà le dernier piège, et c'est souvent le plus vicieux. Tu peux être convaincu de tout ce qu'on a vu dans cette formation. Comprendre le mindset de croissance. Savoir comment construire des habitudes. Avoir une vision claire. Et rester immobile. Parce que tu attends encore quelque chose. Que le moment soit parfait. Que le produit soit fini. Que tu sois plus préparé. C'est la paralysie par l'analyse. Et c'est de la procrastination habillée en prudence. Le moment parfait n'arrive jamais. Parce qu'il n'existe pas."},
+  {type:'list', title:"Les 3 blocages finaux à l'action", items:[
+    {icon:'⏳', name:"Attendre d'être prêt", sub:"Tu seras jamais assez prêt. La préparation nécessaire se fait en faisant."},
+    {icon:'🎯', name:"Attendre la permission", sub:"Personne va venir te donner la permission de réussir. Prends-la toi-même."},
+    {icon:'💯', name:"Attendre la perfection", sub:"Le produit parfait jamais lancé vaut zéro. Le produit imparfait lancé aujourd'hui vaut tout."}],
+   vo:"Trois blocages finaux à l'action que je retrouve chez les entrepreneurs qui stagnent. Un : attendre d'être prêt. Tu seras jamais assez prêt. La préparation nécessaire pour faire quelque chose, ça s'acquiert en le faisant. Pas avant. Deux : attendre la permission. Personne va venir te tapper sur l'épaule et te dire : maintenant t'as le droit. Cette permission, tu te la donnes toi-même. Trois : attendre la perfection. Le produit parfait jamais lancé vaut zéro. Le produit imparfait lancé aujourd'hui te donne du feedback réel. Et le feedback réel, c'est ce qui te permet de construire le bon produit."},
+  {type:'concept', tag:'Le principe clé', title:"Done is better than perfect",
+   body:"Amazon, Airbnb, Facebook. Ils ont tous lancé avec un produit médiocre. <strong>Ce qui les a différenciés, c'est pas la perfection du lancement. C'est la vitesse d'itération après.</strong>",
+   vo:"Amazon a lancé avec un site web moche qui vendait uniquement des livres. Airbnb a lancé avec des photos de mauvaise qualité et trois hôtes. Facebook était réservé à une seule université. Ces entreprises valent aujourd'hui des milliers de milliards. Pas parce qu'ils ont lancé parfaitement. Parce qu'ils ont lancé, récupéré du feedback réel, et itéré vite. La vitesse d'itération est la compétence cruciale. Et tu peux pas itérer si t'as pas lancé. Done is better than perfect. Ce n'est pas une excuse pour faire du mauvais boulot. C'est une permission de commencer."},
+  {type:'quote', text:"Dans cinq ans tu regretteras davantage les choses que t'as pas faites que celles que t'as faites.", auth:"— Mark Twain",
+   vo:"Mark Twain l'a écrit il y a deux siècles et c'est toujours aussi vrai. Les études sur les regrets chez les personnes en fin de vie montrent systématiquement la même chose. Les gens regrettent pas ce qu'ils ont essayé et qui a mal tourné. Ils regrettent ce qu'ils ont pas osé. Les projets pas lancés. Les conversations pas eues. Les risques pas pris. Dans cinq ans, dans dix ans, dans vingt ans, tu regretteras davantage les choses que t'as pas faites. Rappelle-toi ça la prochaine fois que tu hesites à te lancer."},
+  {type:'action', badge:"Le contrat d'engagement", title:"Ton engagement maintenant",
+   steps:[{txt:"Note une action que tu repousses depuis trop longtemps — sois précis, pas vague"},{txt:"Écris : 'Je m'engage à faire [action] d'ici [date précise dans 48h]'"},{txt:"Partage cet engagement avec quelqu'un qui peut te tenir responsable"}],
+   vo:"L'exercice final de cette formation. Note une action que tu repousses depuis trop longtemps. Une action précise, pas vague. Pas 'travailler sur mon business', une vraie action concrète. Envoyer un email à ce client potentiel. Finir cette page de vente. Prendre ce rendez-vous. Puis écris : je m'engage à faire cette action d'ici une date précise dans quarante-huit heures maximum. Et partage cet engagement avec quelqu'un qui peut te demander des comptes. Pas pour qu'il te juge. Pour que tu aies une raison externe d'aller au bout."},
+  {type:'recap', title:"Bilan de la formation Mindset", points:["1-3 : Mindset de croissance, cerveau, peur — comprendre les fondations","4-6 : Zone de confort, identité, vision — te construire","7-9 : Discipline, habitudes, échec — les outils du quotidien","10-12 : Focus, énergie, performance — optimiser ta machine","13-15 : Entourage, résilience, action — tenir et avancer"],
+   vo:"On est au bout. Quinze leçons. Voilà la synthèse. Les leçons un à trois ont posé les fondations : mindset de croissance, fonctionnement du cerveau, relation à la peur. Les leçons quatre à six t'ont aidé à te construire : zone de confort, identité d'entrepreneur, vision à long terme. Les leçons sept à neuf t'ont donné les outils du quotidien : discipline, habitudes, gestion de l'échec. Les leçons dix à douze ont optimisé ta machine : focus, énergie, performance mentale. Et les leçons treize à quinze ont couvert ce qui permet de tenir : entourage, résilience, passage à l'action. T'as maintenant les fondations. Le reste, c'est à toi de jouer."}
+]}
+
+]; // FIN LESSONS
+
+/* ══════════════════════════════════════════════════════
+   MOTEUR PLAYER
+══════════════════════════════════════════════════════ */
+let curLesson = 0, curSlide = 0;
+let playing = true, voiceOn = true;
+let tmr = null, ptmr = null, pstart = null;
+const MIN_DUR = 5500;
+const lessonProgress = {};
+
+/* — VOICE — */
+const synth = window.speechSynthesis;
+let voices = [];
+function loadVoices(){
+  const all = synth.getVoices();
+  voices = all.filter(v => v.lang.startsWith('fr'));
+  if(!voices.length) voices = all;
+}
+if(synth.onvoiceschanged !== undefined) synth.onvoiceschanged = loadVoices;
+loadVoices();
+
+function getBestVoice(){
+  return voices.find(v=>v.name.toLowerCase().includes('google')&&v.lang.startsWith('fr'))
+      || voices.find(v=>v.lang==='fr-FR')
+      || voices[0];
+}
+
+function speak(txt, cb){
+  synth.cancel();
+  if(!voiceOn||!txt){cb&&cb();return;}
+  const u = new SpeechSynthesisUtterance(txt);
+  u.voice = getBestVoice();
+  u.lang = 'fr-FR';
+  u.rate = 1.10;
+  u.pitch = 1.0;
+  showCap(txt);
+  u.onend = ()=>{hideCap();cb&&cb();};
+  u.onerror = ()=>{hideCap();cb&&cb();};
+  synth.speak(u);
+}
+function stopSpeak(){synth.cancel();hideCap();}
+function showCap(t){
+  const el = document.getElementById('capTxt');
+  el.textContent = t.length>130 ? t.slice(0,130)+'…' : t;
+  el.classList.remove('off');
+}
+function hideCap(){ document.getElementById('capTxt').classList.add('off'); }
+
+/* — BUILD SLIDES — */
+function buildSlideHTML(s, i, total, lnum){
+  const tags = `<div class="logo-tag">SBW</div><div class="slide-tag">L${lnum} · ${i+1}/${total}</div>`;
+
+  if(s.type==='intro'){
+    const lines = s.title.split('\n');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-intro">
+        <div class="s-intro-left">
+          <div class="s-tag afb d1">Module Mindset · Leçon ${lnum}</div>
+          <div class="s-intro-title afb d2">${lines.join('<br>')}</div>
+          <div class="s-intro-sub af d3">${s.sub}</div>
+        </div>
+        <div class="s-intro-right">
+          <div class="s-intro-num-bg afr d2">${lnum}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if(s.type==='concept'){
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-center">
+        <div class="s-tag afs d1">${s.tag}</div>
+        <div class="s-concept-title afb d2">${s.title}</div>
+        <div class="s-body af d3">${s.body}</div>
+      </div>
+    </div>`;
+  }
+
+  if(s.type==='list'){
+    const cards = s.items.map((it,j)=>`
+      <div class="s-card afb d${j+2}">
+        <div class="s-card-icon">${it.icon}</div>
+        <div class="s-card-name">${it.name}</div>
+        <div class="s-card-sub">${it.sub}</div>
+      </div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-list-wrap">
+        <div class="s-list-title af d1">${s.title}</div>
+        <div class="s-list-grid">${cards}</div>
+      </div>
+    </div>`;
+  }
+
+  if(s.type==='stat'){
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-stat-wrap">
+        <div class="s-stat-left">
+          <div class="s-stat-num afs d1">${s.num}</div>
+          <div class="s-stat-label af d2">${s.label}</div>
+        </div>
+        <div class="s-stat-right">
+          <div class="s-stat-body af d2">${s.body}</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  if(s.type==='quote'){
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-quote-wrap">
+        <div class="s-quote-mark af d1">"</div>
+        <div class="s-quote-text afb d2">${s.text}</div>
+        <div class="s-quote-auth af d3">${s.auth}</div>
+      </div>
+    </div>`;
+  }
+
+  if(s.type==='action'){
+    const steps = s.steps.map((st,j)=>`
+      <div class="s-step afl d${j+3}">
+        <div class="s-step-n">${j+1}</div>
+        <div class="s-step-txt">${st.txt}</div>
+      </div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-action-wrap">
+        <div class="s-action-left">
+          <div class="s-action-badge af d1">${s.badge}</div>
+          <div class="s-action-title afb d2">${s.title}</div>
+        </div>
+        <div class="s-action-right">${steps}</div>
+      </div>
+    </div>`;
+  }
+
+  if(s.type==='recap'){
+    const pts = s.points.map((p,j)=>`
+      <div class="s-recap-pt afl d${j+2}">
+        <div class="s-recap-dot"></div>
+        <div class="s-recap-txt">${p}</div>
+      </div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="s-recap-wrap">
+        <div class="s-recap-left">
+          <div class="s-recap-tag af d1">Récapitulatif</div>
+          <div class="s-recap-title afb d1">${s.title}</div>
+        </div>
+        <div class="s-recap-right">${pts}</div>
+      </div>
+    </div>`;
+  }
+
+  return `<div class="slide" id="sl-${i}">${tags}<div class="s-center"><div class="s-body af d1">${JSON.stringify(s)}</div></div></div>`;
+}
+
+/* — RENDER LESSON — */
+function renderLesson(idx){
+  stopSpeak(); stopPlay();
+  curLesson = idx; curSlide = 0;
+  const L = LESSONS[idx];
+  document.getElementById('slidesCont').innerHTML = L.slides.map((s,i)=>buildSlideHTML(s,i,L.slides.length,L.id)).join('');
+  document.getElementById('tbLesson').textContent = `L${L.id} — ${L.title}`;
+  updateMenu();
+  showSlide(0);
+  setTimeout(()=>{playing=true; document.getElementById('playBtn').textContent='⏸'; schedNext();}, 400);
+}
+
+function showSlide(i){
+  document.querySelectorAll('#slidesCont .slide').forEach((el,j)=>el.classList.toggle('active',j===i));
+  curSlide = i;
+  updateProg(0);
+  const L = LESSONS[curLesson];
+  document.getElementById('slideCtr').textContent = `${i+1}/${L.slides.length}`;
+  document.getElementById('lessonCtr').textContent = `Leçon ${curLesson+1}/${LESSONS.length}`;
+}
+
+function updateProg(p){
+  const L = LESSONS[curLesson];
+  document.getElementById('progBar').style.width = ((curSlide+p/100)/L.slides.length*100)+'%';
+  lessonProgress[curLesson] = Math.max(lessonProgress[curLesson]||0, Math.round((curSlide+p/100)/L.slides.length*100));
+  const sbBar = document.querySelectorAll('.sb-progbar')[curLesson];
+  if(sbBar) sbBar.style.width = lessonProgress[curLesson]+'%';
+}
+
+function schedNext(){
+  clearTmr();
+  pstart = Date.now();
+  const s = LESSONS[curLesson].slides[curSlide];
+  let speechDone = !voiceOn, timerDone = false;
+
+  function tryAdv(){ if(speechDone&&timerDone) advance(); }
+  speak(s.vo, ()=>{ speechDone=true; tryAdv(); });
+  ptmr = setInterval(()=>updateProg(Math.min((Date.now()-pstart)/MIN_DUR*100, voiceOn?55:100)), 60);
+  tmr = setTimeout(()=>{ timerDone=true; tryAdv(); }, MIN_DUR);
+}
+
+function advance(){
+  clearTmr();
+  const L = LESSONS[curLesson];
+  if(curSlide+1 < L.slides.length){
+    showSlide(curSlide+1);
+    if(playing) schedNext();
+  } else {
+    lessonProgress[curLesson] = 100;
+    updateMenu();
+    const next = curLesson+1;
+    if(next < LESSONS.length){ setTimeout(()=>renderLesson(next), 1200); }
+    else stopPlay();
+  }
+}
+
+function stopPlay(){ playing=false; document.getElementById('playBtn').textContent='▶'; clearTmr(); stopSpeak(); }
+function togglePlay(){ playing?stopPlay():(playing=true, document.getElementById('playBtn').textContent='⏸', schedNext()); }
+function nextSlide(){ clearTmr();stopSpeak(); const L=LESSONS[curLesson]; if(curSlide+1<L.slides.length){showSlide(curSlide+1);if(playing)schedNext();} else if(curLesson+1<LESSONS.length){renderLesson(curLesson+1);} }
+function prevSlide(){ clearTmr();stopSpeak(); if(curSlide>0){showSlide(curSlide-1);if(playing)schedNext();} else if(curLesson>0){renderLesson(curLesson-1);} }
+function clearTmr(){ clearTimeout(tmr); clearInterval(ptmr); }
+function toggleVoice(){ voiceOn=!voiceOn; const btn=document.getElementById('voiceBtn'); btn.textContent=voiceOn?'🔊 Voix ON':'🔇 Voix OFF'; btn.classList.toggle('on',voiceOn); if(!voiceOn)stopSpeak(); }
+
+/* — MENU — */
+function updateMenu(){
+  document.querySelectorAll('.sb-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===curLesson);
+    el.classList.toggle('done', lessonProgress[i]===100);
+    const b = el.querySelector('.sb-progbar');
+    if(b) b.style.width = (lessonProgress[i]||0)+'%';
+  });
+}
+
+const sbList = document.getElementById('sbList');
+LESSONS.forEach((l,i)=>{
+  const el = document.createElement('div');
+  el.className = 'sb-item';
+  el.innerHTML = `<div class="sb-num">L${String(i+1).padStart(2,'0')}</div><div class="sb-title">${l.title}</div><div class="sb-prog"><div class="sb-progbar" style="width:0%"></div></div>`;
+  el.onclick = ()=>renderLesson(i);
+  sbList.appendChild(el);
+});
+
+/* — START — */
+function startApp(){
+  // Wake up audio context with user interaction
+  const u = new SpeechSynthesisUtterance('');
+  synth.speak(u);
+  synth.cancel();
+
+  const landing = document.getElementById('landing');
+  const app = document.getElementById('app');
+  landing.classList.add('out');
+  setTimeout(()=>{
+    landing.style.display='none';
+    app.classList.add('in');
+    renderLesson(0);
+  }, 600);
+}
+</script>
+</body>
+</html>
