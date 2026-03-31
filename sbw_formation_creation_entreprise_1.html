@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SBW — Création d'entreprise & Fiscalité 🇫🇷</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080C14;--gold:#2563EB;--gl:#3B82F6;--white:#F0ECE4;
+  --muted:#5A564E;--dim:#0F172A;--line:rgba(37,99,235,.22);
+  --red:#E05555;--green:#5DBE7A;--blue:#5B9BD5;--orange:#E8853C;
+}
+html,body{height:100%;overflow:hidden;background:#060A12;font-family:'DM Sans',sans-serif}
+
+/* ══ LANDING ══ */
+#landing{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;transition:opacity .6s ease}
+#landing.out{opacity:0;pointer-events:none}
+.l-brand{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:24px}
+.l-emoji{font-size:56px;margin-bottom:20px}
+.l-title{font-family:'Cormorant Garamond',serif;font-size:clamp(32px,5.5vw,66px);font-weight:700;color:var(--white);text-align:center;line-height:1.05;margin-bottom:14px}
+.l-title em{color:var(--gold);font-style:normal;display:block}
+.l-sub{font-size:14px;color:var(--muted);text-align:center;max-width:500px;line-height:1.7;margin-bottom:40px}
+.l-meta{display:flex;gap:32px;margin-bottom:40px}
+.lm{display:flex;flex-direction:column;align-items:center;gap:4px}
+.lm-n{font-family:'Cormorant Garamond',serif;font-size:34px;font-weight:700;color:var(--gl)}
+.lm-l{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.start-btn{padding:18px 52px;background:var(--gold);color:#0C0C0A;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s;box-shadow:0 0 40px rgba(37,99,235,.2)}
+.start-btn:hover{background:var(--gl);transform:translateY(-2px)}
+
+/* ══ APP ══ */
+#app{display:flex;height:100vh;opacity:0;transition:opacity .6s ease}
+#app.in{opacity:1}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:#080C14;border-right:1px solid var(--line);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-head{padding:14px 16px;border-bottom:1px solid var(--line)}
+.sb-brand{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;letter-spacing:.18em;color:var(--gold)}
+.sb-module{font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:3px}
+.sb-list{flex:1;overflow-y:auto;padding:6px}
+.sb-list::-webkit-scrollbar{width:3px}
+.sb-list::-webkit-scrollbar-thumb{background:var(--line)}
+.sb-item{padding:8px 10px;border-radius:7px;cursor:pointer;transition:all .15s;border:1px solid transparent;margin-bottom:3px}
+.sb-item:hover{background:rgba(255,255,255,.025);border-color:var(--line)}
+.sb-item.active{background:rgba(37,99,235,.08);border-color:rgba(37,99,235,.3)}
+.sb-item.done .sb-num::after{content:' ✓';color:var(--green)}
+.sb-num{font-size:8px;color:var(--muted);letter-spacing:.12em;margin-bottom:2px}
+.sb-title{font-size:10px;color:var(--white);font-weight:500;line-height:1.35}
+.sb-item.active .sb-title{color:var(--gl)}
+.sb-prog{margin-top:5px;height:2px;background:var(--dim);border-radius:2px;overflow:hidden}
+.sb-progbar{height:100%;background:var(--gold);border-radius:2px;transition:width .4s}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{height:46px;background:#060A12;border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.tb-lesson{font-size:11px;color:var(--gl);font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tb-voice{padding:5px 14px;background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.2);border-radius:20px;color:var(--gl);font-size:10px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.tb-voice:hover,.tb-voice.on{background:rgba(37,99,235,.2);border-color:var(--gold)}
+
+/* SLIDE AREA */
+.slide-area{flex:1;display:flex;align-items:center;justify-content:center;padding:14px;background:#060A12;overflow:hidden}
+.slide-wrap{position:relative;width:100%;max-width:calc((100vh - 120px)*16/9);aspect-ratio:16/9;background:var(--bg);border-radius:12px;overflow:hidden;box-shadow:0 0 60px rgba(0,0,0,.8),0 0 30px rgba(37,99,235,.06)}
+.prog-bar{position:absolute;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--gold),var(--gl));z-index:50;transition:width .1s linear}
+
+/* SLIDES */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .45s ease}
+.slide.active{opacity:1;pointer-events:all}
+.logo-tag{position:absolute;top:14px;left:18px;font-family:'Cormorant Garamond',serif;font-size:10px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);opacity:.55;z-index:5}
+.slide-tag{position:absolute;top:14px;right:18px;font-size:8px;color:var(--muted);letter-spacing:.1em;z-index:5}
+.caption{position:absolute;bottom:0;left:0;right:0;padding:14px 24px 10px;background:linear-gradient(transparent,rgba(0,0,0,.65));z-index:30;min-height:44px;display:flex;align-items:flex-end}
+.cap-txt{font-size:11px;color:rgba(255,255,255,.8);line-height:1.5;width:100%;text-align:center;transition:opacity .3s}
+.cap-txt.off{opacity:0}
+
+/* CONTROLS */
+.controls{height:52px;background:#080C14;border-top:1px solid var(--line);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0}
+.ctrl{width:34px;height:34px;border-radius:50%;background:rgba(37,99,235,.06);border:1px solid rgba(37,99,235,.2);color:var(--gl);font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;font-family:'DM Sans',sans-serif}
+.ctrl:hover{background:rgba(37,99,235,.18)}
+.ctrl.play{width:42px;height:42px;background:var(--gold);color:#0C0C0A;font-size:15px}
+.ctrl.play:hover{background:var(--gl)}
+.sl-ctr{font-size:10px;color:var(--muted);letter-spacing:.08em;min-width:36px}
+.l-ctr{font-size:10px;color:var(--muted);flex:1;text-align:right}
+
+/* ══ SLIDE LAYOUTS ══════════════════════════ */
+
+/* INTRO — split */
+.ly-intro{display:flex;width:100%;height:100%}
+.intro-l{flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px 36px 36px 48px}
+.intro-r{width:42%;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.intro-r::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,var(--bg) 0%,transparent 40%);z-index:1}
+.intro-r-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:10px}
+.intro-emoji-big{font-size:clamp(60px,8vw,100px);filter:drop-shadow(0 0 20px rgba(37,99,235,.3))}
+.intro-num-bg{font-family:'Cormorant Garamond',serif;font-size:160px;font-weight:700;color:rgba(37,99,235,.07);line-height:1;position:absolute;bottom:-20px;right:10px}
+.s-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(37,99,235,.1);border:1px solid rgba(37,99,235,.25);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px}
+.s-title{font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.2vw,40px);font-weight:700;color:var(--white);line-height:1.1;margin-bottom:12px}
+.s-title em{color:var(--gold);font-style:normal}
+.s-sub{font-size:12px;color:#9A9690;line-height:1.7;max-width:380px}
+
+/* CENTER */
+.ly-center{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 72px;text-align:center}
+.concept-emoji{font-size:36px;margin-bottom:14px}
+.concept-title{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,2.8vw,36px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.body-txt{font-size:13px;color:#B8B4AC;line-height:1.8;max-width:620px}
+.body-txt strong{color:var(--white);font-weight:600}
+.body-txt em{color:var(--gl);font-style:normal}
+
+/* CARDS — 3 col */
+.ly-cards{width:100%;height:100%;display:flex;flex-direction:column;padding:30px 36px 30px 48px}
+.cards-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.cards-grid{display:flex;gap:12px;flex:1}
+.card{flex:1;border-radius:10px;padding:16px 14px;display:flex;flex-direction:column;gap:8px;background:rgba(37,99,235,.04);border:1px solid rgba(37,99,235,.12)}
+.card.green{background:rgba(93,190,122,.04);border-color:rgba(93,190,122,.2)}
+.card.red{background:rgba(224,85,85,.04);border-color:rgba(224,85,85,.2)}
+.card.blue{background:rgba(91,155,213,.04);border-color:rgba(91,155,213,.2)}
+.card.orange{background:rgba(232,133,60,.04);border-color:rgba(232,133,60,.2)}
+.card-emoji{font-size:22px}
+.card-name{font-size:12px;font-weight:700;color:var(--white);line-height:1.3}
+.card.green .card-name{color:#7DDCA0}
+.card.red .card-name{color:#F08080}
+.card.blue .card-name{color:#88B8E8}
+.card.orange .card-name{color:#F0A878}
+.card-sub{font-size:11px;color:var(--muted);line-height:1.45;flex:1}
+
+/* STAT */
+.ly-stat{width:100%;height:100%;display:flex}
+.stat-l{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;gap:8px}
+.stat-emoji{font-size:40px}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:clamp(56px,9vw,110px);font-weight:700;color:var(--gl);line-height:1}
+.stat-label{font-size:11px;color:var(--muted);letter-spacing:.1em;text-align:center;max-width:180px}
+.stat-r{flex:1.2;display:flex;flex-direction:column;justify-content:center;padding:36px 36px 36px 20px;border-left:1px solid var(--line);gap:10px}
+.stat-body{font-size:13px;color:#B8B4AC;line-height:1.8}
+.stat-body strong{color:var(--white)}
+
+/* COMPARE */
+.ly-compare{width:100%;height:100%;display:flex;flex-direction:column;padding:28px 36px 28px 48px}
+.compare-title{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+.compare-grid{display:flex;gap:14px;flex:1}
+.cmp{flex:1;border-radius:12px;padding:18px 16px;display:flex;flex-direction:column;gap:8px}
+.cmp.bad{background:rgba(224,85,85,.06);border:1.5px solid rgba(224,85,85,.25)}
+.cmp.good{background:rgba(93,190,122,.06);border:1.5px solid rgba(93,190,122,.25)}
+.cmp.neutral{background:rgba(91,155,213,.06);border:1.5px solid rgba(91,155,213,.25)}
+.cmp-emoji{font-size:24px}
+.cmp-label{font-size:9px;letter-spacing:.15em;text-transform:uppercase}
+.bad .cmp-label{color:var(--red)}.good .cmp-label{color:var(--green)}.neutral .cmp-label{color:var(--blue)}
+.cmp-num{font-family:'Cormorant Garamond',serif;font-size:clamp(40px,5vw,64px);font-weight:700;line-height:1}
+.bad .cmp-num{color:var(--red)}.good .cmp-num{color:var(--green)}.neutral .cmp-num{color:var(--blue)}
+.cmp-unit{font-size:13px;opacity:.7}
+.bad .cmp-unit{color:var(--red)}.good .cmp-unit{color:var(--green)}.neutral .cmp-unit{color:var(--blue)}
+.cmp-desc{font-size:11px;color:var(--muted);line-height:1.4}
+.compare-note{margin-top:12px;font-size:12px;color:var(--gl);text-align:center;line-height:1.5}
+
+/* CALC — calculation box */
+.ly-calc{width:100%;height:100%;display:flex;gap:0}
+.calc-l{flex:1;display:flex;flex-direction:column;justify-content:center;padding:36px;border-right:1px solid var(--line)}
+.calc-tag{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--orange);background:rgba(232,133,60,.08);border:1px solid rgba(232,133,60,.2);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px}
+.calc-title{font-family:'Cormorant Garamond',serif;font-size:clamp(18px,2.5vw,28px);font-weight:700;color:var(--white);line-height:1.2}
+.calc-premise{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.6}
+.calc-r{flex:1.3;display:flex;flex-direction:column;justify-content:center;padding:24px 30px;gap:8px}
+.calc-line{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-radius:7px;font-size:12px}
+.calc-line.base{background:rgba(91,155,213,.06);border:1px solid rgba(91,155,213,.15)}
+.calc-line.minus{background:rgba(224,85,85,.06);border:1px solid rgba(224,85,85,.15)}
+.calc-line.equals{background:rgba(93,190,122,.08);border:1px solid rgba(93,190,122,.25);font-weight:700}
+.calc-line .cl-label{color:var(--muted)}
+.calc-line.base .cl-label{color:#88B8E8}
+.calc-line.minus .cl-label{color:#F08080}
+.calc-line.equals .cl-label{color:#7DDCA0}
+.calc-line .cl-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700}
+.calc-line.base .cl-val{color:#88B8E8}
+.calc-line.minus .cl-val{color:var(--red)}
+.calc-line.equals .cl-val{color:var(--green)}
+
+/* WARNING */
+.ly-warning{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 72px;text-align:center}
+.warn-emoji{font-size:48px;margin-bottom:16px}
+.warn-title{font-family:'Cormorant Garamond',serif;font-size:clamp(20px,2.8vw,34px);font-weight:700;color:var(--red);margin-bottom:16px;line-height:1.2}
+.warn-body{font-size:13px;color:#B8B4AC;line-height:1.8;max-width:600px}
+.warn-body strong{color:var(--white)}
+.warn-border{border:1.5px solid rgba(224,85,85,.3);border-radius:12px;padding:18px 24px;background:rgba(224,85,85,.04);margin-top:16px;max-width:580px;width:100%}
+.warn-border p{font-size:12px;color:#D08080;line-height:1.6}
+
+/* ACTION */
+.ly-action{width:100%;height:100%;display:flex}
+.act-l{width:280px;display:flex;flex-direction:column;justify-content:center;padding:36px;border-right:1px solid var(--line);flex-shrink:0}
+.act-badge{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--green);background:rgba(93,190,122,.08);border:1px solid rgba(93,190,122,.2);padding:4px 12px;border-radius:20px;display:inline-block;margin-bottom:14px}
+.act-emoji{font-size:32px;margin-bottom:10px}
+.act-title{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.3vw,26px);font-weight:700;color:var(--white);line-height:1.2}
+.act-r{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px;gap:10px}
+.step{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:8px;background:rgba(93,190,122,.04);border:1px solid rgba(93,190,122,.1)}
+.step-n{width:22px;height:22px;border-radius:50%;background:rgba(93,190,122,.12);border:1px solid rgba(93,190,122,.3);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--green);flex-shrink:0;margin-top:1px}
+.step-txt{font-size:12px;color:var(--white);line-height:1.5}
+
+/* RECAP */
+.ly-recap{width:100%;height:100%;display:flex}
+.recap-l{width:260px;display:flex;flex-direction:column;justify-content:center;padding:36px;border-right:1px solid var(--line);flex-shrink:0}
+.recap-emoji{font-size:32px;margin-bottom:12px}
+.recap-tag{font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.recap-title{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.3vw,26px);font-weight:700;color:var(--white);line-height:1.2}
+.recap-r{flex:1;display:flex;flex-direction:column;justify-content:center;padding:32px;gap:9px}
+.recap-pt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:7px;background:rgba(37,99,235,.04);border-left:2px solid var(--gold)}
+.recap-emoji-sm{font-size:14px;flex-shrink:0;margin-top:2px}
+.recap-txt{font-size:12px;color:var(--white);line-height:1.4}
+
+/* QUOTE */
+.ly-quote{width:100%;height:100%;display:flex;align-items:center;justify-content:center;padding:40px 80px;flex-direction:column;gap:16px}
+.q-mark{font-family:'Cormorant Garamond',serif;font-size:80px;color:rgba(37,99,235,.2);line-height:.7}
+.q-text{font-family:'Cormorant Garamond',serif;font-size:clamp(16px,2.3vw,28px);font-style:italic;color:var(--white);text-align:center;line-height:1.5;max-width:680px}
+.q-auth{font-size:11px;color:var(--gl);letter-spacing:.12em;text-align:center}
+
+/* ANIMATIONS */
+.af{opacity:0}.afb{opacity:0;transform:translateY(16px)}.afs{opacity:0;transform:scale(.88)}
+.afl{opacity:0;transform:translateX(-14px)}.afr{opacity:0;transform:translateX(14px)}
+.slide.active .af,.slide.active .afb,.slide.active .afs,.slide.active .afl,.slide.active .afr{transition:all .55s cubic-bezier(.34,1.3,.64,1)}
+.slide.active .af{opacity:1;transition:opacity .55s ease}.slide.active .afb{opacity:1;transform:none}
+.slide.active .afs{opacity:1;transform:none}.slide.active .afl{opacity:1;transform:none}.slide.active .afr{opacity:1;transform:none}
+.d1{transition-delay:.15s!important}.d2{transition-delay:.32s!important}.d3{transition-delay:.49s!important}
+.d4{transition-delay:.66s!important}.d5{transition-delay:.83s!important}.d6{transition-delay:1s!important}
+.d7{transition-delay:1.17s!important}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <div class="l-brand">Start Business World</div>
+  <div class="l-emoji">🏛️💰📊</div>
+  <div class="l-title">Création d'entreprise<em>& Fiscalité</em></div>
+  <div class="l-sub">Tout ce que tu dois savoir pour créer ta société, choisir le bon statut, comprendre les impôts et payer légalement le moins possible dès le départ.</div>
+  <div class="l-meta">
+    <div class="lm"><div class="lm-n">16</div><div class="lm-l">Leçons</div></div>
+    <div class="lm"><div class="lm-n">160+</div><div class="lm-l">Slides</div></div>
+    <div class="lm"><div class="lm-n">~140</div><div class="lm-l">Minutes</div></div>
+  </div>
+  <button class="start-btn" onclick="startApp()">▶ Commencer la formation</button>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="sidebar">
+    <div class="sb-head">
+      <div class="sb-brand">SBW</div>
+      <div class="sb-module">Création d'entreprise 🇫🇷</div>
+    </div>
+    <div class="sb-list" id="sbList"></div>
+  </div>
+  <div class="main-area">
+    <div class="topbar">
+      <div class="tb-lesson" id="tbLesson">—</div>
+      <button class="tb-voice on" id="voiceBtn" onclick="toggleVoice()">🔊 Voix ON</button>
+    </div>
+    <div class="slide-area">
+      <div class="slide-wrap" id="sw">
+        <div class="prog-bar" id="pb" style="width:0%"></div>
+        <div id="sc"></div>
+        <div class="caption"><div class="cap-txt off" id="ct"></div></div>
+      </div>
+    </div>
+    <div class="controls">
+      <button class="ctrl" onclick="prevSlide()">←</button>
+      <button class="ctrl play" id="playBtn" onclick="togglePlay()">⏸</button>
+      <button class="ctrl" onclick="nextSlide()">→</button>
+      <div class="sl-ctr" id="slCtr">-</div>
+      <div style="flex:1;display:flex;justify-content:center">
+        <a href="https://c3po.link/QP9duxvAkg" target="_blank" style="display:inline-flex;align-items:center;gap:7px;padding:7px 18px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:11px;font-weight:700;letter-spacing:.06em;text-decoration:none;cursor:pointer;transition:all .18s;box-shadow:0 0 16px rgba(37,99,235,.35)" onmouseover="this.style.background='var(--gl)';this.style.transform='translateY(-1px)'" onmouseout="this.style.background='var(--gold)';this.style.transform='none'">
+          🏢 Créer mon entreprise — Code <strong style="margin-left:4px;letter-spacing:.08em">SBW25</strong>
+        </a>
+      </div>
+      <div class="l-ctr" id="lCtr">-</div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════════════
+   DONNÉES — 16 LEÇONS CRÉATION D'ENTREPRISE & FISCALITÉ 🇫🇷
+══════════════════════════════════════════════════ */
+const LESSONS = [
+/* ━━ LEÇON 1 ━━ */
+{id:1, title:"🏢 Pourquoi avoir une entreprise déclarée", slides:[
+  {t:'intro', num:'01', emoji:'🏢', title:"Pourquoi avoir une\n<em>entreprise déclarée</em>",
+   sub:"Et les risques concrets si tu le fais pas. Avant de parler d'optimisation, on pose les bases.",
+   vo:"Leçon une. Avant qu'on parle de comment payer moins d'impôts, avant tout ça, y'a un truc de base qu'on doit régler ensemble. Pourquoi t'as besoin d'une entreprise officielle. Déclarée. Légale. Parce que beaucoup de gens commencent à vendre des trucs, à encaisser de l'argent, et ils déclarent rien. Je commence petit, on verra plus tard. Et cette phrase-là, elle a coûté très cher à beaucoup de monde."},
+
+  {t:'concept', emoji:'💳', tag:'Premier blocage', title:"Sans société, les vrais outils te ferment la porte 💳",
+   body:"Tu veux vendre en ligne ? <strong>Stripe, PayPal Pro, les vrais outils de paiement te demandent un numéro de société.</strong> Sans ça, t'as pas accès. Et sans système de paiement professionnel, <em>t'as pas de boutique en ligne sérieuse.</em>",
+   vo:"Premier truc concret. Si tu veux vendre des produits en ligne, tu peux pas encaisser de paiements correctement sans société. Stripe, PayPal Pro, les vrais outils de paiement, ils te demandent un numéro de société. Sans ça, t'as pas accès. Et sans système de paiement propre, t'as pas de boutique en ligne sérieuse. C'est bloquant dès le premier jour. Même pour les fournisseurs sérieux, les grossistes, les partenaires B2B, ils veulent un SIRET. Les portes restent fermées sans ça."},
+
+  {t:'warning', emoji:'⚠️', title:"Le compte perso bloqué — la galère en cascade 🚨",
+   body:"Y'en a qui encaissent sur leur compte perso. Au début ça passe.",
+   warn:"<strong>📵 La banque bloque tout</strong> quand elle voit des virements commerciaux sur un compte personnel.<br><br><strong>👥 Tu fais passer par des amis, la famille</strong> — leur compte se fait scruter, stress énorme.<br><br><strong>💸 T'as plus accès à ton argent</strong> — y compris pour tes dépenses du quotidien.<br><br><strong>🔍 Tout ça parce qu'on avait peur de créer une société.</strong> C'est vraiment dommage.",
+   vo:"Y'en a qui vendent sur Snapchat, sur Leboncoin, en direct, et ils encaissent sur leur compte perso. Au début ça passe. Mais très vite la banque elle voit des dizaines de virements qui ressemblent à du commerce sur un compte personnel. Elle bloque tout. Ton compte perso est bloqué, y compris pour tes dépenses du quotidien. Alors tu commences à faire passer les paiements par le compte d'un ami, d'un frère, de la famille. Et là tu crées un stress énorme autour de toi pour rien. Tout ça parce qu'on avait peur de créer une société."},
+
+  {t:'compare', title:"🛡️ Perso vs Pro — la séparation qui te protège",
+   left:{emoji:'❌', label:'Sans société', num:'0', unit:'', desc:'Aucune séparation perso / pro. Un problème dans le business touche directement ta vie perso. Tes biens personnels en danger.'},
+   right:{emoji:'✅', label:'Avec société', num:'100', unit:'%', desc:"Ce qui se passe dans ta société ça reste dans la société. Ton argent perso est protégé. C'est la responsabilité limitée.", color:'good'},
+   note:"Une société c'est pas une contrainte — c'est une protection pour toi.",
+   vo:"Et y'a un autre truc fondamental que beaucoup comprennent pas. La séparation entre le perso et le pro. Quand t'as une société, ce qui se passe dans ta société ça te concerne pas toi directement en tant que personne. Si ta boîte a un problème, un litige, une dette, ça reste dans la société. Ton argent personnel, ton compte perso, ta vie, tout ça est protégé. C'est ce qu'on appelle la responsabilité limitée. Quand t'as pas de société et que tu fais tout sur ton compte perso, t'as aucune séparation. Le moindre problème te touche directement."},
+
+  {t:'warning', emoji:'🔍', title:"L'administration remonte à 3 ans — les risques fiscaux 🔍",
+   body:"L'administration fiscale peut regarder tes relevés bancaires sur les 3 dernières années.",
+   warn:"<strong>💸 Tous les virements non expliqués</strong> = revenus non déclarés selon l'administration.<br><br><strong>📊 Elle calcule les impôts dessus</strong>, rajoute des pénalités, et te réclame tout d'un coup.<br><br><strong>⚠️ On parle parfois de dizaines de milliers d'euros</strong> sur des activités modestes.<br><br><strong>Depuis 2020</strong> les banques transmettent automatiquement les infos à l'administration.",
+   vo:"Voilà les risques fiscaux concrets quand tu travailles sans être déclaré. L'administration peut regarder tes relevés bancaires sur les trois dernières années. Tous les virements qu'elle comprend pas, elle les considère comme des revenus non déclarés. Elle calcule les impôts dessus, elle rajoute des pénalités, et elle te réclame tout ça d'un coup. On parle parfois de dizaines de milliers d'euros sur des activités qui étaient même pas si grosses. Et depuis 2020, les banques sont obligées de transmettre automatiquement les informations à l'administration fiscale. Tout est tracé. Tout est vu."},
+
+  {t:'concept', emoji:'💡', tag:'La bonne nouvelle', title:"Une société c'est pas le CAC 40 💡",
+   body:"C'est juste dire à l'État : <em>'Je fais du commerce, je suis officiel.'</em><br><br>✅ Simple et rapide à créer en ligne<br>✅ Au départ si tu réinvestis, tu paies peu ou rien en impôts<br>✅ Code <strong>SBW25</strong> sur LegalPlace — 25% de réduction exclusive membres",
+   vo:"Faut pas s'imaginer qu'une société c'est compliqué. C'est pas le CAC 40. C'est pas réservé aux grandes entreprises ou aux gens qui ont fait des études de droit. C'est juste dire à l'État : je fais du commerce, je suis officiel. C'est tout. T'as un numéro, tu peux encaisser proprement, tu protèges ta vie personnelle de ta vie professionnelle. Et surtout, au départ si tu réinvestis dans ta boîte, tu paieras très peu ou rien en impôts. Parce que toutes tes dépenses professionnelles se déduisent. On verra ça dans les prochaines leçons."},
+
+  {t:'recap', emoji:'🏢', title:"Ce qu'il faut retenir",
+   points:[
+     {e:'💳', txt:"Sans société : Stripe, PayPal Pro, grossistes — les portes sont fermées"},
+     {e:'🚫', txt:"Compte perso bloqué + galère famille et amis pour rien"},
+     {e:'🛡️', txt:"Société = séparation perso / pro = responsabilité limitée"},
+     {e:'🔍', txt:"Administration remonte 3 ans en arrière sur tes relevés"},
+     {e:'💡', txt:"Créer une société c'est simple, rapide, et au départ tu paies peu"},
+     {e:'🎯', txt:"LegalPlace — code SBW25 pour 25% de réduction exclusive membres"}],
+   vo:"Ce qu'il faut retenir de cette première leçon. Sans société, Stripe et les vrais outils de paiement te bloquent. Encaisser sur un compte perso mène au compte bloqué et au stress pour toute ta famille. Avoir une société c'est séparer le perso du pro et se protéger. L'administration peut remonter trois ans en arrière. Créer une société c'est simple et au départ tu paies peu si tu réinvestis. Et pour créer ta structure, le code SBW25 sur LegalPlace te donne 25% de réduction exclusive. Prochaine leçon, tous les statuts juridiques expliqués simplement."}
+]},
+
+/* ━━ LEÇON 2 ━━ */
+{id:2, title:"📋 Tous les statuts juridiques expliqués", slides:[
+  {t:'intro', num:'02', emoji:'📋', title:"Tous les statuts\n<em>juridiques expliqués</em>",
+   sub:"Micro-entreprise, SASU, EURL, SAS, SARL, SCI, SA, association — tu vas tout savoir.",
+   vo:"Leçon deux. Avant qu'on rentre dans les détails de chaque structure, j'ai besoin de te donner une vue d'ensemble. Parce que quand tu commences à chercher, tu tombes sur plein de termes. Micro-entreprise, SASU, EURL, SARL, SCI, SA, association. Si tu sais pas ce que ça veut dire, c'est facile de se perdre. Dans cette leçon je te les explique tous. Simple, court, sans jargon."},
+
+  {t:'cards', title:"🏃 Les statuts solo — les plus simples", items:[
+    {emoji:'⚡', name:"Micro-entreprise", sub:"Le plus simple. Charges = % fixe du CA. Si tu gagnes rien, tu paies rien. Pas de bilan. Mais tu peux rien déduire. Plafond de CA. Pour tester ou complément.", color:''},
+    {emoji:'👤', name:"Entreprise Individuelle (EI)", sub:"Toi tout seul, pas de capital. Tu dépasses les plafonds micro. Tu déduis tes dépenses. Mais en EI classique tes biens perso peuvent être touchés si dettes.", color:''},
+    {emoji:'🛡️', name:"EI protégée (depuis 2022)", sub:"Depuis 2022, l'EI protège automatiquement ton patrimoine personnel. Meilleure version de l'EI.", color:'green'}],
+   vo:"Les deux premiers statuts. La micro-entreprise d'abord. Le statut le plus simple. Tu déclares tes revenus, tu paies un pourcentage fixe de charges sur ce que tu encaisses. Si tu gagnes rien, tu paies rien. Pas de comptabilité complexe, pas de bilan. Mais tu peux rien déduire et y'a des plafonds de chiffre d'affaires. L'entreprise individuelle est un peu plus avancée. Tu peux dépasser les plafonds et déduire tes dépenses. Depuis 2022, l'EI protège automatiquement le patrimoine personnel. Mais dans cette formation on va t'orienter vers des structures encore plus optimisées."},
+
+  {t:'compare', title:"⭐ SASU vs EURL — les deux recommandées",
+   left:{emoji:'🚀', label:'SASU — Recommandée', num:'0€', unit:'', desc:"Pas de salaire = zéro charges. Tu gardes chômage, RSA, APL. Dividendes à 30% quand bénéfices. LE meilleur choix pour lancer seul."},
+   right:{emoji:'💼', label:'EURL — Si tu veux te rémunérer', num:'~1 200€', unit:'/an min', desc:"Charges ~40-45% sur rémunération. Mais cotisations minimales même si zéro CA (~1 200€/an). Risque de perdre les aides sociales.", color:'neutral'},
+   note:"On compare ces deux structures en détail dans la leçon 4.",
+   vo:"Les deux structures qu'on recommande dans cette formation. La SASU, Société par Actions Simplifiée Unipersonnelle. Si tu te verses pas de salaire au départ, tu paies zéro. Zéro charges, zéro impôts. Tu gardes tes aides sociales. Et quand ta boîte fait des bénéfices, tu te verses des dividendes taxés à seulement 30%. L'EURL, Entreprise Unipersonnelle à Responsabilité Limitée, c'est mieux si tu veux te verser un revenu rapidement. Les charges sont moins lourdes sur la rémunération, environ 40 à 45%."},
+
+  {t:'cards', title:"👥 Les structures à plusieurs associés", items:[
+    {emoji:'🤝', name:"SAS", sub:"La SASU à plusieurs. Min 2 associés. Très flexible. Préférée des investisseurs. Mêmes avantages fiscaux que la SASU.", color:'green'},
+    {emoji:'🏪', name:"SARL", sub:"La plus répandue en France. Min 2 associés. Gérant majoritaire = charges TNS ~45%. Moins flexible que la SAS.", color:''},
+    {emoji:'🏠', name:"SCI", sub:"Uniquement pour l'immobilier. Acheter des appartements, gérer un patrimoine. On en reparle avec les holdings.", color:'blue'}],
+   vo:"Pour les structures à plusieurs. La SAS c'est la SASU mais à plusieurs associés. Minimum deux personnes. Très flexible dans l'organisation. La structure préférée si vous cherchez des investisseurs. La SARL c'est la forme de société la plus répandue en France. Le gérant majoritaire, celui qui a plus de 50% des parts, relève du régime des travailleurs indépendants avec des charges moins lourdes. La SCI c'est pour l'immobilier uniquement. Acheter des appartements, gérer un patrimoine immobilier."},
+
+  {t:'concept', emoji:'🚫', tag:'À connaître mais pas pour toi', title:"SA et Association — pas pour démarrer 🚫",
+   body:"La <strong>SA (Société Anonyme)</strong> c'est les grandes structures. Minimum 7 actionnaires, capital de 37 000€. Pour la bourse ou les grosses levées de fonds.<br><br>L'<strong>Association loi 1901</strong> c'est pour les activités sans but lucratif. Elle peut avoir des revenus mais ne distribue pas de bénéfices. <em>Pour faire du business, c'est pas la bonne structure.</em>",
+   vo:"Deux statuts importants à connaître mais qui ne te concernent pas au démarrage. La SA, Société Anonyme. Minimum sept actionnaires, capital minimum de 37 000 euros. Pour les grandes entreprises qui veulent entrer en bourse ou lever des fonds importants. Toi au démarrage, t'as aucune raison de t'y intéresser. L'association loi 1901, c'est pas une structure commerciale. Faite pour des activités sans but lucratif. Sport, culture, humanitaire. Elle peut avoir des revenus mais ne peut pas distribuer des bénéfices. Pour faire du business, c'est pas la bonne structure."},
+
+  {t:'recap', emoji:'📋', title:"Récapitulatif — qui choisit quoi",
+   points:[
+     {e:'⚡', txt:"Tester une idée / complément de revenus → Micro-entreprise"},
+     {e:'🚀', txt:"Lancer un vrai business seul, garder les aides → SASU ⭐"},
+     {e:'💼', txt:"Se rémunérer vite, t'es sûr de ton activité → EURL"},
+     {e:'🤝', txt:"Plusieurs associés, flexibilité → SAS"},
+     {e:'🏪', txt:"Plusieurs associés, activité classique → SARL"},
+     {e:'🏠', txt:"Immobilier → SCI"}],
+   vo:"Le récapitulatif. Tu veux tester une idée avec peu de risques, c'est la micro-entreprise. Tu lances un vrai business seul et tu veux garder tes aides sociales, c'est la SASU, le meilleur choix pour démarrer. Tu veux te rémunérer dès le départ et t'es sûr de ton activité, c'est l'EURL. Vous êtes plusieurs et vous voulez de la flexibilité, c'est la SAS. Vous êtes plusieurs pour une activité classique, c'est la SARL. Et pour l'immobilier, c'est la SCI. Prochaine leçon, la micro-entreprise en détail."}
+]},
+
+/* ━━ LEÇON 3 ━━ */
+{id:3, title:"⚡ La micro-entreprise : bien ou piège ?", slides:[
+  {t:'intro', num:'03', emoji:'⚡', title:"La micro-entreprise :\n<em>bien ou piège ?</em>",
+   sub:"Tout le monde te dit de commencer par là. Mon avis honnête sur pourquoi c'est souvent un piège.",
+   vo:"Leçon trois. La micro-entreprise. Tout le monde te conseille ce statut quand tu te lances. Ta famille, tes potes, parfois même des comptables. Commence en micro-entreprise, c'est simple, c'est gratuit. Et dans cette leçon je vais te donner mon avis honnête. Pour moi la micro-entreprise c'est souvent un piège pour quelqu'un qui veut vraiment construire un business sérieux."},
+
+  {t:'cards', title:"✅ Ce qui est vraiment bien", items:[
+    {emoji:'🆓', name:"Gratuit et rapide", sub:"Création en 15 min en ligne sur autoentrepreneur.urssaf.fr. Zéro frais. SIRET en quelques jours.", color:'green'},
+    {emoji:'📊', name:"Simple à gérer", sub:"Déclaration en ligne chaque mois ou trimestre. Tu entres le montant encaissé, le site calcule. Pas de bilan, pas de comptable obligatoire.", color:'green'},
+    {emoji:'🛡️', name:"Zéro risque au démarrage", sub:"Si tu gagnes rien, tu paies rien. Charges = % fixe. Peut se cumuler avec un emploi. L'ACRE réduit les charges les premières années.", color:'green'}],
+   vo:"Soyons honnêtes, y'a des points positifs. La création c'est gratuit et ça prend 15 minutes en ligne. Si tu gagnes rien, tu paies rien. Les charges c'est un pourcentage fixe de ce que tu encaisses. Tu peux le faire en même temps que ton travail. La comptabilité c'est ultra simple. Tu déclares en ligne tous les mois ou tous les trimestres. T'entres juste le montant encaissé, le site calcule automatiquement. Et au démarrage tu peux bénéficier de l'ACRE, une aide de l'État qui réduit tes charges sociales pendant les premières années."},
+
+  {t:'concept', emoji:'⚠️', tag:'Le vrai problème', title:"Tu peux rien déduire — et ça change tout ⚠️",
+   body:"Imagine : tu fais <strong>3 000€ de ventes</strong> ce mois. Pour les générer, t'as acheté <strong>1 500€ de marchandises.</strong> Ton vrai bénéfice c'est 1 500€. <em>Mais en micro-entreprise tu paies tes charges sur les 3 000€.</em> Pas sur les 1 500€. T'as pas le droit de déduire tes dépenses.",
+   vo:"Voilà le piège principal de la micro-entreprise. Tu peux rien déduire. Je vais te donner un exemple très concret. Imagine que tu fais trois mille euros de ventes ce mois. Pour générer ces trois mille euros, t'as acheté quinze cents euros de marchandises. Ton vrai bénéfice c'est quinze cents euros. Mais en micro-entreprise tu paies tes charges sur les trois mille euros. Pas sur les quinze cents euros. T'as pas le droit de soustraire ce que t'as dépensé pour travailler. Et quand tu fais des petites marges, ce qui est souvent le cas au démarrage, là ça devient vraiment problématique."},
+
+  {t:'calc', tag:'💸 Impact concret', title:"Micro vs SASU — sur 3 000€ CA avec 1 500€ achats",
+   premise:"Marges faibles — situation classique en e-commerce",
+   lines:[
+     {type:'base', label:'💰 CA réalisé', val:'3 000 €'},
+     {type:'minus', label:'📦 Achats marchandises', val:'-1 500 €'},
+     {type:'equals', label:'💡 Vrai bénéfice réel', val:'1 500 €'},
+     {type:'minus', label:'⚡ Micro : charges ~12% sur 3 000€', val:'-360 €'},
+     {type:'minus', label:'🚀 SASU : IS 15% sur 1 500€ bénéfice', val:'-225 €'}],
+   vo:"Le calcul concret. Tu fais trois mille euros de ventes. T'as dépensé quinze cents euros en marchandises. Ton vrai bénéfice c'est quinze cents euros. En micro-entreprise, tu paies tes charges sur les trois mille euros, pas sur les quinze cents. Avec un taux de 12%, ça fait trois cent soixante euros de charges. En SASU, tu paies l'IS uniquement sur le bénéfice réel de quinze cents euros. À 15%, ça fait deux cent vingt-cinq euros. La différence semble petite ici mais sur une année entière avec des volumes plus importants, c'est des milliers d'euros d'écart en ta faveur avec une vraie société."},
+
+  {t:'warning', emoji:'⚠️', title:"Les autres limites à connaître 🚨",
+   body:"La micro-entreprise c'est pas fait pour construire un vrai business.",
+   warn:"<strong>📊 Plafond de CA :</strong> vente de produits max 188 700€/an, services max 77 700€/an.<br><br><strong>🤝 Crédibilité limitée :</strong> certains fournisseurs pro, grossistes, partenaires B2B refusent de travailler avec les micro-entrepreneurs.<br><br><strong>🧪 Mindset 'test' :</strong> quand tu te dis je teste, tu te laisses une porte de sortie. À la moindre difficulté tu l'utilises. Quand tu lances, t'es là pour que ça marche.",
+   vo:"Les autres limites. Le plafond de chiffre d'affaires. En vente de produits c'est 188 700 euros par an maximum. Pour les prestations de services c'est 77 700 euros par an. Si tu dépasses, tu bascules en société. Certains partenaires sérieux refusent de travailler avec des micro-entrepreneurs. Et la question de mindset. Quand tu te dis je teste, tu te laisses une porte de sortie. Et à la moindre galère, tu ressors par cette porte. Quand tu lances un business, t'es là pour que ça marche, pas pour tester."},
+
+  {t:'action', badge:"🎁 Code exclusif", emoji:'💻', title:"Créer ta micro-entreprise ou ta société",
+   steps:[
+     {txt:"Micro-entreprise gratuite : directement sur autoentrepreneur.urssaf.fr"},
+     {txt:"Vraie société (SASU, EURL...) : LegalPlace — lien en description"},
+     {txt:"Code SBW25 — 25% de réduction exclusive membres de la formation"},
+     {txt:"(Code public SBW15 — toi t'as 10% de plus en tant que membre)"}],
+   vo:"Si tu veux commencer par la micro-entreprise, tu peux créer directement sur autoentrepreneur.urssaf.fr, c'est gratuit. Si tu veux créer une vraie société comme une SASU ou une EURL, je recommande LegalPlace. Tout se fait en ligne, statuts, domiciliation, compte pro, tout au même endroit. Le lien est dans la description. Et le code SBW25 te donne 25% de réduction, c'est le code exclusif que j'ai négocié pour les membres de cette formation. Dans mes vidéos publiques je donne le code SBW15, mais vu que t'es dans la formation j'ai obtenu 10% de plus pour toi."},
+
+  {t:'recap', emoji:'⚡', title:"Micro-entreprise — l'essentiel",
+   points:[
+     {e:'✅', txt:"Gratuit, simple, zéro risque — idéal pour débuter ou tester"},
+     {e:'⚠️', txt:"Tu peux rien déduire — les charges s'appliquent sur le CA brut"},
+     {e:'📊', txt:"Plafonds CA : 188 700€ produits / 77 700€ services"},
+     {e:'🤝', txt:"Certains partenaires pro refusent de travailler avec les micro"},
+     {e:'🎯', txt:"Recommandée pour : salarié + complément / tester / petits revenus"},
+     {e:'💡', txt:"Pour construire un vrai business : passe en SASU ou EURL"}],
+   vo:"Ce qu'il faut retenir sur la micro-entreprise. C'est gratuit, simple, zéro risque au démarrage. Mais tu peux rien déduire, les charges s'appliquent sur tout ce que tu encaisses. Il y a des plafonds de chiffre d'affaires. Certains partenaires pro ne veulent pas travailler avec des micro-entrepreneurs. La micro c'est bien pour tester ou pour un complément de revenus. Mais pour construire un vrai business avec de vraies marges à optimiser, il faut passer en SASU ou EURL. Prochaine leçon, SASU versus EURL en détail."}
+]},
+
+/* ━━ LEÇON 4 ━━ */
+{id:4, title:"⚖️ SASU vs EURL : laquelle pour toi ?", slides:[
+  {t:'intro', num:'04', emoji:'⚖️', title:"SASU vs EURL :\n<em>laquelle pour toi ?</em>",
+   sub:"Deux structures pour une seule personne. Le choix dépend d'une question clé.",
+   vo:"Leçon quatre. SASU versus EURL. Deux mots qui font peur mais en vrai c'est simple. Et le choix entre les deux, selon ta situation, ça peut te faire économiser ou perdre des milliers d'euros par an. Alors autant comprendre."},
+
+  {t:'concept', emoji:'🚀', tag:'La SASU', title:"SASU — Société par Actions Simplifiée Unipersonnelle 🚀",
+   body:"En SASU, tu es <strong>assimilé salarié.</strong><br>Si tu te verses un salaire → fiches de paie, charges lourdes <strong>(~75-80% du net).</strong><br>Si tu te verses pas de salaire → <em>zéro charges, zéro impôts.</em><br>Tu gardes toutes tes aides sociales — chômage, RSA, APL.",
+   vo:"La SASU. SASU ça veut dire Société par Actions Simplifiée Unipersonnelle. En SASU, si tu te verses un salaire, tu te fais des fiches de paie comme un employé. Et là les charges sont lourdes. On parle d'environ 75 à 80% de charges au-dessus de ce que tu veux toucher net. Pour toucher 2 000 euros nets par mois, ta société doit sortir environ 3 500 euros. C'est beaucoup. Mais là où la SASU devient très intéressante, c'est que si tu te verses aucun salaire et que ta société fait zéro bénéfice, tu paies zéro euro."},
+
+  {t:'concept', emoji:'🛡️', tag:'L\'avantage SASU', title:"Tu gardes tes aides sociales — l'avantage clé 🛡️",
+   body:"La SASU est une <strong>personne morale</strong> — une entité séparée de toi.<br>Tant que tu te verses pas de salaire, <em>toi en tant que personne tu n'as pas de revenus.</em><br><br>✅ Chômage maintenu · ✅ RSA maintenu · ✅ APL maintenu<br><br>C'est un avantage énorme que <strong>beaucoup de gens ignorent.</strong>",
+   vo:"Et là y'a un avantage énorme que beaucoup de gens ignorent. La SASU c'est une personne morale. C'est une entité séparée de toi. Ça veut dire que tant que tu te verses pas de salaire, toi en tant que personne tu n'as pas de revenus. C'est ta société qui en a. Donc tu peux continuer à percevoir le chômage, le RSA, les APL, ou toute autre aide sociale que tu touchais avant. C'est pour ça que la SASU c'est souvent le meilleur choix pour démarrer. Tu fais tourner ta boîte, tu réinvestis, tu gardes tes aides, et quand les bénéfices arrivent tu te verses des dividendes."},
+
+  {t:'concept', emoji:'💼', tag:'L\'EURL', title:"EURL — Entreprise Unipersonnelle à Responsabilité Limitée 💼",
+   body:"En EURL, tu es gérant TNS (Travailleur Non Salarié).<br>Pas de fiches de paie. Rémunération de gérant.<br>Charges moins lourdes — <strong>environ 40-45%.</strong><br><br>⚠️ <strong>Même si tu gagnes zéro :</strong> cotisations minimales <em>~1 000-1 200€/an.</em><br>Risque de perdre les aides sociales.",
+   vo:"Maintenant l'EURL. EURL ça veut dire Entreprise Unipersonnelle à Responsabilité Limitée. En EURL tu relèves du régime des travailleurs indépendants. Tu te verses pas vraiment un salaire, tu te verses une rémunération de gérant. Pas de fiches de paie. Les charges sont moins lourdes qu'en SASU, environ 40 à 45% sur ce que tu te verses. Donc si tu veux te verser un revenu dès le départ, l'EURL est moins chère que la SASU sur la rémunération. Mais attention, il y a un piège important. Même si tu te verses aucun revenu, même si ta société fait zéro bénéfice, tu as quand même des cotisations minimales obligatoires à payer. On parle d'environ 1 000 à 1 200 euros par an minimum."},
+
+  {t:'compare', title:"📊 SASU vs EURL — la comparaison décisive",
+   left:{emoji:'🚀', label:'SASU — Si tu démarres', num:'0€', unit:'', desc:"Pas de salaire = zéro charges. Tu gardes le chômage, RSA, APL. Dividendes à 30% quand bénéfices. LE meilleur choix pour commencer."},
+   right:{emoji:'💼', label:'EURL — Si tu veux te rémunérer', num:'~1 200€', unit:'/an min', desc:"Charges moins lourdes sur rémunération (40-45%). Mais cotisations minimales même si zéro CA. Risque de perdre les aides sociales.", color:'neutral'},
+   note:"Dans les deux cas : consulte un comptable pour ta situation spécifique.",
+   vo:"La comparaison décisive. Si tu lances ton business, que tu sais pas encore combien tu vas gagner, que tu veux garder tes aides sociales le temps que ça décolle, que tu veux payer zéro si tu gagnes zéro, la SASU c'est clairement le meilleur choix. Si tu as déjà de l'expérience, des clients, que tu es sûr que ça va fonctionner dès le départ et que tu veux te verser un revenu rapidement, dans ce cas-là l'EURL peut être mieux. Les charges sur ta rémunération sont moins lourdes qu'en SASU."},
+
+  {t:'concept', emoji:'💰', tag:'Dividendes SASU', title:"Dividendes SASU : la stratégie gagnante 💰",
+   body:"Quand ta SASU fait des bénéfices :<br>• Elle paie <strong>15% d'IS</strong> sur les premiers 42 500€<br>• Tu te verses le reste en <strong>dividendes taxés à 30%</strong> (PFU)<br>• Tu peux aussi prendre un <strong>acompte sur dividendes</strong> en cours d'année si bénéficiaire",
+   vo:"Et là c'est là que la SASU devient vraiment intéressante. Quand ta société fait des bénéfices, elle paie 15% d'impôt sur les sociétés sur les premiers 42 500 euros. Ensuite tu peux te verser ces bénéfices en dividendes taxés à seulement 30% au total. C'est ce qu'on appelle le PFU, le Prélèvement Forfaitaire Unique. 17,2% de prélèvements sociaux et 12,8% d'impôt sur le revenu. Total 30%. C'est beaucoup moins lourd que se verser un salaire."},
+
+  {t:'action', badge:"🎯 Décision", emoji:'⚖️', title:"Comment tu choisis ?",
+   steps:[
+     {txt:"Tu touches le chômage, RSA ou APL et tu veux pas les perdre → SASU"},
+     {txt:"Tu démarres sans certitude sur les revenus, tu veux payer zéro si zéro CA → SASU"},
+     {txt:"T'as déjà des clients, tu veux te rémunérer vite et t'es sûr que ça marche → EURL"},
+     {txt:"LegalPlace pour créer ta structure — code SBW25 pour 25% de réduction"}],
+   vo:"Comment tu choisis. Si tu touches le chômage, le RSA ou les APL et que tu veux pas les perdre, c'est la SASU. Si tu démarres sans certitude sur les revenus et que tu veux payer zéro si tu gagnes zéro, c'est la SASU. Si t'as déjà de l'expérience, des clients confirmés, et que tu veux te rémunérer rapidement sans te soucier des aides, l'EURL peut être mieux. Pour créer ta SASU ou ton EURL en ligne simplement, je recommande LegalPlace. Ils s'occupent de tout, statuts, dépôt du capital, immatriculation, domiciliation, et même ouverture du compte pro. Le lien est dans la description, code SBW25 pour 25% de réduction."},
+
+  {t:'recap', emoji:'⚖️', title:"SASU vs EURL — le résumé",
+   points:[
+     {e:'🚀', txt:"SASU : assimilé salarié — charges lourdes sur salaire (75-80%)"},
+     {e:'🛡️', txt:"SASU sans salaire = 0€ de charges + tu gardes chômage/RSA/APL"},
+     {e:'💰', txt:"SASU : dividendes taxés à 30% seulement — la stratégie gagnante"},
+     {e:'💼', txt:"EURL : TNS, charges 40-45% — mais cotisations minimales ~1 200€/an"},
+     {e:'⚠️', txt:"EURL : risque de perdre les aides sociales"},
+     {e:'🎯', txt:"Démarrage incertain → SASU / Revenus rapides certains → EURL"}],
+   vo:"Le récapitulatif. La SASU est assimilé salarié avec des charges lourdes sur le salaire, mais si tu te verses aucun salaire tu paies zéro et tu gardes toutes tes aides. Les dividendes en SASU sont taxés à seulement 30%, c'est la stratégie gagnante. L'EURL a des charges moins lourdes sur la rémunération mais des cotisations minimales même sans CA et un risque de perdre les aides sociales. Pour un démarrage incertain, la SASU est clairement la meilleure option. Si tu as des revenus certains dès le départ, l'EURL peut être mieux. Prochaine leçon, s'associer."}
+]},
+/* ━━ LEÇON 5 ━━ */
+{id:5, title:"🤝 S'associer : SAS, SARL et pacte", slides:[
+  {t:'intro', num:'05', emoji:'🤝', title:"S'associer :\n<em>SAS, SARL et pacte d'associés</em>",
+   sub:"Vous vous lancez à plusieurs ? Cette leçon peut sauver ton business ET tes relations.",
+   vo:"Leçon cinq. S'associer. Parce que beaucoup de gens se lancent à deux, à trois, avec un ami, un frère, un collègue. Et c'est bien de vouloir s'associer. Mais si c'est mal fait, ça peut détruire ton business et ta relation avec la personne en même temps. Je vais te donner toutes les clés pour que ça se passe bien."},
+
+  {t:'compare', title:"🏢 SAS vs SARL — à plusieurs associés",
+   left:{emoji:'🚀', label:'SAS — Flexible', num:'✓', unit:'', desc:"La SASU à plusieurs. Min 2 associés. Très libre dans l'organisation. Préférée des investisseurs. Dividendes flat tax 30% sans cotisations sociales."},
+   right:{emoji:'🏪', label:'SARL — Classique', num:'✓', unit:'', desc:"La plus répandue. Gérant majoritaire (+50%) = TNS, charges 40-45%. Gérant minoritaire = assimilé salarié. Moins flexible mais très solide.", color:'neutral'},
+   note:"SAS si vous voulez la flexibilité et envisagez des investisseurs. SARL si le gérant veut se rémunérer avec moins de charges.",
+   vo:"On commence par les structures. La SAS c'est la SASU mais à plusieurs. Minimum deux associés. Très flexible dans l'organisation. Vous décidez ensemble dans vos statuts comment fonctionne la société, qui prend les décisions, comment on vote, comment on se partage les bénéfices. La SARL c'est la forme de société la plus répandue en France. Le gérant majoritaire, celui qui détient plus de 50% des parts, relève du régime des travailleurs indépendants avec des charges moins lourdes."},
+
+  {t:'warning', emoji:'⚠️', title:"Le pacte d'associés — le document le plus important 🤝",
+   body:"C'est le truc que 90% des associés oublient de faire. Et c'est souvent là que tout se joue.",
+   warn:"<strong>Au départ tout va bien.</strong> Vous êtes motivés, vous vous faites confiance.<br><br><strong>Mais les conflits entre associés ça arrive.</strong> Même entre amis. Même entre frères.<br><br><strong>Sans pacte d'associés, quand ça part en vrille, t'as rien pour te protéger.</strong>",
+   vo:"Maintenant on va parler du truc le plus important de cette leçon. Le pacte d'associés. Et si t'en retiens qu'une chose aujourd'hui, c'est ça. Le pacte d'associés c'est un document légal que vous signez entre associés en dehors des statuts de la société. Il règle tout ce que les statuts règlent pas. Et c'est ce document qui va te protéger si un jour les choses se passent mal entre vous. Parce que je vais être honnête avec toi. Au départ tout va bien. Mais les conflits entre associés ça arrive. Même entre amis. Même entre frères."},
+
+  {t:'cards', title:"📋 Ce que le pacte d'associés règle", items:[
+    {emoji:'💰', name:"Répartition et évolution des parts", sub:"Qui détient combien. Comment ça peut évoluer. Conditions d'entrée de nouveaux associés.", color:''},
+    {emoji:'🗳️', name:"Prise de décision", sub:"Qui décide de quoi. Décisions à l'unanimité ou à la majorité. Clause anti-blocage en cas de 50/50.", color:''},
+    {emoji:'🚪', name:"Clause de sortie et préemption", sub:"Si un associé veut partir, comment ça se passe. Les autres ont-ils le droit de racheter ses parts en priorité ?", color:''},
+    {emoji:'🚫', name:"Non-concurrence et décès", sub:"Si un associé part, peut-il créer une société concurrente ? Que se passe-t-il si quelqu'un décède ou devient incapable ?", color:'red'}],
+   vo:"Voilà ce que le pacte d'associés règle concrètement. La répartition des parts et comment elle peut évoluer dans le temps. Les décisions, qui décide de quoi, et comment éviter le blocage à 50/50. La clause de sortie, si un associé veut partir comment ça se passe, les autres ont-ils le droit de racheter ses parts en priorité et à quel prix. La non-concurrence, si un associé part peut-il aller créer une société concurrente. Et ce qui se passe si quelqu'un décède ou devient incapable. Ces questions sont difficiles à aborder mais elles doivent être réglées avant."},
+
+  {t:'warning', emoji:'🛡️', title:"La règle d'or : jamais sans pacte 🛡️",
+   body:"Peu importe que ce soit ton meilleur ami, ton frère, ou quelqu'un en qui tu as une confiance totale.",
+   warn:"<strong>Le pacte d'associés c'est pas un manque de confiance.</strong><br>C'est une protection pour vous deux.<br><br><strong>C'est comme une assurance.</strong> Tu espères ne jamais en avoir besoin. Mais si un jour tu en as besoin, tu es content de l'avoir.<br><br><strong>→ LegalPlace</strong> propose des modèles de pacte d'associés personnalisables. Code SBW25.",
+   vo:"Je vais être très direct avec toi maintenant. Ne t'associe jamais sans pacte d'associés. Jamais. Peu importe que ce soit ton meilleur ami, ton frère, ou quelqu'un en qui tu as une confiance totale. Ce document c'est pas un manque de confiance. C'est une protection pour vous deux. C'est comme une assurance. Tu espères ne jamais en avoir besoin. Mais si un jour tu en as besoin, tu es content de l'avoir. LegalPlace propose des modèles de pacte d'associés que tu peux personnaliser. Le lien est dans la description, code SBW25 pour ta réduction exclusive."},
+
+  {t:'recap', emoji:'🤝', title:"S'associer — l'essentiel",
+   points:[
+     {e:'🚀', txt:"SAS : flexible, dividendes flat tax 30%, idéale si vous visez des investisseurs"},
+     {e:'🏪', txt:"SARL : solide, gérant majoritaire TNS avec charges moins lourdes"},
+     {e:'📋', txt:"Pacte d'associés : le document le plus important — ne jamais l'oublier"},
+     {e:'🗳️', txt:"Règles de vote, sortie, non-concurrence, décès — tout écrire avant"},
+     {e:'🛡️', txt:"C'est une protection pour vous deux, pas un manque de confiance"},
+     {e:'💻', txt:"LegalPlace pour créer la société ET le pacte — code SBW25"}],
+   vo:"Le récapitulatif. La SAS c'est la structure flexible pour plusieurs associés, dividendes flat tax 30%, idéale si vous visez des investisseurs. La SARL c'est la structure classique, très répandue, avec des charges moins lourdes pour le gérant majoritaire. Le pacte d'associés c'est le document le plus important quand on s'associe. Règles de vote, clause de sortie, non-concurrence, ce qui se passe en cas de décès, tout ça doit être écrit avant de commencer. C'est une protection pour vous deux. Prochaine leçon, la domiciliation."}
+]},
+
+/* ━━ LEÇON 6 ━━ */
+{id:6, title:"📍 La domiciliation", slides:[
+  {t:'intro', num:'06', emoji:'📍', title:"La domiciliation :\n<em>adresse pro obligatoire</em>",
+   sub:"Mettre son adresse perso sur sa société — l'erreur que beaucoup font et qui peut coûter cher.",
+   vo:"Leçon six. La domiciliation. Quand tu crées ta société, une des premières choses qu'on va te demander c'est l'adresse de ton entreprise. Et là beaucoup de gens mettent leur adresse personnelle, leur appartement, chez leurs parents. Et c'est une erreur. Dans cette leçon je t'explique ce qu'est la domiciliation, pourquoi c'est important, et comment ça marche."},
+
+  {t:'cards', title:"❌ Pourquoi mettre ton adresse perso c'est une mauvaise idée", items:[
+    {emoji:'🔓', name:"Ton adresse devient publique", sub:"Le Kbis de ta société est un document public. N'importe qui peut chercher l'adresse en ligne. Si c'est ton adresse perso, tout le monde sait où tu habites.", color:'red'},
+    {emoji:'📜', name:"Ton bail peut l'interdire", sub:"Beaucoup de contrats de location interdisent l'adresse commerciale. Le propriétaire peut te demander de partir.", color:'red'},
+    {emoji:'😬', name:"C'est pas professionnel", sub:"Une facture avec l'adresse d'un appartement inspire moins confiance qu'une adresse dans un quartier d'affaires.", color:'red'}],
+   vo:"Pourquoi mettre ton adresse personnelle comme adresse de société c'est une mauvaise idée. Premièrement ton adresse devient publique. Le Kbis de ta société est un document public. N'importe qui peut aller chercher l'adresse en ligne. Si c'est ton adresse personnelle, n'importe qui sait où tu habites. Deuxièmement ton bail peut l'interdire. Beaucoup de contrats de location interdisent d'utiliser le logement comme adresse commerciale. Si ton propriétaire s'en aperçoit, il peut te demander de partir. Troisièmement c'est pas professionnel."},
+
+  {t:'concept', emoji:'✅', tag:'La solution', title:"La domiciliation commerciale ✅",
+   body:"C'est un abonnement mensuel pour utiliser une <strong>adresse professionnelle</strong> comme adresse officielle de ta société.<br><br>✅ Courrier reçu et transmis par email<br>✅ Tu travailles d'où tu veux — chez toi, d'un café, de l'étranger<br>✅ <strong>À partir de 20-30€/mois</strong> — et c'est déductible<br>✅ Paris, Lyon, Bordeaux, Marseille...",
+   vo:"La solution c'est la domiciliation commerciale. C'est un service où tu paies un abonnement mensuel pour utiliser une adresse professionnelle comme adresse officielle de ta société. Tu reçois ton courrier là-bas, ils te le transmettent par email ou physiquement selon les formules. Et toi tu travailles d'où tu veux. De chez toi, d'un café, de l'étranger. Peu importe. Ton adresse officielle reste professionnelle. Le coût ça commence à partir d'environ 20 à 30 euros par mois. Et cette dépense elle est déductible de ta société."},
+
+  {t:'concept', emoji:'💻', tag:'LegalPlace + domiciliation', title:"Créer la société ET la domiciliation en même temps 💻",
+   body:"Avec <strong>LegalPlace</strong>, tu choisis directement ton adresse de domiciliation pendant la création de ta société. Tout au même endroit.<br><br>🗺️ Tu choisis la ville parmi celles disponibles<br>📬 L'adresse est activée en même temps que ta société<br>💡 Pas besoin de chercher un prestataire séparé<br><br><strong>Code SBW25 — 25% de réduction exclusive membres.</strong>",
+   vo:"Et le gros avantage avec LegalPlace, c'est que quand tu crées ta société avec eux, tu peux directement choisir une adresse de domiciliation pendant la création. Tout se fait au même endroit. Tu choisis ton adresse parmi celles qu'ils proposent, Paris, Lyon, Bordeaux, Marseille et d'autres villes disponibles, et c'est réglé. Ton adresse professionnelle est activée en même temps que ta société. T'as pas besoin de chercher un prestataire de domiciliation séparé. Le lien est dans la description. Code SBW25 pour ta réduction de 25% exclusive aux membres de la formation."},
+
+  {t:'concept', emoji:'🌍', tag:'Si tu pars à l\'étranger', title:"La domiciliation si tu gères depuis l'étranger 🌍",
+   body:"Si tu pars à Dubaï, au Maroc, à Bali — <strong>ta domiciliation en France reste l'adresse officielle de ta société française.</strong><br><br>C'est ce qui te permet d'avoir une société en France tout en vivant ailleurs.",
+   vo:"Un dernier point important. Si un jour tu pars à l'étranger, si tu gères ta boîte depuis Dubaï, depuis le Maroc, depuis n'importe où, ta domiciliation en France reste l'adresse officielle de ta société française. C'est ce qui te permet d'avoir une société en France tout en vivant ailleurs. Pour l'instant retiens juste : domiciliation commerciale obligatoire, à partir de 20 euros par mois, déductible, et ça se fait directement sur LegalPlace au moment de créer ta société."},
+
+  {t:'recap', emoji:'📍', title:"Domiciliation — l'essentiel",
+   points:[
+     {e:'❌', txt:"Adresse perso = publique + risque bail + pas professionnel"},
+     {e:'✅', txt:"Domiciliation commerciale : adresse pro, courrier transmis, déductible"},
+     {e:'💰', txt:"À partir de 20-30€/mois — charge déductible de ta société"},
+     {e:'🏙️', txt:"Paris, Lyon, Bordeaux, Marseille... tu choisis la ville"},
+     {e:'💻', txt:"LegalPlace : domiciliation incluse dans la création de société"},
+     {e:'🌍', txt:"Permet de gérer ta société française depuis l'étranger"}],
+   vo:"Ce qu'il faut retenir. L'adresse personnelle comme adresse de société, c'est une erreur. Elle devient publique, ton bail peut l'interdire, et c'est pas professionnel. La domiciliation commerciale c'est la solution. Adresse professionnelle, courrier transmis par email, à partir de 20 euros par mois, et c'est déductible. Avec LegalPlace tu choisis ton adresse de domiciliation directement pendant la création de ta société. Et ça permet de gérer ta société française depuis l'étranger si tu pars un jour. Prochaine leçon, le compte pro."}
+]},
+
+/* ━━ LEÇON 7 ━━ */
+{id:7, title:"🏦 Le compte pro", slides:[
+  {t:'intro', num:'07', emoji:'🏦', title:"Le compte pro :\n<em>obligatoire et indispensable</em>",
+   sub:"Pourquoi mélanger perso et pro c'est la pire erreur — et comment bien choisir ton compte.",
+   vo:"Leçon sept. Le compte bancaire professionnel. Là encore c'est un truc que beaucoup de gens négligent au départ. Ils gardent leur compte perso et ils font passer tout le business dessus. C'est une erreur. Dans cette leçon je t'explique pourquoi c'est obligatoire et comment bien choisir."},
+
+  {t:'concept', emoji:'⚖️', tag:'Obligatoire ou pas ?', title:"Pour une société : obligatoire légalement ⚖️",
+   body:"Ta société est une <strong>personne morale.</strong> Elle a sa propre existence légale. Elle doit avoir <strong>son propre compte bancaire.</strong><br><br>Tu peux pas mélanger l'argent de ta société avec ton argent personnel. C'est interdit.<br><br>Pour une micro-entreprise : <em>pas obligatoire légalement</em>, mais fortement recommandé.",
+   vo:"Est-ce que le compte pro c'est obligatoire. Pour une société, SASU, EURL, SAS, SARL, oui c'est obligatoire légalement. Ta société est une personne morale. Elle a sa propre existence légale. Elle doit avoir son propre compte bancaire. Tu peux pas mélanger l'argent de ta société avec ton argent personnel. C'est interdit. Pour une micro-entreprise, c'est pas obligatoire légalement. Mais c'est fortement recommandé quand même. Parce que si tu mélanges tout sur ton compte perso, quand tu vas devoir justifier tes revenus ou gérer ta comptabilité, ce sera un cauchemar."},
+
+  {t:'cards', title:"💡 Pourquoi c'est indispensable au-delà de l'obligation", items:[
+    {emoji:'🛡️', name:"Séparation perso / pro", sub:"Tout ce qui rentre et sort de ta société passe par le compte pro. Si ta société a un problème, ton compte perso est protégé.", color:'green'},
+    {emoji:'🤝', name:"Crédibilité professionnelle", sub:"Tes fournisseurs, clients pro, partenaires — un compte pro inspire confiance. Un compte perso peut bloquer des opérations.", color:'green'},
+    {emoji:'📊', name:"Comptabilité simplifiée", sub:"Ton comptable accède directement à tes relevés pro. Tout est clair, rien n'est mélangé. Tu économises du temps et de l'argent.", color:'green'}],
+   vo:"Pourquoi c'est indispensable au-delà de l'obligation légale. Premièrement la séparation perso et pro. Tout ce qui rentre dans ta société et tout ce qui sort passe par le compte pro. Ton argent personnel reste sur ton compte perso. Si ta société a un problème, ton compte perso est protégé. Deuxièmement la crédibilité. Quand tu paies tes fournisseurs, quand tu reçois des paiements de clients professionnels, un compte pro ça inspire confiance. Troisièmement la comptabilité. Avec un compte pro dédié, ton comptable peut directement accéder à tes relevés et faire ta comptabilité facilement."},
+
+  {t:'compare', title:"🏦 Banque traditionnelle vs Néo-banque pro",
+   left:{emoji:'🏛️', label:'Banque traditionnelle', num:'30-60', unit:'€/mois', desc:"BNP, SG, Crédit Agricole. Agences physiques, conseiller dédié. Mais cher et ouverture qui prend plusieurs semaines."},
+   right:{emoji:'⚡', label:'Néo-banque pro', num:'9-15', unit:'€/mois', desc:"Qonto, Shine, Revolut Business, Blank. Tout en ligne, ouverture en 24-48h, interface simple. Parfait pour démarrer.", color:'good'},
+   note:"Pour un entrepreneur qui se lance, les néo-banques sont souvent le meilleur choix au départ.",
+   vo:"Maintenant lequel choisir. Y'a deux grandes catégories. Les banques traditionnelles et les néo-banques. Les banques traditionnelles comme BNP, Société Générale, Crédit Agricole ont des agences physiques et des services complets. Mais elles sont chères, entre 30 et 60 euros par mois de frais. Et l'ouverture peut prendre plusieurs semaines. Les néo-banques pro comme Qonto, Shine, Revolut Business, Blank, tout se passe en ligne. L'ouverture se fait en quelques jours, parfois en 24 heures. Les frais sont beaucoup moins élevés, entre 9 et 15 euros par mois. Pour un entrepreneur qui se lance, les néo-banques c'est souvent le meilleur choix au départ."},
+
+  {t:'concept', emoji:'💻', tag:'LegalPlace + compte pro', title:"Ouvrir ton compte pro en même temps que ta société 💻",
+   body:"Avec <strong>LegalPlace</strong>, tu peux ouvrir ton compte pro directement pendant la création de ta société. Tout au même endroit.<br><br>✅ Création de société · ✅ Domiciliation · ✅ Compte pro<br><br><strong>Capital social minimum légal : 1€</strong> — recommandé 500-1 000€.",
+   vo:"Et si tu passes par LegalPlace pour créer ta société, ils te proposent directement d'ouvrir un compte pro pendant le processus de création. Tout au même endroit. Tu crées ta société, tu choisis ton adresse de domiciliation, et tu ouvres ton compte pro. En quelques clics. Concernant le capital social, le minimum légal pour une SASU ou une SAS c'est un euro. Oui un euro. Mais en pratique on conseille de mettre au minimum entre 500 et 1 000 euros. Ça montre que ta société a une vraie base financière. Le lien est dans la description, code SBW25 pour ta réduction."},
+
+  {t:'recap', emoji:'🏦', title:"Compte pro — l'essentiel",
+   points:[
+     {e:'⚖️', txt:"Obligatoire légalement pour toute société — interdit de mélanger perso et pro"},
+     {e:'🛡️', txt:"Sépare le perso du pro — protection, crédibilité, comptabilité simplifiée"},
+     {e:'⚡', txt:"Néo-banques (Qonto, Shine...) : 9-15€/mois, ouverture en 24-48h"},
+     {e:'🏛️', txt:"Banques traditionnelles : plus cher, plus long, mais utile pour certains besoins"},
+     {e:'💻', txt:"LegalPlace : compte pro inclus dans le processus de création"},
+     {e:'💰', txt:"Capital social minimum légal : 1€ — recommandé 500-1 000€"}],
+   vo:"Ce qu'il faut retenir. Le compte pro est obligatoire légalement pour toute société et c'est interdit de mélanger perso et pro. Il sépare les finances, protège ton patrimoine perso, crédibilise ta boîte et simplifie la comptabilité. Les néo-banques comme Qonto ou Shine coûtent entre 9 et 15 euros par mois et s'ouvrent en 24 à 48 heures. LegalPlace te permet d'ouvrir ton compte pro en même temps que tu crées ta société. Prochaine leçon, comment te payer."}
+]},
+
+/* ━━ LEÇON 8 ━━ */
+{id:8, title:"💰 Comment te payer : salaire ou dividendes ?", slides:[
+  {t:'intro', num:'08', emoji:'💰', title:"Comment te payer :\n<em>salaire ou dividendes ?</em>",
+   sub:"Ta société gagne de l'argent. Comment tu le mets dans ta poche le plus intelligemment possible ?",
+   vo:"Leçon huit. Ta société tourne. Elle commence à gagner de l'argent. Et là la question que tout le monde se pose c'est comment je me paie. Est-ce que je me verse un salaire ? Est-ce que je prends des dividendes ? C'est quoi la différence ? Dans cette leçon je t'explique tout simplement."},
+
+  {t:'concept', emoji:'💼', tag:'Le salaire', title:"Option 1 : Le salaire 💼",
+   body:"Tu te verses un salaire chaque mois. En SASU : <strong>fiches de paie</strong>, protection sociale.<br><br>✅ Régulier — tu sais exactement combien tu touches<br>✅ Charge déductible — réduit le bénéfice imposable<br>❌ <strong>Charges lourdes — pour toucher 2 000€ nets, ta société sort ~3 500€</strong>",
+   vo:"Première option, le salaire. Tu te verses un salaire chaque mois comme si t'étais un employé de ta propre boîte. En SASU, tu te fais des fiches de paie. Le gros avantage du salaire c'est que c'est régulier. Tu sais exactement combien tu vas toucher chaque mois. Et le salaire que tu te verses c'est une charge pour ta société, ça réduit les bénéfices imposables. Mais le problème du salaire c'est le coût. En SASU, pour te verser 1 500 euros nets par mois, ta société doit sortir environ 2 600 euros. Pour 2 000 euros nets, ta société sort environ 3 500 euros."},
+
+  {t:'concept', emoji:'📈', tag:'Les dividendes', title:"Option 2 : Les dividendes 📈",
+   body:"Les dividendes c'est une façon de distribuer les <strong>bénéfices de ta société</strong> vers ta poche personnelle.<br><br>⚠️ <strong>Condition : ta société doit être en bénéfice.</strong><br><br>✅ Taxés à seulement <strong>30% (PFU)</strong> — 17,2% prélèvements sociaux + 12,8% IR<br>✅ Pas de charges patronales<br>✅ Acompte en cours d'année possible",
+   vo:"Deuxième option, les dividendes. Les dividendes c'est une façon de distribuer les bénéfices de ta société vers ta poche personnelle. Mais attention, tu peux te verser des dividendes uniquement si ta société a fait des bénéfices. Le gros avantage des dividendes c'est la fiscalité. Quand tu te verses des dividendes en SASU, tu paies 30% de taxes au total. C'est ce qu'on appelle le PFU, le Prélèvement Forfaitaire Unique. 17,2% de prélèvements sociaux et 12,8% d'impôt sur le revenu. Total 30%. C'est beaucoup moins lourd que le salaire."},
+
+  {t:'calc', tag:'💡 Exemple concret', title:"Sur 50 000€ de bénéfice annuel en SASU",
+   premise:"Stratégie optimale : IS + dividendes",
+   lines:[
+     {type:'base', label:'💰 Bénéfice avant IS', val:'50 000 €'},
+     {type:'minus', label:'🏛️ IS 15% sur 42 500€ + 25% sur 7 500€', val:'-8 250 €'},
+     {type:'equals', label:'💡 Bénéfice après IS', val:'41 750 €'},
+     {type:'minus', label:'📊 PFU 30% sur dividendes distribués', val:'-12 525 €'},
+     {type:'equals', label:'✅ Net dans ta poche', val:'29 225 €'}],
+   vo:"Le calcul concret sur 50 000 euros de bénéfice en SASU. Ta société paie 15% d'IS sur les premiers 42 500 euros et 25% sur les 7 500 euros restants, soit 8 250 euros d'IS au total. Il reste 41 750 euros dans ta société. Si tu décides de tout distribuer en dividendes, tu paies le PFU à 30%, soit 12 525 euros. Tu touches 29 225 euros nets dans ta poche. Sur 50 000 euros de bénéfice, tu as payé en tout 20 775 euros de taxes et tu as touché 29 225 euros. C'est bien plus intéressant que de tout sortir en salaire."},
+
+  {t:'concept', emoji:'🎯', tag:'La stratégie gagnante', title:"La combinaison optimale : petit salaire + dividendes 🎯",
+   body:"La stratégie que la plupart des entrepreneurs malins utilisent :<br><br>💼 <strong>Un petit salaire</strong> pour couvrir les besoins du quotidien et cotiser<br>📈 <strong>Des dividendes</strong> pour sortir le reste quand la société est bénéficiaire<br><br>💡 Et au début — <strong>ne te verse rien.</strong> Réinvestis. Fais grandir ta boîte d'abord.",
+   vo:"La stratégie que la plupart des entrepreneurs malins utilisent c'est la combinaison des deux. Un petit salaire pour couvrir les besoins du quotidien et maintenir des droits sociaux. Et des dividendes pour sortir le reste quand la société est bénéficiaire. Comme ça tu optimises au maximum. Mais rappelle-toi. Au début quand tu lances, verse-toi rien. Ou le minimum. Réinvestis dans ta boîte. Fais grandir ton business d'abord. Et quand les bénéfices sont stables, là tu optimises ta façon de te payer."},
+
+  {t:'recap', emoji:'💰', title:"Rémunération dirigeant — l'essentiel",
+   points:[
+     {e:'💼', txt:"Salaire : régulier, charge déductible, mais charges lourdes (75-80% en SASU)"},
+     {e:'📈', txt:"Dividendes : seulement si bénéfice, taxés à 30% (PFU) — beaucoup plus léger"},
+     {e:'🎯', txt:"Stratégie optimale : petit salaire + dividendes pour le reste"},
+     {e:'💡', txt:"Au démarrage : verse-toi rien, réinvestis, fais grandir d'abord"},
+     {e:'⏰', txt:"Acompte sur dividendes possible en cours d'année si société bénéficiaire"},
+     {e:'🧮', txt:"Ton comptable te dira le mix optimal selon ta situation exacte"}],
+   vo:"Ce qu'il faut retenir. Le salaire c'est régulier et déductible mais les charges sont lourdes en SASU. Les dividendes sont taxés à seulement 30% mais ta société doit être en bénéfice. La stratégie optimale c'est la combinaison des deux, un petit salaire plus des dividendes. Au démarrage, verse-toi rien et réinvestis dans ta boîte. Et ton comptable te dira précisément le mix optimal selon ta situation exacte. Prochaine leçon, l'impôt sur les sociétés."}
+]},
+/* ━━ LEÇON 9 ━━ */
+{id:9, title:"🧾 L'impôt sur les sociétés (IS)", slides:[
+  {t:'intro', num:'09', emoji:'🧾', title:"L'impôt sur les sociétés :\n<em>comment ça marche</em>",
+   sub:"L'IS c'est pas si compliqué. Et quand tu comprends comment ça fonctionne, tu vois comment payer moins.",
+   vo:"Leçon neuf. L'impôt sur les sociétés, qu'on appelle l'IS. C'est l'impôt que ta société paie sur ce qu'elle gagne. Et c'est important de bien comprendre comment ça marche parce que c'est là que beaucoup d'argent peut être économisé si tu joues bien."},
+
+  {t:'concept', emoji:'💡', tag:'La base', title:"L'IS c'est sur les bénéfices, pas le CA 💡",
+   body:"<strong>L'IS se calcule sur le bénéfice de ta société — pas sur ce que tu encaisses.</strong><br><br>Exemple : ta société encaisse 100 000€. Elle a dépensé 70 000€. Il reste 30 000€. <em>L'IS s'applique sur ces 30 000€ uniquement.</em><br><br>C'est pour ça que les charges déductibles sont si importantes.",
+   vo:"La base. L'IS ce n'est pas un impôt sur ce que tu encaisses. C'est un impôt sur ce que ta société gagne vraiment, c'est-à-dire sur le bénéfice. Le bénéfice c'est ce qu'il reste après avoir soustrait toutes les dépenses de ta société de tous ses revenus. Exemple simple. Ta société encaisse 100 000 euros cette année. Elle a dépensé 70 000 euros. Il reste 30 000 euros. L'IS s'applique sur ces 30 000 euros uniquement. Pas sur les 100 000 euros. C'est pour ça que les charges déductibles sont tellement importantes."},
+
+  {t:'compare', title:"📊 Les 2 taux IS en France 2026",
+   left:{emoji:'🟢', label:'Taux réduit PME', num:'15', unit:'%', desc:"Sur les 42 500 premiers euros de bénéfice. Pour les PME qui remplissent les 3 conditions."},
+   right:{emoji:'🔵', label:'Taux normal', num:'25', unit:'%', desc:"Sur tout ce qui dépasse 42 500€ de bénéfice.", color:'neutral'},
+   note:"Pour le taux réduit : CA < 10M€, capital entièrement libéré, 75% détenu par des personnes physiques.",
+   vo:"Deux taux d'IS en France en 2026. Le taux réduit à 15% qui s'applique sur les premiers 42 500 euros de bénéfice. Et le taux normal à 25% qui s'applique sur tout ce qui dépasse 42 500 euros. Le taux réduit à 15% est automatique pour les PME qui remplissent trois conditions. Un, le chiffre d'affaires est inférieur à 10 millions d'euros. Deux, le capital social est entièrement libéré. Trois, au moins 75% du capital est détenu par des personnes physiques. Quand tu démarres, tu remplis presque automatiquement ces trois conditions."},
+
+  {t:'calc', tag:'💰 Calcul concret', title:"Sur 60 000€ de bénéfice",
+   premise:"PME éligible au taux réduit — situation classique",
+   lines:[
+     {type:'base', label:'🟢 15% sur les 42 500 premiers €', val:'6 375 €'},
+     {type:'base', label:'🔵 25% sur les 17 500€ restants', val:'4 375 €'},
+     {type:'equals', label:'💸 IS total dû', val:'10 750 €'},
+     {type:'equals', label:'✅ Bénéfice restant dans la société', val:'49 250 €'}],
+   vo:"Le calcul concret sur 60 000 euros de bénéfice pour une PME éligible. Sur les premiers 42 500 euros, tu paies 15%, soit 6 375 euros d'IS. Sur les 17 500 euros restants, tu paies 25%, soit 4 375 euros d'IS. Total IS dû : 10 750 euros. Il reste 49 250 euros dans ta société après IS. C'est à partir de là que tu décides combien tu te verses en dividendes et combien tu laisses dans la société pour réinvestir. Garde toujours de l'argent de côté pour payer l'IS. Une bonne habitude c'est de mettre de côté entre 15 et 20% de tes bénéfices dès que l'argent rentre."},
+
+  {t:'concept', emoji:'📅', tag:'Quand tu paies', title:"Les acomptes trimestriels — anticipe 📅",
+   body:"L'IS ne se paie pas en une seule fois. <strong>Tu paies des acomptes trimestriels :</strong><br><br>📅 Mars · Juin · Septembre · Décembre<br><br>En fin d'exercice tu régularises.<br><br>⚠️ <strong>Mets toujours 15-20% de tes bénéfices de côté dès que l'argent rentre.</strong>",
+   vo:"L'IS ne se paie pas en une seule fois à la fin de l'année. En France tu paies des acomptes trimestriels en mars, juin, septembre et décembre. Et en fin d'exercice tu fais le bilan et tu régularises. Tu paies le reste ou tu te fais rembourser si tu as trop payé. Ton comptable gère tout ça pour toi. Mais c'est important de le savoir pour anticiper les sorties d'argent. La bonne habitude c'est de mettre de côté entre 15 et 20% de tes bénéfices dès que l'argent rentre. Comme ça quand l'échéance arrive, t'as l'argent qui attend."},
+
+  {t:'recap', emoji:'🧾', title:"IS — l'essentiel",
+   points:[
+     {e:'💡', txt:"IS = impôt sur les bénéfices nets, pas sur le CA"},
+     {e:'🟢', txt:"15% sur les 42 500 premiers € / 25% au-delà — données 2026"},
+     {e:'✅', txt:"3 conditions pour le 15% : CA < 10M€, capital libéré, 75% pers. physiques"},
+     {e:'💰', txt:"Plus de charges déductibles = moins de bénéfice = moins d'IS"},
+     {e:'📅', txt:"Acomptes trimestriels — anticipe avec 15-20% de côté"},
+     {e:'🧮', txt:"Au démarrage si tu réinvestis tout : bénéfice faible = IS faible ou zéro"}],
+   vo:"Ce qu'il faut retenir. L'IS c'est sur les bénéfices nets, pas le chiffre d'affaires. 15% sur les premiers 42 500 euros, 25% au-delà, avec trois conditions pour le taux réduit. Plus t'as de charges déductibles, moins tu as de bénéfice imposable, moins tu paies d'IS. Tu paies des acomptes trimestriels, anticipe en mettant 15 à 20% de côté. Et au démarrage si tu réinvestis tout dans ta boîte, ton bénéfice sera faible et ton IS sera faible ou nul. Prochaine leçon, la TVA."}
+]},
+
+/* ━━ LEÇON 10 ━━ */
+{id:10, title:"💶 La TVA — tout comprendre", slides:[
+  {t:'intro', num:'10', emoji:'💶', title:"La TVA :\n<em>tout comprendre</em>",
+   sub:"La TVA fait peur à beaucoup. En 10 minutes tu vas comprendre comment ça marche et comment éviter les pièges.",
+   vo:"Leçon dix. La TVA. Tout le monde en a entendu parler mais peu de gens comprennent vraiment comment ça marche. Et surtout, peu de gens savent qu'au départ tu peux choisir de ne pas la gérer du tout. Dans cette leçon je t'explique tout."},
+
+  {t:'concept', emoji:'📊', tag:'La base', title:"La TVA c'est pas ton argent 📊",
+   body:"TVA = Taxe sur la Valeur Ajoutée. En France le taux standard c'est <strong>20%.</strong><br><br>Tu vends un produit 120€ à ton client :<br>✅ 100€ c'est pour toi (hors taxe)<br>❌ 20€ c'est la TVA = pour l'État<br><br><em>Tu es juste l'intermédiaire. Ces 20€ tu les collectes pour l'État.</em>",
+   vo:"La TVA c'est quoi. TVA ça veut dire Taxe sur la Valeur Ajoutée. C'est une taxe que tes clients paient quand ils achètent quelque chose chez toi. En France le taux standard c'est 20%. Sur certains produits alimentaires c'est 5,5%, sur les livres aussi 5,5%. Mais pour la majorité des produits et services, c'est 20%. Tu vends un produit 120 euros. Dans ces 120 euros, 100 euros c'est ton prix hors taxe. Et 20 euros c'est la TVA. Ces 20 euros appartiennent pas à toi. Tu les collectes pour l'État. Tu es juste l'intermédiaire."},
+
+  {t:'calc', tag:'💡 Comment ça marche', title:"Tu ne reverses que la différence",
+   premise:"Tu peux récupérer la TVA que toi tu paies à tes fournisseurs",
+   lines:[
+     {type:'base', label:'📦 TVA collectée sur tes ventes', val:'+200 €'},
+     {type:'minus', label:'🛒 TVA payée sur tes achats (déductible)', val:'-100 €'},
+     {type:'equals', label:'💸 TVA à reverser à l\'État', val:'100 €'},
+     {type:'equals', label:'✅ Si TVA payée > TVA collectée', val:'Crédit TVA — l\'État te rembourse'}],
+   vo:"La TVA que toi tu paies à tes fournisseurs, tu peux la récupérer. On appelle ça la TVA déductible. Exemple. Tu achètes du stock pour 600 euros TTC, dans ces 600 euros il y a 100 euros de TVA. Tu vends ce stock 1 200 euros TTC, dans ces 1 200 euros il y a 200 euros de TVA. Tu reverses à l'État la différence : 200 moins 100 égale 100 euros. Et parfois c'est même l'État qui te doit de l'argent. Si t'as acheté beaucoup de matériel au démarrage, la TVA que t'as payée peut être supérieure à la TVA collectée. Dans ce cas l'État te rembourse la différence. On appelle ça un crédit de TVA."},
+
+  {t:'concept', emoji:'🆓', tag:'Franchise en base', title:"La franchise en base de TVA — la simplification 🆓",
+   body:"En 2026, si ton CA est sous les seuils, tu peux être en <strong>franchise en base de TVA :</strong><br><br>📦 <strong>Vente de produits :</strong> 85 000€/an<br>🛠️ <strong>Prestations de services :</strong> 37 500€/an<br><br>Tu collectes pas de TVA. Tu la reverses pas. Sur tes factures : <em>'TVA non applicable, article 293 B du CGI'.</em>",
+   vo:"Maintenant le point le plus important de cette leçon. La franchise en base de TVA. En France en 2026, quand tu crées ta société, tu as la possibilité d'opter pour la franchise en base de TVA. C'est un régime qui te dispense totalement de collecter et de reverser la TVA. En vente de produits le seuil c'est 85 000 euros de chiffre d'affaires annuel. En prestations de services c'est 37 500 euros. Si tu es en dessous de ces seuils, tu collectes pas de TVA, tu la reverses pas, et sur tes factures tu mentionnes obligatoirement TVA non applicable article 293B du CGI."},
+
+  {t:'compare', title:"🤔 Franchise en base ou TVA réelle ?",
+   left:{emoji:'🆓', label:'Franchise en base', num:'✓', unit:'', desc:"Pas de TVA sur tes ventes = prix plus compétitifs. Pas de déclaration à faire. Idéal si peu d'achats au départ."},
+   right:{emoji:'📊', label:'TVA réelle', num:'✓', unit:'', desc:"Tu récupères la TVA sur tes achats. Si tu investis beaucoup au démarrage, l'État peut te rembourser plusieurs milliers d'euros.", color:'neutral'},
+   note:"Mon conseil : peu d'achats au départ → franchise. Gros investissements → TVA réelle pour récupérer.",
+   vo:"Est-ce que tu dois opter pour la franchise en base ou pas. Ça dépend de ta situation. Si tu as peu de matériel ou de fournitures à acheter, opte pour la franchise en base. Tes prix sont plus compétitifs pour tes clients, t'as moins de paperasse, et pas de déclaration de TVA à faire chaque mois. Si tu vas investir beaucoup dès le départ, beaucoup de stock, du matériel, des équipements neufs, là être soumis à la TVA c'est avantageux. Parce que toute la TVA que tu as payée sur tes achats, tu vas la récupérer. L'État peut te rembourser plusieurs milliers d'euros."},
+
+  {t:'warning', emoji:'⚠️', title:"Règle d'or : la TVA collectée c'est pas ton argent 🚨",
+   body:"Dès que tu es soumis à la TVA :",
+   warn:"<strong>Ne dépense JAMAIS la TVA collectée.</strong><br><br>Quand tu encaisses 1 200€, les 200€ de TVA appartiennent à l'État.<br><br><strong>Beaucoup d'entrepreneurs ont eu de gros problèmes à cause de ça.</strong><br><br>💡 <strong>Astuce :</strong> ouvre un sous-compte dédié TVA. Dès qu'une vente rentre, mets automatiquement 20% de côté.",
+   vo:"Une dernière chose très importante. La TVA c'est pas de l'argent à toi. Dès que tu es soumis à la TVA, quand tu encaisses un paiement client, mets toujours de côté la part de TVA. Ne la dépense jamais. Parce que le jour où tu dois la reverser à l'État, si tu l'as dépensée, t'es dans une situation très compliquée. Beaucoup d'entrepreneurs ont eu de gros problèmes à cause de ça. L'astuce c'est d'ouvrir un sous-compte ou une tirelire dédiée à la TVA et de mettre automatiquement 20% de côté dès qu'une vente rentre. Comme ça la TVA attend et elle sera toujours là le jour J."},
+
+  {t:'recap', emoji:'💶', title:"TVA — l'essentiel",
+   points:[
+     {e:'📊', txt:"TVA 20% standard — tu collectes pour l'État, tu es juste l'intermédiaire"},
+     {e:'💰', txt:"Tu ne reverses que la différence : TVA collectée - TVA payée sur achats"},
+     {e:'🆓', txt:"Franchise en base : pas de TVA si CA < 85 000€ produits / 37 500€ services"},
+     {e:'🤔', txt:"Peu d'achats → franchise / Gros investissements → TVA réelle pour récupérer"},
+     {e:'⚠️', txt:"TVA collectée = pas ton argent. Ne JAMAIS la dépenser"},
+     {e:'💡', txt:"Sous-compte dédié TVA : mets 20% de côté automatiquement à chaque vente"}],
+   vo:"Ce qu'il faut retenir. La TVA à 20% standard, tu la collectes pour l'État, tu es juste l'intermédiaire. Tu ne reverses que la différence entre ce que tu as collecté et ce que tu as payé. La franchise en base te dispense de tout si ton CA est sous les seuils. Si peu d'achats au départ, opte pour la franchise. Si gros investissements, la TVA réelle pour récupérer. Et règle d'or, la TVA collectée c'est pas ton argent, ne jamais la dépenser. Prochaine leçon, les charges déductibles."}
+]},
+
+/* ━━ LEÇON 11 ━━ */
+{id:11, title:"📉 Les charges déductibles", slides:[
+  {t:'intro', num:'11', emoji:'📉', title:"Les charges déductibles :\n<em>tout ce que tu peux déduire</em>",
+   sub:"T'as probablement des milliers d'euros de charges que tu n'utilises pas. Cette leçon va t'ouvrir les yeux.",
+   vo:"Leçon onze. Les charges déductibles. C'est un des sujets les plus importants pour payer le moins d'impôts possible. Et je suis sûr qu'en regardant cette leçon tu vas réaliser que t'as des dépenses dans ta vie que tu peux déduire de ta société et que tu déduisais pas."},
+
+  {t:'concept', emoji:'💡', tag:'Le principe', title:"Comment une charge déductible réduit tes impôts 💡",
+   body:"Une charge déductible = une dépense professionnelle qui se soustrait du bénéfice imposable.<br><br><strong>Règle d'or :</strong> la dépense doit être :<br>✅ Engagée dans l'intérêt de la société<br>✅ Justifiée par une facture ou un reçu<br>✅ Réelle — pas inventée<br><br><em>Garde toujours tes factures. Toujours.</em>",
+   vo:"Une charge déductible c'est une dépense que ta société a faite dans le cadre de son activité professionnelle. Et cette dépense tu la soustrais des revenus de ta société. Moins de revenus imposables, moins d'impôts. La règle de base pour qu'une dépense soit déductible c'est qu'elle doit être engagée dans l'intérêt de la société, justifiée par une facture ou un reçu, et réelle, pas inventée. Garde toujours tes factures. Toujours. En version numérique c'est parfait. Tu prends une photo avec ton téléphone dès que tu as un reçu."},
+
+  {t:'cards', title:"💻 Ce que tu peux déduire — partie 1", items:[
+    {emoji:'💻', name:"Matériel informatique", sub:"Ordinateur, écran, souris, clavier, disque dur, tablette. Tout ce que t'utilises pour travailler. 100% déductible.", color:'green'},
+    {emoji:'📱', name:"Téléphone et abonnement", sub:"Achat du téléphone + abonnement pro. Si mixte perso/pro : déduire la part pro (généralement 50-75%).", color:'green'},
+    {emoji:'☁️', name:"Logiciels et abonnements SaaS", sub:"Shopify, Adobe, Canva Pro, CRM, hébergement, nom de domaine, email marketing. 100% déductible.", color:'green'}],
+   vo:"La liste de ce que tu peux déduire. Le matériel informatique d'abord. Ton ordinateur, ton écran, ta souris, ton clavier, ton disque dur externe, ta tablette. Tout ce que t'utilises pour travailler. C'est déductible. Ton téléphone et ton abonnement. Si tu utilises ton téléphone pour ton business, tu peux déduire l'achat et une partie ou la totalité de l'abonnement. Si c'est mixte perso et pro, tu déduis la partie professionnelle, en général estimée à 50 ou 75%. Les logiciels et abonnements en ligne. Shopify, Adobe, Canva Pro, outils de comptabilité, CRM, hébergement de site, nom de domaine, outils d'email marketing. Tout ça c'est déductible."},
+
+  {t:'cards', title:"🛠️ Ce que tu peux déduire — partie 2", items:[
+    {emoji:'✈️', name:"Frais de déplacement", sub:"Billets train/avion, taxi, hôtel, repas lors de déplacements pro. Tout déplacement dans l'intérêt de la société.", color:'green'},
+    {emoji:'🍽️', name:"Repas professionnels", sub:"Déjeuner avec client, fournisseur, partenaire. Garde le reçu et note avec qui tu as mangé et pourquoi.", color:'green'},
+    {emoji:'📚', name:"Formations et livres pro", sub:"Cette formation que tu suis via ta société, c'est déductible. Livres pro, conférences, séminaires.", color:'green'}],
+   vo:"La suite. Les frais de déplacement. Si tu te déplaces pour ton business, les billets de train, d'avion, les frais de taxi, d'hôtel, les repas lors de déplacements professionnels, tout ça se déduit. Les frais de repas professionnels. Tu as déjeuné avec un client, un fournisseur, un partenaire, le repas est déductible. Garde toujours le reçu et note au dos avec qui tu as mangé et pourquoi. Ça te protège en cas de contrôle. Les formations et livres professionnels. Cette formation que t'es en train de suivre, si tu la paies via ta société c'est une charge déductible. Les livres professionnels, les autres formations en ligne, les conférences et séminaires, tout ça se déduit."},
+
+  {t:'cards', title:"📣 Ce que tu peux déduire — partie 3", items:[
+    {emoji:'📍', name:"Domiciliation et loyer", sub:"Abonnement domiciliation, loyer bureau/coworking. Si tu bosses chez toi : quote-part du loyer selon surface utilisée.", color:'green'},
+    {emoji:'📣', name:"Publicité et marketing", sub:"Facebook Ads, TikTok Ads, Google Ads, influenceurs, création de contenu. 100% déductible.", color:'green'},
+    {emoji:'🧮', name:"Honoraires comptable et avocat", sub:"Les frais de ton comptable, avocat, conseil juridique. Des dépenses professionnelles déductibles.", color:'green'}],
+   vo:"Suite et fin. La domiciliation et le loyer. Ton abonnement de domiciliation c'est déductible. Si tu loues un bureau ou un espace de coworking, c'est déductible. Si tu travailles depuis chez toi, tu peux déduire une partie de ton loyer proportionnellement à la surface que tu utilises pour travailler. Les frais publicitaires. Tes dépenses en publicité Facebook, TikTok Ads, Google Ads, les collaborations avec des influenceurs, la création de contenu pour ton business, tout ça c'est des charges déductibles. Et les honoraires de ton comptable, de ton avocat, tout ça c'est déductible."},
+
+  {t:'warning', emoji:'⚠️', title:"Les 2 règles importantes 🚨",
+   body:"",
+   warn:"<strong>⚠️ Déductible ≠ Gratuit</strong><br>Une charge déductible réduit tes impôts, elle n'efface pas la dépense. Si ta société est imposée à 15%, 1 000€ de charges = 150€ d'économie d'IS. T'as quand même dépensé 1 000€. Dépense intelligemment.<br><br><strong>🚫 Ne déduis jamais des dépenses personnelles</strong><br>Courses, vêtements perso, vacances, sorties — c'est pas déductible. En cas de contrôle fiscal si l'administration trouve des dépenses perso passées en charges, c'est un redressement.",
+   vo:"Deux règles importantes. Premièrement, déductible ne veut pas dire gratuit. Une charge déductible ça veut pas dire que la dépense est gratuite. Ça veut dire que tu la soustrais de tes bénéfices avant de calculer l'impôt. Si ta société est imposée à 15%, une dépense de 1 000 euros te fait économiser 150 euros d'impôts. T'as quand même dépensé 1 000 euros. Donc dépense pas n'importe comment sous prétexte que c'est déductible. Dépense intelligemment. Deuxièmement, ne déduis jamais des dépenses personnelles. Tes courses, tes vêtements perso, tes sorties, tes vacances, c'est pas déductible. En cas de contrôle fiscal si l'administration trouve des dépenses personnelles passées en charges, c'est un redressement."},
+
+  {t:'recap', emoji:'📉', title:"Charges déductibles — l'essentiel",
+   points:[
+     {e:'💻', txt:"Matériel informatique, téléphone, internet — déductibles"},
+     {e:'☁️', txt:"Logiciels et abonnements SaaS (Shopify, Adobe, CRM...) — déductibles"},
+     {e:'✈️', txt:"Déplacements pro, repas avec clients/fournisseurs — déductibles"},
+     {e:'📚', txt:"Formations, livres pro, conférences — déductibles"},
+     {e:'📣', txt:"Publicité et marketing (Meta Ads, TikTok Ads...) — déductibles"},
+     {e:'⚠️', txt:"Règle : réelle + dans l'intérêt de la société + justifiée par facture"}],
+   vo:"Ce qu'il faut retenir. Matériel informatique, téléphone, internet, logiciels et abonnements pro, déplacements professionnels, repas avec clients et fournisseurs, formations et livres professionnels, publicité et marketing, tout ça c'est déductible. La règle c'est que la dépense doit être réelle, dans l'intérêt de la société, et justifiée par une facture. Garde toujours tes factures. Et ne déduis jamais de dépenses personnelles. Prochaine leçon, la comptabilité et le bilan."}
+]},
+
+/* ━━ LEÇON 12 ━━ */
+{id:12, title:"📊 La comptabilité et le bilan", slides:[
+  {t:'intro', num:'12', emoji:'📊', title:"La comptabilité et le bilan :\n<em>c'est quoi en vrai ?</em>",
+   sub:"La comptabilité c'est pas compliqué à comprendre. C'est juste l'histoire financière de ta société.",
+   vo:"Leçon douze. La comptabilité. C'est le mot qui fait peur à beaucoup d'entrepreneurs. Mais dans cette leçon je vais te démystifier tout ça. La comptabilité c'est pas compliqué à comprendre. C'est juste l'histoire financière de ta société. Tout ce qui rentre, tout ce qui sort, tout ce que ta société possède, tout ce qu'elle doit."},
+
+  {t:'concept', emoji:'⚖️', tag:'Le bilan', title:"Le bilan — la photo de ta société ⚖️",
+   body:"Le bilan c'est une <strong>photo de ta société à un instant précis</strong> — en général en fin d'exercice.<br><br>📦 <strong>L'actif</strong> = ce que ta société possède (argent, stock, matériel, créances)<br>💳 <strong>Le passif</strong> = ce que ta société doit (dettes fournisseurs, emprunts, IS à payer)<br><br><em>Règle d'or : l'actif est toujours égal au passif.</em>",
+   vo:"Commençons par le bilan. Le bilan c'est une photo de ta société à un instant précis. En général à la fin de ton exercice comptable. Cette photo elle montre deux choses. L'actif, c'est ce que ta société possède. L'argent sur ton compte bancaire pro, le stock que t'as en réserve, le matériel que t'as acheté, les factures que tes clients doivent encore te payer. Et le passif, c'est ce que ta société doit à des tiers. Les dettes fournisseurs, les emprunts bancaires, la TVA que tu dois reverser à l'État, l'IS que tu dois payer. La règle d'or du bilan c'est que l'actif est toujours égal au passif. Toujours."},
+
+  {t:'concept', emoji:'📈', tag:'Compte de résultat', title:"Le compte de résultat — le film de l'année 📈",
+   body:"Si le bilan c'est une photo, <strong>le compte de résultat c'est le film de l'année.</strong><br><br>Il montre :<br>💰 Tous tes revenus sur l'année<br>💸 Toutes tes dépenses sur l'année<br>📊 Et le résultat : <strong>Bénéfice = Revenus - Dépenses</strong><br><br>C'est ce document qui détermine <em>combien tu vas payer en IS.</em>",
+   vo:"En dehors du bilan, y'a un autre document important qu'on appelle le compte de résultat. Si le bilan c'est une photo de ta société, le compte de résultat c'est le film de l'année. Il montre tous tes revenus et toutes tes dépenses sur l'année. Et il calcule si ta société a fait un bénéfice ou une perte. Revenus moins dépenses égale bénéfice ou perte. C'est ce document qui détermine combien tu vas payer en impôt sur les sociétés. Et c'est le document que ton comptable va produire à la fin de chaque exercice."},
+
+  {t:'cards', title:"✅ Les bonnes habitudes à prendre dès maintenant", items:[
+    {emoji:'🗂️', name:"Garde toutes tes factures", sub:"Photo sur ton téléphone dès que t'as un reçu. Classées par mois dans un dossier numérique. En version numérique c'est parfait.", color:'green'},
+    {emoji:'💻', name:"Utilise un logiciel simple", sub:"Pennylane, Indy, Abby — tu suis tes finances en temps réel. Tu vois combien ta société a gagné, dépensé, où elle en est.", color:'green'},
+    {emoji:'🚫', name:"Ne jamais mélanger perso et pro", sub:"Chaque dépense pro passe par le compte pro. Chaque dépense perso passe par le compte perso. Jamais de mélange.", color:'green'}],
+   vo:"Les bonnes habitudes à prendre dès maintenant. Premièrement, garde absolument toutes tes factures. Factures d'achat, factures de vente, reçus, tickets de caisse pour des dépenses pro. Tout. En version numérique c'est parfait. Tu prends une photo avec ton téléphone dès que tu as un reçu et tu les classes dans un dossier organisé. Deuxièmement, utilise un logiciel de comptabilité simple. Même si tu as un comptable, des outils comme Pennylane, Indy ou Abby te permettent de suivre tes finances en temps réel. Troisièmement, ne jamais mélanger le perso et le pro. Chaque dépense professionnelle passe par le compte pro. Chaque dépense personnelle passe par ton compte perso."},
+
+  {t:'concept', emoji:'📅', tag:'Les échéances', title:"Anticipe les échéances fiscales 📅",
+   body:"TVA à reverser (mensuelle ou trimestrielle)<br>IS en acomptes trimestriels (mars, juin, sept, déc)<br>Charges sociales<br>Liasse fiscale et déclarations annuelles<br><br><strong>Mets ces dates dans ton agenda.</strong> Garde toujours de la trésorerie.<br><br><em>Rapproche ton compte pro chaque semaine.</em>",
+   vo:"Anticipe les échéances fiscales. TVA à reverser chaque mois ou trimestre, IS à payer en acomptes trimestriels. Mets ces dates dans ton agenda. Et garde toujours de la trésorerie de côté. Et comprends tes chiffres. Quand tu comprends ta comptabilité tu prends de meilleures décisions pour ton business. Suis ton chiffre d'affaires, ta marge, ta trésorerie chaque mois. Rapproche ton compte pro régulièrement. Chaque semaine, regarde tes relevés de compte pro. Chaque mouvement doit correspondre à quelque chose de réel."},
+
+  {t:'recap', emoji:'📊', title:"Comptabilité et bilan — l'essentiel",
+   points:[
+     {e:'📸', txt:"Bilan = photo de la société (actif = ce qu'elle a / passif = ce qu'elle doit)"},
+     {e:'🎬', txt:"Compte de résultat = film de l'année (revenus - dépenses = bénéfice)"},
+     {e:'🗂️', txt:"Garde toutes tes factures — photo sur ton téléphone dès réception"},
+     {e:'💻', txt:"Logiciel de suivi (Pennylane, Indy, Abby) même si t'as un comptable"},
+     {e:'🚫', txt:"Jamais mélanger perso et pro — règle absolue"},
+     {e:'📅', txt:"Anticipe les échéances fiscales — mets l'argent de côté dès que ça rentre"}],
+   vo:"Ce qu'il faut retenir. Le bilan c'est la photo de ta société à un instant précis, actif égale passif. Le compte de résultat c'est le film de l'année, revenus moins dépenses égale bénéfice ou perte. Garde toutes tes factures en version numérique. Utilise un logiciel de suivi même si t'as un comptable. Et ne jamais mélanger le perso et le pro. Prochaine leçon, t'as besoin d'un comptable ou pas."}
+]},
+/* ━━ LEÇON 13 ━━ */
+{id:13, title:"🧮 T'as besoin d'un comptable ou pas ?", slides:[
+  {t:'intro', num:'13', emoji:'🧮', title:"T'as besoin d'un comptable\n<em>ou pas ?</em>",
+   sub:"La vraie réponse honnête. Pas celle que tu veux entendre — celle qui va vraiment t'aider.",
+   vo:"Leçon treize. T'as besoin d'un comptable ou pas ? C'est une des questions que j'entends le plus souvent. Est-ce que j'ai besoin d'un comptable ? Est-ce que je peux gérer ma comptabilité tout seul ? C'est cher un comptable ? Dans cette leçon je te donne ma réponse honnête."},
+
+  {t:'compare', title:"Micro-entreprise vs Société — la règle",
+   left:{emoji:'⚡', label:'Micro-entreprise', num:'✓', desc:"Tu n'as pas besoin d'un comptable. Déclaration simple en ligne. Un tableau Excel ou un logiciel gratuit suffit. Pas de bilan, pas de compte de résultat obligatoire."},
+   right:{emoji:'🏢', label:'Société (SASU, EURL...)', num:'!', desc:"Tu es obligé légalement de produire des comptes annuels. Bilan, compte de résultat, annexe. À déposer chaque année au greffe. Un comptable est fortement recommandé.", color:'neutral'},
+   note:"La loi n'oblige pas à prendre un comptable mais le dépôt annuel des comptes est obligatoire pour toute société.",
+   vo:"Commençons par la micro-entreprise. Si t'es en micro-entreprise, tu n'as pas besoin d'un comptable. La comptabilité est ultra simple. Tu déclares ton chiffre d'affaires en ligne tous les mois ou tous les trimestres. Un logiciel gratuit ou un simple tableau Excel suffit. Pas de bilan, pas de compte de résultat. Maintenant pour une société, SASU, EURL, SAS, SARL, là c'est différent. Tu es obligé légalement de produire des comptes annuels. Un bilan, un compte de résultat, une annexe comptable. Ces documents doivent être déposés chaque année au greffe du tribunal de commerce. C'est public, c'est obligatoire, et si tu le fais pas tu risques des sanctions."},
+
+  {t:'cards', title:"💡 3 raisons pour lesquelles un comptable vaut son prix", items:[
+    {emoji:'🛡️', name:"Il te protège des erreurs", sub:"Erreur dans une déclaration TVA, charge mal enregistrée → pénalités, redressement fiscal. Un bon comptable te protège de tout ça.", color:'green'},
+    {emoji:'🧠', name:"Il t'optimise", sub:"Combien te verser en salaire, en dividendes, quelles charges déduire, comment structurer. Ces conseils valent souvent bien plus que ses honoraires.", color:'green'},
+    {emoji:'⏰', name:"Il libère ton temps", sub:"Le temps que tu passes sur la compta c'est du temps pas passé sur ton business. Fais ce que tu sais faire. Délègue ce que tu maîtrises pas.", color:'green'}],
+   vo:"Trois raisons pour lesquelles un comptable vaut son prix. Premièrement il te protège des erreurs. Une erreur dans ta déclaration de TVA, une charge mal enregistrée, ça peut entraîner des pénalités, un redressement fiscal. Un bon comptable te protège de tout ça. Deuxièmement il t'optimise. Il connaît ta situation, il connaît les lois fiscales, et il va t'aider à optimiser. Combien te verser en salaire, combien en dividendes, quelles charges tu peux déduire. Ces conseils valent souvent bien plus que ce que tu paies pour ses honoraires. Troisièmement il libère ton temps. Le temps que tu passes à essayer de comprendre la comptabilité, c'est du temps que tu passes pas à développer ton business."},
+
+  {t:'stat', emoji:'💰', num:'80-200€', label:"par mois pour un comptable société",
+   body:"<strong>960 à 2 400€ par an.</strong> Ça paraît beaucoup. Mais si ton comptable t'aide à économiser <strong>2 000, 3 000 ou 5 000€ d'impôts</strong> grâce à une bonne optimisation, le calcul est vite fait.<br><br>Et cette dépense est <em>déductible de ta société.</em>",
+   vo:"Combien ça coûte un comptable. Pour une petite structure comme une SASU qui démarre, ça varie entre 80 et 200 euros par mois selon le comptable et les services inclus. C'est 960 à 2 400 euros par an. Ça paraît beaucoup. Mais si ton comptable t'aide à économiser 2 000, 3 000 ou 5 000 euros d'impôts grâce à une bonne optimisation, le calcul est vite fait. C'est un investissement, pas une dépense. Et cette dépense elle est déductible de ta société."},
+
+  {t:'cards', title:"🔍 Comment trouver un bon comptable", items:[
+    {emoji:'🎯', name:"Spécialisé dans ton secteur", sub:"Cherche un comptable habitué au business en ligne, e-commerce, import-export. Pas tous comprennent ces activités.", color:''},
+    {emoji:'👥', name:"Recommandé par des entrepreneurs", sub:"Demande dans les communautés business. Les bonnes adresses circulent. Les retours d'expériences comptent.", color:''},
+    {emoji:'💻', name:"Outils modernes en ligne", sub:"En 2026, un bon comptable utilise Pennylane, Indy ou Abby. Tu accèdes à tes finances en temps réel.", color:''}],
+   vo:"Comment tu trouves un bon comptable. Premièrement cherche un comptable qui a l'habitude de travailler avec des entrepreneurs qui font du business en ligne, de l'e-commerce, de l'import-export. Pas tous les comptables comprennent ces activités. Deuxièmement demande autour de toi. Les recommandations c'est souvent la meilleure façon de trouver quelqu'un de bien. Dans les groupes d'entrepreneurs, dans les communautés business. Troisièmement vérifie qu'il utilise des outils en ligne modernes. En 2026, un bon comptable utilise des plateformes comme Pennylane, Indy ou Abby qui te donnent accès à tes finances en temps réel. Et commence tôt. Prends un comptable dès la création de ta société."},
+
+  {t:'recap', emoji:'🧮', title:"Comptable — l'essentiel",
+   points:[
+     {e:'⚡', txt:"Micro-entreprise : pas besoin de comptable, gère seul"},
+     {e:'🏢', txt:"Société : comptable fortement recommandé — dépôt annuel obligatoire"},
+     {e:'🛡️', txt:"Il te protège, t'optimise et libère ton temps"},
+     {e:'💰', txt:"80-200€/mois — investissement déductible qui se rentabilise"},
+     {e:'🔍', txt:"Spécialisé ton secteur + recommandé + outils modernes"},
+     {e:'⏰', txt:"Commence dès la création — pas après les erreurs"}],
+   vo:"Ce qu'il faut retenir. Micro-entreprise, tu gères seul, c'est simple. Pour une société, un comptable est fortement recommandé. Il te protège, t'optimise et libère ton temps. Ça coûte entre 80 et 200 euros par mois, c'est un investissement déductible qui se rentabilise. Cherche quelqu'un de spécialisé dans ton secteur, recommandé par des entrepreneurs, et qui utilise des outils modernes. Et commence dès la création de ta société. Prochaine leçon, l'impôt sur le revenu."}
+]},
+
+/* ━━ LEÇON 14 ━━ */
+{id:14, title:"🏷️ L'impôt sur le revenu (IR)", slides:[
+  {t:'intro', num:'14', emoji:'🏷️', title:"L'impôt sur le revenu :\n<em>comment ça marche ?</em>",
+   sub:"L'IS c'est pour ta boîte. L'IR c'est pour toi. Deux impôts distincts — comprendre les deux change tout.",
+   vo:"Leçon quatorze. L'impôt sur le revenu. Dans les leçons précédentes on a parlé de l'impôt sur les sociétés. C'est l'impôt que ta société paie sur ses bénéfices. Mais y'a un deuxième impôt dont on a pas encore parlé. L'impôt sur le revenu. C'est l'impôt que toi en tant que personne tu paies sur les revenus que tu reçois personnellement. L'IS c'est pour ta boîte. L'IR c'est pour toi. Deux impôts distincts, deux calculs distincts."},
+
+  {t:'concept', emoji:'📊', tag:'Le barème 2026', title:"Le barème progressif par tranches 2026 📊",
+   body:"L'impôt sur le revenu fonctionne par tranches. <strong>Le taux s'applique tranche par tranche, pas sur la totalité.</strong><br><br>🟢 0 à 11 497€ → <strong>0%</strong><br>🟡 11 497 à 29 315€ → <strong>11%</strong><br>🟠 29 315 à 83 823€ → <strong>30%</strong><br>🔴 83 823 à 180 294€ → <strong>41%</strong><br>🔴 + de 180 294€ → <strong>45%</strong>",
+   vo:"L'impôt sur le revenu en France fonctionne par tranches. C'est ce qu'on appelle le barème progressif. Plus tu gagnes, plus le taux augmente. Mais ce taux s'applique pas sur la totalité de tes revenus. Il s'applique tranche par tranche. En 2026 les tranches sont les suivantes. De 0 à 11 497 euros de revenus annuels, tu paies 0%. De 11 497 à 29 315 euros, tu paies 11%. De 29 315 à 83 823 euros, tu paies 30%. De 83 823 à 180 294 euros, tu paies 41%. Au-delà de 180 294 euros, tu paies 45%."},
+
+  {t:'calc', tag:'💡 Exemple concret', title:"Sur 40 000€ de revenus annuels",
+   premise:"Barème 2026 — les taux s'appliquent tranche par tranche",
+   lines:[
+     {type:'base', label:'0% sur les 11 497 premiers €', val:'0 €'},
+     {type:'base', label:'11% sur 17 818€ (11 497→29 315)', val:'1 960 €'},
+     {type:'base', label:'30% sur 10 685€ (29 315→40 000)', val:'3 205 €'},
+     {type:'equals', label:'💸 IR total sur 40 000€', val:'5 165 €'}],
+   vo:"Le calcul concret sur 40 000 euros de revenus annuels. Sur les premiers 11 497 euros, tu paies 0%. Sur les 17 818 euros suivants entre 11 497 et 29 315 euros, tu paies 11%, soit environ 1 960 euros. Sur les 10 685 euros restants entre 29 315 et 40 000 euros, tu paies 30%, soit 3 205 euros. Total impôt sur le revenu, environ 5 165 euros sur 40 000 euros gagnés. C'est beaucoup moins que si t'avais payé 30% sur tout. C'est ça le barème progressif. Chaque tranche est imposée à son propre taux."},
+
+  {t:'concept', emoji:'🔗', tag:'IR + SASU', title:"Comment IR et SASU s'articulent 🔗",
+   body:"• Tu te verses un <strong>salaire depuis ta SASU</strong> → ce salaire rentre dans ton barème IR.<br><br>• Tu te verses des <strong>dividendes depuis ta SASU</strong> → taxés au <em>PFU à 30%</em>. Tu ne paies pas deux fois.<br><br>• Tu peux opter pour l'<strong>intégration au barème</strong> si c'est plus avantageux — ton comptable t'aide à choisir.",
+   vo:"Comment l'impôt sur le revenu s'articule avec ta SASU. Si tu te verses un salaire depuis ta SASU, ce salaire rentre dans le calcul de ton impôt sur le revenu. Si tu te verses des dividendes depuis ta SASU, tu paies le PFU à 30%. Ce PFU de 30% remplace l'impôt sur le revenu et les prélèvements sociaux sur ces dividendes. Donc tu paies pas deux fois. C'est soit l'un soit l'autre. Mais tu peux aussi choisir d'intégrer tes dividendes dans ton barème progressif si c'est plus avantageux. Ton comptable te dit laquelle des deux options est la meilleure selon ta situation."},
+
+  {t:'concept', emoji:'💡', tag:'La stratégie clé', title:"L'argent dans la société c'est pas de l'IR 💡",
+   body:"<strong>L'argent qui reste dans ta SASU n'est pas soumis à l'IR.</strong><br><br>Il est juste soumis à l'IS à 15% sur les premiers 42 500€.<br><br>Tu peux le réinvestir, le faire travailler, construire ton patrimoine <em>depuis ta société</em> — sans IR.<br><br>C'est là que commence la vraie optimisation. <strong>Section 2 : les holdings.</strong>",
+   vo:"Le point le plus important que je veux que tu retiennes. Plus tu te verses d'argent personnellement, que ce soit en salaire ou en dividendes, plus tu vas payer d'impôt sur le revenu. C'est pour ça que la stratégie intelligente c'est de garder un maximum d'argent dans ta société pour réinvestir. L'argent qui reste dans ta société n'est pas soumis à l'impôt sur le revenu. Il est juste soumis à l'IS à 15% sur les premiers 42 500 euros. Et tu peux le réinvestir, le faire travailler, et construire ton patrimoine depuis ta société. C'est là que commence la vraie optimisation qu'on verra dans la section avancée avec les holdings."},
+
+  {t:'recap', emoji:'🏷️', title:"IR — l'essentiel",
+   points:[
+     {e:'📊', txt:"Barème progressif 2026 : 0% / 11% / 30% / 41% / 45% par tranches"},
+     {e:'💰', txt:"Salaire SASU → inclus dans le barème IR selon le montant"},
+     {e:'📈', txt:"Dividendes SASU → PFU 30% (pas de double imposition)"},
+     {e:'💡', txt:"Argent dans la société = pas d'IR (juste IS à 15% sur premiers 42 500€)"},
+     {e:'🎯', txt:"Stratégie : garder l'argent dans la société, sortir le minimum en perso"},
+     {e:'🏗️', txt:"La suite : holdings pour optimiser les gros bénéfices — section 2"}],
+   vo:"Ce qu'il faut retenir. Le barème progressif 2026 avec les tranches à 0%, 11%, 30%, 41% et 45%. Le salaire de ta SASU est inclus dans le barème IR. Les dividendes sont taxés au PFU à 30% sans double imposition. L'argent qui reste dans ta société n'est pas soumis à l'IR. La stratégie c'est de garder l'argent dans la société et de sortir le minimum en perso. Et la suite, dans la section avancée, les holdings pour optimiser les gros bénéfices. Avant-dernière leçon, gérer depuis l'étranger."}
+]},
+
+/* ━━ LEÇON 15 ━━ */
+{id:15, title:"🌍 Gérer sa boîte depuis l'étranger", slides:[
+  {t:'intro', num:'15', emoji:'🌍', title:"Gérer sa boîte\n<em>depuis l'étranger</em>",
+   sub:"Dubaï, Maroc, Bali, Portugal — c'est possible, c'est légal, mais y'a des règles à connaître.",
+   vo:"Leçon quinze. Gérer ton business depuis Dubaï, Istanbul, Bali ou Casablanca. C'est le rêve de beaucoup. Et c'est possible. Mais y'a des règles. Et si tu les connais pas, tu peux te retrouver à devoir payer des impôts dans deux pays en même temps. Cette leçon c'est pour éviter ça."},
+
+  {t:'concept', emoji:'🏠', tag:'Résidence fiscale', title:"Où tu paies tes impôts personnels — les 3 critères 🏠",
+   body:"En France tu es résident fiscal si au moins UN critère est rempli :<br><br>🏠 <strong>Ton foyer principal est en France</strong> (famille, logement principal)<br>📅 <strong>Tu passes plus de 183 jours/an en France</strong><br>💼 <strong>Ton activité professionnelle principale est en France</strong><br><br><em>Si tu pars mais que ta famille est en France et que tu rentres souvent — t'es toujours résident fiscal français.</em>",
+   vo:"Premier truc à comprendre. Où tu es résident fiscal détermine où tu paies tes impôts personnels. En France, t'es résident fiscal français si ton foyer principal est en France, si tu passes plus de 183 jours par an en France, ou si ton activité professionnelle principale est en France. Si t'es résident fiscal français, tu paies tes impôts en France, peu importe où est domiciliée ta société. Donc si tu pars à l'étranger mais que tu rentres tout le temps en France, que tes enfants sont scolarisés en France, pour l'État français t'es toujours résident fiscal français."},
+
+  {t:'concept', emoji:'🏢', tag:'Société vs toi', title:"Ta société et toi c'est pas pareil 🏢",
+   body:"Ta SASU peut être <strong>domiciliée en France</strong> et toi vivre à l'étranger. Deux fiscalités séparées.<br><br>💼 <strong>Ta société</strong> paie l'IS là où elle est enregistrée<br>👤 <strong>Toi personnellement</strong> tu paies l'IR là où t'es résident fiscal<br><br>Si tu coupes ta résidence fiscale française → tu paies l'IR selon les règles du pays où tu vis.",
+   vo:"Deuxième chose importante. Ta société et toi c'est pas pareil. Ta SASU peut être basée en France et toi vivre à l'étranger. Ou ta société peut être à Hong Kong et toi vivre en France. C'est deux fiscalités différentes qui s'appliquent. Ta société paie l'impôt sur ses bénéfices là où elle est enregistrée. Toi tu paies l'impôt sur tes revenus personnels là où t'es résident fiscal. Donc si tu coupes ta résidence fiscale française et que tu t'installes vraiment dans un autre pays, tu paies l'IR selon les règles de ce pays."},
+
+  {t:'cards', title:"🌍 Les destinations populaires et leurs avantages", items:[
+    {emoji:'🇦🇪', name:"Dubaï — 0% IR personnel", sub:"Pas d'impôt sur le revenu. Très populaire. Mais pour couper la résidence fiscale française, faut vraiment y vivre. Pas juste un visa renouvelé.", color:'green'},
+    {emoji:'🇵🇹', name:"Portugal — régime NHR", sub:"Régime spécial pour nouveaux arrivants pendant 10 ans. Avantages fiscaux importants. Très apprécié des entrepreneurs européens.", color:'green'},
+    {emoji:'🇲🇦', name:"Maroc / Tunisie", sub:"Conventions fiscales avec la France qui évitent la double imposition. Proche culturellement, populaire chez les entrepreneurs francophones.", color:''}],
+   vo:"Les destinations qui attirent les entrepreneurs. Dubaï avec 0% d'impôt sur le revenu personnel. Très populaire. Mais pour couper ta résidence fiscale française faut vraiment y vivre, pas juste avoir un visa de touriste renouvelé. Le Portugal a un régime spécial pour les nouveaux arrivants qui donne des avantages fiscaux pendant 10 ans. Très apprécié des entrepreneurs européens. Le Maroc et la Tunisie ont des conventions fiscales avec la France qui évitent de payer deux fois sur les mêmes revenus. Pratique pour rester proche culturellement."},
+
+  {t:'warning', emoji:'⚠️', title:"La règle d'or avant de partir 🚨",
+   body:"Avant tout départ, consulte un spécialiste.",
+   warn:"<strong>Pas un comptable classique.</strong> Un avocat fiscaliste spécialisé en expatriation.<br><br>Les erreurs ici se paient très cher et très longtemps :<br>• Redressement fiscal sur plusieurs années<br>• Double imposition si mal structuré<br>• Pénalités importantes<br><br><strong>💡 Pour les structures internationales</strong> : notre cabinet partenaire accompagne ce type de projets. Toutes les infos dans les ressources de la formation.",
+   vo:"La règle d'or. Avant de partir, tu parles à un spécialiste. Pas un comptable classique, un avocat fiscaliste spécialisé en expatriation. Parce que les erreurs ici se paient très cher et très longtemps. Un redressement fiscal sur plusieurs années, une double imposition si c'est mal structuré, des pénalités importantes. Pour les structures internationales, combiner une société française avec une structure à Hong Kong par exemple, notre cabinet partenaire accompagne exactement ce type de projets. Les informations de contact sont dans les ressources de la formation."},
+
+  {t:'recap', emoji:'🌍', title:"Gérer depuis l'étranger — l'essentiel",
+   points:[
+     {e:'🏠', txt:"Résidence fiscale ≠ où t'habites — 3 critères : foyer, 183 jours, activité principale"},
+     {e:'🏢', txt:"Ta société et toi c'est séparé — deux fiscalités distinctes"},
+     {e:'🇦🇪', txt:"Dubaï 0% IR, Portugal NHR 10 ans, Maroc/Tunisie conventions fiscales"},
+     {e:'⚠️', txt:"Couper la résidence fiscale française = vraiment partir, pas juste un visa"},
+     {e:'👨‍💼', txt:"Avocat fiscaliste spécialisé expatriation avant tout départ — obligatoire"},
+     {e:'💡', txt:"Cabinet partenaire pour structures internationales et Hong Kong"}],
+   vo:"Ce qu'il faut retenir. La résidence fiscale c'est pas juste là où t'habites. Trois critères en France : foyer principal, 183 jours ou activité professionnelle principale. Ta société et toi c'est deux fiscalités séparées. Dubaï à 0% d'IR, le Portugal avec le régime NHR, et les pays avec conventions fiscales avec la France. Couper la résidence fiscale française c'est vraiment partir, pas juste renouveler un visa. Et avant tout départ, un avocat fiscaliste spécialisé en expatriation est indispensable. Dernière leçon de cette formation, les 7 erreurs fiscales que font les débutants."}
+]},
+
+/* ━━ LEÇON 16 ━━ */
+{id:16, title:"🚨 Les 7 erreurs fiscales des débutants", slides:[
+  {t:'intro', num:'16', emoji:'🚨', title:"Les 7 erreurs fiscales\n<em>que font les débutants</em>",
+   sub:"T'as tout regardé. Normalement tu vas pas les faire. Mais je veux les nommer clairement pour que tu les gardes en tête.",
+   vo:"Leçon seize. La dernière leçon de cette formation. Et je voulais la terminer avec quelque chose de très concret. Les sept erreurs fiscales que font quasiment tous les débutants. Des erreurs qui coûtent de l'argent, qui créent du stress, et qui sont toutes évitables quand on sait. Toi maintenant t'as regardé toutes les leçons. T'as les bases. T'as les règles du jeu. Donc normalement tu vas pas les faire. Mais je veux quand même les nommer clairement."},
+
+  {t:'cards', title:"❌ Erreurs 1, 2 et 3", items:[
+    {emoji:'🔀', name:"Erreur 1 : Mélanger perso et pro", sub:"Dépenses pro sur compte perso, virements clients sur compte perso. Comptabilité chaos, justification impossible en cas de contrôle.", color:'red'},
+    {emoji:'🗑️', name:"Erreur 2 : Ne pas garder ses factures", sub:"Tu achètes pour le business, tu jettes le reçu. À la fin de l'année tu peux pas déduire. Tu paies des impôts que t'aurais évités.", color:'red'},
+    {emoji:'📅', name:"Erreur 3 : Pas anticiper les échéances", sub:"TVA, IS en acomptes, charges sociales — tout arrive à des dates précises. Sans argent mis de côté, pénalités et stress garantis.", color:'red'}],
+   vo:"Les trois premières erreurs. Erreur numéro un : mélanger le compte perso et le compte pro. C'est l'erreur la plus courante. Tu paies une dépense pro avec ton compte perso, tu reçois un virement client sur ton compte perso. Résultat, ta comptabilité est un chaos, et en cas de contrôle tu peux pas justifier clairement tes mouvements. Erreur numéro deux : ne pas garder ses factures. Tu achètes quelque chose pour ton business, tu jettes le reçu ou tu le perds. Et à la fin de l'année tu peux pas déduire cette dépense parce que t'as aucune preuve. Erreur numéro trois : ne pas anticiper les échéances fiscales. TVA à reverser, IS à payer en acomptes, charges sociales. Sans argent mis de côté, tu puises dans ta trésorerie ou tu paies en retard avec des pénalités."},
+
+  {t:'cards', title:"❌ Erreurs 4, 5 et 6", items:[
+    {emoji:'💸', name:"Erreur 4 : Trop de salaire trop tôt", sub:"Au démarrage si tu te verses un gros salaire sur une boîte qui fait peu, tu vides ta trésorerie. Plus de cash pour réinvestir.", color:'red'},
+    {emoji:'🙈', name:"Erreur 5 : Ne pas déclarer tous ses revenus", sub:"Depuis 2020 les banques transmettent automatiquement les infos à l'administration. Tout est tracé. Déclare tout. Toujours.", color:'red'},
+    {emoji:'🎭', name:"Erreur 6 : Dépenses perso en charges pro", sub:"Vacances en voyage d'affaires, resto perso en repas pro. C'est de la fraude fiscale. Majorations de 40% sur le redressement.", color:'red'}],
+   vo:"Erreurs 4, 5 et 6. Erreur numéro quatre : se verser trop de salaire trop tôt. Au démarrage si ta société fait peu de bénéfice et que tu te verses un gros salaire, tu paies énormément de charges sociales, tu vides ta trésorerie. Verse-toi le minimum au départ et réinvestis. Erreur numéro cinq : ne pas déclarer tous ses revenus. Depuis 2020 les banques transmettent automatiquement toutes les informations à l'administration fiscale. Tout est tracé. Déclare tout. Toujours. Erreur numéro six : passer des dépenses personnelles en charges professionnelles. Les vacances en famille passées en voyage d'affaires, les restaurants perso en repas professionnels. C'est de la fraude fiscale. Majorations de 40% sur les sommes redressées en cas de contrôle."},
+
+  {t:'warning', emoji:'🚨', title:"Erreur 7 — La plus coûteuse 🚨",
+   body:"Ne pas prendre de comptable pour économiser et finir par payer bien plus cher.",
+   warn:"<strong>Beaucoup de débutants pensent qu'un comptable c'est une dépense inutile.</strong><br><br>Ils gèrent seuls. Ils font des erreurs. Des charges mal déduites, des déclarations incorrectes, des optimisations manquées.<br><br><strong>Quand ils finissent par prendre un comptable pour réparer les dégâts</strong> — c'est beaucoup plus long et cher que si ils en avaient pris un dès le départ.<br><br><em>Un bon comptable c'est un investissement. Pas une dépense.</em>",
+   vo:"Erreur numéro sept. La plus coûteuse. Ne pas prendre de comptable pour économiser et finir par payer bien plus cher. Beaucoup de débutants pensent qu'un comptable c'est une dépense inutile. Ils gèrent seuls. Ils font des erreurs. Des charges mal déduites, des déclarations incorrectes, des optimisations manquées. Et quand ils finissent par prendre un comptable pour réparer les dégâts, c'est beaucoup plus long et beaucoup plus cher que si ils en avaient pris un dès le départ. Un bon comptable c'est un investissement. Pas une dépense. On l'a dit et je le répète."},
+
+  {t:'recap', emoji:'✅', title:"Les 7 erreurs à éviter",
+   points:[
+     {e:'🔀', txt:"1. Mélanger perso et pro — compte pro séparé, toujours"},
+     {e:'🗑️', txt:"2. Perdre ses factures — photo numérique dès réception"},
+     {e:'📅', txt:"3. Pas anticiper les échéances — 15-20% de côté dès que l'argent rentre"},
+     {e:'💸', txt:"4. Trop de salaire trop tôt — réinvestis d'abord"},
+     {e:'🙈', txt:"5. Ne pas tout déclarer — tout est tracé depuis 2020"},
+     {e:'🎭', txt:"6. Dépenses perso en charges pro — fraude, majoration 40%"},
+     {e:'🚨', txt:"7. Pas de comptable par économie — le plus cher des choix"}],
+   vo:"Les sept erreurs. Un, mélanger perso et pro. Deux, perdre ses factures. Trois, pas anticiper les échéances fiscales. Quatre, se verser trop de salaire trop tôt. Cinq, ne pas tout déclarer. Six, passer des dépenses perso en charges pro. Sept, pas prendre de comptable par économie. T'as maintenant toutes les bases pour créer et gérer ta société en France de façon optimale. La suite c'est la section deux avec les holdings et les structures avancées. Et le module Hong Kong pour ceux qui veulent aller encore plus loin. Merci d'avoir suivi cette formation. On se retrouve dans la suite."},
+
+  {t:'quote', text:"Payer ses impôts c'est normal. Payer plus que ce que la loi te demande c'est de la générosité involontaire envers l'État.", auth:"— Principe fondamental de l'optimisation fiscale légale",
+   vo:"Pour terminer cette formation sur une note fondamentale. Il y a une distinction essentielle entre l'optimisation fiscale, qui consiste à utiliser les mécanismes légaux prévus par la loi pour réduire son impôt, et la fraude fiscale, qui consiste à dissimuler des revenus ou inventer des charges. Tout ce qu'on a vu dans cette formation, la SASU, les dividendes à 30%, les charges déductibles, la franchise TVA, tout ça c'est parfaitement légal. C'est le législateur lui-même qui a créé ces dispositifs. Les utiliser c'est jouer selon les règles du jeu. La formation est terminée. Bravo d'être allé jusqu'au bout."}
+]}
+
+]; /* FIN LESSONS */
+/* ══════════════════════════════════════════════════
+   MOTEUR PLAYER
+══════════════════════════════════════════════════ */
+let curL=0, curS=0, playing=true, voiceOn=true;
+let tmr=null,ptmr=null,pst=null;
+const MIN_DUR=5500;
+const lp={};
+
+const synth=window.speechSynthesis;
+let voices=[];
+function loadV(){const a=synth.getVoices();voices=a.filter(v=>v.lang.startsWith('fr'));if(!voices.length)voices=a;}
+if(synth.onvoiceschanged!==undefined)synth.onvoiceschanged=loadV;
+loadV();
+function bestV(){return voices.find(v=>v.name.toLowerCase().includes('google')&&v.lang.startsWith('fr'))||voices.find(v=>v.lang==='fr-FR')||voices[0];}
+
+function speak(txt,cb){
+  synth.cancel();
+  if(!voiceOn||!txt){cb&&cb();return;}
+  const u=new SpeechSynthesisUtterance(txt);
+  u.voice=bestV();u.lang='fr-FR';u.rate=1.10;u.pitch=1.0;
+  showCap(txt);
+  u.onend=()=>{hideCap();cb&&cb();};
+  u.onerror=()=>{hideCap();cb&&cb();};
+  synth.speak(u);
+}
+function stopSpeak(){synth.cancel();hideCap();}
+function showCap(t){const e=document.getElementById('ct');e.textContent=t.length>130?t.slice(0,130)+'…':t;e.classList.remove('off');}
+function hideCap(){document.getElementById('ct').classList.add('off');}
+function toggleVoice(){voiceOn=!voiceOn;const b=document.getElementById('voiceBtn');b.textContent=voiceOn?'🔊 Voix ON':'🔇 Voix OFF';b.classList.toggle('on',voiceOn);if(!voiceOn)stopSpeak();}
+
+/* BUILD SLIDES */
+function bld(s,i,tot,lnum){
+  const tags=`<div class="logo-tag">SBW</div><div class="slide-tag">L${lnum} · ${i+1}/${tot}</div>`;
+
+  if(s.t==='intro') return `<div class="slide" id="sl-${i}">${tags}
+    <div class="ly-intro">
+      <div class="intro-l">
+        <div class="s-tag afb d1">Création d'entreprise 🇫🇷 · Leçon ${lnum}</div>
+        <div class="s-title afb d2">${s.title.split('\n').join('<br>')}</div>
+        <div class="s-sub af d3">${s.sub}</div>
+      </div>
+      <div class="intro-r">
+        <div class="intro-r-inner">
+          <div class="intro-emoji-big afr d2">${s.emoji}</div>
+        </div>
+        <div class="intro-num-bg af d1">${s.num}</div>
+      </div>
+    </div></div>`;
+
+  if(s.t==='concept') return `<div class="slide" id="sl-${i}">${tags}
+    <div class="ly-center">
+      <div class="concept-emoji af d1">${s.emoji}</div>
+      <div class="s-tag afs d1">${s.tag}</div>
+      <div class="concept-title afb d2">${s.title}</div>
+      <div class="body-txt af d3">${s.body}</div>
+    </div></div>`;
+
+  if(s.t==='cards'){
+    const cols=s.items.map((it,j)=>`
+      <div class="card ${it.color||''} afb d${j+2}">
+        <div class="card-emoji">${it.icon}</div>
+        <div class="card-name">${it.name}</div>
+        <div class="card-sub">${it.sub}</div>
+      </div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="ly-cards">
+        <div class="cards-title af d1">📋 ${s.title}</div>
+        <div class="cards-grid">${cols}</div>
+      </div></div>`;}
+
+  if(s.t==='stat') return `<div class="slide" id="sl-${i}">${tags}
+    <div class="ly-stat">
+      <div class="stat-l">
+        <div class="stat-emoji af d1">${s.emoji}</div>
+        <div class="stat-num afs d2">${s.num}</div>
+        <div class="stat-label af d2">${s.label}</div>
+      </div>
+      <div class="stat-r">
+        <div class="stat-body af d2">${s.body}</div>
+      </div>
+    </div></div>`;
+
+  if(s.t==='compare'){
+    const rc=s.right.color==='good'?'good':(s.right.color==='neutral'?'neutral':'good');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="ly-compare">
+        <div class="compare-title af d1">📊 ${s.title}</div>
+        <div class="compare-grid">
+          <div class="cmp bad afb d2">
+            <div class="cmp-emoji">${(s.left.emoji||'📉')}</div>
+            <div class="cmp-label">${s.left.label}</div>
+            <div class="cmp-num">${s.left.num}</div>
+            <div class="cmp-unit">${s.left.unit}</div>
+            <div class="cmp-desc">${s.left.desc}</div>
+          </div>
+          <div class="cmp ${rc} afb d3">
+            <div class="cmp-emoji">${(s.right.emoji||'📈')}</div>
+            <div class="cmp-label">${s.right.label}</div>
+            <div class="cmp-num">${s.right.num}</div>
+            <div class="cmp-unit">${s.right.unit}</div>
+            <div class="cmp-desc">${s.right.desc}</div>
+          </div>
+        </div>
+        ${s.note?`<div class="compare-note af d4">${s.note}</div>`:''}
+      </div></div>`;}
+
+  if(s.t==='calc'){
+    const rows=s.lines.map(l=>`<div class="calc-line ${l.type} af d3"><span class="cl-label">${l.label}</span><span class="cl-val">${l.val}</span></div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="ly-calc">
+        <div class="calc-l">
+          <div class="calc-tag af d1">${s.tag}</div>
+          <div class="calc-title afb d2">${s.title}</div>
+          <div class="calc-premise af d2">${s.premise}</div>
+        </div>
+        <div class="calc-r">${rows}</div>
+      </div></div>`;}
+
+  if(s.t==='warning') return `<div class="slide" id="sl-${i}">${tags}
+    <div class="ly-warning">
+      <div class="warn-emoji afs d1">${s.emoji}</div>
+      <div class="warn-title afb d2">${s.title}</div>
+      <div class="warn-body af d2">${s.body}</div>
+      <div class="warn-border af d3"><p>${s.warn}</p></div>
+    </div></div>`;
+
+  if(s.t==='action'){
+    const steps=s.steps.map((st,j)=>`
+      <div class="step afl d${j+3}">
+        <div class="step-n">${j+1}</div>
+        <div class="step-txt">${st.txt}</div>
+      </div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="ly-action">
+        <div class="act-l">
+          <div class="act-badge af d1">${s.badge}</div>
+          <div class="act-emoji af d1">${s.emoji}</div>
+          <div class="act-title afb d2">${s.title}</div>
+        </div>
+        <div class="act-r">${steps}</div>
+      </div></div>`;}
+
+  if(s.t==='recap'){
+    const pts=s.points.map((p,j)=>`
+      <div class="recap-pt afl d${j+2}">
+        <div class="recap-emoji-sm">${p.e}</div>
+        <div class="recap-txt">${p.txt}</div>
+      </div>`).join('');
+    return `<div class="slide" id="sl-${i}">${tags}
+      <div class="ly-recap">
+        <div class="recap-l">
+          <div class="recap-emoji af d1">${s.emoji}</div>
+          <div class="recap-tag af d1">Récapitulatif 📋</div>
+          <div class="recap-title afb d1">${s.title}</div>
+        </div>
+        <div class="recap-r">${pts}</div>
+      </div></div>`;}
+
+  if(s.t==='quote') return `<div class="slide" id="sl-${i}">${tags}
+    <div class="ly-quote">
+      <div class="q-mark af d1">"</div>
+      <div class="q-text afb d2">${s.text}</div>
+      <div class="q-auth af d3">${s.auth}</div>
+    </div></div>`;
+
+  return `<div class="slide" id="sl-${i}">${tags}<div class="ly-center"><div class="body-txt">${JSON.stringify(s)}</div></div></div>`;
+}
+
+function renderL(idx){
+  stopSpeak();stopPlay();
+  curL=idx;curS=0;
+  const L=LESSONS[idx];
+  document.getElementById('sc').innerHTML=L.slides.map((s,i)=>bld(s,i,L.slides.length,L.id)).join('');
+  document.getElementById('tbLesson').textContent=`L${L.id} — ${L.title}`;
+  updateMenu();showSlide(0);
+  setTimeout(()=>{playing=true;document.getElementById('playBtn').textContent='⏸';schedNext();},400);
+}
+
+function showSlide(i){
+  document.querySelectorAll('#sc .slide').forEach((el,j)=>el.classList.toggle('active',j===i));
+  curS=i;updProg(0);
+  const L=LESSONS[curL];
+  document.getElementById('slCtr').textContent=`${i+1}/${L.slides.length}`;
+  document.getElementById('lCtr').textContent=`Leçon ${curL+1}/${LESSONS.length}`;
+}
+function updProg(p){
+  const L=LESSONS[curL];
+  document.getElementById('pb').style.width=((curS+p/100)/L.slides.length*100)+'%';
+  lp[curL]=Math.max(lp[curL]||0,Math.round((curS+p/100)/L.slides.length*100));
+  const b=document.querySelectorAll('.sb-progbar')[curL];
+  if(b)b.style.width=(lp[curL]||0)+'%';
+}
+function schedNext(){
+  clearTmr();pst=Date.now();
+  const s=LESSONS[curL].slides[curS];
+  let sd=!voiceOn,td=false;
+  function ta(){if(sd&&td)advance();}
+  speak(s.vo,()=>{sd=true;ta();});
+  ptmr=setInterval(()=>updProg(Math.min((Date.now()-pst)/MIN_DUR*100,voiceOn?55:100)),60);
+  tmr=setTimeout(()=>{td=true;ta();},MIN_DUR);
+}
+function advance(){
+  clearTmr();
+  const L=LESSONS[curL];
+  if(curS+1<L.slides.length){showSlide(curS+1);if(playing)schedNext();}
+  else{lp[curL]=100;updateMenu();const n=curL+1;if(n<LESSONS.length)setTimeout(()=>renderL(n),1200);else stopPlay();}
+}
+function stopPlay(){playing=false;document.getElementById('playBtn').textContent='▶';clearTmr();stopSpeak();}
+function togglePlay(){playing?stopPlay():(playing=true,document.getElementById('playBtn').textContent='⏸',schedNext());}
+function nextSlide(){clearTmr();stopSpeak();const L=LESSONS[curL];if(curS+1<L.slides.length){showSlide(curS+1);if(playing)schedNext();}else if(curL+1<LESSONS.length)renderL(curL+1);}
+function prevSlide(){clearTmr();stopSpeak();if(curS>0){showSlide(curS-1);if(playing)schedNext();}else if(curL>0)renderL(curL-1);}
+function clearTmr(){clearTimeout(tmr);clearInterval(ptmr);}
+
+function updateMenu(){
+  document.querySelectorAll('.sb-item').forEach((el,i)=>{
+    el.classList.toggle('active',i===curL);
+    el.classList.toggle('done',lp[i]===100);
+    const b=el.querySelector('.sb-progbar');
+    if(b)b.style.width=(lp[i]||0)+'%';
+  });
+}
+
+const sbL=document.getElementById('sbList');
+LESSONS.forEach((l,i)=>{
+  const el=document.createElement('div');
+  el.className='sb-item';
+  el.innerHTML=`<div class="sb-num">L${String(i+1).padStart(2,'0')}</div><div class="sb-title">${l.title}</div><div class="sb-prog"><div class="sb-progbar" style="width:0%"></div></div>`;
+  el.onclick=()=>renderL(i);
+  sbL.appendChild(el);
+});
+
+function startApp(){
+  const u=new SpeechSynthesisUtterance('');synth.speak(u);synth.cancel();
+  const ld=document.getElementById('landing');
+  const ap=document.getElementById('app');
+  ld.classList.add('out');
+  setTimeout(()=>{ld.style.display='none';ap.classList.add('in');renderL(0);},600);
+}
+</script>
+</body>
+</html>
