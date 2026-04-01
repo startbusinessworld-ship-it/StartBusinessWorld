@@ -539,8 +539,20 @@ async function loadFormations() {
   for (var i = 0; i < allFormations.length; i++) {
     var f = allFormations[i];
     if (f.formation_url) {
-      // Formation externe — pas de progression à calculer
-      f._tot = 0; f._done = 0; f._pct = 0;
+      // Formation externe — lire la progression depuis localStorage (SBW Tracker)
+      var filename = f.formation_url.split('/').pop().replace('.html', '');
+      var storageKey = 'sbw_tracker__' + filename;
+      var trackerData = {};
+      try { trackerData = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
+      var trackerTotal = trackerData._total || 0;
+      var trackerDone = Object.keys(trackerData).filter(function(k) {
+        return k !== '_total' && k !== '_updated' && trackerData[k] === true;
+      }).length;
+      f._tot = trackerTotal;
+      f._done = trackerDone;
+      f._pct = trackerTotal > 0 ? Math.round(trackerDone / trackerTotal * 100) : 0;
+      totalGlobal += trackerTotal;
+      doneGlobal += trackerDone;
       continue;
     }
     var mr = await SB.from("modules").select("id, lecons(id)").eq("formation_id", f.id);
