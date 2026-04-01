@@ -98,21 +98,59 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
 .quote-block{text-align:center;padding:32px 20px}
 .quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,3vw,1.8rem);font-style:italic;line-height:1.5;color:var(--white);margin-bottom:16px;max-width:580px;margin-left:auto;margin-right:auto}
 .quote-bar{width:40px;height:2px;background:var(--gold);margin:0 auto}
-.nav-bar{height:60px;background:var(--surface);border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;flex-shrink:0}
-.nav-info{font-size:.75rem;color:var(--muted)}
-.nav-btns{display:flex;gap:8px}
-.btn-nav{display:flex;align-items:center;gap:6px;padding:8px 18px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:0.5px solid var(--border);background:var(--faint);color:var(--white)}
+.nav-bar{height:60px;background:var(--surface);border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;gap:8px}
+.nav-info{font-size:.75rem;color:var(--muted);flex:1;text-align:center}
+.nav-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn-nav{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:0.5px solid var(--border);background:var(--faint);color:var(--white)}
 .btn-nav:hover{border-color:rgba(255,255,255,.3)}
 .btn-nav:disabled{opacity:.3;cursor:not-allowed}
 .btn-nav.primary{background:var(--gold);border-color:var(--gold);color:#fff}
 .btn-nav.primary:hover{background:var(--gold-light)}
 .btn-nav.done-btn{background:rgba(78,203,113,.12);border-color:rgba(78,203,113,.3);color:var(--green)}
+/* Bouton hamburger */
+.btn-menu{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:8px 10px;border-radius:7px;border:0.5px solid var(--border);background:var(--faint);cursor:pointer;transition:all .15s}
+.btn-menu:hover{border-color:rgba(255,255,255,.3)}
+.btn-menu.active{border-color:var(--gold)}
+.btn-menu span{display:block;width:16px;height:1.5px;background:var(--muted);border-radius:2px;transition:background .15s}
+.btn-menu.active span{background:var(--gold)}
+/* Bouton Play/Pause */
+.btn-play{width:38px;height:38px;border-radius:50%;background:var(--gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;animation:pulse 2.5s infinite}
+.btn-play:hover{background:var(--gold-light);transform:scale(1.08)}
+.btn-play svg{fill:#fff}
+.btn-play.playing{animation:none;background:var(--gold)}
 #btnVoix.active{background:rgba(166,124,58,.15);border-color:var(--gold);color:var(--gold)}
 .subtitles{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:100;max-width:700px;width:90%;text-align:center;pointer-events:none}
 .subtitles-text{display:inline-block;background:rgba(0,0,0,.75);color:#fff;font-size:.92rem;line-height:1.6;padding:8px 18px;border-radius:8px;backdrop-filter:blur(4px);transition:opacity .3s}
 .subtitles-text.hidden{opacity:0}
 .cta-fixed{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:8px;background:var(--gold);color:#fff;padding:11px 28px;border-radius:30px;font-size:.85rem;font-weight:600;text-decoration:none;box-shadow:0 4px 20px rgba(166,124,58,.4);transition:background .15s,transform .15s;white-space:nowrap}
 .cta-fixed:hover{background:var(--gold-light);transform:translateX(-50%) translateY(-2px)}
+
+/* Play/pause dans la nav bar */
+@keyframes pulse{0%,100%{box-shadow:0 0 0 6px rgba(166,124,58,.2)}50%{box-shadow:0 0 0 10px rgba(166,124,58,.06)}}
+
+/* Panneau leçons */
+.lessons-panel{position:fixed;bottom:0;left:0;width:320px;background:var(--surface);border-top:0.5px solid var(--border);border-right:0.5px solid var(--border);border-radius:0 12px 0 0;z-index:300;transform:translateY(100%);transition:transform .3s;max-height:70vh;display:flex;flex-direction:column}
+.lessons-panel.open{transform:translateY(0)}
+.lp-head{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.lp-head-title{font-size:.8rem;font-weight:600;color:var(--white)}
+.lp-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px}
+.lp-scroll{overflow-y:auto;flex:1;padding:8px}
+.lp-lesson{margin-bottom:4px}
+.lp-lesson-btn{width:100%;display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:6px;cursor:pointer;background:none;border:none;font-family:inherit;color:var(--white);text-align:left;transition:background .1s}
+.lp-lesson-btn:hover{background:var(--faint)}
+.lp-lesson-btn.active{color:var(--gold)}
+.lp-lesson-num{font-size:.65rem;color:var(--muted);width:16px;flex-shrink:0}
+.lp-lesson-name{font-size:.78rem;flex:1}
+.lp-lesson-check{font-size:.68rem;color:var(--green);opacity:0}
+.lp-lesson-btn.done .lp-lesson-check{opacity:1}
+.lp-slides{padding:0 0 0 34px;display:none}
+.lp-lesson.open .lp-slides{display:flex;flex-wrap:wrap;gap:4px;padding-bottom:6px}
+.lp-slide-btn{font-size:.68rem;padding:3px 10px;border-radius:4px;border:0.5px solid var(--border);background:var(--faint);color:var(--muted);cursor:pointer;font-family:inherit;transition:all .1s}
+.lp-slide-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lp-slide-btn.active{background:rgba(166,124,58,.2);border-color:var(--gold);color:var(--gold)}
+
+
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--faint);border-radius:2px}
@@ -149,10 +187,21 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
     <div class="slide-progress"><div class="slide-progress-fill" id="slidePbar" style="width:0%"></div></div>
     <div class="slide-area" id="slideArea"></div>
     <div class="nav-bar">
+      <div class="nav-left">
+        <!-- Hamburger menu -->
+        <button class="btn-menu" id="lessonsTab" onclick="toggleLessonsPanel()" title="Navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <!-- Play / Pause -->
+        <button class="btn-play" id="playBtn" onclick="togglePlay()" title="Play / Pause">
+          <svg id="playIcon" viewBox="0 0 24 24" width="14" height="14"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" width="14" height="14" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+        </button>
+      </div>
       <span class="nav-info" id="navInfo"></span>
-      <div class="nav-btns">
-        <button class="btn-nav" id="btnPrev" onclick="prev()">← Précédent</button>
-        <button class="btn-nav primary" id="btnNext" onclick="next()">Suivant →</button>
+      <div class="nav-right">
+        <button class="btn-nav" id="btnPrev" onclick="prev()">←</button>
+        <button class="btn-nav primary" id="btnNext" onclick="next()">→</button>
       </div>
     </div>
   </div>
@@ -160,6 +209,15 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
 
 <div class="subtitles" id="subtitles">
   <div class="subtitles-text hidden" id="subtitlesText"></div>
+</div>
+
+<!-- Panneau leçons -->
+<div class="lessons-panel" id="lessonsPanel">
+  <div class="lp-head">
+    <span class="lp-head-title">Navigation</span>
+    <button class="lp-close" onclick="toggleLessonsPanel()">✕</button>
+  </div>
+  <div class="lp-scroll" id="lpScroll"></div>
 </div>
 
 <a href="https://www.luminoscorp.com" target="_blank" rel="noopener" class="cta-fixed">
@@ -197,7 +255,13 @@ function render(){
   markSeen(curL,curS);
   // Lancer la voix off si activée
   var sl_vo = LESSONS[curL].slides[curS];
-  if (voixOn && sl_vo && sl_vo.vo) { stopVoix(); setTimeout(function(){ playVoix(sl_vo.vo); }, 150); }
+  if (voixOn && sl_vo && sl_vo.vo) {
+    if (synth) synth.cancel();
+    setTimeout(function(){ playVoix(sl_vo.vo); }, 150);
+  } else if (autoPlay) {
+    // Slide sans VO : avancer après 2s
+    setTimeout(autoAdvance, 2000);
+  }
   var a=document.getElementById('slideArea');
   var t=sl.t,h='';
   if(t==='intro'){
@@ -257,30 +321,143 @@ function updateSidebar(){
   }).join('');
 }
 
-function refreshUI(){updatePbars();updateSidebar();}
+function refreshUI(){updatePbars();updateSidebar();renderLessonsPanel();}
+
+function toggleLessonsPanel() {
+  var panel = document.getElementById('lessonsPanel');
+  var tab = document.getElementById('lessonsTab');
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    tab.classList.remove('active');
+  } else {
+    renderLessonsPanel();
+    panel.classList.add('open');
+    tab.classList.add('active');
+  }
+}
+
+function renderLessonsPanel() {
+  var d = loadProg();
+  var el = document.getElementById('lpScroll');
+  el.innerHTML = LESSONS.map(function(l, li) {
+    var isDone = !!d[li];
+    var isActivL = li === curL;
+    var slides = l.slides.map(function(s, si) {
+      var label = s.t === 'intro' ? '▶ Intro' :
+                  s.t === 'recap' ? '✓ Recap' :
+                  s.t === 'action' ? '🚀' :
+                  s.t === 'stat' ? '📊' :
+                  s.t === 'warning' ? '⚠️' :
+                  s.t === 'quote' ? '"' :
+                  s.t === 'compare' ? '⚖️' :
+                  s.t === 'cards' ? '📋' : '💡';
+      var isActS = isActivL && si === curS;
+      return '<button class="lp-slide-btn' + (isActS?' active':'') + '" onclick="goToSlide(' + li + ',' + si + ')">' + label + ' ' + (si+1) + '</button>';
+    }).join('');
+    return '<div class="lp-lesson' + (isActivL?' open':'') + '">' +
+      '<button class="lp-lesson-btn' + (isActivL?' active':'') + (isDone?' done':'') + '" onclick="toggleLpLesson(this,' + li + ')">' +
+        '<span class="lp-lesson-num">' + l.id + '</span>' +
+        '<span class="lp-lesson-name">' + l.title + '</span>' +
+        '<span class="lp-lesson-check">✓</span>' +
+      '</button>' +
+      '<div class="lp-slides">' + slides + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleLpLesson(btn, idx) {
+  var lessonEl = btn.parentElement;
+  var wasOpen = lessonEl.classList.contains('open');
+  document.querySelectorAll('.lp-lesson').forEach(function(el){ el.classList.remove('open'); });
+  if (!wasOpen) lessonEl.classList.add('open');
+}
+
+function goToSlide(li, si) {
+  autoPlay = false; stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  curL = li; curS = si;
+  render();
+  renderLessonsPanel();
+}
 
 // ══ NAVIGATION ══
-function next(){stopVoix();
+function next(){autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
   var L=LESSONS[curL];
   if(curS<L.slides.length-1){curS++;render();}
   else if(curL<LESSONS.length-1){markDone(curL);curL++;curS=0;render();}
   else{markDone(curL);}
 }
-function prev(){stopVoix();
+function prev(){autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
   if(curS>0){curS--;render();}
   else if(curL>0){curL--;curS=LESSONS[curL].slides.length-1;render();}
 }
-function goTo(idx){stopVoix();curL=idx;curS=0;render();}
+function goTo(idx){
+  autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  curL=idx;curS=0;render();}
 
 // ══ TTS ══
 var voixOn = false;
 var synth = window.speechSynthesis;
 var utterance = null;
 
+var autoPlay = false;
+
 function stopVoix() {
+  autoPlay = false;
   if (synth) synth.cancel();
   var subs = document.getElementById('subtitlesText');
   if (subs) { subs.classList.add('hidden'); subs.textContent = ''; }
+}
+
+function togglePlay() {
+  if (autoPlay) {
+    // Pause
+    autoPlay = false;
+    voixOn = false;
+    stopVoix();
+    document.getElementById('playIcon').style.display = 'block';
+    document.getElementById('pauseIcon').style.display = 'none';
+    document.getElementById('playBtn').classList.remove('playing');
+    document.getElementById('btnVoix').classList.remove('active');
+    document.getElementById('btnVoix').textContent = '🔊 Voix';
+  } else {
+    // Play
+    voixOn = true;
+    autoPlay = true;
+    document.getElementById('playIcon').style.display = 'none';
+    document.getElementById('pauseIcon').style.display = 'block';
+    document.getElementById('playBtn').classList.add('playing');
+    document.getElementById('btnVoix').classList.add('active');
+    document.getElementById('btnVoix').textContent = '🔊 Voix ON';
+    var sl = LESSONS[curL].slides[curS];
+    if (sl && sl.vo) playVoix(sl.vo);
+    else autoAdvance();
+  }
+}
+
+function autoAdvance() {
+  if (!autoPlay) return;
+  // Avancer au slide suivant
+  var L = LESSONS[curL];
+  if (curS < L.slides.length - 1) {
+    curS++; render();
+  } else if (curL < LESSONS.length - 1) {
+    markDone(curL); curL++; curS = 0; render();
+  } else {
+    markDone(curL); autoPlay = false;
+  }
 }
 
 function playVoix(text) {
@@ -320,8 +497,16 @@ function playVoix(text) {
   });
   setTimeout(function() { subs.classList.add('hidden'); subs.textContent = ''; }, delay * 1000);
 
-  utterance.onend = function() { subs.classList.add('hidden'); subs.textContent = ''; };
+  utterance.onend = function() {
+    subs.classList.add('hidden'); subs.textContent = '';
+    if (autoPlay) setTimeout(autoAdvance, 400);
+  };
   synth.speak(utterance);
+}
+
+function playVoixAuto(text) {
+  // Comme playVoix mais déclenche autoAdvance à la fin
+  playVoix(text);
 }
 
 function toggleVoix() {
@@ -347,10 +532,7 @@ function toggleVoix() {
   var start=0;
   for(var i=0;i<LESSONS.length;i++){if(!d[i]){start=i;break;}if(i===LESSONS.length-1)start=i;}
   curL=start;curS=0;
-  // Activer la voix off par défaut
-  voixOn=true;
-  document.getElementById('btnVoix').classList.add('active');
-  document.getElementById('btnVoix').textContent='🔊 Voix ON';
+  voixOn = false;
   render();
 })();
 
