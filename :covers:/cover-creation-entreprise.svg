@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 788" width="1400" height="788">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=DM+Sans:wght@300;400&amp;display=swap');
+    </style>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#0e1630"/>
+      <stop offset="100%" stop-color="#080c18"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1400" height="788" fill="url(#bg)"/>
+
+  <!-- Subtle vignette -->
+  <rect width="1400" height="788" fill="black" opacity="0.25"/>
+
+  <!-- TOP LABEL -->
+  <text x="700" y="80" text-anchor="middle"
+    font-family="'DM Sans', sans-serif"
+    font-size="18" font-weight="400"
+    letter-spacing="10"
+    fill="rgba(255,255,255,0.45)">START BUSINESS WORLD</text>
+
+  <!-- EMOJIS -->
+  <text x="700" y="220" text-anchor="middle" font-size="90">🏛️💰📊</text>
+
+  <!-- MAIN TITLE LINE 1 -->
+  <text x="700" y="380" text-anchor="middle"
+    font-family="Georgia, 'DM Serif Display', serif"
+    font-size="110" font-weight="700"
+    fill="white">Création d'entreprise</text>
+
+  <!-- MAIN TITLE LINE 2 -->
+  <text x="700" y="510" text-anchor="middle"
+    font-family="Georgia, 'DM Serif Display', serif"
+    font-size="110" font-weight="700"
+    fill="#4A7FD4">&amp; Fiscalité</text>
+
+  <!-- SUBTITLE -->
+  <text x="700" y="615" text-anchor="middle"
+    font-family="'DM Sans', Georgia, sans-serif"
+    font-size="26" font-weight="300"
+    fill="rgba(255,255,255,0.5)">Tout ce que tu dois savoir pour créer ta société, choisir le bon statut,</text>
+  <text x="700" y="650" text-anchor="middle"
+    font-family="'DM Sans', Georgia, sans-serif"
+    font-size="26" font-weight="300"
+    fill="rgba(255,255,255,0.5)">comprendre les impôts et payer légalement le moins possible dès le départ.</text>
+</svg>
