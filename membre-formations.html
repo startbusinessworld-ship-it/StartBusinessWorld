@@ -238,12 +238,19 @@ async function loadAll() {
     .order('position');
 
   allData = (r.data || []).map(function(f) {
+    // Normaliser le type : si NULL ou inconnu → video
+    if (!f.type) f.type = 'video';
+    // Auto-détecter html si un module a html_url
     f.modules = (f.modules || [])
       .sort(function(a,b){return a.position-b.position;})
       .map(function(m) {
         m.lecons = (m.lecons || []).sort(function(a,b){return a.position-b.position;});
         return m;
       });
+    // Si au moins un module a html_url → type html
+    if (f.type === 'video' && f.modules.some(function(m){return !!m.html_url;})) {
+      f.type = 'html';
+    }
     return f;
   });
 
@@ -315,7 +322,7 @@ function renderAll() {
 
 // ── Progression d'un module ──
 function getModuleProgress(f, m) {
-  if (f.type === 'html' && m.html_url) {
+  if (m.html_url) {
     // Lire depuis localStorage (SBW Tracker)
     var filename = m.html_url.split('/').pop().replace('.html', '');
     var key = 'sbw_tracker__' + filename;
@@ -364,7 +371,7 @@ function makeModuleCard(f, m, idx, progData) {
 
   // Bouton
   var btn;
-  if (f.type === 'html' && m.html_url) {
+  if (m.html_url) {
     btn = document.createElement('a');
     btn.href = m.html_url;
     btn.target = '_blank';
@@ -372,7 +379,7 @@ function makeModuleCard(f, m, idx, progData) {
     btn.className = 'm-card-btn gold';
     btn.textContent = progData.pct > 0 ? '▶ Continuer' : '▶ Commencer';
     btn.addEventListener('click', function(e) { e.stopPropagation(); });
-  } else if (f.type === 'video') {
+  } else {
     btn = document.createElement('button');
     btn.className = 'm-card-btn';
     btn.textContent = progData.pct > 0 ? '▶ Continuer' : '▶ Voir les leçons';
@@ -383,8 +390,8 @@ function makeModuleCard(f, m, idx, progData) {
 
   // Click card
   card.addEventListener('click', function() {
-    if (f.type === 'html' && m.html_url) window.open(m.html_url, '_blank', 'noopener');
-    else if (f.type === 'video') openDetailModule(f, m);
+    if (m.html_url) window.open(m.html_url, '_blank', 'noopener');
+    else openDetailModule(f, m);
   });
 
   return card;
