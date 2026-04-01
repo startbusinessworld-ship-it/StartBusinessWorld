@@ -530,7 +530,7 @@ function saveProgress() {
 
 // ── FORMATIONS ──
 async function loadFormations() {
-  var res = await SB.from("formations").select("id,title,description,cover_url,formation_url,status,position").eq("status", "published").order("position");
+  var res = await SB.from("formations").select("id,title,description,cover_url,formation_url,extra_stats,status,position").eq("status", "published").order("position");
   allFormations = res.data || [];
 
   // Charger les stats de progression pour chaque formation
@@ -591,62 +591,75 @@ function renderGrid() {
   grid.innerHTML = "";
 
   allFormations.forEach(function(f, i) {
-    var badge = f._pct === 100
-      ? '<span class="badge-done">✓ Terminée</span>'
-      : f._pct > 0 ? '<span class="badge-prog">En cours</span>' : "";
-
     var hasUrl = !!f.formation_url;
 
-    // Cover : iframe live si URL, emoji sinon
+    // ── COVER ──
     var coverHtml;
-    if (hasUrl) {
+    if (hasUrl && f.cover_url) {
+      // Image screenshot en haut
       coverHtml =
-        '<div class="cover-iframe-wrap" style="width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;background:var(--dark)">' +
-          '<iframe src="' + f.formation_url + '" style="width:1280px;height:720px;position:absolute;top:0;left:0;pointer-events:none;border:none;transform-origin:top left" scrolling="no" tabindex="-1"></iframe>' +
+        '<div style="width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px 10px 0 0;background:var(--dark);position:relative">' +
+          '<img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block" loading="lazy">' +
+          '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(0,0,0,.35))"></div>' +
         '</div>';
-    } else if (f.cover_url) {
-      coverHtml = '<div class="f-card-cover"><img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;position:absolute;inset:0" loading="lazy"></div>';
+    } else if (hasUrl) {
+      coverHtml =
+        '<div style="width:100%;aspect-ratio:16/9;background:var(--dark);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:3rem">' +
+          EMOJIS[i % EMOJIS.length] +
+        '</div>';
     } else {
-      coverHtml = '<div class="f-card-cover"><span style="font-size:2.2rem">' + EMOJIS[i % EMOJIS.length] + '</span></div>';
+      coverHtml =
+        '<div class="f-card-cover" style="border-radius:10px 10px 0 0">' +
+          (f.cover_url
+            ? '<img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" loading="lazy">'
+            : '<span style="font-size:2.2rem">' + EMOJIS[i % EMOJIS.length] + '</span>') +
+        '</div>';
     }
+
+    // ── BODY ──
+    var bodyHtml =
+      '<div style="padding:16px 18px 18px">' +
+        // Titre
+        '<div style="font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.3">' + f.title + '</div>' +
+        // Description
+        (f.description
+          ? '<div style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>'
+          : '') +
+        // Séparateur
+        '<div style="height:.5px;background:var(--subtle);margin-bottom:12px"></div>' +
+        // Stats
+        '<div style="font-size:.72rem;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px">' +
+          (f.extra_stats
+            ? '<span>' + f.extra_stats + '</span>'
+            : '<span id="fmeta_' + f.id + '">—</span>') +
+        '</div>' +
+        // Bouton
+        (hasUrl
+          ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:600;text-decoration:none;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">▶ Commencer la formation</a>'
+          : '<button onclick="event.stopPropagation();openFormation(' + JSON.stringify({id:f.id,title:f.title}).replace(/"/g,'&quot;') + ')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--dark);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
+        ) +
+      '</div>';
 
     var card = document.createElement("div");
     card.className = "f-card";
-    if (hasUrl) card.style.cursor = "pointer";
+    card.style.cssText = "border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column";
+    card.innerHTML = coverHtml + bodyHtml;
 
-    // Pour les formations URL : juste le cadran, sans body en dessous
-    if (hasUrl) {
-      card.innerHTML = coverHtml;
-    } else {
-      card.innerHTML =
-        coverHtml +
-        '<div class="f-card-body">' +
-          '<div class="f-card-top"><div class="f-card-title">' + f.title + '</div>' + badge + '</div>' +
-          (f.description ? '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>' : '') +
-          '<div class="f-card-meta"><span id="fmeta_' + f.id + '">—</span></div>' +
-          '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
-          '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>' +
-        '</div>';
-    }
+    card.onmouseover = function() { this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)'; };
+    card.onmouseout = function() { this.style.transform=''; this.style.boxShadow=''; };
 
     if (hasUrl) {
-      card.addEventListener("click", function() {
-        window.open(f.formation_url, "_blank", "noopener");
-      });
+      card.addEventListener("click", function() { window.open(f.formation_url, "_blank", "noopener"); });
     } else {
-      card.style.cursor = "pointer";
       card.addEventListener("click", (function(fm) { return function() { openFormation(fm); }; })(f));
     }
 
     grid.appendChild(card);
   });
 
-  // Scale des iframes miniatures
-  scaleIframes();
-  window.addEventListener("resize", scaleIframes);
-
-  // Nombre de modules
+  // Stats pour formations classiques
   allFormations.forEach(function(f) {
+    if (f.extra_stats) return;
     SB.from("modules").select("id", { count: "exact" }).eq("formation_id", f.id).then(function(r) {
       var el = document.getElementById("fmeta_" + f.id);
       if (el) el.textContent = (r.count || 0) + " module" + (r.count > 1 ? "s" : "") + " · " + f._tot + " leçon" + (f._tot > 1 ? "s" : "");

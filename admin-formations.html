@@ -203,6 +203,11 @@
       </div>
     </div>
     <div class="field">
+      <label>Stats de la formation</label>
+      <input type="text" id="fStats" placeholder="Ex: 71 leçons · 11 sections · 8h de contenu">
+      <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Affiché sous la couverture dans l'espace membre.</div>
+    </div>
+    <div class="field">
       <label>Statut</label>
       <select id="fStatus">
         <option value="draft">Brouillon \u2014 non visible</option>
@@ -385,6 +390,7 @@ function openFormationModal(f) {
   document.getElementById('fUrl').value = f ? (f.formation_url || '') : '';
   document.getElementById('fCover').value = f ? (f.cover_url || '') : '';
   if (f && f.cover_url) previewCover(f.cover_url); else { document.getElementById('coverPreview').style.display='none'; }
+  document.getElementById('fStats').value = f ? (f.extra_stats || '') : '';
   document.getElementById('fStatus').value = f ? f.status : 'draft';
   document.getElementById('saveFormationBtn').textContent = f ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
   openOverlay('overlayFormation');
@@ -398,6 +404,7 @@ async function saveFormation() {
     title: title,
     description: document.getElementById('fDesc').value.trim(),
     formation_url: document.getElementById('fUrl').value.trim() || null,
+    extra_stats: document.getElementById('fStats').value.trim() || null,
     cover_url: document.getElementById('fCover').value.trim() || null,
     status: document.getElementById('fStatus').value
   };
