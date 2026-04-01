@@ -283,49 +283,25 @@ function renderAll() {
 
   container.innerHTML = '';
 
+  var grid = document.createElement('div');
+  grid.className = 'm-grid';
+
   allData.forEach(function(f, fi) {
-    var group = document.createElement('div');
-    group.className = 'f-group';
-
-    // Header du groupe
-    var typeLabel = f.type === 'html' ? '⚡ IA' : f.type === 'external' ? '🔗 Externe' : '▶ Vidéo';
-    var badgeClass = f.type === 'html' ? 'badge-html' : f.type === 'external' ? 'badge-ext' : 'badge-video';
-    var head = document.createElement('div');
-    head.className = 'f-group-head';
-    head.innerHTML =
-      '<span class="f-group-title">' + f.title + '</span>' +
-      '<span class="f-group-badge ' + badgeClass + '">' + typeLabel + '</span>';
-    group.appendChild(head);
-
-    var grid = document.createElement('div');
-    grid.className = 'm-grid';
-
-    // ── TYPE EXTERNE : 1 seule card ──
     if (f.type === 'external') {
       var card = makeExtCard(f, fi);
       grid.appendChild(card);
+    } else {
+      f.modules.forEach(function(m, mi) {
+        var prog_data = getModuleProgress(f, m);
+        totalDone += prog_data.done;
+        totalAll += prog_data.total;
+        var card = makeModuleCard(f, m, mi + fi * 10, prog_data);
+        grid.appendChild(card);
+      });
     }
-    // ── TYPE HTML ou VIDÉO : une card par module ──
-    else {
-      if (!f.modules.length) {
-        var empty = document.createElement('div');
-        empty.style.cssText = 'font-size:.82rem;color:var(--muted);grid-column:1/-1';
-        empty.textContent = 'Aucun module disponible.';
-        grid.appendChild(empty);
-      } else {
-        f.modules.forEach(function(m, mi) {
-          var prog_data = getModuleProgress(f, m);
-          totalDone += prog_data.done;
-          totalAll += prog_data.total;
-          var card = makeModuleCard(f, m, mi + fi * 10, prog_data);
-          grid.appendChild(card);
-        });
-      }
-    }
-
-    group.appendChild(grid);
-    container.appendChild(group);
   });
+
+  container.appendChild(grid);
 
   // Barre globale
   var pct = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
