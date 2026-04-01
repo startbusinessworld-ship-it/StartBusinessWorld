@@ -187,12 +187,20 @@
     </div>
     <div class="field">
       <label>URL de la formation (optionnel)</label>
-      <input type="text" id="fUrl" placeholder="https://start-business-world.vercel.app/shopify.html">
-      <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Si renseignee, les membres seront rediriges directement vers cette page.</div>
+      <input type="text" id="fUrl" placeholder="https://start-business-world.vercel.app/shopify.html" oninput="autoCaptureCover(this.value)">
+      <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Si renseignée, les membres seront redirigés directement vers cette page.</div>
     </div>
     <div class="field">
-      <label>Image de couverture (URL)</label>
-      <input type="text" id="fCover" placeholder="https://images.unsplash.com/...">
+      <label>Image de couverture</label>
+      <div style="display:flex;gap:8px;align-items:flex-start">
+        <div style="flex:1">
+          <input type="text" id="fCover" placeholder="Auto-générée depuis l'URL ou colle une URL d'image" oninput="previewCover(this.value)">
+        </div>
+        <button type="button" onclick="autoCaptureCover(document.getElementById('fUrl').value)" style="padding:7px 12px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">📸 Capturer</button>
+      </div>
+      <div id="coverPreview" style="margin-top:8px;display:none">
+        <img id="coverPreviewImg" style="width:100%;height:120px;object-fit:cover;border-radius:6px;border:.5px solid var(--subtle)" alt="Aperçu">
+      </div>
     </div>
     <div class="field">
       <label>Statut</label>
@@ -376,6 +384,7 @@ function openFormationModal(f) {
   document.getElementById('fDesc').value = f ? (f.description || '') : '';
   document.getElementById('fUrl').value = f ? (f.formation_url || '') : '';
   document.getElementById('fCover').value = f ? (f.cover_url || '') : '';
+  if (f && f.cover_url) previewCover(f.cover_url); else { document.getElementById('coverPreview').style.display='none'; }
   document.getElementById('fStatus').value = f ? f.status : 'draft';
   document.getElementById('saveFormationBtn').textContent = f ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
   openOverlay('overlayFormation');
@@ -631,6 +640,24 @@ function insertOutil() {
   ta.value = ta.value.substring(0, pos) + insert + ta.value.substring(pos);
   ta.focus();
   ta.setSelectionRange(pos + insert.length, pos + insert.length);
+}
+
+// ── AUTO COVER depuis URL ──
+function autoCaptureCover(url) {
+  if (!url || !url.startsWith('http')) return;
+  // API thum.io — screenshot gratuit sans clé
+  var screenshotUrl = 'https://image.thum.io/get/width/800/crop/450/' + encodeURIComponent(url);
+  document.getElementById('fCover').value = screenshotUrl;
+  previewCover(screenshotUrl);
+}
+
+function previewCover(url) {
+  var box = document.getElementById('coverPreview');
+  var img = document.getElementById('coverPreviewImg');
+  if (!url) { box.style.display = 'none'; return; }
+  img.src = url;
+  box.style.display = 'block';
+  img.onerror = function() { box.style.display = 'none'; };
 }
 
 // =====================
