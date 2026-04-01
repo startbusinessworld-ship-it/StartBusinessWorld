@@ -5948,13 +5948,6 @@ function updateTabs(){
 let cur=0, playing=true, voiceOn=true;
 let timer=null, ptimer=null, pstart=null;
 const MIN_DUR=5500, prog={};
-
-// ── SBW Tracker init ──
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.SBWTracker) {
-    SBWTracker.init(SLIDES.length);
-  }
-});
 const synth=window.speechSynthesis;
 let voices=[];
 function loadV(){const v=synth.getVoices();voices=v.filter(x=>x.lang.startsWith('fr'));if(!voices.length)voices=v;}
@@ -5986,9 +5979,7 @@ function showSlide(i){
 }
 function updateBar(p){
   document.getElementById('pbar').style.width=((cur+p/100)/SLIDES.length*100)+'%';
-  prog[cur]=Math.max(prog[cur]||0,Math.round((cur+p/100)/SLIDES.length*100));
-  // SBW Tracker — marquer terminée si >= 80%
-  if (window.SBWTracker && (prog[cur]||0) >= 80) SBWTracker.markDone(cur);
+  prog[cur]=Math.max(prog[cur]||0,Math.round((cur+p/100)/SLIDES.length*100));if(window.SBWTracker&&(prog[cur]||0)>=80)SBWTracker.markDone(cur);
   const pb=document.getElementById(`npb-${cur}`);if(pb)pb.style.width=(prog[cur]||0)+'%';
 }
 function getSectionLabel(i){
