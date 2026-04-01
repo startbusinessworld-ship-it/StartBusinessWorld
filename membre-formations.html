@@ -129,6 +129,15 @@ nav{background:var(--dark);height:54px;padding:0 1.5rem;display:flex;align-items
 @media(max-width:480px){
   .m-grid{grid-template-columns:1fr}
 }
+/* ── Overlay formation HTML ── */
+#formationOverlay{display:none;position:fixed;inset:0;z-index:9999;background:#000;flex-direction:column}
+#formationOverlay.open{display:flex}
+.overlay-bar{height:48px;background:#0E0D0B;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;border-bottom:0.5px solid rgba(255,255,255,.1)}
+.overlay-bar-title{font-size:.85rem;color:rgba(255,255,255,.6);font-weight:500}
+.overlay-close{background:none;border:0.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.overlay-close:hover{background:rgba(255,255,255,.1);color:#fff}
+#overlayFrame{flex:1;border:none;width:100%;height:100%}
+}
 </style>
 </head>
 <body>
@@ -324,10 +333,24 @@ function renderAll() {
 function getModuleProgress(f, m) {
   if (m.html_url) {
     // Lire depuis localStorage (SBW Tracker)
-    var filename = m.html_url.split('/').pop().replace('.html', '');
+    // Extraire le nom du fichier sans le param ?lesson=N
+    var urlBase = m.html_url.split('?')[0];
+    var filename = urlBase.split('/').pop().replace('.html', '');
     var key = 'sbw_tracker__' + filename;
     var data = {};
     try { data = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+
+    // Si l'URL a un param lesson, vérifier cette leçon spécifique (0-based)
+    var lessonParam = m.html_url.indexOf('?lesson=') > -1
+      ? parseInt(m.html_url.split('?lesson=')[1]) - 1
+      : null;
+
+    if (lessonParam !== null) {
+      // Carte = 1 leçon
+      var done = data[lessonParam] === true ? 1 : 0;
+      return { done: done, total: 1, pct: done * 100 };
+    }
+
     var total = data._total || 0;
     var done = Object.keys(data).filter(function(k) {
       return k !== '_total' && k !== '_updated' && data[k] === true;
@@ -372,13 +395,13 @@ function makeModuleCard(f, m, idx, progData) {
   // Bouton
   var btn;
   if (m.html_url) {
-    btn = document.createElement('a');
-    btn.href = m.html_url;
-    btn.target = '_blank';
-    btn.rel = 'noopener';
+    btn = document.createElement('button');
     btn.className = 'm-card-btn gold';
     btn.textContent = progData.pct > 0 ? '▶ Continuer' : '▶ Commencer';
-    btn.addEventListener('click', function(e) { e.stopPropagation(); });
+    btn.addEventListener('click', (function(url, title) { return function(e) {
+      e.stopPropagation();
+      openFormationOverlay(url, title);
+    }; })(m.html_url, m.title));
   } else {
     btn = document.createElement('button');
     btn.className = 'm-card-btn';
@@ -389,10 +412,10 @@ function makeModuleCard(f, m, idx, progData) {
   card.appendChild(body);
 
   // Click card
-  card.addEventListener('click', function() {
-    if (m.html_url) window.open(m.html_url, '_blank', 'noopener');
+  card.addEventListener('click', (function(url, title) { return function() {
+    if (url) openFormationOverlay(url, title);
     else openDetailModule(f, m);
-  });
+  }; })(m.html_url, m.title));
 
   return card;
 }
@@ -621,7 +644,35 @@ function fmtInline(text) {
   return text;
 }
 
+function openFormationOverlay(url, title) {
+  document.getElementById('overlayTitle').textContent = title || '';
+  document.getElementById('overlayFrame').src = url;
+  document.getElementById('formationOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeFormationOverlay() {
+  document.getElementById('formationOverlay').classList.remove('open');
+  document.getElementById('overlayFrame').src = '';
+  document.body.style.overflow = '';
+}
+
+// Fermer avec Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeFormationOverlay();
+});
+
 init();
 </script>
+
+<!-- Overlay formation HTML -->
+<div id="formationOverlay">
+  <div class="overlay-bar">
+    <span class="overlay-bar-title" id="overlayTitle"></span>
+    <button class="overlay-close" onclick="closeFormationOverlay()">✕</button>
+  </div>
+  <iframe id="overlayFrame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+</div>
+
 </body>
 </html>

@@ -275,6 +275,7 @@ html,body{height:100%;overflow:hidden;background:#0A0606;font-family:'DM Sans',s
 }
 </style>
 <script src="/sbw-tracker.js"></script>
+<script src="/sbw-tracker.js"></script>
 </head>
 <body>
 
@@ -944,6 +945,7 @@ function updProg(p){
   const L=LESSONS[curL];
   document.getElementById('pb').style.width=((curS+p/100)/L.slides.length*100)+'%';
   lp[curL]=Math.max(lp[curL]||0,Math.round((curS+p/100)/L.slides.length*100));
+  if(window.SBWTracker&&(lp[curL]||0)>=80)SBWTracker.markDone(curL);
   const b=document.querySelectorAll('.sb-progbar')[curL];
   if(b)b.style.width=(lp[curL]||0)+'%';
 }
@@ -991,7 +993,11 @@ function startApp(){
   const ld=document.getElementById('landing');
   const ap=document.getElementById('app');
   ld.classList.add('out');
-  setTimeout(()=>{ld.style.display='none';ap.classList.add('in');renderL(0);},600);
+  setTimeout(()=>{ld.style.display='none';ap.classList.add('in');
+    var _lp=parseInt(new URLSearchParams(window.location.search).get('lesson')||'1')-1;
+    if(_lp<0||_lp>=LESSONS.length)_lp=0;
+    renderL(_lp);
+    if(window.SBWTracker)SBWTracker.init(LESSONS.length);},600);
 }
 </script>
 </body>
