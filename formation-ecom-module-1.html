@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Préparer son projet e-commerce 🛒 | SBW</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0C0A;--surface:#141412;--border:rgba(255,255,255,.08);
+  --white:#F0ECE4;--muted:rgba(240,236,228,.45);--faint:rgba(240,236,228,.07);
+  --gold:#1B5E20;--gold-rgb:27,94,32;--gold-light:#2E7D32;--green:#4ECB71;--red:#E05252;--site-gold:#A67C3A;--site-gold-light:#C49A4E;
+  --sidebar:240px;--header:52px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--white);display:flex;flex-direction:column}
+header{height:var(--header);background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.h-left{display:flex;align-items:center;gap:14px}
+.h-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--site-gold);letter-spacing:.04em}
+.h-sep{width:0.5px;height:18px;background:var(--border)}
+.h-title{font-size:.82rem;color:var(--muted)}
+.h-right{display:flex;align-items:center;gap:12px}
+.h-pbar-wrap{width:120px;height:4px;background:var(--faint);border-radius:2px;overflow:hidden}
+.h-pbar-fill{height:100%;background:var(--site-gold);border-radius:2px;transition:width .4s}
+.h-pct{font-size:.72rem;color:var(--muted)}
+.btn-close{background:none;border:0.5px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:5px;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-close:hover{border-color:var(--white);color:var(--white)}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-head{padding:14px 14px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.sb-head-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.sb-lessons{flex:1;overflow-y:auto;padding:6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:background .1s}
+.sb-item:hover{background:var(--faint)}
+.sb-item.active{background:rgba(166,124,58,.15)}
+.sb-item.active .sb-num{color:var(--gold)}
+.sb-num{font-size:.65rem;color:var(--muted);width:16px;flex-shrink:0;text-align:right;font-weight:500}
+.sb-info{flex:1;min-width:0}
+.sb-name{font-size:.78rem;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-bar{height:2px;background:var(--faint);border-radius:1px;margin-top:4px;overflow:hidden}
+.sb-bar-fill{height:100%;background:var(--site-gold);border-radius:1px;transition:width .3s}
+.sb-check{font-size:.7rem;color:var(--green);opacity:0;flex-shrink:0;transition:opacity .2s}
+.sb-item.done .sb-check{opacity:1}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.slide-progress{height:3px;background:var(--faint);flex-shrink:0}
+.slide-progress-fill{height:100%;background:var(--site-gold);transition:width .3s}
+.slide-area{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:32px 40px 100px}
+.slide-wrap{width:100%;max-width:720px}
+.slide-intro{text-align:center;padding:40px 20px 32px}
+.slide-num{font-size:.7rem;letter-spacing:.15em;color:var(--gold);margin-bottom:12px;text-transform:uppercase}
+.slide-emoji-big{font-size:3.5rem;margin-bottom:20px;display:block}
+.slide-intro-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.1;margin-bottom:18px}
+.slide-intro-title em{color:var(--gold);font-style:italic}
+.slide-intro-sub{font-size:.92rem;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.7}
+.slide-block{padding:8px 0}
+.slide-tag{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px}
+.slide-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;line-height:1.2;margin-bottom:16px}
+.slide-body{font-size:.9rem;color:rgba(240,236,228,.85);line-height:1.75}
+.slide-body strong{color:var(--white);font-weight:600}
+.slide-body em{color:var(--gold);font-style:italic}
+.cards-grid{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.card-item{background:var(--faint);border:0.5px solid var(--border);border-radius:9px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.card-emoji{font-size:1.4rem;flex-shrink:0;margin-top:1px}
+.card-name{font-size:.88rem;font-weight:600;margin-bottom:3px}
+.card-sub{font-size:.78rem;color:var(--muted);line-height:1.55}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.compare-col{background:var(--faint);border:0.5px solid var(--border);border-radius:9px;padding:16px}
+.compare-col.good{border-color:rgba(78,203,113,.3);background:rgba(78,203,113,.06)}
+.compare-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.compare-emoji{font-size:1.3rem}
+.compare-label{font-size:.78rem;font-weight:600}
+.compare-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px}
+.compare-num.green{color:var(--green)}
+.compare-unit{font-size:.7rem;color:var(--muted);margin-bottom:10px}
+.compare-desc{font-size:.78rem;color:var(--muted);line-height:1.55}
+.compare-note{margin-top:12px;padding:10px 14px;background:rgba(166,124,58,.08);border-left:2px solid var(--gold);border-radius:0 6px 6px 0;font-size:.78rem;color:rgba(240,236,228,.7);line-height:1.6}
+.stat-block{text-align:center;padding:32px 20px}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,10vw,5.5rem);font-weight:700;color:var(--gold);line-height:1}
+.stat-unit{font-size:1rem;color:var(--muted);margin-top:4px;margin-bottom:20px}
+.stat-body{font-size:.88rem;color:var(--muted);line-height:1.7;max-width:500px;margin:0 auto}
+.warning-block{background:rgba(224,82,82,.08);border:0.5px solid rgba(224,82,82,.25);border-radius:10px;padding:20px 22px}
+.warning-icon{font-size:1.6rem;margin-bottom:10px}
+.warning-title{font-size:1rem;font-weight:600;margin-bottom:10px;color:#F08080}
+.warning-body{font-size:.86rem;color:rgba(240,236,228,.8);line-height:1.7}
+.action-block{background:linear-gradient(135deg,rgba(166,124,58,.12),rgba(166,124,58,.06));border:0.5px solid rgba(166,124,58,.3);border-radius:12px;padding:24px}
+.action-badge{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);background:rgba(166,124,58,.15);padding:4px 10px;border-radius:20px;margin-bottom:14px}
+.action-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;margin-bottom:16px}
+.action-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.action-step{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;color:rgba(240,236,228,.85);line-height:1.5}
+.action-step-num{width:20px;height:20px;border-radius:50%;background:var(--gold);color:#000;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.action-cta{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;padding:12px 24px;border-radius:8px;font-size:.88rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:background .15s}
+.action-cta:hover{background:var(--gold-light)}
+.recap-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;margin-bottom:14px;color:var(--gold)}
+.recap-list{display:flex;flex-direction:column;gap:7px}
+.recap-item{display:flex;align-items:flex-start;gap:10px;font-size:.86rem;color:rgba(240,236,228,.85);line-height:1.55}
+.recap-dot{color:var(--gold);font-size:.7rem;flex-shrink:0;margin-top:3px}
+.quote-block{text-align:center;padding:32px 20px}
+.quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,3vw,1.8rem);font-style:italic;line-height:1.5;color:var(--white);margin-bottom:16px;max-width:580px;margin-left:auto;margin-right:auto}
+.quote-bar{width:40px;height:2px;background:var(--gold);margin:0 auto}
+.nav-bar{height:60px;background:var(--surface);border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;gap:8px}
+.nav-info{font-size:.75rem;color:var(--muted);flex:1;text-align:center}
+.nav-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn-nav{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:0.5px solid var(--border);background:var(--faint);color:var(--white)}
+.btn-nav:hover{border-color:rgba(255,255,255,.3)}
+.btn-nav:disabled{opacity:.3;cursor:not-allowed}
+.btn-nav.primary{background:var(--site-gold);border-color:var(--site-gold);color:#fff}
+.btn-nav.primary:hover{background:var(--site-gold-light)}
+.btn-nav.done-btn{background:rgba(78,203,113,.12);border-color:rgba(78,203,113,.3);color:var(--green)}
+/* Bouton hamburger */
+.btn-menu{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:8px 10px;border-radius:7px;border:0.5px solid var(--border);background:var(--faint);cursor:pointer;transition:all .15s}
+.btn-menu:hover{border-color:rgba(255,255,255,.3)}
+.btn-menu.active{border-color:var(--gold)}
+.btn-menu span{display:block;width:16px;height:1.5px;background:var(--muted);border-radius:2px;transition:background .15s}
+.btn-menu.active span{background:var(--gold)}
+/* Bouton Play/Pause */
+.btn-play{width:38px;height:38px;border-radius:50%;background:var(--site-gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;animation:pulse 2.5s infinite}
+.btn-play:hover{background:var(--site-gold-light);transform:scale(1.08)}
+.btn-play svg{fill:#fff}
+.btn-play.playing{animation:none;background:var(--gold)}
+#btnVoix.active{background:rgba(166,124,58,.15);border-color:var(--gold);color:var(--gold)}
+.subtitles{position:fixed;bottom:130px;left:calc(var(--sidebar) + (100% - var(--sidebar)) / 2);transform:translateX(-50%);z-index:100;max-width:700px;width:90%;text-align:center;pointer-events:none}
+.subtitles-text{display:inline-block;background:rgba(0,0,0,.75);color:#fff;font-size:.92rem;line-height:1.6;padding:8px 18px;border-radius:8px;backdrop-filter:blur(4px);transition:opacity .3s}
+.subtitles-text.hidden{opacity:0}
+.cta-fixed{position:fixed;bottom:72px;left:calc(var(--sidebar) + (100% - var(--sidebar)) / 2);transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:8px;background:var(--gold);color:#fff;padding:11px 28px;border-radius:30px;font-size:.85rem;font-weight:600;text-decoration:none;box-shadow:0 4px 20px rgba(27,94,32,.4);transition:background .15s,transform .15s;white-space:nowrap}
+.cta-fixed:hover{background:var(--gold-light);transform:translateX(-50%) translateY(-2px)}
+
+/* Play/pause dans la nav bar */
+@keyframes pulse{0%,100%{box-shadow:0 0 0 6px rgba(166,124,58,.2)}50%{box-shadow:0 0 0 10px rgba(166,124,58,.06)}}
+
+/* Panneau leçons */
+.lessons-panel{position:fixed;bottom:0;left:0;width:320px;background:var(--surface);border-top:0.5px solid var(--border);border-right:0.5px solid var(--border);border-radius:0 12px 0 0;z-index:300;transform:translateY(100%);transition:transform .3s;max-height:70vh;display:flex;flex-direction:column}
+.lessons-panel.open{transform:translateY(0)}
+.lp-head{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.lp-head-title{font-size:.8rem;font-weight:600;color:var(--white)}
+.lp-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px}
+.lp-scroll{overflow-y:auto;flex:1;padding:8px}
+.lp-lesson{margin-bottom:4px}
+.lp-lesson-btn{width:100%;display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:6px;cursor:pointer;background:none;border:none;font-family:inherit;color:var(--white);text-align:left;transition:background .1s}
+.lp-lesson-btn:hover{background:var(--faint)}
+.lp-lesson-btn.active{color:var(--gold)}
+.lp-lesson-num{font-size:.65rem;color:var(--muted);width:16px;flex-shrink:0}
+.lp-lesson-name{font-size:.78rem;flex:1}
+.lp-lesson-check{font-size:.68rem;color:var(--green);opacity:0}
+.lp-lesson-btn.done .lp-lesson-check{opacity:1}
+.lp-slides{padding:0 0 0 34px;display:none}
+.lp-lesson.open .lp-slides{display:flex;flex-wrap:wrap;gap:4px;padding-bottom:6px}
+.lp-slide-btn{font-size:.68rem;padding:3px 10px;border-radius:4px;border:0.5px solid var(--border);background:var(--faint);color:var(--muted);cursor:pointer;font-family:inherit;transition:all .1s}
+.lp-slide-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lp-slide-btn.active{background:rgba(166,124,58,.2);border-color:var(--gold);color:var(--gold)}
+
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--faint);border-radius:2px}
+
+/* Animations slides */
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeSlideInLeft{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+.slide-enter{animation:fadeSlideIn .28s cubic-bezier(.22,1,.36,1)}
+.slide-enter-back{animation:fadeSlideInLeft .28s cubic-bezier(.22,1,.36,1)}
+
+/* Concept enrichi */
+.concept-card{background:var(--faint);border:0.5px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:12px}
+.concept-highlight{background:linear-gradient(135deg,rgba(var(--gold-rgb),.12),transparent);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:.9rem;line-height:1.7;color:var(--white)}
+.key-point{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.key-point:last-child{border-bottom:none}
+.key-point-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.key-point-text{font-size:.87rem;color:rgba(240,236,228,.85);line-height:1.6}
+.slide-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.slide-eyebrow-icon{font-size:1.8rem}
+.slide-eyebrow-tag{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold)}
+@media(max-width:600px){
+  .sidebar{display:none}
+  .slide-area{padding:20px}
+  .compare-grid{grid-template-columns:1fr}
+  .h-title{display:none}
+  .cta-fixed{left:50%}
+  .subtitles{left:50%}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-left">
+    <span class="h-logo">SBW</span>
+    <div class="h-sep"></div>
+    <span class="h-title">Préparer son projet e-commerce 🛒</span>
+  </div>
+  <div class="h-right">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="h-pbar-wrap"><div class="h-pbar-fill" id="hPbarFill" style="width:0%"></div></div>
+      <span class="h-pct" id="hPct">0%</span>
+    </div>
+    <button id="btnVoix" onclick="toggleVoix()" style="display:flex;align-items:center;gap:5px;background:none;border:0.5px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:5px;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s" title="Voix off 1.05x">🔊 Voix</button>
+    <button class="btn-close" onclick="stopVoix();window.parent.postMessage('sbw:close','*')">✕ Fermer</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-head"><div class="sb-head-label">6 leçons</div></div>
+    <div class="sb-lessons" id="sbLessons"></div>
+  </aside>
+  <div class="main">
+    <div class="slide-progress"><div class="slide-progress-fill" id="slidePbar" style="width:0%"></div></div>
+    <div class="slide-area" id="slideArea"></div>
+    <div class="nav-bar">
+      <div class="nav-left">
+        <!-- Hamburger menu -->
+        <button class="btn-menu" id="lessonsTab" onclick="toggleLessonsPanel()" title="Navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <!-- Play / Pause -->
+        <button class="btn-play" id="playBtn" onclick="togglePlay()" title="Play / Pause">
+          <svg id="playIcon" viewBox="0 0 24 24" width="14" height="14"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" width="14" height="14" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+        </button>
+      </div>
+      <span class="nav-info" id="navInfo"></span>
+      <div class="nav-right">
+        <button class="btn-nav" id="btnPrev" onclick="prev()">←</button>
+        <button class="btn-nav primary" id="btnNext" onclick="next()">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="subtitles" id="subtitles">
+  <div class="subtitles-text hidden" id="subtitlesText"></div>
+</div>
+
+<!-- Panneau leçons -->
+<div class="lessons-panel" id="lessonsPanel">
+  <div class="lp-head">
+    <span class="lp-head-title">Navigation</span>
+    <button class="lp-close" onclick="toggleLessonsPanel()">✕</button>
+  </div>
+  <div class="lp-scroll" id="lpScroll"></div>
+</div>
+
+<a href="https://c3po.link/QP9duxvAkg" target="_blank" rel="noopener" class="cta-fixed">
+  🛒 Créer mon entreprise — Code SBW25
+</a>
+
+<script>
+const LESSONS=[
+{id:1,title:"\ud83d\ude80 Vue d'ensemble",slides:[
+{t:'intro',emoji:"\ud83d\uded2",num:"00",title:"Pr\u00e9parer son projet\n<em>e-commerce</em>",sub:"5 sections fondamentales avant de cr\u00e9er ta boutique : niche, veille, nom de marque, identit\u00e9 visuelle, photos & contenus.",vo:"Pour te lancer en e-commerce, il faut d'abord préparer ton projet. Et c'est exactement ce qu'on fait ici. Dans cette formation, tu vas poser cinq fondations : trouver ta niche, analyser tes concurrents, choisir ton nom de marque, construire ton identité visuelle, et créer des photos qui vendent. Et pour que tu voies pas juste la théorie, on va tout appliquer en live sur une vraie marque qu'on a construite pour toi : CÉLESTE, une marque de bougies artisanales françaises. Chaque étape qu'on explique, tu vas voir comment on l'a faite sur CÉLESTE. Comme ça t'as toujours un exemple concret sous les yeux. Peu importe ton produit, cette méthode fonctionne. C'est parti."}]},
+{id:2,title:"\ud83d\udd0d Niche & produit",slides:[
+{t:'intro',emoji:"\ud83d\udd0d",num:"01",title:"Trouver sa niche & son produit",sub:"La d\u00e9cision la plus importante de toute ta carri\u00e8re e-commerce. Un bon produit dans une mauvaise niche ne vendra pas. Un mauvais produit avec une belle boutique ne vendra pas. Ici on apprend \u00e0 choisir juste.",vo:"Bienvenue dans la premi\u00e8re section de la formation e-commerce compl\u00e8te. Trouver sa niche et son produit. C'est la d\u00e9cision la plus importante de toute ta carri\u00e8re e-commerce. Un mauvais produit dans une bonne niche peut parfois fonctionner. Un bon produit dans une mauvaise niche, jamais. Dans cette section, on voit les quatre crit\u00e8res d'une niche rentable, les outils pour trouver et valider ses id\u00e9es, et comment on a trouv\u00e9 C\u00c9LESTE."},
+{t:'cards',tag:"Le\u00e7on 1 \u00b7 Les bases",title:"Les 4 crit\u00e8res d'",vo:"Les quatre crit\u00e8res d'une niche rentable. Premier crit\u00e8re : la marge. Ton produit doit se vendre minimum trois fois son co\u00fbt. En dessous, impossible de payer la publicit\u00e9, les frais Shopify, et de te r\u00e9mun\u00e9rer. Deuxi\u00e8me crit\u00e8re : l'achat r\u00e9p\u00e9t\u00e9. Une niche o\u00f9 les clients reviennent vaut dix fois une niche o\u00f9 chaque client n'ach\u00e8te qu'une fois. Troisi\u00e8me crit\u00e8re : un probl\u00e8me ou d\u00e9sir fort. Plus l'\u00e9motion derri\u00e8re l'achat est intense, plus la conversion est facile. Quatri\u00e8me crit\u00e8re : la transportabilit\u00e9. Petit, l\u00e9ger, pas fragile. Les co\u00fbts logistiques tuent les marges des produits lourds.",items:[{emoji:"\ud83d\udcb0",name:"Marge suffisante",sub:"Le produit doit pouvoir se vendre <strong>3\u00d7 son co\u00fbt minimum</strong>. En dessous, impossible de payer la pub, les frais et se r\u00e9mun\u00e9rer."},{emoji:"\ud83d\udd01",name:"Achat r\u00e9p\u00e9t\u00e9 possible",sub:"Une niche avec des clients qui reviennent vaut <strong>10\u00d7 une niche one-shot</strong>. Bougies, cosm\u00e9tiques, caf\u00e9, suppl\u00e9ments = clients fid\u00e8les."},{emoji:"\ud83d\ude24",name:"Probl\u00e8me ou d\u00e9sir fort",sub:"Les gens ach\u00e8tent pour r\u00e9soudre un probl\u00e8me ou satisfaire un d\u00e9sir. <strong>Plus l'\u00e9motion est forte, plus la conversion est facile.</strong>"},{emoji:"\ud83d\udce6",name:"Produit transportable",sub:"Petit, l\u00e9ger, pas fragile. <strong>Les co\u00fbts logistiques tuent les marges</strong> sur les produits lourds ou volumineux. Id\u00e9al : moins de 1kg."}]},
+{t:'cards',tag:"Le\u00e7on 2 \u00b7 Outils",title:"Les outils pour trouver des id\u00e9es",body:"Les outils pour trouver des id\u00e9es. Cinq outils gratuits pour commencer. Google Trends pour voir si une niche monte ou descend. L'onglet D\u00e9couverte de TikTok pour rep\u00e9rer les produits qui explosent en ce moment. Amazon Best Sellers pour voir ce qui se vend d\u00e9j\u00e0. AliExpress pour estimer le co\u00fbt du pro...",vo:"Les outils pour trouver des id\u00e9es. Cinq outils gratuits pour commencer. Google Trends pour voir si une niche monte ou descend. L'onglet D\u00e9couverte de TikTok pour rep\u00e9rer les produits qui explosent en ce moment. Amazon Best Sellers pour voir ce qui se vend d\u00e9j\u00e0. AliExpress pour estimer le co\u00fbt du produit et calculer ta marge potentielle \u2014 attention, AliExpress c'est uniquement pour la recherche \u00e0 ce stade, pas pour approvisionner ta boutique. Le vrai sourcing \u2014 Alibaba, agents logistiques, 3PL, envoi en FBA Amazon \u2014 on l'apprend dans le module Import Chine. Et Pinterest Trends pour les niches lifestyle. Trois niveaux de sourcing selon ton budget : AliExpress pour d\u00e9marrer sans stock, Alibaba avec un agent 3PL pour des marges autour de cinquante pourcent, et l'usine directe pour aller chercher soixante-dix pourcent de marge.",items:[{emoji:"\ud83d\udcc8",name:"Google Trends",sub:"Vois si une niche monte ou descend. Compare plusieurs mots-cl\u00e9s. Filtre sur France et 12 mois."},{emoji:"\ud83c\udfb5",name:"TikTok \u2014 onglet D\u00e9couverte",sub:"Recherche ton produit. Si tu vois des vid\u00e9os avec 1M+ de vues sur un produit = signal fort."},{emoji:"\ud83d\udce6",name:"Amazon Best Sellers",sub:"Les meilleures ventes par cat\u00e9gorie. Filtre sur la France. Regarde les notes et le volume d'avis."},{emoji:"\ud83d\uded2",name:"AliExpress \u2014 Estimer le co\u00fbt produit",sub:"Utilise AliExpress uniquement pour estimer le prix de revient et calculer ta marge. Le sourcing r\u00e9el (Alibaba, agents, usines) est trait\u00e9 dans le modu"},{emoji:"\ud83d\udc41\ufe0f",name:"Pinterest Trends",sub:"Id\u00e9al pour les niches lifestyle, d\u00e9co, bien-\u00eatre. Les tendances y arrivent 6 mois avant TikTok."}]},
+{t:'cards',tag:"Le\u00e7on 3 \u00b7 Validation",title:"Valider la demande avant d'",vo:"Valider la demande avant d'investir. Cinq signaux \u00e0 v\u00e9rifier. D'abord le volume de recherche sur Google : minimum mille recherches par mois pour ton mot-cl\u00e9 principal. Ensuite la concurrence : ni trop peu, ni trop. Z\u00e9ro concurrent signifie qu'il n'y a pas de march\u00e9. Trop de concurrents signifie une guerre des prix. Une communaut\u00e9 active : groupes Facebook, TikTok, Reddit d\u00e9di\u00e9s. Un prix de march\u00e9 viable entre vingt-cinq et quatre-vingts euros. Et un fournisseur identifiable. Et surtout : avant de commander cinq cents unit\u00e9s, teste avec cent euros de publicit\u00e9 sur dix \u00e0 vingt unit\u00e9s. Si \u00e7a vend, tu scales. Sinon tu perds cent euros, pas cinq mille.",items:[{emoji:"01",name:"Volume de recherche Google",sub:"Utilise Ubersuggest ou Google Keyword Planner. Le mot-cl\u00e9 principal doit avoir <strong>min 1 000 recherches/mois en France</strong>."},{emoji:"02",name:"Concurrence existante mais pas satur\u00e9e",sub:"<strong>Z\u00e9ro concurrent = mauvais signe</strong> (pas de march\u00e9). Trop de concurrents = guerre des prix. Cherche l'entre-deux."},{emoji:"03",name:"Communaut\u00e9 active",sub:"Des groupes Facebook, des subreddits, des comptes TikTok d\u00e9di\u00e9s. <strong>Une communaut\u00e9 = une audience d\u00e9j\u00e0 \u00e9duqu\u00e9e.</strong>"},{emoji:"04",name:"Prix du march\u00e9 viable",sub:"Les concurrents vendent entre 25 \u20ac et 80 \u20ac. Dans cette zone, <strong>la marge est possible et le client accepte de payer.</strong>"},{emoji:"05",name:"Fournisseur identifi\u00e9",sub:"Tu trouves facilement le produit sur AliExpress, Alibaba ou en France. <strong>Pas de fournisseur = pas de business.</strong>"}]},
+{t:'cards',tag:"Les co\u00fbts que personne ne calcule",title:"Calculer ses marges d\u00e8s le d\u00e9part",body:"Calculer ses marges d\u00e8s le d\u00e9part. L'erreur classique : calculer uniquement prix de vente moins co\u00fbt produit. La r\u00e9alit\u00e9 est plus complexe. Sur une bougie \u00e0 34,90 euros, le co\u00fbt produit est 8 euros. Mais il faut ajouter les frais de livraison fournisseur, les frais Shopify, les frais bancaires Strip...",vo:"Calculer ses marges d\u00e8s le d\u00e9part. L'erreur classique : calculer uniquement prix de vente moins co\u00fbt produit. La r\u00e9alit\u00e9 est plus complexe. Sur une bougie \u00e0 34,90 euros, le co\u00fbt produit est 8 euros. Mais il faut ajouter les frais de livraison fournisseur, les frais Shopify, les frais bancaires Stripe, l'emballage, et surtout le marketing. Six euros de publicit\u00e9 par commande en moyenne, c'est r\u00e9aliste. Au total, dix-sept euros de co\u00fbts pour vingt-trois dollars de marge nette. Quarante-neuf pourcent. C'est une excellente marge. En dessous de vingt pourcent, c'est dangereux. Le moindre impr\u00e9vu peut te co\u00fbter toute ta marge.",items:[{emoji:"\u25b8",name:"Co\u00fbt produit (ex: bougie 220g)",sub:"8,00 \u20ac (23% du prix de vente)"},{emoji:"\u25b8",name:"Frais de livraison fournisseur",sub:"1,50 \u20ac (4% du prix de vente)"},{emoji:"\u25b8",name:"Frais Shopify (Basic 2%)",sub:"0,70 \u20ac (2% du prix de vente)"},{emoji:"\u25b8",name:"Frais bancaire Stripe (1,5%)",sub:"0,52 \u20ac (1,5% du prix de vente)"},{emoji:"\u25b8",name:"Emballage + mat\u00e9riaux",sub:"1,00 \u20ac (3% du prix de vente)"},{emoji:"\u25b8",name:"Marketing / publicit\u00e9 (estim\u00e9)",sub:"6,00 \u20ac (17% du prix de vente)"},{emoji:"\ud83d\udd34",name:"Total des co\u00fbts",sub:"17,72 \u20ac (51% du prix de vente)"},{emoji:"\u25b8",name:"Prix de vente",sub:"34,90 \u20ac (100% du prix de vente)"}]},
+{t:'cards',tag:"Le\u00e7on 5 \u00b7 Pi\u00e8ges",title:"Les erreurs de niche \u00e0 \u00e9viter",vo:"Les erreurs de niche \u00e0 \u00e9viter. C\u00f4t\u00e9 pi\u00e8ges : les produits trop g\u00e9n\u00e9riques o\u00f9 Amazon domine, les niches en d\u00e9clin sur Google Trends, les produits r\u00e9glement\u00e9s comme les compl\u00e9ments alimentaires, et les produits lourds ou fragiles avec des co\u00fbts logistiques qui tuent les marges. C\u00f4t\u00e9 niches prometteuses : le naturel et l'\u00e9co, les animaux de compagnie, le bien-\u00eatre, le sport, et les enfants. Dans toutes ces cat\u00e9gories, la passion d'achat est forte et l'achat r\u00e9current est naturel. Avant de valider une niche, pose-toi trois questions. Est-ce que tu peux cr\u00e9er cinquante contenus TikTok dessus sans t'ennuyer ? Est-ce que tu connais ta cible ? Est-ce que tu serais toi-m\u00eame client de cette boutique ?",items:[{emoji:"\ud83d\udca7",name:"Produit trop g\u00e9n\u00e9rique",sub:"\"Bouteille d'eau\" \u2014 Amazon domine, impossible de se diff\u00e9rencier."},{emoji:"\ud83d\udcc9",name:"Niche en d\u00e9clin",sub:"V\u00e9rifier sur Google Trends. Une niche qui descend depuis 2 ans ne remontera pas."},{emoji:"\ud83d\ude10",name:"Aucune passion ni expertise",sub:"Tu vas devoir cr\u00e9er du contenu dessus pendant des mois. Si \u00e7a ne t'int\u00e9resse pas, c'est \u00e9puisant."},{emoji:"\u2696\ufe0f",name:"Produit r\u00e9glement\u00e9",sub:"Compl\u00e9ments alimentaires, cosm\u00e9tiques, jouets \u2014 r\u00e9glementation stricte. Commence pas l\u00e0."},{emoji:"\ud83d\udc18",name:"Produit lourd ou fragile",sub:"Frais de port \u00e9normes. Taux de casse. Retours complexes. Fuis."}]},
+{t:'cards',tag:"Le\u00e7on 6 \u00b7 Strat\u00e9gie produit",title:"Choisir son produit phare",vo:"Comment choisir son produit phare. Cinq caract\u00e9ristiques. Il doit r\u00e9soudre un seul probl\u00e8me clairement \u2014 pas de message flou. Il doit \u00eatre dans la zone vingt-cinq \u00e0 quatre-vingts euros \u2014 assez premium pour inspirer confiance, assez accessible pour l'achat impulsif. Il doit \u00eatre visuellement attractif en photo et en vid\u00e9o. Il doit \u00eatre d\u00e9clinable en gamme pour que le premier produit ouvre la voie aux suivants. Et il doit \u00eatre valid\u00e9 par des donn\u00e9es. Ne commence pas avec cinquante produits. Lance avec trois \u00e0 cinq produits parfaitement choisis. Un produit phare qui attire, deux \u00e0 trois compl\u00e9mentaires pour le cross-sell, et un coffret pour maximiser la marge par commande.",items:[{emoji:"\ud83c\udfaf",name:"Un seul probl\u00e8me r\u00e9solu clairement",sub:"Ton produit doit avoir un message ultra-clair. \"La bougie qui parfume pendant 60h\" est clair. \"La bougie multi-usage polyvalente\" ne l'est pas."},{emoji:"\ud83d\udc8e",name:"Per\u00e7u comme premium mais pas inaccessible",sub:"Dans la zone 25-80\u20ac. Assez cher pour inspirer confiance, assez accessible pour d\u00e9clencher l'achat impulsif."},{emoji:"\ud83d\udcf8",name:"Visuellement attractif",sub:"Le produit doit \u00eatre beau en photo et en vid\u00e9o. C'est lui qui va g\u00e9n\u00e9rer les vues sur TikTok et les clics sur les pubs."},{emoji:"\ud83d\udd04",name:"D\u00e9clinable en gamme",sub:"Un produit phare ouvre la porte \u00e0 une gamme. Bougie 220g \u2192 coffrets \u2192 recharges \u2192 diffuseurs. Le premier produit am\u00e8ne les suivants."},{emoji:"\ud83d\udcca",name:"Valid\u00e9 par des chiffres",sub:"Des concurrents qui vendent, des avis sur Amazon, des vid\u00e9os TikTok avec des vues. Les donn\u00e9es confirment avant le lancement."}]},
+{t:'cards',tag:"\ud83d\udd6f️ Exemple — Comment on a trouvé CÉLESTE",title:"Exemple — Comment on a trouvé CÉLESTE",vo:"Voil\u00e0 comment on a trouv\u00e9 C\u00c9LESTE. \u00c9tape par \u00e9tape. Google Trends sur bougies artisanales : tendance en hausse constante depuis 2020 avec un pic en novembre-d\u00e9cembre pour les cadeaux. TikTok : des dizaines de vid\u00e9os avec des millions de vues. La flamme d'une bougie est visuellement magn\u00e9tique, le contenu se cr\u00e9e naturellement. Amazon France : des milliers d'avis sur les bougies entre quinze et quarante-cinq euros. La demande est prouv\u00e9e. AliExpress : co\u00fbt entre trois et huit euros selon la qualit\u00e9. Ratio fois quatre minimum. Et aucun g\u00e9ant dominant le march\u00e9 fran\u00e7ais. Six crit\u00e8res sur six valid\u00e9s. C'est pour \u00e7a qu'on a choisi C\u00c9LESTE pour construire cette formation avec toi.",items:[{emoji:"1",name:"Google Trends : \"bougies artisanales\"",sub:"Tendance en hausse constante depuis 2020. Pic en novembre-d\u00e9cembre (cadeaux). Recherches stables toute l'ann\u00e9e. \u2705"},{emoji:"2",name:"TikTok D\u00e9couverte : \"bougie maison\"",sub:"Des dizaines de vid\u00e9os avec 500K \u00e0 2M de vues. La flamme est visuellement magn\u00e9tique. Contenu facile \u00e0 cr\u00e9er. \u2705"},{emoji:"3",name:"Amazon France : cat\u00e9gorie Bougies parfum\u00e9es",sub:"BSR #1 \u00e0 #20 tous des bougies entre 15 et 45\u20ac. Des milliers d'avis. La demande est prouv\u00e9e. \u2705"},{emoji:"4",name:"AliExpress : estimation co\u00fbt \"soy candle jar\"",sub:"Co\u00fbt estim\u00e9 entre 3 et 8\u20ac selon qualit\u00e9. Ratio \u00d7 4 \u00e0 \u00d7 5 possible. Le sourcing r\u00e9el se fait via Alibaba + agent 3PL (Module Import Chine). \u2705"},{emoji:"5",name:"V\u00e9rification concurrence FR",sub:"Beaucoup de petites marques mais aucune dominante. Pas de g\u00e9ant. March\u00e9 accessible. \u2705"}]},
+{t:'recap',title:"Ce qu'il faut retenir",vo:"R\u00e9capitulatif de la section un. Les quatre crit\u00e8res d'une niche rentable. Les outils gratuits pour trouver des id\u00e9es. L'importance de valider avant d'investir avec le test des cent euros. Calculer tous les co\u00fbts r\u00e9els, pas seulement le co\u00fbt produit. Les niches pi\u00e8ges \u00e0 fuir. Les caract\u00e9ristiques du produit phare id\u00e9al. Et C\u00c9LESTE qui coche six crit\u00e8res sur six. Dans la prochaine section, on fait la veille concurrentielle pour comprendre qui sont tes concurrents et comment te diff\u00e9rencier d'eux.",points:["\ud83d\udcb0 4 crit\u00e8res : marge (\u00d73 min), achat r\u00e9p\u00e9t\u00e9, d\u00e9sir fort, transportable","\ud83d\udee0\ufe0f Outils gratuits : Google Trends, TikTok D\u00e9couverte, Amazon BSR, AliExpress","\ud83e\uddea Toujours valider avant d'investir \u2014 le test des 100\u20ac sauve des milliers \u20ac","\ud83d\udcca Calculer TOUS les co\u00fbts : produit + logistique + Shopify + banque + marketing","\u274c Fuir : produits g\u00e9n\u00e9riques, niches en d\u00e9clin, produits r\u00e9glement\u00e9s, produits lourds","\ud83c\udfc6 Produit phare : 1 message clair, zone 25-80\u20ac, visuellement attractif, d\u00e9clinable","\ud83d\udd6f\ufe0f C\u00c9LESTE : 6/6 crit\u00e8res valid\u00e9s \u2014 c'est notre boutique d\u00e9mo pour toute la formation"]}]},
+{id:3,title:"\ud83d\udd75\ufe0f Veille concurrentielle",slides:[
+{t:'intro',emoji:"\ud83d\udd75\ufe0f",num:"02",title:"Veille concurrentielle",sub:"Tes concurrents ont d\u00e9j\u00e0 test\u00e9 ce qui marche et ce qui ne marche pas. Analyser leur boutique, leurs prix, leur contenu et leurs avis clients, c'est six mois d'apprentissage offerts gratuitement.",vo:"Bienvenue dans la section deux. La veille concurrentielle. Tes concurrents ont d\u00e9j\u00e0 investi du temps et de l'argent pour tester ce qui fonctionne. Leurs erreurs, leurs succ\u00e8s, leurs prix, leur contenu, tout \u00e7a est visible gratuitement. Une bonne analyse concurrentielle t'\u00e9vite six mois d'essais-erreurs. Dans cette section, on apprend \u00e0 les trouver, les analyser en profondeur, et en tirer un angle diff\u00e9renciateur qui te permet de te positionner sans te battre frontalement."},
+{t:'cards',tag:"Le\u00e7on 1 \u00b7 Identification",title:"Comment trouver ses concurrents",vo:"Comment trouver ses concurrents. Cinq m\u00e9thodes. D'abord Google \u2014 tape le nom de ton produit avec le mot acheter et regarde les dix premiers r\u00e9sultats. Google Shopping ensuite, l'onglet au-dessus des r\u00e9sultats, qui liste tous les vendeurs avec leurs prix. TikTok avec les hashtags produit \u2014 les comptes qui cartonnent sur ta niche sont tes concurrents les plus importants. Instagram et Pinterest pour rep\u00e9rer les comptes qui font de la pub. Et Amazon en filtrant par meilleures ventes dans ta cat\u00e9gorie. L'objectif : identifier cinq \u00e0 dix concurrents directs s\u00e9rieux qu'on va analyser en profondeur.",items:[{emoji:"01",name:"Google \u2014 recherche directe",sub:"Tape le nom de ton produit + \"acheter\" ou \"boutique\". Scrute les 10 premiers r\u00e9sultats. <em>Exemple : \"bougie artisanale fran\u00e7aise acheter\"</em>"},{emoji:"02",name:"Google Shopping",sub:"Clique sur l'onglet Shopping. Tu vois imm\u00e9diatement tous les vendeurs, leurs prix, et leurs photos produit. Analyse qui revient souvent."},{emoji:"03",name:"TikTok \u2014 hashtags produit",sub:"Recherche ton produit sur TikTok. Les comptes qui ont le plus de vues sur ce produit sont tes concurrents les plus importants."},{emoji:"04",name:"Instagram & Pinterest",sub:"Recherche le hashtag de ta niche. Les comptes sponsoris\u00e9s sont des concurrents qui d\u00e9pensent en pub. <strong>Ils vendent.</strong>"},{emoji:"05",name:"Amazon \u2014 cat\u00e9gorie produit",sub:"Filtre par Meilleures ventes. Les marques qui dominent Amazon dominent probablement le march\u00e9. Analyse leurs fiches et leurs avis."}]},
+{t:'cards',tag:"Le\u00e7on 2 \u00b7 Analyse boutique",title:"Analyser une boutique concurrente",vo:"Les huit points \u00e0 analyser sur chaque boutique concurrente. Le design et la coh\u00e9rence visuelle. La politique de prix \u2014 leur produit phare, leurs bundles, leurs promotions. Le catalogue \u2014 combien de produits, lesquels sont mis en avant. La qualit\u00e9 des fiches produit. Les conditions de livraison. Et surtout les avis clients \u2014 particuli\u00e8rement les un et deux \u00e9toiles. Les critiques n\u00e9gatives de tes concurrents sont une mine d'or. Chaque d\u00e9faut qu'un client leur reproche est une promesse que tu peux faire dans ta boutique. Un concurrent dont les clients se plaignent que les bougies s'\u00e9teignent vite te donne exactement quoi mettre en avant sur tes propres bougies.",items:[{emoji:"\ud83c\udfa8",name:"Design & branding",sub:"Le th\u00e8me est-il premium ? La charte graphique est-elle coh\u00e9rente ? Quelles couleurs et polices utilisent-ils ?"},{emoji:"\ud83d\udcb0",name:"Politique de prix",sub:"Prix du produit phare, prix moyen du catalogue, bundles/coffrets propos\u00e9s. Est-ce qu'ils font des promotions r\u00e9guli\u00e8res ?"},{emoji:"\ud83d\udce6",name:"Catalogue produit",sub:"Combien de produits ? Comment sont-ils organis\u00e9s ? Quel est leur bestseller \u00e9vident (souvent mis en avant en page d'accueil) ?"},{emoji:"\ud83d\udcdd",name:"Fiches produit",sub:"Qualit\u00e9 des photos, longueur des descriptions, arguments de vente utilis\u00e9s. Est-ce que \u00e7a donne envie ?"},{emoji:"\ud83d\ude9a",name:"Conditions de livraison",sub:"D\u00e9lais, co\u00fbts, seuil livraison offerte. C'est un argument commercial fort qu'ils affichent ou non."},{emoji:"\u2b50",name:"Avis clients",sub:"Note globale, volume d'avis, types de commentaires. Les avis n\u00e9gatifs sont une mine d'or pour trouver ce que les clients n'aiment pas."}]},
+{t:'cards',tag:"Le\u00e7on 3 \u00b7 R\u00e9seaux sociaux",title:"Analyser leur contenu sur les r\u00e9seaux",body:"Analyser le contenu de tes concurrents sur les r\u00e9seaux sociaux. Sur TikTok, regarde leurs vid\u00e9os les plus vues. Quel format performe : fabrication, unboxing, utilisation ? Quels sons ? Ce qui g\u00e9n\u00e8re des vues g\u00e9n\u00e8re des ventes. Sur Instagram, compare leurs Reels et leurs posts statiques pour voir leq...",vo:"Analyser le contenu de tes concurrents sur les r\u00e9seaux sociaux. Sur TikTok, regarde leurs vid\u00e9os les plus vues. Quel format performe : fabrication, unboxing, utilisation ? Quels sons ? Ce qui g\u00e9n\u00e8re des vues g\u00e9n\u00e8re des ventes. Sur Instagram, compare leurs Reels et leurs posts statiques pour voir lequel performe. La qualit\u00e9 visuelle est-elle premium ou lifestyle amateur ? Sur Pinterest, quelle \u00e9pingle g\u00e9n\u00e8re le plus de clics ? Et si tu as acc\u00e8s \u00e0 Minea, tu peux voir directement leurs publicit\u00e9s payantes actives. Une pub qui tourne depuis trente jours ou plus est une pub rentable. Tu t'inspires de ce qui marche sans copier \u2014 tu comprends le m\u00e9canisme et tu cr\u00e9es ta propre version.",items:[{emoji:"\ud83c\udfb5",name:"TikTok",sub:"Quel type de vid\u00e9o g\u00e9n\u00e8re le plus de vues ? \u00b7 Est-ce qu'"},{emoji:"\ud83d\udcf8",name:"Instagram",sub:"Reels vs Posts statiques : lequel performe mieux ? \u00b7 La qualit\u00e9 photo est-elle premium ou lifestyle amateur ?"},{emoji:"\ud83d\udccc",name:"Pinterest",sub:"Quelle \u00e9pingle g\u00e9n\u00e8re le plus de clics ? \u00b7 Les visuels sont-ils lifestyle ou fond blanc ?"}]},
+{t:'cards',tag:"Le\u00e7on 4 \u00b7 Synth\u00e8se",title:"Construire sa matrice concurrentielle",body:"La matrice concurrentielle. C'est un tableau simple que tu construis pour synth\u00e9tiser ton analyse. Nom du concurrent, prix moyen, pr\u00e9sence TikTok, qualit\u00e9 per\u00e7ue, volume d'avis, et principale faiblesse. Sur cinq \u00e0 dix concurrents analys\u00e9s, le tableau r\u00e9v\u00e8le imm\u00e9diatement les trous du march\u00e9. Pour C\u00c9...",vo:"La matrice concurrentielle. C'est un tableau simple que tu construis pour synth\u00e9tiser ton analyse. Nom du concurrent, prix moyen, pr\u00e9sence TikTok, qualit\u00e9 per\u00e7ue, volume d'avis, et principale faiblesse. Sur cinq \u00e0 dix concurrents analys\u00e9s, le tableau r\u00e9v\u00e8le imm\u00e9diatement les trous du march\u00e9. Pour C\u00c9LESTE, l'analyse montre que personne ne combine \u00e0 la fois un storytelling artisanal fort, une pr\u00e9sence TikTok active, et des coffrets cadeaux premium. C'est l'angle diff\u00e9renciateur de C\u00c9LESTE. La matrice ne prend qu'une heure \u00e0 construire et elle guide toute ta strat\u00e9gie de positionnement.",items:[{emoji:"\u274c",name:"Maison Berger",sub:"Prix: 45\u20ac \u00b7 \u2b50\u2b50\u2b50\u2b50\u2b50 (4.7 (12k)) \u00b7 Faiblesse: Trop industriel, peu authentique"},{emoji:"\u2705 50k abos",name:"La Bougie Fran\u00e7aise",sub:"Prix: 32\u20ac \u00b7 \u2b50\u2b50\u2b50\u2b50 (4.4 (800)) \u00b7 Faiblesse: Peu de vari\u00e9t\u00e9, pas de coffrets"},{emoji:"\u2705 12k abos",name:"Bougies & Sens",sub:"Prix: 38\u20ac \u00b7 \u2b50\u2b50\u2b50\u2b50 (4.5 (1.2k)) \u00b7 Faiblesse: Pas de storytelling, packaging basique"},{emoji:"\u2705 \u00c0 construire",name:"<em style=\"color:var(--cel-gold)\">C\u00c9LESTE (nous)</em>",sub:"Prix: 34.90\u20ac \u00b7 \u2b50\u2b50\u2b50\u2b50\u2b50 (\u2192 Objectif) \u00b7 Faiblesse: <em style=\"color:#4ECBA0\">Angle : artisanal FR + soja + coffrets</em>"}]},
+{t:'cards',tag:"Le\u00e7on 5 \u00b7 Positionnement",title:"Trouver son angle diff\u00e9renciateur",vo:"Trouver son angle diff\u00e9renciateur. Six angles possibles. Le prix \u2014 dangereux, \u00e9vite la guerre des prix. La qualit\u00e9 sup\u00e9rieure \u2014 mat\u00e9riaux premium, fabrication artisanale. Le design et l'esth\u00e9tique \u2014 packaging iconique, parfait \u00e0 offrir. L'origine et l'\u00e9thique \u2014 fabriqu\u00e9 en France, bio, circuit court. La personnalisation \u2014 gravure, sur mesure, difficile \u00e0 copier. Et la niche dans la niche \u2014 bougies pour m\u00e9ditation, bougies mariage. Pour C\u00c9LESTE, on combine qualit\u00e9, origine France, storytelling de la fondatrice et coffrets cadeaux. Ces quatre angles ensemble cr\u00e9ent une position unique que les concurrents n'occupent pas encore. Ne cherche pas \u00e0 avoir tous les angles \u2014 deux \u00e0 trois angles forts et coh\u00e9rents valent mieux que six angles dilu\u00e9s.",items:[{emoji:"\ud83d\udcb0",name:"Le prix",sub:"Moins cher que la concurrence. Dangereux : guerre des prix, marges comprim\u00e9es. \u00c0 \u00e9viter sauf si tu as un avantage fournisseur massif."},{emoji:"\u2728",name:"La qualit\u00e9 sup\u00e9rieure",sub:"Mat\u00e9riaux premium, fabrication artisanale, dur\u00e9e de vie sup\u00e9rieure. Justifie un prix plus \u00e9lev\u00e9 et fid\u00e9lise. <strong>L'angle de C\u00c9LESTE.</strong>"},{emoji:"\ud83c\udfa8",name:"Le design / esth\u00e9tique",sub:"Packaging iconique, identit\u00e9 visuelle forte. Les clients ach\u00e8tent aussi pour le c\u00f4t\u00e9 \"beau objet\" et \"parfait \u00e0 offrir\"."},{emoji:"\ud83d\udc64",name:"La personnalisation",sub:"Gravure, message personnalis\u00e9, parfum sur mesure. Diff\u00e9renciation forte, difficile \u00e0 copier, panier moyen \u00e9lev\u00e9."},{emoji:"\ud83c\udfaf",name:"La niche dans la niche",sub:"Au lieu de \"bougies\", tu fais \"bougies pour m\u00e9ditation\" ou \"bougies mariage\". Audience plus petite mais plus qualifi\u00e9e."}]},
+{t:'cards',tag:"Ce que les clients reprochent aux concurrents",title:"Exemple — Application sur CÉLESTE",body:"Voil\u00e0 le r\u00e9sultat concret de la veille concurrentielle pour C\u00c9LESTE. On a compil\u00e9 les critiques les plus fr\u00e9quentes des clients sur les boutiques de bougies existantes. L'odeur ne tient pas, la m\u00e8che s'\u00e9teint, l'emballage est d\u00e9cevant, pas d'information sur la dur\u00e9e, et le doute sur l'origine et la...",vo:"Voil\u00e0 le r\u00e9sultat concret de la veille concurrentielle pour C\u00c9LESTE. On a compil\u00e9 les critiques les plus fr\u00e9quentes des clients sur les boutiques de bougies existantes. L'odeur ne tient pas, la m\u00e8che s'\u00e9teint, l'emballage est d\u00e9cevant, pas d'information sur la dur\u00e9e, et le doute sur l'origine et la naturalit\u00e9. Chacune de ces critiques est devenue une promesse de C\u00c9LESTE. Dur\u00e9e garantie cinquante-cinq heures, m\u00e8che coton qui ne s'\u00e9teint jamais, emballage cadeau inclus, information dur\u00e9e sur chaque produit, cire soja certifi\u00e9e, fabriqu\u00e9e en France. La veille concurrentielle n'a pas juste inform\u00e9 notre strat\u00e9gie. Elle a d\u00e9fini chaque argument de vente de la boutique.",items:[{emoji:"\ud83d\udce6",name:"\"Emballage basique, pas cadeau\"",sub:""},{emoji:"\ud83c\udf3f",name:"\"Pas s\u00fbr que ce soit vraiment naturel\"",sub:""},{emoji:"\ud83c\udde8\ud83c\uddf3",name:"\"Fabriqu\u00e9 en Chine, pas ce que je voulais\"",sub:""}]},
+{t:'recap',title:"Ce qu'il faut retenir",vo:"R\u00e9capitulatif de la section deux. Cinq m\u00e9thodes pour trouver ses concurrents. Huit points \u00e0 analyser sur chaque boutique. Les avis n\u00e9gatifs des concurrents comme source d'arguments de vente. La matrice concurrentielle pour synth\u00e9tiser et trouver les opportunit\u00e9s. Deux \u00e0 trois angles diff\u00e9renciateurs maximum. Et pour C\u00c9LESTE, une position unique construite sur la qualit\u00e9, l'origine fran\u00e7aise, le storytelling et les coffrets cadeaux. Dans la prochaine section, on passe au nom de marque et aux aspects l\u00e9gaux.",points:["\ud83d\udd0d 5 m\u00e9thodes : Google, Google Shopping, TikTok, Instagram, Amazon","\ud83d\udd2c 8 points \u00e0 analyser : design, prix, catalogue, fiches, livraison, avis, r\u00e9seaux, trafic","\ud83d\udc8e Les avis n\u00e9gatifs des concurrents = tes meilleurs arguments de vente","\ud83d\udcca La matrice concurrentielle r\u00e9v\u00e8le les trous du march\u00e9 \u00e0 occuper","\ud83c\udfaf 2 \u00e0 3 angles diff\u00e9renciateurs max \u2014 coh\u00e9rents et compl\u00e9mentaires","\ud83d\udd6f\ufe0f C\u00c9LESTE : qualit\u00e9 + France + storytelling + coffrets = position unique"]}]},
+{id:4,title:"\u270d\ufe0f Nom de marque & L\u00e9gal",slides:[
+{t:'intro',emoji:"\u270d\ufe0f",num:"03",title:"Nom de marque & L\u00e9gal",sub:"Un bon nom se retient, se prononce, et se trouve facilement en ligne. Une bonne structure juridique prot\u00e8ge ton patrimoine et optimise tes imp\u00f4ts. Les deux m\u00e9ritent qu'on y passe du temps maintenant.",vo:"Bienvenue dans la section trois. Nom de marque et l\u00e9gal. Un mauvais nom de marque, c'est des ann\u00e9es de communication perdues et parfois un proc\u00e8s en contrefa\u00e7on. Une mauvaise structure juridique, c'est des milliers d'euros de probl\u00e8mes fiscaux. Ces deux sujets paraissent ennuyeux. Ils ne le sont pas. On les traite s\u00e9rieusement dans cette section."},
+{t:'cards',tag:"Le\u00e7on 1 \u00b7 Le nom",title:"Comment choisir le bon nom de marque",vo:"Les six crit\u00e8res d'un bon nom de marque. Court \u2014 une \u00e0 deux syllabes maximum. Les marques m\u00e9morables sont courtes. Pronon\u00e7able sans h\u00e9sitation \u2014 teste-le \u00e0 voix haute. Fonctionnel en plusieurs langues \u2014 \u00e9vite les significations n\u00e9gatives dans d'autres langues. Trouvable sur Google \u2014 si une marque similaire existe dans ta niche, oublie-le. Domaine .com disponible \u2014 c'est toujours la r\u00e9f\u00e9rence. Et disponible sur tous les r\u00e9seaux sociaux. Pour trouver ton nom, trois approches : le mot \u00e9vocateur qui sugg\u00e8re ton univers sans \u00eatre litt\u00e9ral, la contraction de deux mots de ton univers, ou un nom propre stylis\u00e9. \u00c9vite absolument les noms descriptifs comme BougieFrance \u2014 impossibles \u00e0 prot\u00e9ger et qui te cantonnent \u00e0 une seule cat\u00e9gorie.",items:[{emoji:"\ud83d\udccf",name:"Court \u2014 1 \u00e0 2 syllabes max",sub:"Les marques les plus m\u00e9morables tiennent en 2 syllabes. <em>Zara, Lush, C\u00e9lio, S\u00e9zane.</em> Plus c'est court, plus c'est retenu."},{emoji:"\ud83d\udde3\ufe0f",name:"Pronon\u00e7able sans h\u00e9sitation",sub:"Si les gens ne savent pas comment le dire, ils ne vont pas en parler. Teste-le \u00e0 voix haute avec 5 personnes diff\u00e9rentes."},{emoji:"\ud83c\udf0d",name:"Fonctionnel en plusieurs langues",sub:"\u00c9vite les significations n\u00e9gatives dans d'autres langues. <strong>Nova</strong> signifie \"ne roule pas\" en espagnol. Ce genre d'erreur se paie cher."},{emoji:"\ud83d\udd0d",name:"Trouvable sur Google",sub:"Tape le nom sur Google avant de le choisir. S'il n'y a rien, c'est bon signe. S'il y a une marque similaire dans ta niche, passe ton chemin."},{emoji:"\ud83c\udf10",name:"Domaine .com disponible",sub:"Le .com est toujours la r\u00e9f\u00e9rence. Un .fr peut marcher pour la France mais le .com reste prioritaire pour la cr\u00e9dibilit\u00e9 internationale."},{emoji:"\ud83d\udcf1",name:"Disponible sur tous les r\u00e9seaux",sub:"V\u00e9rifie Instagram, TikTok, Pinterest, YouTube. L'identit\u00e9 @nomDeLaMarque doit \u00eatre libre partout avant de valider."}]},
+{t:'cards',tag:"Le\u00e7on 2 \u00b7 V\u00e9rification",title:"V\u00e9rifier la disponibilit\u00e9 du nom",vo:"La v\u00e9rification en quatre \u00e9tapes dans cet ordre. D'abord l'INPI sur inpi.fr \u2014 recherche si une marque similaire est d\u00e9pos\u00e9e dans les classes qui correspondent \u00e0 ton activit\u00e9. Si oui, change de nom. Ensuite Namechk sur namechk.com \u2014 v\u00e9rifie en un clic tous les r\u00e9seaux sociaux. Tous doivent \u00eatre libres. Le domaine .com sur namecheap.com ou ovh.com. Et enfin Google pour v\u00e9rifier la r\u00e9putation. Ces quatre v\u00e9rifications prennent vingt minutes. Ne les saute pas. Une mise en demeure d'une marque d\u00e9pos\u00e9e peut te forcer \u00e0 tout renommer du jour au lendemain.",items:[{emoji:"01",name:"INPI \u2014 Marque d\u00e9pos\u00e9e",sub:"Rendez-vous sur inpi.fr \u2192 Recherche de marques. Tape ton nom et cherche dans les classes qui correspondent \u00e0 ton activit\u00e9. <strong>Si une marque simil"},{emoji:"02",name:"Namechk \u2014 R\u00e9seaux sociaux",sub:"namechk.com v\u00e9rifie en un clic si le pseudo est disponible sur Instagram, TikTok, YouTube, Pinterest, Twitter. <em>Tous doivent \u00eatre libres avant de v"},{emoji:"04",name:"Google \u2014 R\u00e9putation",sub:"Tape le nom sur Google. Est-ce qu'il y a des articles, des marques, des pol\u00e9miques associ\u00e9es \u00e0 ce nom ? Tu veux partir de z\u00e9ro, pas h\u00e9riter d'une r\u00e9pu"}]},
+{t:'cards',tag:"Le\u00e7on 3 \u00b7 Protection",title:"D\u00e9poser sa marque \u00e0 l'INPI",vo:"D\u00e9poser sa marque \u00e0 l'INPI. Cinq \u00e9tapes. Cr\u00e9er un compte sur inpi.fr et lancer le d\u00e9p\u00f4t. Choisir la marque verbale en priorit\u00e9 \u2014 elle prot\u00e8ge le nom sous toutes ses formes graphiques, m\u00eame si ton logo \u00e9volue. S\u00e9lectionner les classes de Nice qui correspondent \u00e0 ton activit\u00e9 \u2014 la classe trois pour les bougies parfum\u00e9es, la classe trente-cinq pour le commerce en ligne. R\u00e9gler deux cent quatre-vingt-dix euros pour la premi\u00e8re classe. Et surveiller la publication au BOPI pendant les deux mois de p\u00e9riode d'opposition. Deux cent quatre-vingt-dix euros pour dix ans de protection, c'est vingt-neuf euros par an. Sans d\u00e9p\u00f4t INPI, quelqu'un peut d\u00e9poser ton nom et te forcer \u00e0 tout recommencer. Ne fais pas cette erreur.",items:[{emoji:"01",name:"Se rendre sur inpi.fr",sub:"Cr\u00e9er un compte, aller dans \"D\u00e9poser une marque\". L'interface est simple et guid\u00e9e."},{emoji:"02",name:"Choisir le type de marque",sub:"Marque verbale (texte seul) ou marque figurative (logo). <strong>D\u00e9pose d'abord la marque verbale</strong> \u2014 elle prot\u00e8ge le nom sous toutes ses forme"},{emoji:"03",name:"S\u00e9lectionner les classes de Nice",sub:"Le syst\u00e8me de Nice classe les produits et services en 45 classes. <em>Exemples : Classe 3 = cosm\u00e9tiques/bougies parfum\u00e9es. Classe 35 = commerce en lig"},{emoji:"04",name:"R\u00e9gler les frais",sub:"<strong>290 \u20ac pour 1 classe</strong>, +40 \u20ac par classe suppl\u00e9mentaire. La protection dure <strong>10 ans</strong>, renouvelable. C'est l'un des meille"},{emoji:"05",name:"Surveiller la publication",sub:"L'INPI publie la marque dans le BOPI (bulletin officiel). Tu as 2 mois de p\u00e9riode d'opposition pendant lesquels d'autres marques peuvent contester."}]},
+{t:'cards',tag:"Le\u00e7on 4 \u00b7 Cr\u00e9er son entreprise",title:"Cr\u00e9er son entreprise",body:"Cr\u00e9er son entreprise. Le statut qu'on recommande pour l'e-commerce : la SASU. Voil\u00e0 pourquoi. En auto-entrepreneur, tu paies des charges sur ton chiffre d'affaires m\u00eame quand tu n'as pas encore de b\u00e9n\u00e9fice. Et tu ne peux rien d\u00e9duire. En SASU, tu paies l'imp\u00f4t uniquement sur tes b\u00e9n\u00e9fices r\u00e9els. Et...",vo:"Cr\u00e9er son entreprise. Le statut qu'on recommande pour l'e-commerce : la SASU. Voil\u00e0 pourquoi. En auto-entrepreneur, tu paies des charges sur ton chiffre d'affaires m\u00eame quand tu n'as pas encore de b\u00e9n\u00e9fice. Et tu ne peux rien d\u00e9duire. En SASU, tu paies l'imp\u00f4t uniquement sur tes b\u00e9n\u00e9fices r\u00e9els. Et tu d\u00e9duis toutes tes charges : le stock, la publicit\u00e9, Shopify, ton t\u00e9l\u00e9phone, les frais de livraison, le comptable, la formation. Regardons un exemple concret. Cinq mille euros de CA avec trois mille euros de charges. En auto-entrepreneur, tu paies des charges sur six cent quinze euros fictifs et tu gardes mille trois cent quatre-vingt-cinq euros. En SASU, tu d\u00e9duis les trois mille euros, tu paies quinze pourcent d'imp\u00f4t sur les deux mille euros de b\u00e9n\u00e9fice, et tu gardes mille sept cents euros. La SASU te rapporte plus. Pour cr\u00e9er ta SASU facilement et en ligne, clique sur le bouton LegalPlace avec le code SBW25 pour ta r\u00e9duction exclusive.",items:[{emoji:"\u2705",name:"Gratuit et rapide",sub:""},{emoji:"\u2705",name:"Charges sur CA r\u00e9el",sub:""},{emoji:"\u2705",name:"D\u00e9duction de TOUTES les charges",sub:""},{emoji:"\u274c",name:"Z\u00e9ro d\u00e9duction de charges",sub:""},{emoji:"\u274c",name:"Plafond 188 700\u20ac/an",sub:""},{emoji:"\u274c",name:"Patrimoine non prot\u00e9g\u00e9",sub:""}]},
+{t:'cards',tag:"Le\u00e7on 5 \u00b7 L\u00e9gal",title:"Les obligations l\u00e9gales de ton e-commerce",vo:"Les obligations l\u00e9gales du e-commerce en France. Cinq \u00e9l\u00e9ments obligatoires. Les Conditions G\u00e9n\u00e9rales de Vente \u2014 sans elles, tu ne peux pas l\u00e9galement vendre en ligne. Les mentions l\u00e9gales sur le site \u2014 identit\u00e9, SIRET, h\u00e9bergeur. La politique de confidentialit\u00e9 conforme au RGPD \u2014 obligatoire d\u00e8s que tu collectes un email. Le droit de r\u00e9tractation de quatorze jours que tu dois clairement informer \u00e0 tes clients. Et les informations produit avec le prix TTC affich\u00e9. Shopify g\u00e9n\u00e8re des templates pour tous ces documents. Personnalise-les avec tes vraies conditions. Et ne vends jamais sans eux \u2014 en cas de litige, tu es en position de faiblesse totale.",items:[{emoji:"\u2705",name:"CGV \u2014 Conditions G\u00e9n\u00e9rales de Vente",sub:"Obligatoires. Elles encadrent la relation commerciale : prix, livraison, retours, garanties. Sans CGV, tu ne peux pas l\u00e9galement vendre en ligne en Fr"},{emoji:"\u2705",name:"Mentions l\u00e9gales",sub:"Obligatoires sur tout site web. Identit\u00e9 de l'entreprise, si\u00e8ge social, num\u00e9ro SIRET, h\u00e9bergeur, directeur de publication."},{emoji:"\u2705",name:"Politique de confidentialit\u00e9 (RGPD)",sub:"Obligatoire d\u00e8s que tu collectes des donn\u00e9es personnelles (email, adresse). Explique comment tu utilises et prot\u00e8ges les donn\u00e9es. Amende CNIL jusqu'\u00e0 "},{emoji:"\u2705",name:"Droit de r\u00e9tractation 14 jours",sub:"En France, tout acheteur en ligne a 14 jours pour retourner un produit sans justification. Tu dois l'informer clairement dans tes CGV."},{emoji:"\u2705",name:"Informations produit",sub:"Prix TTC affich\u00e9 clairement, composition des produits (obligatoire pour cosm\u00e9tiques, alimentaire), d\u00e9lais de livraison, disponibilit\u00e9 du stock."},{emoji:"\u26a0\ufe0f",name:"TVA \u2014 \u00c0 surveiller",sub:"Auto-entrepreneur : exon\u00e9r\u00e9 sous 91 900\u20ac. Au-del\u00e0 : collecte et reverse la TVA. Pour vendre dans l'UE : r\u00e8gles OSS \u00e0 conna\u00eetre. En dehors de l'UE : TV"}]},
+{t:'cards',tag:"\ud83d\udd6f️ Exemple — Nom & statut de CÉLESTE",title:"Exemple — CÉLESTE : nom + statut",vo:"Voil\u00e0 comment on a choisi et s\u00e9curis\u00e9 le nom C\u00c9LESTE. \u00c9vocateur sans \u00eatre descriptif \u2014 le ciel, la lumi\u00e8re, la puret\u00e9. Deux syllabes, m\u00e9morable au premier coup d'oreille. Fonctionne en fran\u00e7ais et en anglais. Disponible partout \u2014 INPI libre, @celestebougies disponible sur tous les r\u00e9seaux, celeste-bougies.com disponible. Et d\u00e9pos\u00e9 \u00e0 l'INPI dans les classes trois et trente-cinq pour trois cent trente euros. Le statut SASU cr\u00e9\u00e9 via LegalPlace avec le code SBW25. C\u00c9LESTE est maintenant une marque prot\u00e9g\u00e9e sur une fondation solide.",items:[{emoji:"\u2728",name:"\u00c9vocateur sans \u00eatre descriptif",sub:"C\u00c9LESTE \u00e9voque le ciel, la lumi\u00e8re, la puret\u00e9. \u00c7a sugg\u00e8re l'univers premium d'une bougie artisanale sans \u00eatre litt\u00e9ral comme \"BougieNaturelle\"."},{emoji:"\ud83d\udccf",name:"2 syllabes, m\u00e9morable",sub:"C\u00e9-leste. Court, musical, facile \u00e0 retenir apr\u00e8s une seule \u00e9coute. Le test avec 5 personnes : 5/5 savaient comment le prononcer."},{emoji:"\ud83c\udf0d",name:"Fonctionne en fran\u00e7ais et en anglais",sub:"\"C\u00e9leste\" existe dans les deux langues avec une connotation premium et po\u00e9tique. Aucun probl\u00e8me de prononciation internationale."},{emoji:"\u2705",name:"Disponible partout",sub:"INPI : libre dans la classe 3 (bougies) et classe 35 (e-commerce). @celestebougies disponible sur tous les r\u00e9seaux. celeste-bougies.com disponible."}]},
+{t:'recap',title:"Ce qu'il faut retenir",vo:"R\u00e9capitulatif de la section trois. Les crit\u00e8res d'un bon nom de marque. Les quatre v\u00e9rifications obligatoires dans l'ordre. Le d\u00e9p\u00f4t INPI \u00e0 deux cent quatre-vingt-dix euros \u2014 un investissement non n\u00e9gociable. Le statut juridique : auto-entrepreneur pour d\u00e9marrer, SASU quand le business prend de l'ampleur. Et les obligations l\u00e9gales : CGV, mentions l\u00e9gales, RGPD, droit de r\u00e9tractation. Dans la prochaine section, on construit l'identit\u00e9 visuelle de C\u00c9LESTE \u2014 logo, couleurs, charte graphique.",points:["\ud83d\udccf Bon nom : court (1-2 syllabes), pronon\u00e7able, multilingue, pas descriptif","\ud83d\udd0d 4 v\u00e9rifications : INPI, Namechk, domaine .com, Google \u2014 dans cet ordre","\ud83d\udee1\ufe0f INPI : 290\u20ac pour 10 ans de protection \u2014 investissement non n\u00e9gociable","\u2696\ufe0f Auto-entrepreneur pour d\u00e9marrer \u2192 SASU \u00e0 3 000\u20ac/mois","\ud83d\udccb Obligatoire : CGV, mentions l\u00e9gales, politique RGPD, droit r\u00e9tractation 14j","\ud83d\udd6f\ufe0f C\u00c9LESTE : 2 syllabes, d\u00e9pos\u00e9 INPI classes 3&35, auto-entrepreneur \u2192 SASU"]}]},
+{id:5,title:"\ud83c\udfa8 Identit\u00e9 visuelle",slides:[
+{t:'intro',emoji:"\ud83c\udfa8",num:"04",title:"Identit\u00e9 visuelle",sub:"Avant de cr\u00e9er ta boutique Shopify, tu dois savoir exactement comment elle va ressembler. Couleurs, polices, logo. Ces d\u00e9cisions prises maintenant guident tout ce qui vient ensuite.",vo:"Bienvenue dans la section quatre. L'identit\u00e9 visuelle. Avant de toucher \u00e0 Shopify, tu dois savoir exactement comment ta marque va ressembler visuellement. Couleurs, polices, logo, charte graphique. Ces d\u00e9cisions prises maintenant vont guider toute la cr\u00e9ation de ta boutique, de tes contenus TikTok, de tes packagings, de tes publicit\u00e9s. On les prend une fois et elles durent des ann\u00e9es."},
+{t:'cards',tag:"Le\u00e7on 1 \u00b7 Les bases",title:"Pourquoi l'identit\u00e9 visuelle fait la diff\u00e9rence",vo:"Pourquoi l'identit\u00e9 visuelle fait la diff\u00e9rence. Quatre raisons. Elle cr\u00e9e la reconnaissance instantan\u00e9e \u2014 la couleur est trait\u00e9e par le cerveau avant m\u00eame que tu lises le texte. Elle justifie le prix premium \u2014 un m\u00eame produit est per\u00e7u jusqu'\u00e0 quarante pourcent plus qualitatif avec un packaging soign\u00e9. Elle cr\u00e9e la coh\u00e9rence sur tous tes canaux \u2014 boutique, TikTok, packaging, pub doivent ressembler \u00e0 la m\u00eame marque. Et elle inspire confiance en moins de quatre-vingt-dix secondes. Soixante \u00e0 quatre-vingt-dix pourcent de cette \u00e9valuation repose uniquement sur les couleurs. Tu n'as pas de deuxi\u00e8me chance de faire une premi\u00e8re impression.",items:[{emoji:"\u26a1",name:"Cr\u00e9e la reconnaissance instantan\u00e9e",sub:"Un visiteur qui voit ta couleur principale ou ta police reconna\u00eet ta marque avant m\u00eame de lire le nom. <strong>Coca-Cola rouge, Herm\u00e8s orange, Tiffany"},{emoji:"\ud83d\udc8e",name:"Justifie le prix premium",sub:"Une identit\u00e9 visuelle soign\u00e9e signal la qualit\u00e9 du produit. Des \u00e9tudes montrent qu'un m\u00eame produit est per\u00e7u <strong>jusqu'\u00e0 40% plus qualitatif</stro"},{emoji:"\ud83d\udd01",name:"Cr\u00e9e de la coh\u00e9rence sur tous les canaux",sub:"Ta boutique Shopify, ton TikTok, tes packagings, tes pubs Meta \u2014 tout doit avoir <em>la m\u00eame identit\u00e9</em>. Sinon ton client ne sait pas qui tu es."},{emoji:"\ud83e\udd1d",name:"Inspire confiance au premier regard",sub:"90% des jugements sur une marque sont faits en moins de 90 secondes. Et 62 \u00e0 90% de cette \u00e9valuation repose uniquement sur les couleurs. <strong>Tu n'"}]},
+{t:'cards',tag:"Le\u00e7on 2 \u00b7 Couleurs",title:"Choisir sa palette de couleurs",body:"Choisir sa palette de couleurs. La psychologie des couleurs en e-commerce est r\u00e9elle et document\u00e9e. L'or et le dor\u00e9 signalent le luxe et l'artisanat. Le noir chaud apporte l'\u00e9l\u00e9gance et la sophistication. Le cr\u00e8me \u00e9voque le naturel et l'authenticit\u00e9. Le vert for\u00eat pour le bio et l'\u00e9thique. Le bordea...",vo:"Choisir sa palette de couleurs. La psychologie des couleurs en e-commerce est r\u00e9elle et document\u00e9e. L'or et le dor\u00e9 signalent le luxe et l'artisanat. Le noir chaud apporte l'\u00e9l\u00e9gance et la sophistication. Le cr\u00e8me \u00e9voque le naturel et l'authenticit\u00e9. Le vert for\u00eat pour le bio et l'\u00e9thique. Le bordeaux pour la passion et l'intensit\u00e9. Le bleu marine pour la confiance et le s\u00e9rieux. La r\u00e8gle est simple : trois couleurs maximum. Une couleur primaire qui domine soixante pourcent des surfaces. Une secondaire pour les accents et boutons. Et une neutre pour le texte. Pour construire ta palette, Coolors.co g\u00e9n\u00e8re des combinaisons harmonieuses en quelques clics.",items:[{emoji:"\ud83c\udfa8",name:"Or / Dor\u00e9",sub:"Luxe, premium, artisanal, chaleur. Utilis\u00e9 par les marques haut de gamme."},{emoji:"\ud83c\udfa8",name:"Noir chaud",sub:"\u00c9l\u00e9gance, sophistication, modernit\u00e9. Le noir cr\u00e9dibilise imm\u00e9diatement."},{emoji:"\ud83c\udfa8",name:"Cr\u00e8me / Ivoire",sub:"Naturel, douceur, authenticit\u00e9. Contraste \u00e9l\u00e9gant avec le noir."},{emoji:"\ud83c\udfa8",name:"Vert for\u00eat",sub:"Nature, bio, bien-\u00eatre, \u00e9thique. Id\u00e9al pour le naturel et l'"},{emoji:"\ud83c\udfa8",name:"Rouge bordeaux",sub:"Passion, premium, intensit\u00e9. \u00c9vite le rouge vif (urgence, promotion)."},{emoji:"\ud83c\udfa8",name:"Bleu marine",sub:"Confiance, s\u00e9rieux, professionnel. Id\u00e9al pour la tech et le B2B."}]},
+{t:'cards',tag:"Le\u00e7on 3 \u00b7 Typographie",title:"Choisir sa typographie",body:"La typographie. R\u00e8gle absolue : deux polices maximum. Une pour les titres et une pour le texte courant. Les quatre grandes familles. Les Serif \u2014 Cormorant Garamond, Playfair Display \u2014 \u00e9voquent l'\u00e9l\u00e9gance classique et le luxe. Les Sans-Serif \u2014 DM Sans, Montserrat \u2014 sont modernes, neutres, lisibles. L...",vo:"La typographie. R\u00e8gle absolue : deux polices maximum. Une pour les titres et une pour le texte courant. Les quatre grandes familles. Les Serif \u2014 Cormorant Garamond, Playfair Display \u2014 \u00e9voquent l'\u00e9l\u00e9gance classique et le luxe. Les Sans-Serif \u2014 DM Sans, Montserrat \u2014 sont modernes, neutres, lisibles. Les Display pour les titres impactants. Et les Script pour l'artisanal et le fait-main. La combinaison la plus efficace pour une marque premium : une Serif \u00e9l\u00e9gante pour les titres et une Sans-Serif propre pour le texte. Google Fonts est gratuit et donne acc\u00e8s \u00e0 des centaines de polices de qualit\u00e9. Cherche 'font pairing' plus le nom de ta police pour trouver le bon duo.",items:[{emoji:"\u270d\ufe0f",name:"Serif",sub:"Cormorant Garamond \u00b7 Playfair Display \u00b7 Libre Baskerville \u2014 Luxe, artisanat, mode, beaut\u00e9 haut de gamme. \u00c9voque l'"},{emoji:"\u270d\ufe0f",name:"Sans-Serif",sub:"DM Sans \u00b7 Inter \u00b7 Montserrat \u00b7 Poppins \u2014 Tech, startup, e-commerce moderne, sport. Lisible, neutre, professionnel."},{emoji:"\u270d\ufe0f",name:"Display / D\u00e9coratif",sub:"Bebas Neue \u00b7 Oswald \u00b7 Anton \u2014 Pour les titres seulement. Identit\u00e9 forte, mais jamais pour le texte courant."},{emoji:"\u270d\ufe0f",name:"Script / Calligraphie",sub:"Great Vibes \u00b7 Dancing Script \u00b7 Pacifico \u2014 Artisanal, fait main, mariage, luxe. \u00c0 utiliser avec parcimonie et jamais en petit."}]},
+{t:'cards',tag:"Le\u00e7on 4 \u00b7 Logo",title:"Cr\u00e9er son logo",vo:"Cr\u00e9er son logo. Quatre r\u00e8gles. Lisible \u00e0 toutes les tailles \u2014 de seize pixels pour le favicon jusqu'\u00e0 trois cents pixels pour les banni\u00e8res. Fonctionne en noir et blanc \u2014 si tu enl\u00e8ves les couleurs et le logo devient illisible, simplifie-le. Simple et m\u00e9morable \u2014 Apple, Nike, Airbnb sont simples. La complexit\u00e9 ne se retient pas. Et livr\u00e9 en formats vectoriels \u2014 SVG et PDF obligatoirement. Trois options pour cr\u00e9er ton logo. Canva gratuitement pour d\u00e9marrer rapidement. Midjourney pour g\u00e9n\u00e9rer des concepts originaux. Ou un freelance sur Malt ou Fiverr entre cent cinquante et cinq cents euros pour quelque chose de vraiment unique. Et pour d\u00e9marrer, souviens-toi que ton nom en belle typographie est souvent suffisant.",items:[{emoji:"\ud83d\udccf",name:"Lisible \u00e0 toutes les tailles",sub:"Ton logo doit \u00eatre reconnaissable \u00e0 16px (favicon) comme \u00e0 300px (banni\u00e8re). Teste-le en tr\u00e8s petit. Si le d\u00e9tail dispara\u00eet \u2192 simplifie."},{emoji:"\ud83c\udfa8",name:"Fonctionne en noir et blanc",sub:"Si ton logo n'est pas lisible sans ses couleurs, il est trop d\u00e9pendant de la couleur. Un bon logo fonctionne en monochrome."},{emoji:"\u23f1\ufe0f",name:"Simple et m\u00e9morable",sub:"Les logos les plus iconiques sont les plus simples. Apple, Nike, Airbnb. La complexit\u00e9 est l'ennemie de la m\u00e9morisation."},{emoji:"\ud83d\udcc1",name:"Livr\u00e9 en formats vectoriels",sub:"SVG et PDF sont indispensables. Ils s'agrandissent \u00e0 l'infini sans perte de qualit\u00e9. Jamais livrer un logo uniquement en JPEG."}]},
+{t:'cards',tag:"Le\u00e7on 5 \u00b7 Charte graphique",title:"La charte graphique",vo:"La charte graphique. C'est le document de r\u00e9f\u00e9rence qui fixe toutes les r\u00e8gles visuelles de ta marque. Elle garantit la coh\u00e9rence que ce soit toi ou un prestataire qui cr\u00e9e du contenu. Sept \u00e9l\u00e9ments indispensables. Le logo et ses variantes. La palette de couleurs avec les codes HEX. La typographie avec les polices et tailles. Le style photographique \u2014 fond blanc ou lifestyle ? La tonalit\u00e9 \u00e9ditoriale \u2014 tu ou vous ? s\u00e9rieux ou accessible ? Les templates r\u00e9seaux sociaux pr\u00eats \u00e0 l'emploi. Et les exemples d'erreurs \u00e0 ne pas faire. Tu peux cr\u00e9er ta charte gratuitement sur Canva avec les templates brand guidelines. Dix pages bien construites suffisent pour d\u00e9marrer.",items:[{emoji:"01",name:"Logo et ses variantes",sub:"Logo principal, version invers\u00e9e (fond sombre), favicon, version monochrome. Avec les zones de protection minimum."},{emoji:"02",name:"Palette de couleurs",sub:"Nom de chaque couleur, code HEX, RGB et CMJN. Exemples d'utilisation et d'erreurs \u00e0 \u00e9viter."},{emoji:"03",name:"Typographie",sub:"Polices titre et texte, graisses autoris\u00e9es, tailles minimum, interlignes recommand\u00e9s."},{emoji:"04",name:"Style photographique",sub:"Ambiance des photos (fond blanc ? lifestyle sombre ? lumi\u00e8re naturelle ?). Filtres autoris\u00e9s. Ce qu'il faut \u00e9viter."},{emoji:"05",name:"Tone of voice",sub:"Le ton de ta marque : formel ou tutoiement ? S\u00e9rieux ou d\u00e9contract\u00e9 ? Luxueux ou accessible ? Ces r\u00e8gles s'appliquent \u00e0 tous tes textes."},{emoji:"06",name:"Templates r\u00e9seaux sociaux",sub:"Mod\u00e8les Canva pr\u00e9-configur\u00e9s avec tes couleurs et polices pour tes posts Instagram et TikTok."}]},
+{t:'cards',tag:"\ud83d\udd6f️ Exemple — Identité visuelle de CÉLESTE",title:"Exemple — L'identité visuelle de CÉLESTE",body:"L'identit\u00e9 visuelle de C\u00c9LESTE. Trois couleurs. Le noir chaud 1C1A14 \u2014 pas un noir pur mais un noir l\u00e9g\u00e8rement brun, plus artisanal et moins agressif. L'or C\u00c9LESTE C9A96E \u2014 un or naturel qui \u00e9voque la cire et la chaleur sans l'exc\u00e8s dor\u00e9. Et le cr\u00e8me F5F0E8 \u2014 un blanc cass\u00e9 chaud qui contraste \u00e9l\u00e9ga...",vo:"L'identit\u00e9 visuelle de C\u00c9LESTE. Trois couleurs. Le noir chaud 1C1A14 \u2014 pas un noir pur mais un noir l\u00e9g\u00e8rement brun, plus artisanal et moins agressif. L'or C\u00c9LESTE C9A96E \u2014 un or naturel qui \u00e9voque la cire et la chaleur sans l'exc\u00e8s dor\u00e9. Et le cr\u00e8me F5F0E8 \u2014 un blanc cass\u00e9 chaud qui contraste \u00e9l\u00e9gamment avec le noir. La typographie : Cormorant Garamond pour tous les titres et le logo \u2014 cette police serif apporte imm\u00e9diatement le c\u00f4t\u00e9 luxueux. DM Sans pour le texte courant \u2014 lisible, neutre, moderne. Le logo : simplement le mot C\u00c9LESTE en Cormorant Garamond dor\u00e9. Aucun \u00e9l\u00e9ment graphique superflu. Les photos : bougies allum\u00e9es sur fond sombre avec une lumi\u00e8re chaude. Et le tone of voice : tutoiement chaleureux avec un vocabulaire po\u00e9tique. Tout raconte la m\u00eame histoire.",items:[{emoji:"\ud83c\udfa8",name:"Noir chaud",sub:"Couleur principale \u00b7 Fond, en-t\u00eate, texte \u2014 Pas un noir pur (#000) mais un noir chaud l\u00e9g\u00e8rement brun. Moins agressif, plus artisanal."},{emoji:"\ud83c\udfa8",name:"Or C\u00c9LESTE",sub:"Couleur secondaire \u00b7 Logo, accents, boutons, prix \u2014 Un or naturel, pas m\u00e9tallique. \u00c9voque la cire, la chaleur, le premium sans l'"},{emoji:"\ud83c\udfa8",name:"Cr\u00e8me",sub:"Couleur neutre \u00b7 Arri\u00e8re-plan, texte sur fond noir \u2014 Blanc cass\u00e9 chaud. Plus doux que le blanc pur, coh\u00e9rent avec l'"}]},
+{t:'recap',title:"Ce qu'il faut retenir",vo:"R\u00e9capitulatif de la section quatre. L'identit\u00e9 visuelle fait la diff\u00e9rence \u2014 quatre-vingt-dix pourcent des jugements en quatre-vingt-dix secondes. Trois couleurs maximum avec la r\u00e8gle des soixante, trente, dix pourcent. Deux polices maximum \u2014 Serif pour les titres, Sans-Serif pour le texte. Un logo simple, lisible \u00e0 toutes les tailles, en SVG. Et une charte graphique pour garantir la coh\u00e9rence partout. Pour C\u00c9LESTE : noir chaud, or naturel, cr\u00e8me. Cormorant Garamond et DM Sans. Coh\u00e9rent sur tous les canaux. Dans la prochaine section, on s'occupe des photos produit."}]},
+{id:6,title:"\ud83d\udcf8 Photos & Contenus",slides:[
+{t:'intro',emoji:"\ud83d\udcf8",num:"05",title:"Photos & Contenus produit",sub:"Ton client ne peut pas tenir le produit dans ses mains. Il d\u00e9cide d'acheter ou non uniquement par ce qu'il voit \u00e0 l'\u00e9cran. Les photos ne sont pas une option. Elles sont ton argument de vente num\u00e9ro un.",vo:"Section cinq. Photos et contenus produit. En e-commerce, ton client ne peut pas toucher le produit. Il ne peut pas le sentir, l'essayer, l'examiner. Il prend sa d\u00e9cision d'achat uniquement sur la base de ce qu'il voit \u00e0 l'\u00e9cran. Une mauvaise photo, c'est une vente perdue. Une belle photo, c'est une vente gagn\u00e9e avant m\u00eame de lire la description. C'est peut-\u00eatre la section la plus importante du Module un."},
+{t:'cards',tag:"Le\u00e7on 1 \u00b7 L'impact",title:"Pourquoi les photos font la vente",vo:"Les chiffres parlent. Soixante-quinze pourcent des acheteurs en ligne consid\u00e8rent les photos comme le facteur num\u00e9ro un de leur d\u00e9cision d'achat. Vingt-deux pourcent d'augmentation du taux de conversion avec des photos haute qualit\u00e9. Soixante-six pourcent des consommateurs veulent voir plusieurs angles. Et deux fois plus de temps pass\u00e9 sur une page produit avec une vid\u00e9o. Les mauvaises photos co\u00fbtent cher. Un taux de conversion divis\u00e9 par trois. Un taux de retour qui explose quand la photo ne correspond pas \u00e0 la r\u00e9alit\u00e9. Et une cr\u00e9dibilit\u00e9 en baisse. Retiens \u00e7a : investir cinq cents euros dans un bon photographe qui triple ton taux de conversion est plus rentable que cinq cents euros de pub avec de mauvaises photos.",items:[{emoji:"75%",name:"75%",sub:"des acheteurs en ligne consid\u00e8rent les photos comme le facteur n\u00b01 de leur d\u00e9cision d''achat"},{emoji:"22%",name:"22%",sub:"d''augmentation du taux de conversion avec des photos haute qualit\u00e9 vs photos basiques"},{emoji:"66%",name:"66%",sub:"des consommateurs veulent voir plusieurs angles d''un produit avant d'acheter"},{emoji:"2\u00d7",name:"2\u00d7",sub:"plus de temps pass\u00e9 sur une page produit avec une vid\u00e9o plut\u00f4t que des photos seules"}]},
+{t:'cards',tag:"Le\u00e7on 2 \u00b7 Les types de photos",title:"Les 5 types de photos indispensables",body:"Les cinq types de photos indispensables pour ton e-commerce. Premier type : la photo principale sur fond neutre. C'est la photo de ta fiche Shopify et Amazon. Fond blanc ou fond sombre selon ton univers, produit centr\u00e9, format carr\u00e9. Deuxi\u00e8me : les photos multiples angles. Minimum trois angles diff\u00e9...",vo:"Les cinq types de photos indispensables pour ton e-commerce. Premier type : la photo principale sur fond neutre. C'est la photo de ta fiche Shopify et Amazon. Fond blanc ou fond sombre selon ton univers, produit centr\u00e9, format carr\u00e9. Deuxi\u00e8me : les photos multiples angles. Minimum trois angles diff\u00e9rents \u2014 le client ne peut pas tenir le produit. Troisi\u00e8me : la photo de d\u00e9tail. Zoom sur les finitions qui justifient le prix. Quatri\u00e8me : la photo lifestyle. Le produit en situation r\u00e9elle \u2014 c'est celle qui performe sur TikTok et Instagram. Et cinqui\u00e8me : le packshot. L'emballage, la bo\u00eete, le c\u00f4t\u00e9 parfait \u00e0 offrir. Ces cinq types couvrent tous les canaux de vente et r\u00e9pondent \u00e0 toutes les questions du client.",items:[{emoji:"01",name:"Photo principale \u2014 fond neutre",sub:"Fond blanc ou fond sombre selon ton univers. Produit centr\u00e9. <strong>Rapport 1:1 ou 4:5.</strong> C'est la photo principale Shopify et Amazon."},{emoji:"02",name:"Photos multiples angles",sub:"Montre tous les angles du produit. Le client qui ne peut pas tenir le produit a besoin de voir sous toutes les coutures. <strong>Minimum 3 angles diff"},{emoji:"03",name:"Photo zoom et d\u00e9tail",sub:"Zoom sur les finitions, la mati\u00e8re, la texture, l'\u00e9tiquette. Montre ce qui justifie le prix. <em>Pour C\u00c9LESTE : la cire, la m\u00e8che, le verre.</em>"},{emoji:"04",name:"Photo lifestyle / ambiance",sub:"Le produit en contexte r\u00e9el. Fait projeter le client dans la vie qu'il veut. <strong>C'est la photo TikTok et Instagram.</strong>"},{emoji:"05",name:"Photo packshot / coffret",sub:"L'emballage, le ruban, la carte. Le c\u00f4t\u00e9 \"parfait \u00e0 offrir\". D\u00e9clenche les achats impulsifs autour des f\u00eates."}]},
+{t:'cards',tag:"Le\u00e7on 4 \u00b7 IA & Retouche",title:"Am\u00e9liorer ses photos avec l'IA",body:"Les outils IA pour am\u00e9liorer ses photos. Remove.bg supprime l'arri\u00e8re-plan en trois secondes \u2014 r\u00e9sultat professionnel sans Photoshop. Adobe Lightroom mobile est gratuit et permet la retouche exposition et couleurs avec des presets pour garder la coh\u00e9rence. Canva IA g\u00e9n\u00e8re des fonds \u00e0 partir de ton p...",vo:"Les outils IA pour am\u00e9liorer ses photos. Remove.bg supprime l'arri\u00e8re-plan en trois secondes \u2014 r\u00e9sultat professionnel sans Photoshop. Adobe Lightroom mobile est gratuit et permet la retouche exposition et couleurs avec des presets pour garder la coh\u00e9rence. Canva IA g\u00e9n\u00e8re des fonds \u00e0 partir de ton produit d\u00e9coup\u00e9 \u2014 dis-lui l'ambiance et elle cr\u00e9e le fond en trente secondes. Topaz Photo AI agrandit tes photos sans perte de qualit\u00e9 pour les exigences Amazon. Midjourney g\u00e9n\u00e8re des photos lifestyle de ton produit sans shooting r\u00e9el. Et Squoosh compresse les images pour que ton site charge vite. Le workflow : shooting DIY, retouche Lightroom, d\u00e9coupage fond, compression, et variantes IA. Deux heures pour un set complet pr\u00eat pour tous les canaux.",items:[{emoji:"\ud83d\uddbc\ufe0f",name:"Remove.bg",sub:"Supprime l'arri\u00e8re-plan en 3 secondes. Tu peux ensuite placer le produit sur n'importe quel fond. R\u00e9sultat professionnel sans Photoshop."},{emoji:"\u2728",name:"Adobe Lightroom (mobile)",sub:"Retouche exposition, contraste, couleurs, nettet\u00e9. L'application mobile est gratuite et suffisante. Cr\u00e9e des presets avec tes r\u00e9glages pour garder une"},{emoji:"\ud83c\udfa8",name:"Canva \u2014 IA de fond",sub:"G\u00e9n\u00e8re un fond \u00e0 partir de ton produit d\u00e9coup\u00e9. Dis \u00e0 l'IA l'ambiance voulue \"marbre dor\u00e9 luxueux\" et elle cr\u00e9e le fond. R\u00e9sultat studio en 30 seconde"},{emoji:"\ud83d\udd2c",name:"Topaz Photo AI",sub:"Agrandis tes photos sans perte de qualit\u00e9. Utile quand tu n'as qu'une petite photo et besoin de l'upscaler pour Amazon (2500px minimum)."},{emoji:"\ud83c\udfad",name:"Midjourney / DALL-E",sub:"G\u00e9n\u00e8re des photos lifestyle de ton produit sans shooting. D\u00e9cris la sc\u00e8ne en prompt : \"bougie artisanale sur table en marbre, lumi\u00e8re dor\u00e9e, style lux"},{emoji:"\ud83d\udccf",name:"Squoosh \u2014 Compression",sub:"Compresse tes images sans perte visible de qualit\u00e9. Shopify charge plus vite, meilleur SEO. Cible : moins de 500KB par image."}]},
+{t:'cards',tag:"Le\u00e7on 5 \u00b7 Vid\u00e9o & R\u00e9seaux",title:"Cr\u00e9er du contenu vid\u00e9o qui convertit",vo:"Les formats vid\u00e9o qui g\u00e9n\u00e8rent des ventes. Six formats qui marchent. L'unboxing \u2014 le format le plus engageant. Les gens adorent voir ce qu'il y a dans un colis. Le making of et la fabrication \u2014 pour C\u00c9LESTE, la coul\u00e9e de cire et la pr\u00e9paration du parfum cr\u00e9ent une connexion \u00e9motionnelle forte. L'avant apr\u00e8s \u2014 convainc les ind\u00e9cis en dix secondes. La d\u00e9mo produit \u2014 montre le b\u00e9n\u00e9fice, pas le produit. Le t\u00e9moignage client \u2014 la preuve sociale la plus puissante. Et le contenu \u00e9ducatif \u2014 pourquoi la cire de soja, comment entretenir une bougie. Deux r\u00e8gles d'or. Les trois premi\u00e8res secondes d\u00e9cident tout \u2014 commence par le r\u00e9sultat ou une \u00e9motion. Et les sous-titres sont obligatoires car quatre-vingt-cinq pourcent des vid\u00e9os sont regard\u00e9es sans son. Pour monter tout \u00e7a facilement sur ton t\u00e9l\u00e9phone, inscris-toi sur CapCut en cliquant sur le bouton. C'est gratuit et c'est l'outil qu'on utilise pour toutes nos vid\u00e9os.",items:[{emoji:"\ud83c\udfed",name:"Le making of / fabrication",sub:"Montre comment le produit est fait. Pour C\u00c9LESTE : la coul\u00e9e de cire, la pr\u00e9paration du parfum. Authentique et magn\u00e9tique. <em>Cr\u00e9e une connexion \u00e9mot"},{emoji:"\u2b50",name:"Avant / Apr\u00e8s",sub:"Avant l'utilisation du produit vs apr\u00e8s. Simple, efficace, universel. Le format qui convainc les ind\u00e9cis en moins de 10 secondes."},{emoji:"\ud83c\udfaf",name:"La d\u00e9mo produit",sub:"Montre le produit en action. Pour une bougie : la flamme, le parfum qui se diffuse, l'ambiance cr\u00e9\u00e9e. Met en sc\u00e8ne le b\u00e9n\u00e9fice, pas le produit."},{emoji:"\ud83d\udc64",name:"Le t\u00e9moignage client",sub:"Client r\u00e9el qui parle de son exp\u00e9rience. La preuve sociale la plus puissante. Demande \u00e0 tes premiers clients de filmer un rapide retour."},{emoji:"\ud83d\udd22",name:"Le contenu \u00e9ducatif",sub:"Pourquoi la cire de soja ? Comment entretenir une bougie ? Ces vid\u00e9os \u00e9duquent et vendent indirectement. Tr\u00e8s bon pour le SEO TikTok."}]},
+{t:'cards',tag:"Exemple — Style photo & contenu de CÉLESTE",title:"Exemple — Style photo & contenu de CÉLESTE",body:"La strat\u00e9gie photo et vid\u00e9o de C\u00c9LESTE. Cinq r\u00e8gles photo. Fond sombre \u2014 pas de fond blanc pour C\u00c9LESTE. Le fond noir ou brun fonc\u00e9 met en valeur la flamme et renforce le positionnement premium. Bougie allum\u00e9e toujours \u2014 une bougie \u00e9teinte ne fait pas r\u00eaver. La flamme cr\u00e9e le mouvement et l'\u00e9motion....",vo:"La strat\u00e9gie photo et vid\u00e9o de C\u00c9LESTE. Cinq r\u00e8gles photo. Fond sombre \u2014 pas de fond blanc pour C\u00c9LESTE. Le fond noir ou brun fonc\u00e9 met en valeur la flamme et renforce le positionnement premium. Bougie allum\u00e9e toujours \u2014 une bougie \u00e9teinte ne fait pas r\u00eaver. La flamme cr\u00e9e le mouvement et l'\u00e9motion. Lumi\u00e8re chaude et unique \u2014 la lumi\u00e8re de la bougie \u00e9claire la sc\u00e8ne. Surfaces nobles \u2014 marbre noir, bois sombre, linge cr\u00e8me. Et l'\u00e9tiquette C\u00c9LESTE visible sur au moins une photo. Pour le planning TikTok : trois vid\u00e9os par semaine. Le lundi un making of, le mercredi du lifestyle, le vendredi un unboxing. Pour C\u00c9LESTE, la flamme est le contenu. Elle se filme toute seule et est le meilleur argument de vente sans prononcer un mot.",items:[{emoji:"\u25b8",name:"Style photo",sub:"Sombre, chaleureux, premium"},{emoji:"\u25b8",name:"Fond",sub:"Noir #1C1A14 ou brun fonc\u00e9"},{emoji:"\u25b8",name:"\u00c9clairage",sub:"Lumi\u00e8re bougie + r\u00e9flecteur dor\u00e9"},{emoji:"\u25b8",name:"Surfaces",sub:"Marbre noir, bois, lin cr\u00e8me"},{emoji:"\u25b8",name:"Format photos",sub:"2048\u00d72048px \u00b7 JPEG < 500KB"},{emoji:"\u25b8",name:"TikTok",sub:"3 vid\u00e9os/semaine \u00b7 9:16 vertical"},{emoji:"\u25b8",name:"Sous-titres",sub:"Oui \u2014 toujours (CapCut)"},{emoji:"\u25b8",name:"IA utilis\u00e9e",sub:"Remove.bg \u00b7 Lightroom \u00b7 Midjourney"}]},
+{t:'recap',title:"Ce qu'il faut retenir",vo:"R\u00e9capitulatif de la section cinq. Soixante-quinze pourcent des achats d\u00e9cid\u00e9s par les photos. Les cinq types de photos indispensables. Un setup DIY efficace entre cinquante et quatre-vingts euros. Les outils IA pour am\u00e9liorer et compl\u00e9ter. Les six formats vid\u00e9o qui fonctionnent. Et pour C\u00c9LESTE, fond sombre, flamme, lumi\u00e8re chaude, trois vid\u00e9os TikTok par semaine. C'est aussi le r\u00e9capitulatif du Module un entier. La niche est valid\u00e9e, les concurrents analys\u00e9s, le nom C\u00c9LESTE d\u00e9pos\u00e9 \u00e0 l'INPI, la SASU cr\u00e9\u00e9e sur LegalPlace, l'identit\u00e9 visuelle d\u00e9finie, et les photos pr\u00eates. Le Module un est termin\u00e9. Direction le Module deux \u2014 construire la boutique Shopify de C\u00c9LESTE.",points:["\ud83d\udcca 75% des achats d\u00e9cid\u00e9s par les photos \u2014 c'est ton argument de vente n\u00b01","\ud83d\udcf8 5 types : fond neutre \u00b7 angles \u00b7 d\u00e9tail \u00b7 lifestyle \u00b7 packshot","\ud83c\udfe0 DIY setup : lumi\u00e8re naturelle + fond blanc + tr\u00e9pied = 50-80\u20ac total","\ud83e\udd16 IA : Remove.bg \u00b7 Lightroom \u00b7 CapCut \u00b7 Midjourney pour compl\u00e9ter","\ud83c\udfac 6 formats vid\u00e9o : unboxing \u00b7 making of \u00b7 avant/apr\u00e8s \u00b7 d\u00e9mo \u00b7 t\u00e9moignage \u00b7 \u00e9ducatif","\ud83d\udd6f\ufe0f C\u00c9LESTE : fond sombre + flamme + lumi\u00e8re chaude + 3 vid\u00e9os/semaine TikTok"]}]},
+];
+
+
+
+
+// ══ TRACKER NATIF ══
+const TRACKER_KEY='sbw_tracker__formation-ecom-module-1';
+function loadProg(){try{return JSON.parse(localStorage.getItem(TRACKER_KEY)||'{}')}catch(e){return{}}}
+function saveProg(d){try{localStorage.setItem(TRACKER_KEY,JSON.stringify(d))}catch(e){}}
+function markDone(idx){var d=loadProg();if(!d[idx]){d[idx]=true;d._total=LESSONS.length;d._updated=Date.now();saveProg(d);refreshUI()}}
+function globalPct(){var d=loadProg();var n=LESSONS.filter(function(_,i){return!!d[i]}).length;return Math.round(n/LESSONS.length*100)}
+
+// ══ STATE ══
+var curL=0,curS=0,seen={};
+function markSeen(l,s){if(!seen[l])seen[l]=new Set();seen[l].add(s);var tot=LESSONS[l].slides.length;var pct=Math.round(seen[l].size/tot*100);if(pct>=80)markDone(l);updatePbars()}
+
+// ══ RENDER ══
+function render(){
+  var L=LESSONS[curL],sl=L.slides[curS];
+  markSeen(curL,curS);
+  // Lancer la voix off si activée
+  var sl_vo = LESSONS[curL].slides[curS];
+  if (voixOn && sl_vo && sl_vo.vo) {
+    if (synth) synth.cancel();
+    setTimeout(function(){ playVoix(sl_vo.vo); }, 150);
+  } else if (autoPlay) {
+    // Slide sans VO : avancer après 2s
+    setTimeout(autoAdvance, 2000);
+  }
+  var a=document.getElementById('slideArea');
+  var t=sl.t,h='';
+  if(t==='intro'){
+    h='<div class="slide-intro"><div class="slide-num">Leçon '+L.id+' / '+LESSONS.length+'</div><span class="slide-emoji-big">'+(sl.emoji||'')+'</span><div class="slide-intro-title">'+sl.title.replace(/\\n|\n/g,'<br>')+'</div>'+(sl.sub?'<div class="slide-intro-sub">'+sl.sub+'</div>':'')+'</div>';
+  } else if(t==='concept'){
+    // Extraire les lignes fortes du body pour les mettre en valeur
+    var bodyFmt = (sl.body||'').replace(/<br><br>/g,'</p><p>');
+    // Détecter les éléments ✅ ❌ ⚠️ 🔴 etc pour les transformer en key-points
+    var hasKeyPoints = /^[✅❌⚠️🔴🟢•▪]/.test(sl.body||'');
+    var bodyHtml;
+    if(hasKeyPoints){
+      var klines = (sl.body||'').split('<br>').filter(Boolean);
+      var kpts = klines.map(function(l){
+        var icon = l.match(/^(\S+)\s*/);
+        var txt = icon ? l.replace(icon[0],'') : l;
+        return '<div class="key-point"><div class="key-point-icon">'+(icon?icon[1]:'▸')+'</div><div class="key-point-text">'+txt+'</div></div>';
+      }).join('');
+      bodyHtml = '<div class="concept-card">'+kpts+'</div>';
+    } else {
+      // Mettre les parties <strong>...</strong> en highlight
+      var highlighted = (sl.body||'').replace(/<strong>(.*?)<\/strong>/g,'</p><div class="concept-highlight">$1</div><p>');
+      bodyHtml = '<div class="slide-body">'+highlighted+'</div>';
+    }
+    var eyebrow = sl.emoji ? '<div class="slide-eyebrow"><span class="slide-eyebrow-icon">'+sl.emoji+'</span>'+(sl.tag?'<span class="slide-eyebrow-tag">'+sl.tag+'</span>':'')+'</div>' : (sl.tag?'<div class="slide-tag">'+sl.tag+'</div>':'');
+    h='<div class="slide-block">'+eyebrow+'<div class="slide-title">'+sl.title+'</div>'+bodyHtml+'</div>';
+  } else if(t==='cards'){
+    var items=sl.items.map(function(it){return'<div class="card-item"><div class="card-emoji">'+it.emoji+'</div><div><div class="card-name">'+it.name+'</div><div class="card-sub">'+it.sub+'</div></div></div>';}).join('');
+    h='<div class="slide-block"><div class="slide-title">'+sl.title+'</div><div class="cards-grid">'+items+'</div></div>';
+  } else if(t==='compare'){
+    var lc=sl.left,rc=sl.right;
+    h='<div class="slide-block"><div class="slide-title">'+sl.title+'</div><div class="compare-grid"><div class="compare-col"><div class="compare-header"><span class="compare-emoji">'+lc.emoji+'</span><span class="compare-label">'+lc.label+'</span></div><div class="compare-num">'+lc.num+'</div>'+(lc.unit?'<div class="compare-unit">'+lc.unit+'</div>':'')+'<div class="compare-desc">'+lc.desc+'</div></div><div class="compare-col '+(rc.color||'')+'"><div class="compare-header"><span class="compare-emoji">'+rc.emoji+'</span><span class="compare-label">'+rc.label+'</span></div><div class="compare-num '+(rc.color==='good'?'green':'')+'">'+rc.num+'</div>'+(rc.unit?'<div class="compare-unit">'+rc.unit+'</div>':'')+'<div class="compare-desc">'+rc.desc+'</div></div></div>'+(sl.note?'<div class="compare-note">'+sl.note+'</div>':'')+'</div>';
+  } else if(t==='stat'){
+    h='<div class="slide-block"><div class="stat-block"><div class="stat-val">'+sl.val+'</div><div class="stat-unit">'+sl.unit+'</div><div class="stat-body">'+sl.body+'</div></div></div>';
+  } else if(t==='warning'){
+    h='<div class="slide-block"><div class="warning-block"><div class="warning-icon">'+(sl.emoji||'⚠️')+'</div><div class="warning-title">'+sl.title+'</div><div class="warning-body">'+(sl.body||sl.warn||'')+'</div></div></div>';
+  } else if(t==='action'){
+    var steps=sl.steps.map(function(s,i){return'<div class="action-step"><div class="action-step-num">'+(i+1)+'</div><span>'+s+'</span></div>';}).join('');
+    h='<div class="slide-block"><div class="action-block"><div class="action-badge">'+sl.badge+'</div><div class="action-title">'+sl.title+'</div><div class="action-steps">'+steps+'</div><a href="'+sl.url+'" target="_blank" rel="noopener" class="action-cta">'+sl.cta+' →</a></div></div>';
+  } else if(t==='quote'){
+    h='<div class="slide-block"><div class="quote-block"><div class="quote-text">"'+sl.text+'"</div><div class="quote-bar"></div></div></div>';
+  } else if(t==='recap'){
+    var pts=sl.points.map(function(p){return'<div class="recap-item"><span class="recap-dot">◆</span><span>'+p+'</span></div>';}).join('');
+    h='<div class="slide-block"><div class="recap-title">'+sl.title+'</div><div class="recap-list">'+pts+'</div></div>';
+  }
+  a.classList.remove('slide-enter','slide-enter-back');
+  a.innerHTML=h;
+  void a.offsetWidth; // force reflow
+  a.classList.add(window._slideDir==='prev'?'slide-enter-back':'slide-enter');
+  window._slideDir='next';
+  a.scrollTop=0;
+  updateNav();updatePbars();updateSidebar();
+}
+
+function updateNav(){
+  var L=LESSONS[curL];
+  document.getElementById('navInfo').textContent='Leçon '+L.id+' · Slide '+(curS+1)+'/'+L.slides.length;
+  document.getElementById('btnPrev').disabled=curL===0&&curS===0;
+  var last=curL===LESSONS.length-1&&curS===L.slides.length-1;
+  var nb=document.getElementById('btnNext');
+  nb.textContent=last?'Terminer ✓':'Suivant →';
+  nb.className=last?'btn-nav done-btn':'btn-nav primary';
+}
+
+function updatePbars(){
+  var s=seen[curL]?seen[curL].size:1;
+  var tot=LESSONS[curL].slides.length;
+  var pct=Math.max(Math.round(s/tot*100),Math.round((curS+1)/tot*100));
+  document.getElementById('slidePbar').style.width=pct+'%';
+  var gp=globalPct();
+  document.getElementById('hPbarFill').style.width=gp+'%';
+  document.getElementById('hPct').textContent=gp+'%';
+}
+
+function updateSidebar(){
+  var d=loadProg();
+  document.getElementById('sbLessons').innerHTML=LESSONS.map(function(l,i){
+    var done=!!d[i];
+    var s=seen[i]?seen[i].size:0;
+    var pct=done?100:Math.round(s/l.slides.length*100);
+    return'<div class="sb-item'+(i===curL?' active':'')+(done?' done':'')+'" onclick="goTo('+i+')">'+'<span class="sb-num">'+l.id+'</span><div class="sb-info"><div class="sb-name">'+l.title+'</div><div class="sb-bar"><div class="sb-bar-fill" style="width:'+pct+'%"></div></div></div><span class="sb-check">✓</span></div>';
+  }).join('');
+}
+
+function refreshUI(){updatePbars();updateSidebar();renderLessonsPanel();}
+
+function toggleLessonsPanel() {
+  var panel = document.getElementById('lessonsPanel');
+  var tab = document.getElementById('lessonsTab');
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    tab.classList.remove('active');
+  } else {
+    renderLessonsPanel();
+    panel.classList.add('open');
+    tab.classList.add('active');
+  }
+}
+
+function renderLessonsPanel() {
+  var d = loadProg();
+  var el = document.getElementById('lpScroll');
+  el.innerHTML = LESSONS.map(function(l, li) {
+    var isDone = !!d[li];
+    var isActivL = li === curL;
+    var slides = l.slides.map(function(s, si) {
+      var label = s.t === 'intro' ? '▶ Intro' :
+                  s.t === 'recap' ? '✓ Recap' :
+                  s.t === 'action' ? '🚀' :
+                  s.t === 'stat' ? '📊' :
+                  s.t === 'warning' ? '⚠️' :
+                  s.t === 'quote' ? '"' :
+                  s.t === 'compare' ? '⚖️' :
+                  s.t === 'cards' ? '📋' : '💡';
+      var isActS = isActivL && si === curS;
+      return '<button class="lp-slide-btn' + (isActS?' active':'') + '" onclick="goToSlide(' + li + ',' + si + ')">' + label + ' ' + (si+1) + '</button>';
+    }).join('');
+    return '<div class="lp-lesson' + (isActivL?' open':'') + '">' +
+      '<button class="lp-lesson-btn' + (isActivL?' active':'') + (isDone?' done':'') + '" onclick="toggleLpLesson(this,' + li + ')">' +
+        '<span class="lp-lesson-num">' + l.id + '</span>' +
+        '<span class="lp-lesson-name">' + l.title + '</span>' +
+        '<span class="lp-lesson-check">✓</span>' +
+      '</button>' +
+      '<div class="lp-slides">' + slides + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleLpLesson(btn, idx) {
+  var lessonEl = btn.parentElement;
+  var wasOpen = lessonEl.classList.contains('open');
+  document.querySelectorAll('.lp-lesson').forEach(function(el){ el.classList.remove('open'); });
+  if (!wasOpen) lessonEl.classList.add('open');
+}
+
+function goToSlide(li, si) {
+  autoPlay = false; stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  curL = li; curS = si;
+  render();
+  renderLessonsPanel();
+}
+
+// ══ NAVIGATION ══
+function next(){autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  window._slideDir='next';
+  var L=LESSONS[curL];
+  if(curS<L.slides.length-1){curS++;render();}
+  else if(curL<LESSONS.length-1){markDone(curL);curL++;curS=0;render();}
+  else{markDone(curL);}
+}
+function prev(){autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  window._slideDir='prev';
+  if(curS>0){curS--;render();}
+  else if(curL>0){curL--;curS=LESSONS[curL].slides.length-1;render();}
+}
+function goTo(idx){
+  autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  curL=idx;curS=0;render();}
+
+// ══ TTS ══
+var voixOn = false;
+var synth = window.speechSynthesis;
+var utterance = null;
+
+var autoPlay = false;
+
+function stopVoix() {
+  autoPlay = false;
+  if (synth) synth.cancel();
+  var subs = document.getElementById('subtitlesText');
+  if (subs) { subs.classList.add('hidden'); subs.textContent = ''; }
+}
+
+function togglePlay() {
+  if (autoPlay) {
+    // Pause
+    autoPlay = false;
+    voixOn = false;
+    stopVoix();
+    document.getElementById('playIcon').style.display = 'block';
+    document.getElementById('pauseIcon').style.display = 'none';
+    document.getElementById('playBtn').classList.remove('playing');
+    document.getElementById('btnVoix').classList.remove('active');
+    document.getElementById('btnVoix').textContent = '🔊 Voix';
+  } else {
+    // Play
+    voixOn = true;
+    autoPlay = true;
+    document.getElementById('playIcon').style.display = 'none';
+    document.getElementById('pauseIcon').style.display = 'block';
+    document.getElementById('playBtn').classList.add('playing');
+    document.getElementById('btnVoix').classList.add('active');
+    document.getElementById('btnVoix').textContent = '🔊 Voix ON';
+    var sl = LESSONS[curL].slides[curS];
+    if (sl && sl.vo) playVoix(sl.vo);
+    else autoAdvance();
+  }
+}
+
+function autoAdvance() {
+  if (!autoPlay) return;
+  window._slideDir='next';
+  // Avancer au slide suivant
+  var L = LESSONS[curL];
+  if (curS < L.slides.length - 1) {
+    curS++; render();
+  } else if (curL < LESSONS.length - 1) {
+    markDone(curL); curL++; curS = 0; render();
+  } else {
+    markDone(curL); autoPlay = false;
+  }
+}
+
+function playVoix(text) {
+  if (!voixOn || !text || !synth) return;
+  synth.cancel();
+  // Supprimer le préfixe "Leçon X." en début de VO
+  text = text.replace(/^Le[çc]on\s+\w+\.?\s*/i, '');
+  utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'fr-FR';
+  utterance.rate = 1.05;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+  var voices = synth.getVoices();
+  var frVoice = voices.find(function(v) { return v.lang === 'fr-FR' && v.name.indexOf('Google') > -1; })
+    || voices.find(function(v) { return v.lang === 'fr-FR'; })
+    || voices.find(function(v) { return v.lang.startsWith('fr'); });
+  if (frVoice) utterance.voice = frVoice;
+
+  // Sous-titres synchronisés via boundary event
+  var subs = document.getElementById('subtitlesText');
+  var sentences = text.match(/[^.!?…]+[.!?…]+\s*/g) || [text];
+  // Précalculer les positions de début de chaque phrase
+  var positions = [];
+  var pos = 0;
+  sentences.forEach(function(s) {
+    positions.push(pos);
+    pos += s.length;
+  });
+
+  utterance.onboundary = function(e) {
+    if (e.name !== 'word' && e.name !== 'sentence') return;
+    var ci = e.charIndex;
+    // Trouver la phrase qui contient cet index
+    var phraseIdx = 0;
+    for (var i = positions.length - 1; i >= 0; i--) {
+      if (ci >= positions[i]) { phraseIdx = i; break; }
+    }
+    subs.classList.remove('hidden');
+    subs.textContent = sentences[phraseIdx].trim();
+  };
+
+  utterance.onend = function() {
+    subs.classList.add('hidden');
+    subs.textContent = '';
+    if (autoPlay) setTimeout(autoAdvance, 400);
+  };
+  utterance.onerror = function() {
+    subs.classList.add('hidden');
+    subs.textContent = '';
+  };
+
+  synth.speak(utterance);
+}
+
+function playVoixAuto(text) {
+  // Comme playVoix mais déclenche autoAdvance à la fin
+  playVoix(text);
+}
+
+function toggleVoix() {
+  voixOn = !voixOn;
+  var btn = document.getElementById('btnVoix');
+  if (voixOn) {
+    btn.classList.add('active');
+    btn.textContent = '🔊 Voix ON';
+    // Lire le slide actuel
+    var sl = LESSONS[curL].slides[curS];
+    if (sl.vo) playVoix(sl.vo);
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '🔊 Voix';
+    stopVoix();
+  }
+}
+
+// ══ INIT ══
+(function(){
+  var d=loadProg();
+  LESSONS.forEach(function(l,i){if(d[i])seen[i]=new Set(Array.from({length:l.slides.length},function(_,j){return j;}));});
+  var start=0;
+  for(var i=0;i<LESSONS.length;i++){if(!d[i]){start=i;break;}if(i===LESSONS.length-1)start=i;}
+  curL=start;curS=0;
+  voixOn = false;
+  render();
+})();
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prev();}
+});
+</script>
+</body>
+</html>
