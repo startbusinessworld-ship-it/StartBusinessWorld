@@ -662,6 +662,14 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeFormationOverlay();
 });
 
+// Écouter la fermeture depuis la formation
+window.addEventListener('message', function(e) {
+  if (e.data === 'sbw:close') {
+    closeFormationOverlay();
+    renderAll(); // Rafraîchir les progressions
+  }
+});
+
 init();
 </script>
 
