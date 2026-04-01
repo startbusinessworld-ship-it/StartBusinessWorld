@@ -614,17 +614,20 @@ function renderGrid() {
     card.className = "f-card";
     if (hasUrl) card.style.cursor = "pointer";
 
-    card.innerHTML =
-      coverHtml +
-      '<div class="f-card-body">' +
-        '<div class="f-card-top"><div class="f-card-title">' + f.title + '</div>' + badge + '</div>' +
-        (f.description ? '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>' : '') +
-        '<div class="f-card-meta"><span id="fmeta_' + f.id + '">—</span></div>' +
-        (!hasUrl
-          ? '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
-            '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>'
-          : '') +
-      '</div>';
+    // Pour les formations URL : juste le cadran, sans body en dessous
+    if (hasUrl) {
+      card.innerHTML = coverHtml;
+    } else {
+      card.innerHTML =
+        coverHtml +
+        '<div class="f-card-body">' +
+          '<div class="f-card-top"><div class="f-card-title">' + f.title + '</div>' + badge + '</div>' +
+          (f.description ? '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>' : '') +
+          '<div class="f-card-meta"><span id="fmeta_' + f.id + '">—</span></div>' +
+          '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
+          '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>' +
+        '</div>';
+    }
 
     if (hasUrl) {
       card.addEventListener("click", function() {
