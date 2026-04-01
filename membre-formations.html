@@ -589,52 +589,60 @@ function renderGrid() {
     return;
   }
   grid.innerHTML = "";
+
   allFormations.forEach(function(f, i) {
     var badge = f._pct === 100
       ? '<span class="badge-done">✓ Terminée</span>'
       : f._pct > 0 ? '<span class="badge-prog">En cours</span>' : "";
 
     var hasUrl = !!f.formation_url;
-    var coverContent = f.cover_url
-      ? '<img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;position:absolute;inset:0" loading="lazy">'      : '<span style="font-size:2.2rem">' + EMOJIS[i % EMOJIS.length] + '</span>';
-    var coverBg = '';
+
+    // Cover : iframe live si URL, emoji sinon
+    var coverHtml;
+    if (hasUrl) {
+      coverHtml =
+        '<div class="cover-iframe-wrap" style="width:100%;aspect-ratio:16/9;overflow:hidden;position:relative;background:var(--dark)">' +
+          '<iframe src="' + f.formation_url + '" style="width:1280px;height:720px;position:absolute;top:0;left:0;pointer-events:none;border:none;transform-origin:top left" scrolling="no" tabindex="-1"></iframe>' +
+        '</div>';
+    } else if (f.cover_url) {
+      coverHtml = '<div class="f-card-cover"><img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block;position:absolute;inset:0" loading="lazy"></div>';
+    } else {
+      coverHtml = '<div class="f-card-cover"><span style="font-size:2.2rem">' + EMOJIS[i % EMOJIS.length] + '</span></div>';
+    }
 
     var card = document.createElement("div");
     card.className = "f-card";
+    if (hasUrl) card.style.cursor = "pointer";
+
     card.innerHTML =
-      '<div class="f-card-cover">' + coverContent + '</div>' +
+      coverHtml +
       '<div class="f-card-body">' +
         '<div class="f-card-top"><div class="f-card-title">' + f.title + '</div>' + badge + '</div>' +
         (f.description ? '<div style="font-size:.75rem;color:var(--muted);margin-bottom:6px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>' : '') +
         '<div class="f-card-meta"><span id="fmeta_' + f.id + '">—</span></div>' +
-        (!hasUrl ? '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
-        '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>' : '') +
-        '<div style="margin-top:10px">' +
-          (hasUrl
-            ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:600;text-decoration:none">&#9654; Lancer la formation</a>'
-            : '<button class="btn-open-formation" data-fid="' + f.id + '" style="display:inline-flex;align-items:center;gap:6px;background:var(--dark);color:#fff;padding:8px 18px;border-radius:6px;font-size:.78rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
-          ) +
-        '</div>' +
+        (!hasUrl
+          ? '<div class="pbar"><div class="pfill" style="width:' + f._pct + '%"></div></div>' +
+            '<div class="plabel"><span>' + f._pct + '% complété</span><span>' + f._done + '/' + f._tot + '</span></div>'
+          : '') +
       '</div>';
-    if (!hasUrl) {
-      card.style.cursor = "pointer";
-      card.addEventListener("click", (function(fm) { return function(e) {
-        if (e.target.tagName === "BUTTON" || e.target.tagName === "A") return;
-        openFormation(fm);
-      }; })(f));
-    }
-    grid.appendChild(card);
 
-    // Bouton "Voir le contenu" sans JSON inline
-    var btnOpen = card.querySelector(".btn-open-formation");
-    if (btnOpen) {
-      btnOpen.addEventListener("click", (function(fm) { return function(e) {
-        e.stopPropagation();
-        openFormation(fm);
-      }; })(f));
+    if (hasUrl) {
+      card.addEventListener("click", function() {
+        window.open(f.formation_url, "_blank", "noopener");
+      });
+    } else {
+      card.style.cursor = "pointer";
+      card.addEventListener("click", (function(fm) { return function() { openFormation(fm); }; })(f));
     }
+
+    grid.appendChild(card);
   });
 
+  // Scale des iframes miniatures
+  scaleIframes();
+  window.addEventListener("resize", scaleIframes);
+
+  // Nombre de modules
   allFormations.forEach(function(f) {
     SB.from("modules").select("id", { count: "exact" }).eq("formation_id", f.id).then(function(r) {
       var el = document.getElementById("fmeta_" + f.id);
@@ -642,6 +650,17 @@ function renderGrid() {
     });
   });
 }
+
+function scaleIframes() {
+  document.querySelectorAll(".cover-iframe-wrap").forEach(function(wrap) {
+    var iframe = wrap.querySelector("iframe");
+    if (!iframe) return;
+    var w = wrap.offsetWidth;
+    if (!w) return;
+    iframe.style.transform = "scale(" + (w / 1280) + ")";
+  });
+}
+
 
 // ── DÉTAIL FORMATION ──
 async function openFormation(f) {
