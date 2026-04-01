@@ -645,8 +645,8 @@ function insertOutil() {
 // ── AUTO COVER depuis URL ──
 function autoCaptureCover(url) {
   if (!url || !url.startsWith('http')) return;
-  // WordPress mShots — screenshot gratuit sans clé
-  var screenshotUrl = 'https://s0.wordpress.com/mshots/v1/' + encodeURIComponent(url) + '?w=800&h=450';
+  // WordPress mShots — 1280x720 (16:9 natif)
+  var screenshotUrl = 'https://s0.wordpress.com/mshots/v1/' + encodeURIComponent(url) + '?w=1280&h=720&screen_width=1280';
   document.getElementById('fCover').value = screenshotUrl;
   previewCover(screenshotUrl);
 }
