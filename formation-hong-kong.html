@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Société Hong Kong 🇭🇰 — 0% impôts | SBW</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0C0A;--surface:#141412;--border:rgba(255,255,255,.08);
+  --white:#F0ECE4;--muted:rgba(240,236,228,.45);--faint:rgba(240,236,228,.07);
+  --gold:#8B0000;--gold-rgb:139,0,0;--gold-light:#A52020;--green:#4ECB71;--red:#E05252;--site-gold:#A67C3A;--site-gold-light:#C49A4E;
+  --sidebar:240px;--header:52px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--white);display:flex;flex-direction:column}
+header{height:var(--header);background:var(--surface);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0}
+.h-left{display:flex;align-items:center;gap:14px}
+.h-logo{font-family:'Cormorant Garamond',serif;font-size:1rem;font-weight:600;color:var(--site-gold);letter-spacing:.04em}
+.h-sep{width:0.5px;height:18px;background:var(--border)}
+.h-title{font-size:.82rem;color:var(--muted)}
+.h-right{display:flex;align-items:center;gap:12px}
+.h-pbar-wrap{width:120px;height:4px;background:var(--faint);border-radius:2px;overflow:hidden}
+.h-pbar-fill{height:100%;background:var(--site-gold);border-radius:2px;transition:width .4s}
+.h-pct{font-size:.72rem;color:var(--muted)}
+.btn-close{background:none;border:0.5px solid var(--border);color:var(--muted);padding:5px 14px;border-radius:5px;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-close:hover{border-color:var(--white);color:var(--white)}
+.layout{display:flex;flex:1;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--surface);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden}
+.sb-head{padding:14px 14px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+.sb-head-label{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--muted)}
+.sb-lessons{flex:1;overflow-y:auto;padding:6px}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:7px;cursor:pointer;transition:background .1s}
+.sb-item:hover{background:var(--faint)}
+.sb-item.active{background:rgba(166,124,58,.15)}
+.sb-item.active .sb-num{color:var(--gold)}
+.sb-num{font-size:.65rem;color:var(--muted);width:16px;flex-shrink:0;text-align:right;font-weight:500}
+.sb-info{flex:1;min-width:0}
+.sb-name{font-size:.78rem;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-bar{height:2px;background:var(--faint);border-radius:1px;margin-top:4px;overflow:hidden}
+.sb-bar-fill{height:100%;background:var(--site-gold);border-radius:1px;transition:width .3s}
+.sb-check{font-size:.7rem;color:var(--green);opacity:0;flex-shrink:0;transition:opacity .2s}
+.sb-item.done .sb-check{opacity:1}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.slide-progress{height:3px;background:var(--faint);flex-shrink:0}
+.slide-progress-fill{height:100%;background:var(--site-gold);transition:width .3s}
+.slide-area{flex:1;overflow-y:auto;display:flex;align-items:flex-start;justify-content:center;padding:32px 40px 100px}
+.slide-wrap{width:100%;max-width:720px}
+.slide-intro{text-align:center;padding:40px 20px 32px}
+.slide-num{font-size:.7rem;letter-spacing:.15em;color:var(--gold);margin-bottom:12px;text-transform:uppercase}
+.slide-emoji-big{font-size:3.5rem;margin-bottom:20px;display:block}
+.slide-intro-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:600;line-height:1.1;margin-bottom:18px}
+.slide-intro-title em{color:var(--gold);font-style:italic}
+.slide-intro-sub{font-size:.92rem;color:var(--muted);max-width:540px;margin:0 auto;line-height:1.7}
+.slide-block{padding:8px 0}
+.slide-tag{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:10px}
+.slide-title{font-family:'Cormorant Garamond',serif;font-size:1.7rem;font-weight:600;line-height:1.2;margin-bottom:16px}
+.slide-body{font-size:.9rem;color:rgba(240,236,228,.85);line-height:1.75}
+.slide-body strong{color:var(--white);font-weight:600}
+.slide-body em{color:var(--gold);font-style:italic}
+.cards-grid{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.card-item{background:var(--faint);border:0.5px solid var(--border);border-radius:9px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.card-emoji{font-size:1.4rem;flex-shrink:0;margin-top:1px}
+.card-name{font-size:.88rem;font-weight:600;margin-bottom:3px}
+.card-sub{font-size:.78rem;color:var(--muted);line-height:1.55}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:4px}
+.compare-col{background:var(--faint);border:0.5px solid var(--border);border-radius:9px;padding:16px}
+.compare-col.good{border-color:rgba(78,203,113,.3);background:rgba(78,203,113,.06)}
+.compare-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.compare-emoji{font-size:1.3rem}
+.compare-label{font-size:.78rem;font-weight:600}
+.compare-num{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;color:var(--gold);line-height:1;margin-bottom:4px}
+.compare-num.green{color:var(--green)}
+.compare-unit{font-size:.7rem;color:var(--muted);margin-bottom:10px}
+.compare-desc{font-size:.78rem;color:var(--muted);line-height:1.55}
+.compare-note{margin-top:12px;padding:10px 14px;background:rgba(166,124,58,.08);border-left:2px solid var(--gold);border-radius:0 6px 6px 0;font-size:.78rem;color:rgba(240,236,228,.7);line-height:1.6}
+.stat-block{text-align:center;padding:32px 20px}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,10vw,5.5rem);font-weight:700;color:var(--gold);line-height:1}
+.stat-unit{font-size:1rem;color:var(--muted);margin-top:4px;margin-bottom:20px}
+.stat-body{font-size:.88rem;color:var(--muted);line-height:1.7;max-width:500px;margin:0 auto}
+.warning-block{background:rgba(224,82,82,.08);border:0.5px solid rgba(224,82,82,.25);border-radius:10px;padding:20px 22px}
+.warning-icon{font-size:1.6rem;margin-bottom:10px}
+.warning-title{font-size:1rem;font-weight:600;margin-bottom:10px;color:#F08080}
+.warning-body{font-size:.86rem;color:rgba(240,236,228,.8);line-height:1.7}
+.action-block{background:linear-gradient(135deg,rgba(166,124,58,.12),rgba(166,124,58,.06));border:0.5px solid rgba(166,124,58,.3);border-radius:12px;padding:24px}
+.action-badge{display:inline-flex;align-items:center;gap:6px;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);background:rgba(166,124,58,.15);padding:4px 10px;border-radius:20px;margin-bottom:14px}
+.action-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;margin-bottom:16px}
+.action-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
+.action-step{display:flex;align-items:flex-start;gap:10px;font-size:.85rem;color:rgba(240,236,228,.85);line-height:1.5}
+.action-step-num{width:20px;height:20px;border-radius:50%;background:var(--gold);color:#000;font-size:.65rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.action-cta{display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;padding:12px 24px;border-radius:8px;font-size:.88rem;font-weight:600;text-decoration:none;border:none;cursor:pointer;font-family:inherit;transition:background .15s}
+.action-cta:hover{background:var(--gold-light)}
+.recap-title{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:600;margin-bottom:14px;color:var(--gold)}
+.recap-list{display:flex;flex-direction:column;gap:7px}
+.recap-item{display:flex;align-items:flex-start;gap:10px;font-size:.86rem;color:rgba(240,236,228,.85);line-height:1.55}
+.recap-dot{color:var(--gold);font-size:.7rem;flex-shrink:0;margin-top:3px}
+.quote-block{text-align:center;padding:32px 20px}
+.quote-text{font-family:'Cormorant Garamond',serif;font-size:clamp(1.2rem,3vw,1.8rem);font-style:italic;line-height:1.5;color:var(--white);margin-bottom:16px;max-width:580px;margin-left:auto;margin-right:auto}
+.quote-bar{width:40px;height:2px;background:var(--gold);margin:0 auto}
+.nav-bar{height:60px;background:var(--surface);border-top:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0;gap:8px}
+.nav-info{font-size:.75rem;color:var(--muted);flex:1;text-align:center}
+.nav-left{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.btn-nav{display:flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;font-family:inherit;transition:all .15s;border:0.5px solid var(--border);background:var(--faint);color:var(--white)}
+.btn-nav:hover{border-color:rgba(255,255,255,.3)}
+.btn-nav:disabled{opacity:.3;cursor:not-allowed}
+.btn-nav.primary{background:var(--site-gold);border-color:var(--site-gold);color:#fff}
+.btn-nav.primary:hover{background:var(--site-gold-light)}
+.btn-nav.done-btn{background:rgba(78,203,113,.12);border-color:rgba(78,203,113,.3);color:var(--green)}
+/* Bouton hamburger */
+.btn-menu{display:flex;flex-direction:column;justify-content:center;gap:4px;padding:8px 10px;border-radius:7px;border:0.5px solid var(--border);background:var(--faint);cursor:pointer;transition:all .15s}
+.btn-menu:hover{border-color:rgba(255,255,255,.3)}
+.btn-menu.active{border-color:var(--gold)}
+.btn-menu span{display:block;width:16px;height:1.5px;background:var(--muted);border-radius:2px;transition:background .15s}
+.btn-menu.active span{background:var(--gold)}
+/* Bouton Play/Pause */
+.btn-play{width:38px;height:38px;border-radius:50%;background:var(--site-gold);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;animation:pulse 2.5s infinite}
+.btn-play:hover{background:var(--site-gold-light);transform:scale(1.08)}
+.btn-play svg{fill:#fff}
+.btn-play.playing{animation:none;background:var(--gold)}
+#btnVoix.active{background:rgba(166,124,58,.15);border-color:var(--gold);color:var(--gold)}
+.subtitles{position:fixed;bottom:130px;left:50%;transform:translateX(-50%);z-index:100;max-width:700px;width:90%;text-align:center;pointer-events:none}
+.subtitles-text{display:inline-block;background:rgba(0,0,0,.75);color:#fff;font-size:.92rem;line-height:1.6;padding:8px 18px;border-radius:8px;backdrop-filter:blur(4px);transition:opacity .3s}
+.subtitles-text.hidden{opacity:0}
+.cta-fixed{position:fixed;bottom:72px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:center;gap:8px;background:var(--gold);color:#fff;padding:11px 28px;border-radius:30px;font-size:.85rem;font-weight:600;text-decoration:none;box-shadow:0 4px 20px rgba(166,124,58,.4);transition:background .15s,transform .15s;white-space:nowrap}
+.cta-fixed:hover{background:var(--gold-light);transform:translateX(-50%) translateY(-2px)}
+
+/* Play/pause dans la nav bar */
+@keyframes pulse{0%,100%{box-shadow:0 0 0 6px rgba(166,124,58,.2)}50%{box-shadow:0 0 0 10px rgba(166,124,58,.06)}}
+
+/* Panneau leçons */
+.lessons-panel{position:fixed;bottom:0;left:0;width:320px;background:var(--surface);border-top:0.5px solid var(--border);border-right:0.5px solid var(--border);border-radius:0 12px 0 0;z-index:300;transform:translateY(100%);transition:transform .3s;max-height:70vh;display:flex;flex-direction:column}
+.lessons-panel.open{transform:translateY(0)}
+.lp-head{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.lp-head-title{font-size:.8rem;font-weight:600;color:var(--white)}
+.lp-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px}
+.lp-scroll{overflow-y:auto;flex:1;padding:8px}
+.lp-lesson{margin-bottom:4px}
+.lp-lesson-btn{width:100%;display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:6px;cursor:pointer;background:none;border:none;font-family:inherit;color:var(--white);text-align:left;transition:background .1s}
+.lp-lesson-btn:hover{background:var(--faint)}
+.lp-lesson-btn.active{color:var(--gold)}
+.lp-lesson-num{font-size:.65rem;color:var(--muted);width:16px;flex-shrink:0}
+.lp-lesson-name{font-size:.78rem;flex:1}
+.lp-lesson-check{font-size:.68rem;color:var(--green);opacity:0}
+.lp-lesson-btn.done .lp-lesson-check{opacity:1}
+.lp-slides{padding:0 0 0 34px;display:none}
+.lp-lesson.open .lp-slides{display:flex;flex-wrap:wrap;gap:4px;padding-bottom:6px}
+.lp-slide-btn{font-size:.68rem;padding:3px 10px;border-radius:4px;border:0.5px solid var(--border);background:var(--faint);color:var(--muted);cursor:pointer;font-family:inherit;transition:all .1s}
+.lp-slide-btn:hover{border-color:var(--gold);color:var(--gold)}
+.lp-slide-btn.active{background:rgba(166,124,58,.2);border-color:var(--gold);color:var(--gold)}
+
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--faint);border-radius:2px}
+
+/* Animations slides */
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeSlideInLeft{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+.slide-enter{animation:fadeSlideIn .28s cubic-bezier(.22,1,.36,1)}
+.slide-enter-back{animation:fadeSlideInLeft .28s cubic-bezier(.22,1,.36,1)}
+
+/* Concept enrichi */
+.concept-card{background:var(--faint);border:0.5px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:12px}
+.concept-highlight{background:linear-gradient(135deg,rgba(var(--gold-rgb),.12),transparent);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:.9rem;line-height:1.7;color:var(--white)}
+.key-point{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.key-point:last-child{border-bottom:none}
+.key-point-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.key-point-text{font-size:.87rem;color:rgba(240,236,228,.85);line-height:1.6}
+.slide-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.slide-eyebrow-icon{font-size:1.8rem}
+.slide-eyebrow-tag{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold)}
+@media(max-width:600px){
+  .sidebar{display:none}
+  .slide-area{padding:20px}
+  .compare-grid{grid-template-columns:1fr}
+  .h-title{display:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="h-left">
+    <span class="h-logo">SBW</span>
+    <div class="h-sep"></div>
+    <span class="h-title">Société Hong Kong 🇭🇰 0% impôts</span>
+  </div>
+  <div class="h-right">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="h-pbar-wrap"><div class="h-pbar-fill" id="hPbarFill" style="width:0%"></div></div>
+      <span class="h-pct" id="hPct">0%</span>
+    </div>
+    <button id="btnVoix" onclick="toggleVoix()" style="display:flex;align-items:center;gap:5px;background:none;border:0.5px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:5px;font-size:.75rem;cursor:pointer;font-family:inherit;transition:all .15s" title="Voix off 1.05x">🔊 Voix</button>
+    <button class="btn-close" onclick="stopVoix();window.parent.postMessage('sbw:close','*')">✕ Fermer</button>
+  </div>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sb-head"><div class="sb-head-label">10 leçons</div></div>
+    <div class="sb-lessons" id="sbLessons"></div>
+  </aside>
+  <div class="main">
+    <div class="slide-progress"><div class="slide-progress-fill" id="slidePbar" style="width:0%"></div></div>
+    <div class="slide-area" id="slideArea"></div>
+    <div class="nav-bar">
+      <div class="nav-left">
+        <!-- Hamburger menu -->
+        <button class="btn-menu" id="lessonsTab" onclick="toggleLessonsPanel()" title="Navigation">
+          <span></span><span></span><span></span>
+        </button>
+        <!-- Play / Pause -->
+        <button class="btn-play" id="playBtn" onclick="togglePlay()" title="Play / Pause">
+          <svg id="playIcon" viewBox="0 0 24 24" width="14" height="14"><polygon points="5,3 19,12 5,21"/></svg>
+          <svg id="pauseIcon" viewBox="0 0 24 24" width="14" height="14" style="display:none"><rect x="5" y="3" width="4" height="18" rx="1"/><rect x="15" y="3" width="4" height="18" rx="1"/></svg>
+        </button>
+      </div>
+      <span class="nav-info" id="navInfo"></span>
+      <div class="nav-right">
+        <button class="btn-nav" id="btnPrev" onclick="prev()">←</button>
+        <button class="btn-nav primary" id="btnNext" onclick="next()">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="subtitles" id="subtitles">
+  <div class="subtitles-text hidden" id="subtitlesText"></div>
+</div>
+
+<!-- Panneau leçons -->
+<div class="lessons-panel" id="lessonsPanel">
+  <div class="lp-head">
+    <span class="lp-head-title">Navigation</span>
+    <button class="lp-close" onclick="toggleLessonsPanel()">✕</button>
+  </div>
+  <div class="lp-scroll" id="lpScroll"></div>
+</div>
+
+<a href="https://www.luminoscorp.com" target="_blank" rel="noopener" class="cta-fixed">
+  🇭🇰 Créer ma société Hong Kong
+</a>
+
+<script>
+const LESSONS=[{id:1,title:"🇭🇰 Pourquoi Hong Kong change tout",slides:[{t:'intro',emoji:'🇭🇰',num:'01',title:"Pourquoi Hong Kong\n<em>change tout</em>",sub:"Il existe un endroit sur terre où les entrepreneurs paient légalement 0% d'impôts sur leurs revenus offshore. Cet endroit s'appelle Hong Kong."},{t:'concept',tag:"Le principe offshore",emoji:'🌏',title:"Le principe offshore de Hong Kong 🌏",body:"Hong Kong applique le principe de la <strong>territorialité fiscale.</strong> Concrètement :<br><br>✅ Revenus générés <strong>DEPUIS Hong Kong</strong> → Impôts à HK (16,5%)<br>✅ Revenus générés <strong>EN DEHORS de Hong Kong</strong> → <em>0% d'impôts</em><br><br>Si tu fais du commerce international, de l'e-commerce, de l'import-export — <strong>tes profits ne sont pas imposés.</strong>"},{t:'compare',title:"🌍 France vs Hong Kong — la différence concrète",left:{emoji:'🇫🇷',label:"Société en France",num:'25',unit:'%',desc:"IS à 25% sur les bénéfices. TVA à gérer. Charges sociales lourdes. Déclarations complexes. L'État prend le quart de tout ce que tu gagnes."},right:{emoji:'🇭🇰',label:"Société à Hong Kong",num:'0',unit:'%',desc:"0% d'impôts sur les revenus offshore. Pas de TVA. Comptabilité simple. Banque internationale. Pour les business qui vendent hors de HK.",color:'good'},note:"La légalité est totale — Hong Kong est membre de l'OMC, reconnue par tous les pays. Pas un paradis fiscal exotique : une des places financières les plus réputées au monde."},{t:'stat',val:'0',unit:"% d'impôts sur vos revenus offshore",body:"Ce n'est pas une astuce cachée. C'est <strong>inscrit dans la loi hongkongaise</strong> depuis 1947 — le principe de la <em>territorialité fiscale.</em> Ce que tu génères en dehors de Hong Kong n'est pas imposé. Légalement. Reconnu mondialement."},{t:'warning',emoji:'⚠️',title:"Ce qu'il faut absolument comprendre avant de continuer 🚨",body:"Créer une société à Hong Kong ne te dispense pas automatiquement de payer des impôts en France.<br><br>La société HK paie <strong>0% sur ses bénéfices offshore</strong>. Mais si tu es résident fiscal français et que tu te verses des dividendes ou un salaire depuis cette société, <strong>ces revenus personnels sont imposés en France.</strong><br><br>L'optimisation complète = société HK (IS 0%) + résidence fiscale adaptée (IR 0%). On voit ça en leçon 7."},{t:'recap',title:"Ce qu'il faut retenir",points:["Territorialité fiscale : revenus offshore = 0% d'impôts à HK","100% légal — inscrit dans la loi HK depuis 1947, reconnu mondialement","E-commerce, import-export, services internationaux — tous éligibles","Résidence fiscale française = impôt personnel en France quand même","Société HK = optimisation du business / résidence = optimisation perso","L'optimisation complète = société HK + résidence fiscale adaptée"]}]},{id:2,title:"💎 Les avantages concrets d'une société HK",slides:[{t:'intro',emoji:'💎',num:'02',title:"Les avantages concrets\n<em>d'une société Hong Kong</em>",sub:"0% c'est le principal. Mais c'est loin d'être le seul avantage. Voilà pourquoi Hong Kong est bien plus qu'une simple optimisation fiscale."},{t:'cards',title:"💰 Les avantages fiscaux",items:[{emoji:'0️⃣',name:"0% sur les revenus offshore",sub:"Tes ventes en dehors de Hong Kong ne sont pas imposées. E-commerce, dropshipping, services digitaux, import-export."},{emoji:'🚫',name:"Pas de TVA",sub:"Hong Kong n'a pas de TVA. Tu ne collectes pas, tu ne déclares pas, tu ne reverses pas. Zéro friction administrative."},{emoji:'📊',name:"16,5% si activité locale",sub:"Si ton business génère des revenus depuis Hong Kong même (ventes locales), le taux reste parmi les plus bas du monde."}]},{t:'cards',title:"🌏 Les avantages business",items:[{emoji:'🏦',name:"Accès aux banques mondiales",sub:"HSBC, Standard Chartered, Citibank — les plus grandes banques mondiales. Plus Airwallex, Wise Business."},{emoji:'💳',name:"Multi-devises natif",sub:"Reçois en USD, EUR, GBP, AUD, HKD, CNY. Paie tes fournisseurs dans leur devise. Zéro friction de change."},{emoji:'🤝',name:"Crédibilité internationale",sub:"Une société HK inspire confiance auprès des fournisseurs asiatiques, des clients internationaux, des partenaires."}]},{t:'cards',title:"⚡ Les avantages opérationnels",items:[{emoji:'📋',name:"Création simple et rapide",sub:"Une société à Hong Kong se crée en 5 à 7 jours ouvrés depuis chez toi. Zéro déplacement, zéro notaire."},{emoji:'🔒',name:"Confidentialité",sub:"Les actionnaires ne sont pas dans les registres publics. Confidentialité bien meilleure qu'en France."},{emoji:'🌐',name:"Accès à la Chine",sub:"Hong Kong est la porte d'entrée vers les fournisseurs chinois. Les entreprises chinoises préfèrent traiter avec des entités HK."}]},{t:'stat',val:'5-7',unit:"jours pour créer ta société HK depuis chez toi",body:"Pas besoin de se déplacer à Hong Kong. Pas besoin d'un avocat local. Un <strong>cabinet spécialisé en création à distance</strong> comme <em>Luminos Corp</em> gère tout : dossier, dépôt, documents officiels, en français."},{t:'recap',title:"Ce qu'il faut retenir",points:["0% sur revenus offshore — e-commerce, services, import-export","Pas de TVA — zéro déclaration, zéro reversement","Accès aux meilleures banques mondiales","Multi-devises natif — USD, EUR, GBP, CNY...","Création en 5-7 jours, tout à distance","Porte d'entrée vers les fournisseurs chinois"]}]},{id:3,title:"🔍 Comment fonctionne le 0% offshore",slides:[{t:'intro',emoji:'🔍',num:'03',title:"Comment fonctionne\n<em>le 0% offshore</em>",sub:"C'est quoi exactement un revenu offshore ? Qui peut en bénéficier ? Quelles sont les conditions ? On rentre dans le détail."},{t:'concept',tag:"La définition offshore",emoji:'🌏',title:"C'est quoi un revenu offshore à Hong Kong ? 🌏",body:"Un revenu est considéré <strong>offshore</strong> si :<br><br>✅ Le contrat est conclu en dehors de Hong Kong<br>✅ Le service est exécuté en dehors de Hong Kong<br>✅ Les biens sont achetés et revendus en dehors de HK<br><br>Concrètement : si tu gères ton business depuis la France ou l'étranger et que tes clients sont hors HK → <strong>tes revenus sont offshore → 0%.</strong>"},{t:'cards',title:"✅ Les business éligibles au 0%",items:[{emoji:'🛒',name:"E-commerce et dropshipping",sub:"Tu vends à des clients en Europe ou aux US depuis ta société HK. Clients et stocks hors HK. Offshore à 100%."},{emoji:'📦',name:"Import-export / Trading",sub:"Tu achètes en Chine, tu revends en France ou en Europe. Tout se passe hors de HK. 0% sur les marges."},{emoji:'💻',name:"Services digitaux",sub:"Agence marketing, développement web, consulting, formation en ligne, SaaS. Clients hors HK. Offshore."},{emoji:'📱',name:"Contenu et médias",sub:"YouTube, affiliation, courses en ligne, royalties. Revenus générés hors HK. 0%."}]},{t:'warning',emoji:'📋',title:"La documentation — c'est ce qui fait la différence 📋",body:"Le 0% ne s'applique pas automatiquement. Tu dois <strong>prouver</strong> le caractère offshore de tes revenus.<br><br>Ce qu'il faut garder :<br>✅ Contrats avec tes clients (emails, agreements)<br>✅ Factures émises depuis ta société HK<br>✅ Preuves que les transactions se déroulent hors de HK<br>✅ Relevés bancaires montrant les flux<br><br>Ton comptable HK (fourni par Luminos) prépare chaque année la déclaration et demande l'<strong>exemption offshore</strong> officiellement."},{t:'concept',emoji:'🧮',title:"Le taux réduit HK pour les petits bénéfices 🧮",body:"Pour les revenus <strong>onshore</strong> (générés à Hong Kong même) :<br><br>💼 <strong>8,25%</strong> sur les premiers 2 millions HKD (~250k€)<br>💼 <strong>16,5%</strong> au-delà<br><br>Même si une partie de ton activité est onshore, les taux restent parmi les plus compétitifs au monde. Et dans la plupart des cas pour les entrepreneurs en ligne, l'intégralité est offshore."},{t:'recap',title:"Ce qu'il faut retenir",points:["Offshore = contrats, services et ventes réalisés hors de Hong Kong","E-commerce, trading, services digitaux, médias — tous éligibles","Documentation obligatoire — garde tous tes contrats et preuves","Revenus onshore : 8,25% sur les premiers 2M HKD puis 16,5%","Comptable HK obligatoire pour la déclaration offshore","Si tu gères depuis l'étranger et tes clients sont hors HK → 0%"]}]},{id:4,title:"⚡ Créer ta société HK depuis chez toi",slides:[{t:'intro',emoji:'⚡',num:'04',title:"Créer ta société HK\n<em>depuis chez toi</em>",sub:"Pas besoin de prendre l'avion. Pas besoin d'un avocat local. En 5 à 7 jours ouvrés, ta société est créée."},{t:'cards',title:"📋 Les éléments pour créer ta société HK",items:[{emoji:'🏢',name:"Nom de la société",sub:"Tu choisis un nom en anglais, généralement se terminant par 'Limited' ou 'Ltd'. Luminos vérifie la disponibilité."},{emoji:'👤',name:"Actionnaire(s) et directeur",sub:"Minimum 1 actionnaire et 1 directeur. Peut être la même personne — toi. La nationalité n'importe pas."},{emoji:'📍',name:"Adresse enregistrée HK",sub:"Une adresse physique à Hong Kong est obligatoire. Le cabinet qui crée ta société (Luminos) te la fournit."},{emoji:'📄',name:"Passeport valide",sub:"Copie de ton passeport suffisant. Pas besoin de l'apostiller ou de le certifier pour la création en ligne."}]},{t:'concept',emoji:'📅',title:"Le processus de création — étape par étape 📅",body:"<strong>Jour 1-2 :</strong> Tu fournis les documents, tu choisis ton nom<br><strong>Jour 2-3 :</strong> Dépôt au Companies Registry de Hong Kong<br><strong>Jour 4-5 :</strong> Validation et Certificate of Incorporation<br><strong>Jour 5-7 :</strong> BR Certificate, statuts, certificat d'actions<br><br>Tout se fait à distance. Luminos coordonne chaque étape et te tient informé en français."},{t:'stat',val:'1 490',unit:"USD pour la création complète avec Luminos",body:"Tarif tout compris de <strong>Luminos Corp</strong>, cabinet spécialisé en création de sociétés à Hong Kong pour entrepreneurs francophones.<br><br>✅ Certificate of Incorporation<br>✅ Business Registration Certificate<br>✅ Statuts et certificat d'actions<br>✅ Adresse officielle HK incluse 1 an<br>✅ Secrétaire légal obligatoire inclus 1 an"},{t:'action',badge:"🚀 Passe à l'action",emoji:'🇭🇰',title:"Crée ta société HK maintenant",steps:["Rends-toi sur www.luminoscorp.com — cabinet spécialisé en création HK pour francophones","Prépare ton passeport + le nom que tu veux pour ta société","Remplis le formulaire de prise de contact — réponse sous 24h","Société créée en 5 à 7 jours ouvrés — tout se fait par email, en français"],cta:"Créer ma société HK",url:"https://www.luminoscorp.com"},{t:'recap',title:"Ce qu'il faut retenir",points:["Documents : passeport + nom choisi — c'est tout","Délai : 5 à 7 jours ouvrés — tout à distance","Luminos Corp : 1 490 USD création / 990 USD renouvellement annuel","Tu reçois : Certificate of Incorporation, BR Certificate, statuts, actions","Confidentialité : actionnaires non publics","www.luminoscorp.com — bouton ci-dessus"]}]},{id:5,title:"🏦 Les banques physiques HK",slides:[{t:'intro',emoji:'🏦',num:'05',title:"Les banques physiques\n<em>à Hong Kong</em>",sub:"HSBC, Standard Chartered, Bank of China — les grandes banques mondiales accessibles depuis ta société HK."},{t:'cards',title:"🏛️ Les 3 principales banques physiques HK",items:[{emoji:'🟥',name:"HSBC Hong Kong",sub:"La référence. Présence mondiale, accès au réseau HSBC international. Idéale pour les grosses transactions B2B. Ouverture difficile — exige souvent une présence physique ou un dossier solide."},{emoji:'🟩',name:"Standard Chartered HK",sub:"Excellente pour les transactions internationales. Plus accessible qu'HSBC pour les non-résidents dans certains cas. Multi-devises, réseau international solide."},{emoji:'🟥',name:"Bank of China HK",sub:"Incontournable si tu travailles avec des fournisseurs chinois. CNY natif, virements vers la Chine facilités. Particulièrement adaptée au trading et à l'import-export Chine."}]},{t:'compare',title:"💡 Banque physique vs Néo-banque",left:{emoji:'🏛️',label:"Banque physique",num:'✓',unit:'',desc:"Crédibilité maximale. Accès au crédit. Recommandée pour les grosses transactions. Mais ouverture difficile sans présence physique, lente."},right:{emoji:'⚡',label:"Néo-banque",num:'✓',unit:'',desc:"Ouverture 100% en ligne en 48h. Multi-devises. Intégration Stripe/PayPal. Frais très bas. La solution pour 95% des entrepreneurs.",color:'good'},note:"Notre recommandation : commencer avec une néo-banque (Airwallex) puis ajouter une banque physique si besoin."},{t:'warning',emoji:'⚠️',title:"Le défi des banques physiques pour non-résidents 🚨",body:"Ouvrir un compte dans une banque physique à Hong Kong sans y habiter est difficile.<br><br>❌ HSBC exige souvent une visite en agence HK ou une présentation via un conseiller<br>❌ Standard Chartered peut demander des justificatifs d'activité importants<br>❌ Bank of China HK a des exigences variables selon ton profil<br><br>✅ La solution pour démarrer : <strong>Airwallex ou Wise Business</strong> — compte ouvert en 24-48h en ligne, multi-devises, intégration Stripe/PayPal."},{t:'recap',title:"Ce qu'il faut retenir",points:["HSBC : la référence mondiale — difficile à ouvrir sans présence physique","Standard Chartered : internationale, plus accessible pour non-résidents","Bank of China : idéale pour le commerce avec la Chine","Recommandation : débuter avec une néo-banque, puis ajouter une banque physique","Pour 95% des cas : Airwallex ou Wise Business suffisent au démarrage","Prochaine leçon : Airwallex — la néo-banque incontournable"]}]},{id:6,title:"⚡ Airwallex & les néo-banques HK",slides:[{t:'intro',emoji:'⚡',num:'06',title:"Airwallex & les néo-banques :\n<em>la révolution bancaire</em>",sub:"Airwallex, Wise Business, Mercury — les outils bancaires qui ont tout changé pour les entrepreneurs avec des sociétés HK."},{t:'stat',val:'#1',unit:"Airwallex — le choix numéro un pour HK",body:"<strong>Airwallex</strong> est une fintech australienne fondée à Hong Kong. Elle offre :<br><br>✅ Ouverture de compte 100% en ligne en <strong>24-48h</strong><br>✅ Comptes multi-devises (USD, EUR, GBP, AUD, HKD, CNY...)<br>✅ Connexion directe <strong>Stripe, PayPal Pro</strong><br>✅ Cartes physiques et virtuelles multi-devises<br>✅ Taux de change interbancaires — économies de 3-5% vs banques traditionnelles"},{t:'cards',title:"💡 Pourquoi Airwallex est supérieure pour HK",items:[{emoji:'🔗',name:"Connecte les processeurs de paiement",sub:"Stripe, PayPal Pro peuvent être connectés directement à ton compte Airwallex. Tes revenus arrivent directement dans ta société HK."},{emoji:'💱',name:"Taux de change imbattables",sub:"Taux interbancaire réel. Économies de 3 à 5% sur les conversions vs banques traditionnelles. Sur de gros volumes, ça représente des milliers d'euros."},{emoji:'🌏',name:"Virements internationaux ultra-rapides",sub:"Envoie de l'argent dans 150+ pays en quelques heures. Paye tes fournisseurs en CNY, en USD, en EUR directement."}]},{t:'compare',title:"⚡ Airwallex vs Wise Business",left:{emoji:'🚀',label:"Airwallex",num:'✓',unit:'',desc:"Meilleure intégration Stripe/PayPal. API avancée. Idéale pour les gros volumes. Cartes physiques multi-devises. Conçue pour les business HK."},right:{emoji:'💙',label:"Wise Business",num:'✓',unit:'',desc:"Plus simple à ouvrir. Très populaire en Europe. Excellente pour les particuliers qui s'internationalisent. Moins d'intégrations e-commerce.",color:'neutral'},note:"Les deux sont excellents. Airwallex est la référence pour les business en ligne à gros volume. Wise Business pour les profils plus simples."},{t:'warning',emoji:'⚠️',title:"Ping Pong — la néo-banque à éviter pour HK 🚨",body:"Ping Pong est une néo-banque populaire dans certaines communautés d'entrepreneurs. <strong>Mais elle présente un problème majeur pour les sociétés HK :</strong><br><br>❌ <strong>Ping Pong ne connecte pas les processeurs de paiement</strong> (Stripe, PayPal) à ta société HK<br><br>Concrètement : si tu fais de l'e-commerce et que tu utilises Stripe, tu ne pourras pas faire pointer tes paiements vers ta société HK via Ping Pong.<br><br>✅ Recommandation claire : <strong>Airwallex</strong> pour les business e-commerce."},{t:'recap',title:"Ce qu'il faut retenir",points:["Airwallex n°1 — ouverture 24-48h, connecte Stripe/PayPal, multi-devises","Wise Business — alternative simple, très bien pour profils non e-commerce","Ping Pong — ne connecte pas les processeurs de paiement — à éviter pour HK","Taux de change interbancaires = économies significatives sur gros volumes","Paiements dans 150+ pays, CNY direct pour fournisseurs chinois","Recommandation : Airwallex pour e-commerce / Wise Business pour services"]}]},{id:7,title:"🔗 Combiner HK avec ta situation perso",slides:[{t:'intro',emoji:'🔗',num:'07',title:"Combiner HK\n<em>avec ta situation perso</em>",sub:"HK + France, HK + Dubaï, HK + Maroc — les différentes combinaisons et laquelle est optimale selon ton profil."},{t:'cards',title:"📊 Les 3 profils et leurs combinaisons",items:[{emoji:'🇫🇷',name:"Profil 1 : Tu restes en France",sub:"Société HK paie 0% sur ses bénéfices offshore. Mais quand tu te verses de l'argent (dividendes), tu paies l'IR en France. Stratégie : réinvestir dans la société, minimiser les sorties."},{emoji:'🇦🇪',name:"Profil 2 : Tu pars à Dubaï",sub:"0% d'IS sur les bénéfices société HK + 0% d'IR à Dubaï. L'optimisation complète. La structure qu'utilisent les entrepreneurs les plus avancés."},{emoji:'🌍',name:"Profil 3 : Nomade / autre pays",sub:"Dépend des conventions fiscales entre ton pays et Hong Kong. Portugal, Maroc, Thaïlande, Géorgie — chaque pays a ses règles."}]},{t:'concept',emoji:'🎯',title:"HK + Dubaï = 0% + 0% 🎯",body:"C'est la structure que utilisent les entrepreneurs les plus optimisés :<br><br>🇭🇰 <strong>Société Hong Kong</strong> → IS 0% sur bénéfices offshore<br>🇦🇪 <strong>Résidence fiscale Dubaï</strong> → IR 0% sur revenus personnels<br><br>Résultat : la société accumule sans impôts, et quand tu te verses de l'argent, tu ne paies pas d'IR non plus.<br><br>Condition : résider réellement à Dubaï (183 jours minimum, Emirates ID, appartement...)."},{t:'concept',emoji:'🇫🇷',title:"HK + France — ce qui est possible 🇫🇷",body:"Rester résident fiscal français avec une société HK c'est possible et légal. Mais il faut comprendre les règles :<br><br>✅ La société HK paie 0% sur ses bénéfices offshore<br>⚠️ Si tu te verses des dividendes depuis la société HK → flat tax 30% en France<br>⚠️ Règles CFC (contrôle des sociétés étrangères) à respecter<br>⚠️ Déclaration obligatoire de la société étrangère en France<br><br>Stratégie HK + France : accumuler dans la société, réinvestir, et structurer les sorties avec un expert fiscal."},{t:'warning',emoji:'⚠️',title:"Les points légaux à ne jamais négliger 🚨",body:"<strong>CFC — Contrôle des sociétés étrangères :</strong> En France, si tu contrôles une société étrangère, les bénéfices peuvent être considérés comme des revenus français dans certains cas. Un expert fiscal t'aide à structurer correctement.<br><br><strong>Prix de transfert :</strong> Si tu as une société en France et une à HK qui travaillent ensemble, les transactions entre elles doivent être au prix du marché.<br><br><strong>Déclaration obligatoire :</strong> En France, toute société étrangère que tu contrôles doit être déclarée (formulaire 3916-bis). Pénalités lourdes en cas d'oubli."},{t:'recap',title:"Ce qu'il faut retenir",points:["HK + France : société accumule à 0%, dividendes perso imposés en France","HK + Dubaï : 0% + 0% — l'optimisation maximale","HK + autre pays : dépend des conventions fiscales locales","En France : déclaration obligatoire de la société étrangère","Expert fiscal indispensable avant de structurer","Stratégie HK + France : réinvestir dans la société, sortir quand ça change"]}]},{id:8,title:"⚙️ Gérer sa société HK sans prise de tête",slides:[{t:'intro',emoji:'⚙️',num:'08',title:"Gérer sa société HK\n<em>sans prise de tête</em>",sub:"Hong Kong c'est l'un des environnements les plus simples au monde pour les entrepreneurs. Ce qui se passe concrètement chaque année."},{t:'cards',title:"📅 Ce qui se passe chaque année",items:[{emoji:'🔎',name:"L'audit annuel",sub:"À Hong Kong on ne parle pas de bilan comptable mais d'audit. Un auditeur certifié HK vérifie tes comptes. Luminos te connecte avec leurs partenaires."},{emoji:'🏛️',name:"Business Registration Renewal",sub:"Le renouvellement annuel de ton certificat d'activité. Luminos s'en occupe entièrement. Inclus dans les 990 USD de renouvellement."},{emoji:'🏢',name:"Annual Return",sub:"Une déclaration annuelle simple au Companies Registry qui confirme que ta société existe toujours. Luminos gère ça aussi."},{emoji:'📋',name:"Profits Tax Return",sub:"Si tes revenus sont 100% offshore, tu demandes l'exemption. Tu paies 0. Luminos et leur auditeur préparent tout."}]},{t:'stat',val:'990',unit:"USD par an — et Luminos gère tout",body:"Budget annuel simple :<br><br>✅ <strong>990 USD</strong> — renouvellement Luminos (adresse, secrétaire légal, Annual Return)<br>✅ <strong>500-800 USD</strong> — audit annuel (auditeur certifié HK partenaire Luminos)<br><br>Total : environ <strong>1 500-1 800 USD/an</strong> pour maintenir ta société HK en parfait état de marche."},{t:'concept',emoji:'🤝',title:"Tu délègues tout — tu te concentres sur ton business",body:"Avec Luminos comme cabinet de référence :<br><br>✅ Renouvellements gérés<br>✅ Mise en relation auditeurs certifiés HK<br>✅ Support en français pour toutes tes questions<br>✅ Déclarations fiscales préparées<br>✅ Conseil sur la structure et les optimisations<br><br>Toi, tu te concentres sur ce qui génère du chiffre. Luminos s'occupe du reste."},{t:'recap',title:"Ce qu'il faut retenir",points:["Audit annuel à HK — pas un bilan comme en France, Luminos coordonne","Renouvellements et Annual Return — gérés par Luminos (990 USD/an)","Exemption offshore si revenus hors HK → 0% d'IS","Budget total ~1 500-1 800 USD/an — rentabilisé en quelques semaines","Support en français — Luminos pense francophone","Prochaine leçon : Luminos Corp — le cabinet qui s'occupe de tout"]}]},{id:9,title:"🌟 Luminos Corp — ton cabinet HK",slides:[{t:'intro',emoji:'🌟',num:'09',title:"Luminos Corp :\n<em>ton cabinet à Hong Kong</em>",sub:"Le cabinet qui crée et maintient ta société à Hong Kong, en français, à distance."},{t:'concept',tag:"Qui est Luminos ?",emoji:'🌏',title:"Luminos Corp — le pont entre la France et Hong Kong 🌏",body:"Luminos Corp est un cabinet spécialisé dans la création et la gestion de sociétés à Hong Kong pour les entrepreneurs <strong>francophones</strong>.<br><br>Basé à Hong Kong, Luminos a été créé pour répondre à un besoin spécifique : rendre accessible la structure HK aux entrepreneurs français et francophones qui ne parlent pas anglais et ne peuvent pas se déplacer.<br><br>Leur spécialité : tout gérer à distance, en français, avec des délais rapides."},{t:'cards',title:"✅ Ce que Luminos fait pour toi",items:[{emoji:'⚡',name:"Création complète en 5-7 jours",sub:"Dossier, dépôt au Companies Registry, Certificate of Incorporation, BR Certificate, statuts, certificat d'actions. Tout livré par email."},{emoji:'📍',name:"Adresse officielle à Hong Kong",sub:"Adresse légale requise pour toute société HK. Incluse dans le package. Ton courrier est géré par Luminos."},{emoji:'👔',name:"Secrétaire légal obligatoire",sub:"Toute société HK doit avoir un secrétaire légal local. Luminos assure ce rôle. Inclus dans la création et le renouvellement."},{emoji:'🤝',name:"Mise en relation auditeurs et banques",sub:"Luminos te connecte avec leurs partenaires auditeurs certifiés HK et peut t'aider à orienter ton dossier bancaire."}]},{t:'compare',title:"💰 Les tarifs Luminos",left:{emoji:'⚡',label:"Création complète",num:'1 490',unit:'USD',desc:"Tout inclus : création société, adresse 1 an, secrétaire légal 1 an, documents officiels, accompagnement en français."},right:{emoji:'🔄',label:"Renouvellement annuel",num:'990',unit:'USD',desc:"Adresse officielle, secrétaire légal, Annual Return, renouvellements — tout géré. Plus mise en relation auditeur.",color:'neutral'},note:"Investissement récupéré en quelques semaines sur les économies d'IS réalisées."},{t:'cards',title:"🌟 Pourquoi Luminos et pas un autre cabinet ?",items:[{emoji:'🇫🇷',name:"Support 100% en français",sub:"Toutes les communications, les explications, les documents d'accompagnement — en français. Rare et précieux pour un cabinet HK."},{emoji:'🎯',name:"Spécialisé entrepreneurs francophones",sub:"Ils connaissent les questions des entrepreneurs français. Résidence fiscale, CFC, optimisation — ils ont les réponses."},{emoji:'🔗',name:"Réseau bancaire et auditeurs",sub:"Accès à leur réseau de partenaires : auditeurs certifiés HK, connexions bancaires, conseils adaptés à chaque profil."}]},{t:'action',badge:"🚀 Passe à l'action",emoji:'🌟',title:"Contacte Luminos maintenant",steps:["Clique sur 'Créer ma société Hong Kong' ci-dessous","Tu arrives sur www.luminoscorp.com — remplis le formulaire de contact","Réponse sous 24h — échange en français sur ta situation spécifique","Dans 5-7 jours ta société HK est créée et tu peux ouvrir ton compte Airwallex"],cta:"Créer ma société Hong Kong",url:"https://www.luminoscorp.com"},{t:'recap',title:"Ce qu'il faut retenir",points:["Cabinet spécialisé création sociétés HK pour entrepreneurs francophones","Support 100% en français — rare pour un cabinet Hong Kong","Création en 5-7 jours : 1 490 USD tout compris","Renouvellement annuel : 990 USD — tout géré","Réseau auditeurs certifiés HK + aide à l'ouverture bancaire","www.luminoscorp.com — bouton ci-dessus"]}]},{id:10,title:"🎯 Ton plan d'action — passe à l'action",slides:[{t:'intro',emoji:'🎯',num:'10',title:"Ton plan d'action :\n<em>passe à l'action maintenant</em>",sub:"T'as toutes les informations. La seule chose qui reste c'est de passer à l'action. Voilà exactement quoi faire."},{t:'cards',title:"📅 Le plan d'action en 4 étapes",items:[{emoji:'1️⃣',name:"Créer ta société HK avec Luminos",sub:"Bouton ci-dessous → www.luminoscorp.com. Formulaire en ligne. Dans 5-7 jours ta société est créée."},{emoji:'2️⃣',name:"Ouvrir ton compte Airwallex",sub:"Dossier avec tes documents HK. Compte ouvert en 24-48h. Connecte Stripe ou PayPal si tu fais de l'e-commerce."},{emoji:'3️⃣',name:"Demander l'exemption offshore",sub:"Luminos te met en relation avec un auditeur certifié HK. Il prépare ta Profits Tax Return et demande l'exemption. Tu paies 0%."},{emoji:'4️⃣',name:"Structurer tes revenus",sub:"Migre tes paiements vers ta société HK. Émets tes factures depuis HK. Commence à accumuler à 0% d'impôts."}]},{t:'concept',emoji:'🧠',title:"Pourquoi les gens attendent — et pourquoi c'est une erreur",body:"La plupart des entrepreneurs qui regardent cette formation vont attendre. Ils vont se dire que c'est trop compliqué, qu'ils vérifieront plus tard, que ce n'est pas encore le bon moment.<br><br>La vérité : <strong>il n'existe pas de moment parfait.</strong><br><br>Chaque mois passé sans structure HK, c'est des impôts payés sur des revenus qui auraient pu rester dans ta société."},{t:'concept',emoji:'💡',title:"Chaque mois d'attente a un prix 💡",body:"Sur 3 000€ de bénéfices mensuels :<br><br>🇫🇷 France (IS 25%) → tu gardes <strong>2 250€/mois</strong> → 27 000€/an<br>🇭🇰 Hong Kong (IS 0%) → tu gardes <strong>3 000€/mois</strong> → 36 000€/an<br><br><strong>Différence : 9 000€ par an.</strong> Récupérés dans ta société. Sans rien changer à ton activité. Juste en ayant la bonne structure.<br><br>Dans 5 ans : 45 000€ de différence. Capitalisés."},{t:'action',badge:"🎯 Passe à l'action",emoji:'🇭🇰',title:"Ce que tu fais maintenant",steps:["Clique sur 'Créer ma société Hong Kong' → www.luminoscorp.com","Ouvre ton compte Airwallex en parallèle","Dans 5-7 jours ta société HK est créée et ton compte ouvert","Dans 2 semaines ton infrastructure internationale est en place — 0% d'IS"],cta:"Créer ma société Hong Kong",url:"https://www.luminoscorp.com"},{t:'quote',text:"Ceux qui comprennent le système fiscal international et agissent tôt gardent ce qu'ils gagnent. Les autres donnent une part croissante à des États qui n'ont pas construit leur business."},{t:'recap',title:"Bilan de la formation Hong Kong",points:["0% sur revenus offshore — territorialité fiscale HK depuis 1947","Avantages : 0% IS, pas de TVA, banques mondiales, multi-devises","Création : 5-7 jours avec Luminos Corp — 1 490 USD tout compris","Banques : Airwallex (n°1 e-commerce), HSBC/SCB (physiques)","Luminos Corp : cabinet francophone, tout géré, support en français","Prochaine étape : bouton ci-dessus — passe à l'action"]}]}];
+
+
+// ══ VOICE-OVER DATA ══
+const VO = {"1": ["Il existe un endroit sur terre, parfaitement légal, reconnu internationalement, stable depuis des décennies, où tu peux créer une société et payer zéro pourcent d'impôts. Cet endroit s'appelle Hong Kong.", "Le principe fondamental de la fiscalité de Hong Kong s'appelle la territorialité. C'est simple. Hong Kong n'impose que les revenus qui sont générés depuis et dans Hong Kong. Si tu vends à des clients en France, en Europe, aux États-Unis, en Australie — ces revenus sont considérés comme offshore. Offshore ça veut dire générés en dehors de Hong Kong. Et les revenus offshore sont taxés à zéro pourcent. Pas à 1%, pas à 5%. Zéro. C'est inscrit dans la loi de Hong Kong depuis des décennies. Et c'est ce principe qui attire des dizaines de milliers d'entrepreneurs du monde entier chaque année.", "La comparaison concrète. En France, ta société paie 25% d'IS sur ses bénéfices. En plus tu as la TVA à gérer, les charges sociales, les déclarations complexes. Au total, une partie très significative de ce que tu génères part en impôts et charges. À Hong Kong, si tes revenus viennent de l'extérieur, tu paies zéro. Zéro impôts. Pas de TVA. La comptabilité est simple. Les banques sont accessibles depuis chez toi. Et tout ça c'est parfaitement légal. Hong Kong c'est pas un paradis fiscal obscur dans les Caraïbes. C'est une des places financières les plus respectées au monde.", "Pour être très clair sur la légalité. Le taux zéro pourcent sur les revenus offshore à Hong Kong ce n'est pas une technique de contournement fiscal. Ce n'est pas une arnaque. C'est inscrit noir sur blanc dans la loi de Hong Kong depuis 1947. Les autorités fiscales de Hong Kong reconnaissent explicitement que les revenus générés hors de leur territoire ne sont pas soumis à l'impôt local. Cette règle a été maintenue pendant plus de 75 ans à travers les changements politiques et économiques. Des milliers d'entrepreneurs du monde entier l'utilisent légalement. C'est simplement une loi différente de la loi française.", "Avant qu'on aille plus loin, je dois être complètement honnête avec toi. Créer une société à Hong Kong ne te dispense pas automatiquement de payer des impôts en France sur tes revenus personnels. Si tu es résident fiscal français, l'État français a le droit de t'imposer sur tous tes revenus mondiaux, y compris ceux que tu te verses depuis une société hong-kongaise. La société Hong Kong c'est une structure pour optimiser le business. Les bénéfices qui restent dans la société ne sont pas imposés. C'est quand tu sors l'argent personnellement que ça se complique si tu restes en France. L'optimisation complète combine la société HK avec une résidence fiscale adaptée. On en parle dans la dernière leçon.", "Ce qu'il faut retenir de cette première leçon. Hong Kong applique la territorialité fiscale. Tes revenus offshore sont taxés à zéro pourcent. C'est parfaitement légal, inscrit dans la loi depuis 1947, et utilisé par des milliers d'entrepreneurs. L'e-commerce, l'import-export, les services internationaux sont tous éligibles. Mais si tu es résident fiscal français, tes revenus personnels restent imposables en France. La société HK c'est pour le business. La résidence fiscale c'est pour le perso. L'optimisation complète combine les deux. Prochaine leçon, les avantages concrets d'une société à Hong Kong."], "2": ["Leçon deux. Le 0% d'impôts c'est l'avantage principal, celui qui attire. Mais une société à Hong Kong offre bien d'autres avantages que beaucoup d'entrepreneurs ignorent. Dans cette leçon je vais te les présenter tous, un par un, pour que tu comprennes exactement pourquoi cette structure est si puissante pour les entrepreneurs qui vendent à l'international.", "Les avantages fiscaux. Premièrement, zéro pourcent sur les revenus offshore. Si ton business vend à des clients en dehors de Hong Kong, France, Europe, États-Unis, Australie, Moyen-Orient, n'importe où dans le monde sauf Hong Kong, ces revenus ne sont pas imposés. Deuxièmement, il n'y a pas de TVA à Hong Kong. Pas de collecte, pas de déclaration mensuelle, pas de reversement à l'État. Zéro. Si tu gères une boutique en ligne et que tu vends des produits physiques ou des services digitaux, t'as pas à gérer la TVA. Troisièmement, si jamais tu as des revenus générés depuis Hong Kong même, le taux est de 16,5%, ce qui reste nettement inférieur au taux français.", "Les avantages business. Premièrement, l'accès aux banques mondiales. Avec une société à Hong Kong tu peux ouvrir des comptes chez HSBC, Standard Chartered, Citibank, les plus grandes banques mondiales. Et tu as accès à des néo-banques comme Airwallex ou Wise Business qui sont incontournables pour le business en ligne international. Deuxièmement, le multi-devises natif. Tu peux recevoir des paiements en dollars américains, en euros, en livres sterling, en dollars australiens, en yuan chinois. Et payer tes fournisseurs dans leur devise locale sans frais excessifs. Troisièmement, la crédibilité internationale. Une société à Hong Kong inspire immédiatement confiance.", "Les avantages opérationnels. La création d'une société à Hong Kong prend entre 5 et 7 jours ouvrés. Tu fais tout depuis chez toi, depuis Paris, depuis Dubaï, depuis Bali. Zéro déplacement nécessaire. Les formalités sont digitalisées et simples. La confidentialité est meilleure qu'en France. Les actionnaires ne figurent pas dans les registres publics. Et enfin, Hong Kong c'est la porte d'entrée vers la Chine. Si tu fais de l'import depuis la Chine, si tu travailles avec des fournisseurs chinois, avoir une société à Hong Kong change radicalement la façon dont ils te perçoivent et les conditions qu'ils t'accordent.", "En cinq à sept jours ouvrés, ta société à Hong Kong est créée, immatriculée, et opérationnelle. Tout se fait à distance. Tu n'as pas besoin de prendre un avion pour Hong Kong. Tu n'as pas besoin d'un avocat local que tu ne pourras pas superviser. Un cabinet spécialisé comme Luminos gère l'ensemble du processus pour toi. Tu fournis tes documents d'identité, tu remplis quelques formulaires en ligne, et tu reçois tous tes documents officiels par email. Certificat de constitution, numéro d'immatriculation, statuts de la société. Tout est digital, tout est légal, tout est rapide.", "Le résumé des avantages. Zéro pourcent sur les revenus offshore. Pas de TVA. Accès aux meilleures banques mondiales. Multi-devises natif. Création en cinq à sept jours depuis chez toi. Et accès privilégié aux fournisseurs chinois. Prochaine leçon, on plonge dans le détail : comment fonctionne exactement le 0% et qui peut en bénéficier."], "3": ["Leçon trois. Maintenant on entre dans le détail. Le 0% c'est réel, mais pour que ça s'applique à toi, y'a des conditions à respecter. Dans cette leçon je t'explique exactement ce qu'est un revenu offshore au sens de la loi de Hong Kong, quelles activités sont éligibles, et ce que tu dois documenter pour que le statut offshore soit reconnu.", "Qu'est-ce qu'un revenu offshore au sens de la loi de Hong Kong. Un revenu est considéré offshore si plusieurs conditions sont réunies. Pour les services, le contrat doit être négocié et signé en dehors de Hong Kong, et le service doit être fourni en dehors de Hong Kong. Pour le commerce de produits, les achats et les ventes doivent se faire en dehors de Hong Kong. En pratique, si tu gères ton business depuis la France, depuis Dubaï, depuis Bali, depuis n'importe où sauf Hong Kong, et que tes clients sont en dehors de Hong Kong, tes revenus sont considérés offshore et taxés à zéro pourcent.", "Les types de business éligibles au zéro pourcent. L'e-commerce et le dropshipping. Tu vends à des clients en Europe ou aux États-Unis depuis ta société à Hong Kong. Tes clients sont hors de Hong Kong, ton stock est hors de Hong Kong. Zéro pourcent. L'import-export et le trading. Tu achètes en Chine, tu revends en France ou en Europe. Tout se passe hors de Hong Kong. Zéro pourcent. Les services digitaux. Agence marketing, développement web, consulting, formation en ligne, applications SaaS. Tes clients sont hors de Hong Kong. Zéro pourcent. Et le contenu et les médias. YouTube, affiliation, cours en ligne, royalties sur des licences. Tant que les revenus viennent de hors Hong Kong. Zéro pourcent.", "Point critique. Le statut offshore et le zéro pourcent qui va avec ne s'appliquent pas automatiquement. C'est quelque chose que tu demandes à l'administration fiscale de Hong Kong en prouvant le caractère offshore de tes revenus. Et pour ça, tu dois documenter correctement. Tu gardes tous tes contrats signés avec des clients en dehors de Hong Kong. Tu gardes les factures et les preuves de paiement. Tu gardes les preuves que le service a été rendu hors de Hong Kong, emails, livrables, captures d'écran. Tu gardes les relevés bancaires qui montrent d'où viennent les paiements. Ton comptable à Hong Kong te guidera sur exactement quels documents conserver pour ton type d'activité. Ne néglige pas ça.", "Pour être complet, parlons aussi des revenus onshore, c'est-à-dire générés depuis Hong Kong même. Le taux standard est de 16,5%. Mais pour les sociétés dont les bénéfices ne dépassent pas deux millions de dollars de Hong Kong, environ 230 000 euros, le taux réduit est de 8,25%. Mais encore une fois, si tu gères un business depuis l'Europe ou depuis Dubaï, si tes clients sont hors de Hong Kong, tu n'as aucun revenu onshore. Tu paies zéro. Ces taux réduits ne concernent que les très rares cas où une partie de l'activité se passe physiquement à Hong Kong.", "Ce qu'il faut retenir. Offshore ça veut dire que les contrats sont signés hors de Hong Kong, les services rendus hors de Hong Kong, et les ventes faites hors de Hong Kong. L'e-commerce, le trading, les services digitaux, les médias, tout ça est éligible. La documentation est obligatoire, garde tous tes contrats et tes preuves. Et si un jour une partie de ton activité est onshore, le taux est de 8,25% sur les premiers 2 millions de HKD. Prochaine leçon, comment créer ta société à Hong Kong depuis chez toi."], "4": ["Leçon quatre. Comment tu crées concrètement ta société à Hong Kong sans te déplacer. Parce que beaucoup de gens pensent que c'est compliqué, que ça prend des mois, qu'il faut aller physiquement à Hong Kong. C'est faux. La procédure est digitalisée, simple, et un cabinet spécialisé peut gérer l'intégralité pour toi.", "Ce dont tu as besoin pour créer ta société à Hong Kong. Premièrement, un nom pour la société. Tu choisis un nom en anglais qui se termine généralement par Limited ou Ltd. Le cabinet vérifie la disponibilité pour toi. Deuxièmement, un actionnaire et un directeur. C'est le minimum légal. Ces deux rôles peuvent être remplis par la même personne, toi. La nationalité n'a aucune importance, tu peux être français, marocain, tunisien, n'importe quelle nationalité. Troisièmement, une adresse enregistrée à Hong Kong. Cette adresse est obligatoire légalement et le cabinet qui crée ta société te la fournit avec un abonnement annuel. Et enfin, une copie de ton passeport. C'est tout ce qu'il te faut.", "Le processus pas à pas. Jours un et deux, tu fournis tes documents. Ton passeport, le nom choisi pour la société, quelques informations basiques sur l'activité. Jours trois et quatre, le cabinet dépose le dossier auprès du Companies Registry de Hong Kong. Jours cinq à sept, tu reçois par email tous tes documents officiels. Le Certificate of Incorporation qui prouve que ta société existe légalement. Le Business Registration Certificate qui autorise l'exercice de l'activité commerciale. Les Articles of Association, c'est-à-dire les statuts de ta société. Et le Share Certificate qui atteste que tu es actionnaire. Ta société est opérationnelle. Tu peux ouvrir un compte bancaire, émettre des factures, et démarrer le business.", "Pour la création de ta société à Hong Kong, je recommande Luminos Corp. C'est un cabinet spécialisé dans la création de sociétés à Hong Kong pour les entrepreneurs francophones. Ils font ça à distance, ils parlent français, et ils connaissent exactement les questions que se posent les entrepreneurs français et francophones qui veulent structurer leur business. Le tarif de création tout compris est de 1 490 dollars américains. Ça inclut la création de la société, l'adresse officielle pour un an, le secrétaire légal qui est obligatoire à Hong Kong pour un an, et l'accompagnement complet. Le renouvellement annuel ensuite c'est 990 dollars. Pour mettre en place une structure qui te permet de payer zéro pourcent d'impôts sur tes revenus offshore, c'est un investissement qui se rentabilise très vite.", "Comment passer à l'action. Rends-toi sur le site www.luminoscorp.com. C'est le cabinet que je recommande pour la création de sociétés à Hong Kong pour les entrepreneurs francophones. Tu remplis le formulaire de prise de contact, tu précises ce que tu veux faire, et tu reçois une réponse sous 24 heures. Tu prépares ton passeport et le nom que tu veux pour ta société. Et en cinq à sept jours ouvrés, ta société est créée. Tout se fait à distance. Le bouton en bas de l'écran t'amène directement sur le site de Luminos.", "Ce qu'il faut retenir. Pour créer ta société à Hong Kong tu as besoin juste de ton passeport et d'un nom. Le délai c'est 5 à 7 jours ouvrés depuis chez toi. Luminos Corp gère tout, 1 490 dollars pour la création, 990 dollars pour le renouvellement annuel. Tu reçois tous tes documents officiels par email. Les actionnaires ne sont pas dans les registres publics. Et le bouton en bas de cet écran t'amène directement sur le site de Luminos. Prochaine leçon, les banques physiques à Hong Kong."], "5": ["Leçon cinq. Une fois ta société créée, il faut un compte bancaire. Il existe deux grandes catégories de comptes pour une société à Hong Kong. Les banques physiques traditionnelles et les néo-banques. Dans cette leçon on parle des banques physiques. HSBC, Standard Chartered, Bank of China. Et dans la leçon suivante on parle des néo-banques comme Airwallex.", "Les trois principales banques physiques à Hong Kong. HSBC Hong Kong d'abord. C'est la référence absolue. Présence mondiale dans plus de 60 pays. Si tu as un compte HSBC à Hong Kong, tu peux faire des transactions partout dans le monde avec une fluidité exceptionnelle. C'est idéale pour les grosses transactions et les relations B2B internationales. Mais c'est la plus difficile à ouvrir pour un non-résident. Elle exige souvent une présence physique ou une recommandation d'un client existant. Standard Chartered ensuite. Excellent choix pour les transactions internationales. Plus accessible qu'HSBC pour les entrepreneurs qui ne vivent pas à Hong Kong. Et Bank of China Hong Kong, absolument incontournable si tu travailles avec des fournisseurs chinois.", "La comparaison entre banques physiques et néo-banques. Les banques physiques comme HSBC ou Standard Chartered offrent une crédibilité maximale, un accès au crédit, et sont recommandées pour les grosses transactions B2B. Mais l'ouverture est difficile sans présence physique, ça prend du temps, et les frais sont plus élevés. Les néo-banques s'ouvrent en 48 heures depuis chez toi, tout en ligne, multi-devises natif, intégration directe avec Stripe et PayPal, frais très bas. Pour 95% des entrepreneurs qui démarrent avec une société Hong Kong, une néo-banque est largement suffisante et bien plus pratique. Notre recommandation c'est de commencer avec Airwallex et d'ajouter une banque physique plus tard si ton business en a besoin.", "La réalité que je dois te dire clairement. Ouvrir un compte dans une banque physique à Hong Kong quand tu n'habites pas là-bas, c'est difficile. HSBC exige souvent une visite physique à Hong Kong ou un parrainage d'un client existant avec un compte chez eux depuis longtemps. Standard Chartered est plus flexible mais peut demander de nombreux justificatifs sur ton activité et tes revenus. Bank of China est la plus accessible des trois, surtout si ton activité est liée à la Chine ou à l'Asie. La solution pragmatique pour la plupart des entrepreneurs c'est de commencer avec Airwallex ou Wise Business, qu'on va voir dans la prochaine leçon, et d'ajouter une banque physique ensuite quand ton business a du volume et de la crédibilité.", "Ce qu'il faut retenir. HSBC c'est la référence mondiale mais difficile à ouvrir sans aller à Hong Kong. Standard Chartered est plus accessible pour les non-résidents. Bank of China est idéale si tu travailles avec la Chine. Pour 95% des entrepreneurs qui lancent une société HK depuis l'étranger, commencer avec une néo-banque est la solution la plus pratique. On passe maintenant à Airwallex, la néo-banque que je recommande pour les entrepreneurs internationaux."], "6": ["Leçon six. Les néo-banques pour ta société à Hong Kong. Et quand je dis néo-banques, je parle d'Airwallex en premier. Parce qu'Airwallex c'est probablement l'outil le plus puissant qui existe pour un entrepreneur qui gère un business en ligne à l'international depuis une société Hong Kong. Dans cette leçon je te présente les meilleures néo-banques, leurs forces, leurs limites, et comment les utiliser.", "Airwallex. C'est la néo-banque que je recommande en numéro un pour les sociétés Hong Kong. Airwallex est une fintech fondée à Hong Kong et aujourd'hui valorisée à plusieurs milliards de dollars. Elle est conçue spécifiquement pour les entrepreneurs qui gèrent des business internationaux. Ouverture de compte en 24 à 48 heures, entièrement en ligne. Comptes multi-devises dans plus de 20 devises dont le dollar américain, l'euro, la livre sterling, le dollar australien, le dollar singapourien. Intégration native avec Stripe, PayPal, Shopify. Des cartes virtuelles et physiques que tu peux créer en quelques secondes. Et une API pour automatiser les paiements si tu as un business à gros volume.", "Pourquoi Airwallex est supérieure pour une société Hong Kong. Premièrement, elle connecte les processeurs de paiement. Tu peux brancher ton compte Stripe directement sur ton compte Airwallex. Tes revenus e-commerce arrivent directement dans ta société HK. Deuxièmement, les taux de change. Airwallex utilise le taux interbancaire réel, celui que les banques utilisent entre elles, sans la marge excessive des banques traditionnelles. Sur des volumes importants, les économies sur les conversions représentent des milliers d'euros par an. Troisièmement, les virements internationaux. Tu peux envoyer de l'argent dans plus de 150 pays en quelques heures. Et payer tes fournisseurs en Chine directement en yuan, ce qui accélère les livraisons et améliore les relations.", "La comparaison entre Airwallex et Wise Business. Les deux sont d'excellentes options. Airwallex est supérieure pour les intégrations avec Stripe et PayPal, pour l'API avancée, pour les gros volumes de transactions. Elle est conçue spécifiquement pour les business en ligne internationaux et elle est particulièrement bien adaptée aux sociétés de Hong Kong. Wise Business est plus simple à ouvrir et très populaire en Europe. C'est une excellente option pour les profils plus simples qui n'ont pas besoin d'intégrations e-commerce avancées. Si tu fais du volume important en e-commerce ou en dropshipping, choisis Airwallex. Si tu as une activité de services ou un profil plus simple, Wise Business est une très bonne alternative.", "Un avertissement important. Ping Pong est une néo-banque dont tu entends parfois parler dans les communautés d'entrepreneurs. Elle est utilisée par certains pour les sociétés à Hong Kong. Mais il y a un problème critique que tu dois connaître. Ping Pong ne permet pas de connecter des processeurs de paiement comme Stripe ou PayPal Pro à ton compte. Si tu fais de l'e-commerce, du dropshipping, ou si tu vends quoi que ce soit en ligne, c'est éliminatoire. Tu ne pourras pas recevoir tes revenus Stripe directement dans ton compte Ping Pong. Pour les sociétés Hong Kong qui vendent en ligne, Airwallex est clairement le meilleur choix. Cette information seule peut t'éviter des mois de frustration.", "Le résumé. Airwallex est la néo-banque numéro un pour les sociétés Hong Kong qui vendent en ligne. Ouverture en 24 à 48 heures, connexion directe avec Stripe et PayPal, multi-devises, taux de change interbancaires. Wise Business est une excellente alternative pour les profils plus simples. Et Ping Pong est à éviter si tu fais de l'e-commerce car elle ne connecte pas les processeurs de paiement. Prochaine leçon, comment combiner ta société Hong Kong avec ta situation personnelle pour une optimisation maximale."], "7": ["Leçon sept. Ta société à Hong Kong existe. Elle paie zéro pourcent sur ses revenus offshore. Maintenant la question c'est comment toi personnellement tu te positionnes pour que l'optimisation soit maximale. La réponse dépend de ta résidence fiscale. Dans cette leçon je te présente les différentes combinaisons possibles.", "Trois profils principaux. Profil un, tu restes en France. Ta société HK paie zéro pourcent sur ses bénéfices offshore. La société accumule des bénéfices sans impôts. Mais quand tu te verses de l'argent personnellement depuis la société HK en France, tu paies l'impôt sur le revenu français sur ces dividendes. La société HK reste très utile pour accumuler des bénéfices et réinvestir. Profil deux, tu pars à Dubaï. C'est la combinaison optimale. Société HK à zéro pourcent sur les bénéfices. Et quand tu sors l'argent personnellement à Dubaï, zéro pourcent d'impôt sur le revenu également. Les bénéfices de la société ne sont jamais imposés ni dans la société ni quand tu les sortis personnellement. Profil trois, nomade ou autre pays. Ça dépend des conventions fiscales.", "La combinaison que les entrepreneurs les plus optimisés utilisent. Société à Hong Kong pour les bénéfices offshore à zéro pourcent. Et résidence fiscale à Dubaï où l'impôt sur le revenu personnel est zéro. Tu accumules les bénéfices dans ta société HK sans payer d'IS. Tu te verses de l'argent personnellement à Dubaï sans payer d'IR. Optimisation totale sur les deux niveaux. Les bénéfices ne sont jamais imposés ni dans la société ni quand tu les sors personnellement. C'est pour ça que cette combinaison est si populaire parmi les entrepreneurs internationaux qui ont des business en ligne ou dans l'import-export.", "Si tu décides de rester en France, voilà comment ça fonctionne. Ta société à Hong Kong est parfaitement légale depuis la France. Elle accumule ses bénéfices à zéro pourcent d'IS. Tu peux réinvestir ces bénéfices dans le business, acheter du stock, payer des freelances, investir dans la publicité, tout ça depuis la société sans impôts. Par contre, quand tu te verses de l'argent personnellement depuis ta société HK en France, ces dividendes sont imposables à l'impôt sur le revenu français. La stratégie pour les entrepreneurs qui restent en France c'est de laisser l'argent dans la société, de réinvestir au maximum, et de sortir l'argent personnellement quand leur situation fiscale change, par exemple quand ils partent vivre ailleurs.", "Des points légaux importants à ne jamais négliger. En France, la législation CFC, contrôle des sociétés étrangères, peut dans certains cas considérer les bénéfices d'une société étrangère que tu contrôles comme des revenus français imposables. Les conditions exactes sont complexes et un expert fiscal peut t'aider à structurer correctement pour éviter ce risque. Si tu as une société en France et une société à Hong Kong, les transactions entre les deux doivent respecter les règles de prix de transfert, c'est-à-dire se faire aux prix du marché. Et surtout, en France, détenir une société étrangère doit être déclaré à l'administration fiscale chaque année. Ne jamais oublier cette obligation déclarative.", "Ce qu'il faut retenir. HK plus France, la société accumule à zéro pourcent mais les dividendes perso sont imposés en France. HK plus Dubaï, c'est l'optimisation maximale zéro pourcent partout. Et pour les nomades, ça dépend des conventions fiscales locales. En France, la déclaration de la société étrangère est obligatoire. Un expert fiscal est indispensable avant de structurer. Prochaine leçon, la comptabilité de ta société HK et les obligations légales."], "8": ["Leçon huit. Une fois ta société créée, y'a des formalités annuelles à respecter pour maintenir la structure en règle. La bonne nouvelle c'est que Hong Kong est réputé comme l'un des environnements les plus simples au monde pour les entrepreneurs. Et surtout, un cabinet comme Luminos peut tout gérer pour toi. Tu te concentres sur ton business, eux ils gèrent le reste.", "Ce qui se passe chaque année avec ta société à Hong Kong. Premièrement, l'audit annuel. À Hong Kong ce n'est pas un bilan comptable comme en France mais un audit réalisé par un auditeur certifié. Luminos peut te recommander des partenaires auditeurs avec qui ils travaillent. Deuxièmement le renouvellement du Business Registration Certificate. C'est Luminos qui s'en occupe directement dans le cadre de leur package de renouvellement annuel à 990 dollars. Troisièmement l'Annual Return, la déclaration annuelle au Companies Registry. Géré par Luminos également. Et quatrièmement la Profits Tax Return, la déclaration fiscale. Si tes revenus sont offshore, tu demandes l'exemption et tu paies zéro.", "Le budget annuel réaliste. Le renouvellement Luminos c'est 990 dollars par an. Ça couvre l'adresse officielle, le secrétaire légal, et toutes les formalités de renouvellement. L'audit annuel via les partenaires de Luminos c'est entre 500 et 800 dollars. Total environ 1 500 à 1 800 dollars par an pour maintenir une société Hong Kong parfaitement en règle avec zéro gestion de ta part. Et pour mettre ça en perspective, sur 50 000 euros de bénéfices annuels, en France tu paierais environ 12 500 euros d'IS. À Hong Kong tu paies zéro. L'investissement dans la structure se rentabilise en quelques semaines d'activité.", "L'avantage de passer par Luminos c'est que tu délègues l'intégralité de la gestion administrative de ta société. Les renouvellements sont gérés automatiquement. Ils te mettent en relation avec des auditeurs certifiés à Hong Kong avec qui ils travaillent régulièrement. La déclaration fiscale et la demande d'exemption offshore sont coordonnées. Ton adresse officielle est maintenue. Et tout ça se fait en français, parce que Luminos est un cabinet pensé pour les entrepreneurs francophones. Toi tu te concentres sur ce qui compte, faire tourner et développer ton business.", "Ce qu'il faut retenir. L'audit annuel à Hong Kong ce n'est pas un bilan français, c'est un audit certifié, et Luminos te met en relation avec les bons partenaires. Les renouvellements et l'Annual Return sont gérés par Luminos dans leur package annuel à 990 dollars. Si tes revenus sont offshore tu paies zéro pourcent d'IS. Le budget total c'est environ 1 500 à 1 800 dollars par an. Et tout se passe en français avec Luminos. Prochaine leçon, je te présente en détail Luminos Corp, le cabinet qui s'occupe de tout."], "9": ["Leçon neuf. Dans cette leçon je vais te parler en détail de Luminos Corp. C'est le cabinet que je recommande pour la création et la gestion de sociétés à Hong Kong pour les entrepreneurs francophones. Je vais te présenter ce qu'ils font exactement, pourquoi ils se distinguent, et pourquoi c'est le bon choix pour toi.", "Luminos Corp. Quand tu regardes le logo, les caractères chinois en dessous ça se lit Tumino, leur nom en mandarin. C'est un signal fort : ce cabinet est vraiment ancré à Hong Kong, avec une présence locale réelle, tout en étant pensé pour les entrepreneurs francophones. Ils connaissent les deux mondes. Le monde des entrepreneurs français qui veulent se structurer à l'international. Et le monde de Hong Kong, ses réglementations, ses banques, ses auditeurs. Ce double ancrage c'est précisément ce qu'il te faut.", "Ce que Luminos fait concrètement pour toi. La création complète de ta société en cinq à sept jours. Ils gèrent tout le dossier, le dépôt au Companies Registry, et te livrent par email le Certificate of Incorporation, le Business Registration Certificate, les statuts, et ton certificat d'actions. L'adresse officielle à Hong Kong, requise légalement pour toute société, est incluse dans leur package. Le rôle de secrétaire légal, également obligatoire à Hong Kong, est assuré par Luminos et inclus dans le renouvellement annuel. Et ils te mettent en relation avec leurs partenaires auditeurs certifiés et peuvent t'aider à préparer ton dossier pour l'ouverture bancaire.", "Les tarifs de Luminos. La création complète est à 1 490 dollars américains. Ça couvre l'intégralité du processus de création, l'adresse officielle pour un an, le secrétaire légal pour un an, tous les documents officiels, et l'accompagnement en français tout au long du processus. Le renouvellement annuel ensuite c'est 990 dollars par an. Ça couvre l'adresse officielle, le secrétaire légal, l'Annual Return, tous les renouvellements administratifs, et la mise en relation avec leurs partenaires auditeurs. Pour mettre ça en perspective, si ton business génère 3 000 euros de bénéfices par mois, tu économises environ 750 euros d'IS par mois en France. En deux mois tu as récupéré le coût de création de la structure.", "Pourquoi choisir Luminos plutôt qu'un autre cabinet pour créer ta société à Hong Kong. Premièrement le support en français. La grande majorité des cabinets à Hong Kong travaillent en anglais ou en cantonais. Luminos te communique en français, t'explique tout en français, et comprend précisément les préoccupations des entrepreneurs francophones. Deuxièmement ils sont spécialisés dans les profils d'entrepreneurs qui viennent de France ou des pays francophones. Ils connaissent les questions sur la résidence fiscale, les règles CFC françaises, la combinaison société HK avec une résidence à Dubaï ou au Maroc. Troisièmement leur réseau. Ils ont des partenaires auditeurs certifiés à Hong Kong et peuvent t'aider à préparer ton dossier pour les banques.", "Comment passer à l'action avec Luminos. Tu cliques sur le bouton en bas de cet écran. Tu arrives directement sur le site de Luminos Corp. Tu remplis leur formulaire de contact en quelques minutes. Tu expliques brièvement ton activité et ce que tu veux mettre en place. Et tu reçois une réponse en français sous 24 heures. Ils vont analyser ta situation et te proposer la meilleure façon de structurer. Dans cinq à sept jours ouvrés, ta société est créée. Et tu peux immédiatement ouvrir ton compte Airwallex avec les documents reçus.", "Le résumé sur Luminos Corp. C'est un cabinet spécialisé dans la création de sociétés à Hong Kong pour les entrepreneurs francophones. Support en français, expertise sur les profils français et francophones. Création complète en cinq à sept jours pour 1 490 dollars. Renouvellement annuel à 990 dollars, tout géré. Réseau d'auditeurs certifiés et aide à l'ouverture bancaire. Et tout ça se passe en français depuis chez toi. Pour passer à l'action, le bouton est en bas de l'écran."], "10": ["Leçon dix. La dernière leçon de cette formation. T'as toutes les informations maintenant. Tu comprends le 0% offshore, tu sais comment créer la société, tu connais les banques, tu sais que Luminos peut tout gérer pour toi. La seule chose qui reste c'est de passer à l'action. Dans cette leçon je te donne un plan d'action clair, étape par étape, dans le bon ordre.", "Le plan d'action en quatre étapes. Étape un, créer ta société Hong Kong avec Luminos. Tu cliques sur le bouton en bas de l'écran, tu arrives sur le site de Luminos Corp, tu remplis le formulaire, et dans cinq à sept jours ta société est créée. Étape deux, ouvrir ton compte Airwallex avec le bouton dédié en bas de l'écran. Tu fournis les documents de ta société HK, et en 24 à 48 heures ton compte multi-devises est opérationnel. Tu connectes Stripe ou PayPal directement. Étape trois, demander l'exemption offshore. Luminos te met en relation avec un auditeur certifié qui prépare ta déclaration fiscale et demande l'exemption. Tu paies zéro. Étape quatre, tu structures tes revenus pour qu'ils transitent par ta société HK.", "Maintenant je veux te parler de quelque chose d'important. La psychologie du passage à l'action. La plupart des gens qui regardent cette formation vont attendre. Ils vont se dire : je vais attendre que mon business soit plus gros. Je vais me renseigner encore un peu. Peut-être que c'est pas pour moi. Et pendant ce temps-là, ils continuent à donner 25% de leurs bénéfices à l'État français alors qu'ils pourraient en garder la quasi-totalité. Il n'y a pas de moment parfait. Il n'y a pas de taille de business minimum. La structure Hong Kong fonctionne pour un business qui génère 2 000 euros par mois comme pour un business qui génère 200 000 euros par mois.", "La vérité sur le bon moment. Il n'existe pas de moment parfait. Et chaque mois que tu attends, tu continues à payer de l'IS en France sur tes bénéfices. Sur 3 000 euros de bénéfices mensuels en France, tu paies environ 750 euros d'IS par mois. C'est 9 000 euros par an donnés à l'État. Sur 10 000 euros mensuels de bénéfices, c'est 2 500 euros par mois, 30 000 euros par an. La création chez Luminos c'est 1 490 dollars. Récupérés en quelques semaines d'activité pour n'importe quel business qui tourne.", "Voilà exactement ce que tu fais maintenant. Tu cliques sur le bouton Créer ma société Hong Kong en bas de cet écran. Tu arrives chez Luminos Corp. Tu remplis le formulaire de contact en quelques minutes. Réponse sous 24 heures. Dans cinq à sept jours ta société est créée. En parallèle tu ouvres ton compte Airwallex avec le bouton dédié. Et dans deux semaines maximum, ton infrastructure internationale est en place. Tu commences à payer zéro pourcent d'impôts sur tes revenus offshore. Cette décision peut changer radicalement ta situation financière pour les années à venir.", "Je vais terminer cette formation avec une pensée importante. Il y a deux types d'entrepreneurs. Ceux qui comprennent que les règles fiscales ne sont pas universelles et qu'il existe des structures légales pour optimiser. Et ceux qui subissent passivement les règles du pays où ils sont nés sans jamais se poser la question. Cette formation t'a donné les outils pour être dans la première catégorie. L'information seule ne change rien. C'est l'action qui change les choses. Le bouton est en bas de l'écran. Bravo d'avoir suivi cette formation jusqu'au bout.", "Le bilan final. Zéro pourcent sur les revenus offshore grâce à la territorialité fiscale de Hong Kong. Pas d'IS, pas de TVA, accès aux meilleures banques mondiales. Création en cinq à sept jours avec Luminos Corp pour 1 490 dollars tout compris. Airwallex pour les paiements en ligne, HSBC ou Standard Chartered pour les besoins de crédibilité avancée. Et Luminos Corp qui gère tout en français. Les deux boutons en bas de l'écran te permettent de passer à l'action maintenant. Bonne continuation."]};
+// Patcher les slides avec leurs VOs
+LESSONS.forEach(function(l, li) {
+  var vos = VO[l.id] || [];
+  l.slides.forEach(function(s, si) {
+    if (vos[si]) s.vo = vos[si];
+  });
+});
+
+// ══ TRACKER NATIF ══
+const TRACKER_KEY='sbw_tracker__formation_hong_kong';
+function loadProg(){try{return JSON.parse(localStorage.getItem(TRACKER_KEY)||'{}')}catch(e){return{}}}
+function saveProg(d){try{localStorage.setItem(TRACKER_KEY,JSON.stringify(d))}catch(e){}}
+function markDone(idx){var d=loadProg();if(!d[idx]){d[idx]=true;d._total=LESSONS.length;d._updated=Date.now();saveProg(d);refreshUI()}}
+function globalPct(){var d=loadProg();var n=LESSONS.filter(function(_,i){return!!d[i]}).length;return Math.round(n/LESSONS.length*100)}
+
+// ══ STATE ══
+var curL=0,curS=0,seen={};
+function markSeen(l,s){if(!seen[l])seen[l]=new Set();seen[l].add(s);var tot=LESSONS[l].slides.length;var pct=Math.round(seen[l].size/tot*100);if(pct>=80)markDone(l);updatePbars()}
+
+// ══ RENDER ══
+function render(){
+  var L=LESSONS[curL],sl=L.slides[curS];
+  markSeen(curL,curS);
+  // Lancer la voix off si activée
+  var sl_vo = LESSONS[curL].slides[curS];
+  if (voixOn && sl_vo && sl_vo.vo) {
+    if (synth) synth.cancel();
+    setTimeout(function(){ playVoix(sl_vo.vo); }, 150);
+  } else if (autoPlay) {
+    // Slide sans VO : avancer après 2s
+    setTimeout(autoAdvance, 2000);
+  }
+  var a=document.getElementById('slideArea');
+  var t=sl.t,h='';
+  if(t==='intro'){
+    h='<div class="slide-intro"><div class="slide-num">Leçon '+L.id+' / '+LESSONS.length+'</div><span class="slide-emoji-big">'+(sl.emoji||'')+'</span><div class="slide-intro-title">'+sl.title.replace(/\\n|\n/g,'<br>')+'</div>'+(sl.sub?'<div class="slide-intro-sub">'+sl.sub+'</div>':'')+'</div>';
+  } else if(t==='concept'){
+    // Extraire les lignes fortes du body pour les mettre en valeur
+    var bodyFmt = (sl.body||'').replace(/<br><br>/g,'</p><p>');
+    // Détecter les éléments ✅ ❌ ⚠️ 🔴 etc pour les transformer en key-points
+    var hasKeyPoints = /^[✅❌⚠️🔴🟢•▪]/.test(sl.body||'');
+    var bodyHtml;
+    if(hasKeyPoints){
+      var klines = (sl.body||'').split('<br>').filter(Boolean);
+      var kpts = klines.map(function(l){
+        var icon = l.match(/^(\S+)\s*/);
+        var txt = icon ? l.replace(icon[0],'') : l;
+        return '<div class="key-point"><div class="key-point-icon">'+(icon?icon[1]:'▸')+'</div><div class="key-point-text">'+txt+'</div></div>';
+      }).join('');
+      bodyHtml = '<div class="concept-card">'+kpts+'</div>';
+    } else {
+      // Mettre les parties <strong>...</strong> en highlight
+      var highlighted = (sl.body||'').replace(/<strong>(.*?)<\/strong>/g,'</p><div class="concept-highlight">$1</div><p>');
+      bodyHtml = '<div class="slide-body">'+highlighted+'</div>';
+    }
+    var eyebrow = sl.emoji ? '<div class="slide-eyebrow"><span class="slide-eyebrow-icon">'+sl.emoji+'</span>'+(sl.tag?'<span class="slide-eyebrow-tag">'+sl.tag+'</span>':'')+'</div>' : (sl.tag?'<div class="slide-tag">'+sl.tag+'</div>':'');
+    h='<div class="slide-block">'+eyebrow+'<div class="slide-title">'+sl.title+'</div>'+bodyHtml+'</div>';
+  } else if(t==='cards'){
+    var items=sl.items.map(function(it){return'<div class="card-item"><div class="card-emoji">'+it.emoji+'</div><div><div class="card-name">'+it.name+'</div><div class="card-sub">'+it.sub+'</div></div></div>';}).join('');
+    h='<div class="slide-block"><div class="slide-title">'+sl.title+'</div><div class="cards-grid">'+items+'</div></div>';
+  } else if(t==='compare'){
+    var lc=sl.left,rc=sl.right;
+    h='<div class="slide-block"><div class="slide-title">'+sl.title+'</div><div class="compare-grid"><div class="compare-col"><div class="compare-header"><span class="compare-emoji">'+lc.emoji+'</span><span class="compare-label">'+lc.label+'</span></div><div class="compare-num">'+lc.num+'</div>'+(lc.unit?'<div class="compare-unit">'+lc.unit+'</div>':'')+'<div class="compare-desc">'+lc.desc+'</div></div><div class="compare-col '+(rc.color||'')+'"><div class="compare-header"><span class="compare-emoji">'+rc.emoji+'</span><span class="compare-label">'+rc.label+'</span></div><div class="compare-num '+(rc.color==='good'?'green':'')+'">'+rc.num+'</div>'+(rc.unit?'<div class="compare-unit">'+rc.unit+'</div>':'')+'<div class="compare-desc">'+rc.desc+'</div></div></div>'+(sl.note?'<div class="compare-note">'+sl.note+'</div>':'')+'</div>';
+  } else if(t==='stat'){
+    h='<div class="slide-block"><div class="stat-block"><div class="stat-val">'+sl.val+'</div><div class="stat-unit">'+sl.unit+'</div><div class="stat-body">'+sl.body+'</div></div></div>';
+  } else if(t==='warning'){
+    h='<div class="slide-block"><div class="warning-block"><div class="warning-icon">'+(sl.emoji||'⚠️')+'</div><div class="warning-title">'+sl.title+'</div><div class="warning-body">'+(sl.body||sl.warn||'')+'</div></div></div>';
+  } else if(t==='action'){
+    var steps=sl.steps.map(function(s,i){return'<div class="action-step"><div class="action-step-num">'+(i+1)+'</div><span>'+s+'</span></div>';}).join('');
+    h='<div class="slide-block"><div class="action-block"><div class="action-badge">'+sl.badge+'</div><div class="action-title">'+sl.title+'</div><div class="action-steps">'+steps+'</div><a href="'+sl.url+'" target="_blank" rel="noopener" class="action-cta">'+sl.cta+' →</a></div></div>';
+  } else if(t==='quote'){
+    h='<div class="slide-block"><div class="quote-block"><div class="quote-text">"'+sl.text+'"</div><div class="quote-bar"></div></div></div>';
+  } else if(t==='recap'){
+    var pts=sl.points.map(function(p){return'<div class="recap-item"><span class="recap-dot">◆</span><span>'+p+'</span></div>';}).join('');
+    h='<div class="slide-block"><div class="recap-title">'+sl.title+'</div><div class="recap-list">'+pts+'</div></div>';
+  }
+  a.classList.remove('slide-enter','slide-enter-back');
+  a.innerHTML=h;
+  void a.offsetWidth; // force reflow
+  a.classList.add(window._slideDir==='prev'?'slide-enter-back':'slide-enter');
+  window._slideDir='next';
+  a.scrollTop=0;
+  updateNav();updatePbars();updateSidebar();
+}
+
+function updateNav(){
+  var L=LESSONS[curL];
+  document.getElementById('navInfo').textContent='Leçon '+L.id+' · Slide '+(curS+1)+'/'+L.slides.length;
+  document.getElementById('btnPrev').disabled=curL===0&&curS===0;
+  var last=curL===LESSONS.length-1&&curS===L.slides.length-1;
+  var nb=document.getElementById('btnNext');
+  nb.textContent=last?'Terminer ✓':'Suivant →';
+  nb.className=last?'btn-nav done-btn':'btn-nav primary';
+}
+
+function updatePbars(){
+  var s=seen[curL]?seen[curL].size:1;
+  var tot=LESSONS[curL].slides.length;
+  var pct=Math.max(Math.round(s/tot*100),Math.round((curS+1)/tot*100));
+  document.getElementById('slidePbar').style.width=pct+'%';
+  var gp=globalPct();
+  document.getElementById('hPbarFill').style.width=gp+'%';
+  document.getElementById('hPct').textContent=gp+'%';
+}
+
+function updateSidebar(){
+  var d=loadProg();
+  document.getElementById('sbLessons').innerHTML=LESSONS.map(function(l,i){
+    var done=!!d[i];
+    var s=seen[i]?seen[i].size:0;
+    var pct=done?100:Math.round(s/l.slides.length*100);
+    return'<div class="sb-item'+(i===curL?' active':'')+(done?' done':'')+'" onclick="goTo('+i+')">'+'<span class="sb-num">'+l.id+'</span><div class="sb-info"><div class="sb-name">'+l.title+'</div><div class="sb-bar"><div class="sb-bar-fill" style="width:'+pct+'%"></div></div></div><span class="sb-check">✓</span></div>';
+  }).join('');
+}
+
+function refreshUI(){updatePbars();updateSidebar();renderLessonsPanel();}
+
+function toggleLessonsPanel() {
+  var panel = document.getElementById('lessonsPanel');
+  var tab = document.getElementById('lessonsTab');
+  var isOpen = panel.classList.contains('open');
+  if (isOpen) {
+    panel.classList.remove('open');
+    tab.classList.remove('active');
+  } else {
+    renderLessonsPanel();
+    panel.classList.add('open');
+    tab.classList.add('active');
+  }
+}
+
+function renderLessonsPanel() {
+  var d = loadProg();
+  var el = document.getElementById('lpScroll');
+  el.innerHTML = LESSONS.map(function(l, li) {
+    var isDone = !!d[li];
+    var isActivL = li === curL;
+    var slides = l.slides.map(function(s, si) {
+      var label = s.t === 'intro' ? '▶ Intro' :
+                  s.t === 'recap' ? '✓ Recap' :
+                  s.t === 'action' ? '🚀' :
+                  s.t === 'stat' ? '📊' :
+                  s.t === 'warning' ? '⚠️' :
+                  s.t === 'quote' ? '"' :
+                  s.t === 'compare' ? '⚖️' :
+                  s.t === 'cards' ? '📋' : '💡';
+      var isActS = isActivL && si === curS;
+      return '<button class="lp-slide-btn' + (isActS?' active':'') + '" onclick="goToSlide(' + li + ',' + si + ')">' + label + ' ' + (si+1) + '</button>';
+    }).join('');
+    return '<div class="lp-lesson' + (isActivL?' open':'') + '">' +
+      '<button class="lp-lesson-btn' + (isActivL?' active':'') + (isDone?' done':'') + '" onclick="toggleLpLesson(this,' + li + ')">' +
+        '<span class="lp-lesson-num">' + l.id + '</span>' +
+        '<span class="lp-lesson-name">' + l.title + '</span>' +
+        '<span class="lp-lesson-check">✓</span>' +
+      '</button>' +
+      '<div class="lp-slides">' + slides + '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleLpLesson(btn, idx) {
+  var lessonEl = btn.parentElement;
+  var wasOpen = lessonEl.classList.contains('open');
+  document.querySelectorAll('.lp-lesson').forEach(function(el){ el.classList.remove('open'); });
+  if (!wasOpen) lessonEl.classList.add('open');
+}
+
+function goToSlide(li, si) {
+  autoPlay = false; stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  curL = li; curS = si;
+  render();
+  renderLessonsPanel();
+}
+
+// ══ NAVIGATION ══
+function next(){autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  window._slideDir='next';
+  var L=LESSONS[curL];
+  if(curS<L.slides.length-1){curS++;render();}
+  else if(curL<LESSONS.length-1){markDone(curL);curL++;curS=0;render();}
+  else{markDone(curL);}
+}
+function prev(){autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  window._slideDir='prev';
+  if(curS>0){curS--;render();}
+  else if(curL>0){curL--;curS=LESSONS[curL].slides.length-1;render();}
+}
+function goTo(idx){
+  autoPlay=false;stopVoix();
+  document.getElementById('playIcon').style.display='block';
+  document.getElementById('pauseIcon').style.display='none';
+  document.getElementById('playBtn').classList.remove('playing');
+  curL=idx;curS=0;render();}
+
+// ══ TTS ══
+var voixOn = false;
+var synth = window.speechSynthesis;
+var utterance = null;
+
+var autoPlay = false;
+
+function stopVoix() {
+  autoPlay = false;
+  if (synth) synth.cancel();
+  var subs = document.getElementById('subtitlesText');
+  if (subs) { subs.classList.add('hidden'); subs.textContent = ''; }
+}
+
+function togglePlay() {
+  if (autoPlay) {
+    // Pause
+    autoPlay = false;
+    voixOn = false;
+    stopVoix();
+    document.getElementById('playIcon').style.display = 'block';
+    document.getElementById('pauseIcon').style.display = 'none';
+    document.getElementById('playBtn').classList.remove('playing');
+    document.getElementById('btnVoix').classList.remove('active');
+    document.getElementById('btnVoix').textContent = '🔊 Voix';
+  } else {
+    // Play
+    voixOn = true;
+    autoPlay = true;
+    document.getElementById('playIcon').style.display = 'none';
+    document.getElementById('pauseIcon').style.display = 'block';
+    document.getElementById('playBtn').classList.add('playing');
+    document.getElementById('btnVoix').classList.add('active');
+    document.getElementById('btnVoix').textContent = '🔊 Voix ON';
+    var sl = LESSONS[curL].slides[curS];
+    if (sl && sl.vo) playVoix(sl.vo);
+    else autoAdvance();
+  }
+}
+
+function autoAdvance() {
+  if (!autoPlay) return;
+  window._slideDir='next';
+  // Avancer au slide suivant
+  var L = LESSONS[curL];
+  if (curS < L.slides.length - 1) {
+    curS++; render();
+  } else if (curL < LESSONS.length - 1) {
+    markDone(curL); curL++; curS = 0; render();
+  } else {
+    markDone(curL); autoPlay = false;
+  }
+}
+
+function playVoix(text) {
+  if (!voixOn || !text || !synth) return;
+  synth.cancel();
+  // Supprimer le préfixe "Leçon X." en début de VO
+  text = text.replace(/^Le[çc]on\s+\w+\.?\s*/i, '');
+  utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'fr-FR';
+  utterance.rate = 1.05;
+  utterance.pitch = 1;
+  utterance.volume = 1;
+  var voices = synth.getVoices();
+  var frVoice = voices.find(function(v) { return v.lang === 'fr-FR' && v.name.indexOf('Google') > -1; })
+    || voices.find(function(v) { return v.lang === 'fr-FR'; })
+    || voices.find(function(v) { return v.lang.startsWith('fr'); });
+  if (frVoice) utterance.voice = frVoice;
+
+  // Sous-titres synchronisés via boundary event
+  var subs = document.getElementById('subtitlesText');
+  var sentences = text.match(/[^.!?…]+[.!?…]+\s*/g) || [text];
+  // Précalculer les positions de début de chaque phrase
+  var positions = [];
+  var pos = 0;
+  sentences.forEach(function(s) {
+    positions.push(pos);
+    pos += s.length;
+  });
+
+  utterance.onboundary = function(e) {
+    if (e.name !== 'word' && e.name !== 'sentence') return;
+    var ci = e.charIndex;
+    // Trouver la phrase qui contient cet index
+    var phraseIdx = 0;
+    for (var i = positions.length - 1; i >= 0; i--) {
+      if (ci >= positions[i]) { phraseIdx = i; break; }
+    }
+    subs.classList.remove('hidden');
+    subs.textContent = sentences[phraseIdx].trim();
+  };
+
+  utterance.onend = function() {
+    subs.classList.add('hidden');
+    subs.textContent = '';
+    if (autoPlay) setTimeout(autoAdvance, 400);
+  };
+  utterance.onerror = function() {
+    subs.classList.add('hidden');
+    subs.textContent = '';
+  };
+
+  synth.speak(utterance);
+}
+
+function playVoixAuto(text) {
+  // Comme playVoix mais déclenche autoAdvance à la fin
+  playVoix(text);
+}
+
+function toggleVoix() {
+  voixOn = !voixOn;
+  var btn = document.getElementById('btnVoix');
+  if (voixOn) {
+    btn.classList.add('active');
+    btn.textContent = '🔊 Voix ON';
+    // Lire le slide actuel
+    var sl = LESSONS[curL].slides[curS];
+    if (sl.vo) playVoix(sl.vo);
+  } else {
+    btn.classList.remove('active');
+    btn.textContent = '🔊 Voix';
+    stopVoix();
+  }
+}
+
+// ══ INIT ══
+(function(){
+  var d=loadProg();
+  LESSONS.forEach(function(l,i){if(d[i])seen[i]=new Set(Array.from({length:l.slides.length},function(_,j){return j;}));});
+  var start=0;
+  for(var i=0;i<LESSONS.length;i++){if(!d[i]){start=i;break;}if(i===LESSONS.length-1)start=i;}
+  curL=start;curS=0;
+  voixOn = false;
+  render();
+})();
+
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prev();}
+});
+</script>
+</body>
+</html>
