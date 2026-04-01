@@ -55,6 +55,10 @@ nav{background:var(--dark);height:54px;padding:0 1.5rem;display:flex;align-items
 .m-card-cover-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3))}
 .m-card-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:8px}
 .m-card-title{font-size:0.92rem;font-weight:600;line-height:1.3;color:var(--ink)}
+.m-card-cover-gradient{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px}
+.m-card-cover-emoji{font-size:2.5rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.4))}
+.m-card-cover-stats{font-size:.68rem;font-weight:600;color:rgba(255,255,255,.7);letter-spacing:.05em;background:rgba(0,0,0,.3);padding:3px 10px;border-radius:10px}
+.m-card-sub{font-size:.75rem;color:var(--muted);line-height:1.4;margin-top:-2px}
 .m-card-stats{font-size:0.72rem;color:var(--muted)}
 .m-card-divider{height:0.5px;background:var(--subtle)}
 .m-card-prog{display:flex;flex-direction:column;gap:4px}
@@ -138,6 +142,7 @@ nav{background:var(--dark);height:54px;padding:0 1.5rem;display:flex;align-items
 .overlay-close:hover{background:rgba(255,255,255,.1);color:#fff}
 #overlayFrame{flex:1;border:none;width:100%;height:100%}
 }
+/* Overlay visible uniquement quand .open — déjà géré par CSS */
 </style>
 </head>
 <body>
@@ -370,26 +375,42 @@ function makeModuleCard(f, m, idx, progData) {
   var card = document.createElement('div');
   card.className = 'm-card';
 
-  // Cover
+  // Cover — formation cover > module cover > gradient par défaut
   var cover = document.createElement('div');
   cover.className = 'm-card-cover';
-  if (m.cover_url) {
-    cover.innerHTML = '<img src="' + m.cover_url + '" alt="" loading="lazy"><div class="m-card-cover-overlay"></div>';
+  var imgSrc = f.cover_url || m.cover_url || '';
+  if (imgSrc) {
+    cover.innerHTML = '<img src="' + imgSrc + '" alt="" loading="lazy"><div class="m-card-cover-overlay"></div>';
   } else {
-    cover.innerHTML = '<div class="m-card-cover-icon">' + EMOJIS[idx % EMOJIS.length] + '</div>';
+    // Gradient par défaut basé sur la position
+    var gradients = [
+      'linear-gradient(135deg,#8B0000 0%,#3a0000 100%)',
+      'linear-gradient(135deg,#1e3a8a 0%,#1e1b4b 100%)',
+      'linear-gradient(135deg,#831843 0%,#500724 100%)',
+      'linear-gradient(135deg,#14532d 0%,#052e16 100%)',
+      'linear-gradient(135deg,#064e3b 0%,#022c22 100%)',
+    ];
+    var grad = gradients[f.position ? (f.position - 1) % gradients.length : idx % gradients.length];
+    var stats = f.extra_stats || m.extra_stats || '';
+    cover.innerHTML = '<div class="m-card-cover-gradient" style="background:' + grad + '">' +
+      '<div class="m-card-cover-emoji">' + EMOJIS[idx % EMOJIS.length] + '</div>' +
+      (stats ? '<div class="m-card-cover-stats">' + stats + '</div>' : '') +
+    '</div>';
   }
   card.appendChild(cover);
 
-  // Body
+  // Body — titre formation + description
   var body = document.createElement('div');
   body.className = 'm-card-body';
+  var displayTitle = f.title || m.title;
+  var displaySub = f.description || m.extra_stats || '';
   body.innerHTML =
-    '<div class="m-card-title">' + m.title + '</div>' +
-    (m.extra_stats ? '<div class="m-card-stats">' + m.extra_stats + '</div>' : '') +
+    '<div class="m-card-title">' + displayTitle + '</div>' +
+    (displaySub ? '<div class="m-card-sub">' + displaySub.substring(0,90) + (displaySub.length>90?'…':'') + '</div>' : '') +
     '<div class="m-card-divider"></div>' +
     '<div class="m-card-prog">' +
       '<div class="prog-bar"><div class="prog-fill" style="width:' + progData.pct + '%"></div></div>' +
-      '<div class="prog-label"><span>' + progData.pct + '% complété</span><span>' + progData.done + '/' + progData.total + '</span></div>' +
+      '<div class="prog-label"><span>' + progData.pct + '% complété</span><span>' + (f.extra_stats || m.extra_stats || '') + '</span></div>' +
     '</div>';
 
   // Bouton
@@ -649,12 +670,42 @@ function openFormationOverlay(url, title) {
   document.getElementById('overlayFrame').src = url;
   document.getElementById('formationOverlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  // History API — bouton retour ferme l'overlay au lieu de quitter la page
+  history.pushState({ overlay: true }, '', '#formation');
 }
 
+window.addEventListener('popstate', function() {
+  if (document.getElementById('formationOverlay').classList.contains('open')) {
+    var frame = document.getElementById('overlayFrame');
+    try {
+      if (frame.contentWindow && frame.contentWindow.speechSynthesis) frame.contentWindow.speechSynthesis.cancel();
+      if (frame.contentWindow && frame.contentWindow.synth) frame.contentWindow.synth.cancel();
+    } catch(e) {}
+    frame.src = '';
+    document.getElementById('formationOverlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+});
+
 function closeFormationOverlay() {
+  // Stopper la voix dans l'iframe
+  var frame = document.getElementById('overlayFrame');
+  try {
+    if (frame.contentWindow && frame.contentWindow.speechSynthesis) {
+      frame.contentWindow.speechSynthesis.cancel();
+    }
+    if (frame.contentWindow && frame.contentWindow.synth) {
+      frame.contentWindow.synth.cancel();
+    }
+  } catch(e) {}
+  // Vider l'iframe
+  frame.src = '';
   document.getElementById('formationOverlay').classList.remove('open');
-  document.getElementById('overlayFrame').src = '';
   document.body.style.overflow = '';
+  // Nettoyer l'historique
+  if (window.history.state && window.history.state.overlay) {
+    history.back();
+  }
 }
 
 // Fermer avec Escape
@@ -673,12 +724,8 @@ window.addEventListener('message', function(e) {
 init();
 </script>
 
-<!-- Overlay formation HTML -->
+<!-- Overlay formation HTML — plein écran, fermeture via X dans la formation -->
 <div id="formationOverlay">
-  <div class="overlay-bar">
-    <span class="overlay-bar-title" id="overlayTitle"></span>
-    <button class="overlay-close" onclick="closeFormationOverlay()">✕</button>
-  </div>
   <iframe id="overlayFrame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 </div>
 
