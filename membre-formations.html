@@ -44,7 +44,7 @@ nav{background:var(--dark);height:54px;padding:0 1.5rem;display:flex;align-items
 .f-group-count{font-size:0.75rem;color:var(--muted);margin-left:auto}
 
 /* ── Module grid ── */
-.m-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 
 /* ── Module card ── */
 .m-card{background:#fff;border-radius:12px;border:0.5px solid var(--subtle);overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,border-color 0.15s;display:flex;flex-direction:column}
@@ -141,6 +141,7 @@ nav{background:var(--dark);height:54px;padding:0 1.5rem;display:flex;align-items
 .overlay-close{background:none;border:0.5px solid rgba(255,255,255,.2);color:rgba(255,255,255,.6);width:32px;height:32px;border-radius:6px;cursor:pointer;font-size:1.1rem;display:flex;align-items:center;justify-content:center;transition:all .15s}
 .overlay-close:hover{background:rgba(255,255,255,.1);color:#fff}
 #overlayFrame{flex:1;border:none;width:100%;height:100%}
+}
 /* Overlay visible uniquement quand .open — déjà géré par CSS */
 </style>
 </head>
@@ -725,11 +726,7 @@ init();
 
 <!-- Overlay formation HTML — plein écran, fermeture via X dans la formation -->
 <div id="formationOverlay">
-  <div class="overlay-bar">
-    <span class="overlay-bar-title" id="overlayTitle"></span>
-    <button class="overlay-close" onclick="closeFormationOverlay()" title="Fermer">✕</button>
-  </div>
-  <iframe id="overlayFrame" src="" allowfullscreen allow="autoplay; encrypted-media; microphone"></iframe>
+  <iframe id="overlayFrame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
 </div>
 
 </body>
