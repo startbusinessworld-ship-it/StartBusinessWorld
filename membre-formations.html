@@ -3,1069 +3,612 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes Formations — Club SBW</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<title>Formations — Club SBW</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{
-  --bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);
-  --muted:#888;--gold:#A67C3A;--red:#C0392B;--dark:#0E0D0B;
-}
-body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+:root{--bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);--muted:#888;--gold:#A67C3A;--red:#C0392B;--dark:#0E0D0B}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:100px}
 a{text-decoration:none;color:inherit}
 
-/* ── NAV ── */
-nav{
-  background:var(--dark);height:54px;padding:0 2rem;
-  display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;
-}
+/* ── Nav ── */
+nav{background:var(--dark);height:54px;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
 .nav-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:1.1rem}
 .nav-right{display:flex;align-items:center;gap:12px}
-.nav-back{font-size:0.78rem;color:rgba(255,255,255,0.5);cursor:pointer;transition:color .15s}
-.nav-back:hover{color:#fff}
 .nav-user{font-size:0.75rem;color:rgba(255,255,255,0.4)}
-.btn-logout{background:none;border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);padding:4px 12px;border-radius:4px;font-size:0.72rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.btn-logout{background:none;border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);padding:4px 12px;border-radius:4px;font-size:0.72rem;cursor:pointer;font-family:inherit}
 .btn-logout:hover{border-color:rgba(255,255,255,.4);color:#fff}
 
-/* ── LAYOUT ── */
-.layout{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 54px)}
+/* ── Main ── */
+.main{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+.page-head{margin-bottom:2.5rem}
+.page-title{font-family:"DM Serif Display",serif;font-size:1.8rem;margin-bottom:4px}
+.page-sub{font-size:0.85rem;color:var(--muted)}
 
-/* ── SIDEBAR FORMATIONS ── */
-.sidebar{
-  background:var(--dark);border-right:1px solid rgba(255,255,255,0.07);
-  position:sticky;top:54px;height:calc(100vh - 54px);overflow-y:auto;
-  scrollbar-width:none;display:flex;flex-direction:column;
-}
-.sidebar::-webkit-scrollbar{display:none}
-.sb-head{
-  padding:20px 20px 14px;border-bottom:1px solid rgba(255,255,255,0.07);
-}
-.sb-title{font-size:0.62rem;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,0.25);margin-bottom:12px}
-.sb-progress{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden;margin-bottom:6px}
-.sb-progress-fill{height:100%;background:var(--gold);border-radius:2px;transition:width .4s ease}
-.sb-progress-label{font-size:0.7rem;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between}
+/* ── Global progress ── */
+.global-bar{background:var(--surface);border-radius:10px;padding:16px 20px;margin-bottom:2.5rem;display:flex;align-items:center;gap:16px}
+.gbar-wrap{flex:1;height:6px;background:var(--subtle);border-radius:3px;overflow:hidden}
+.gbar-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.4s}
+.gbar-label{font-size:0.78rem;color:var(--muted);flex-shrink:0}
+.gbar-pct{font-size:0.78rem;font-weight:600;color:var(--ink);flex-shrink:0;min-width:32px;text-align:right}
 
-/* Formation items */
-.f-list{padding:8px;flex:1}
-.f-item{
-  padding:10px 12px;border-radius:8px;cursor:pointer;
-  transition:background .12s;margin-bottom:2px;
-  display:flex;align-items:center;gap:10px;
-}
-.f-item:hover{background:rgba(255,255,255,0.05)}
-.f-item.active{background:rgba(255,255,255,0.1)}
-.f-item-icon{width:34px;height:34px;border-radius:7px;background:rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
-.f-item.active .f-item-icon{background:rgba(166,124,58,0.2)}
-.f-item-info{flex:1;min-width:0}
-.f-item-name{font-size:0.82rem;font-weight:500;color:#F0EDE4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
-.f-item.active .f-item-name{color:#fff}
-.f-item-bar{height:2px;background:rgba(255,255,255,0.08);border-radius:1px;overflow:hidden}
-.f-item-fill{height:100%;background:var(--gold);border-radius:1px}
-.f-item-pct{font-size:0.62rem;color:rgba(255,255,255,0.25);margin-top:2px}
+/* ── Formation group ── */
+.f-group{margin-bottom:3rem}
+.f-group-head{display:flex;align-items:baseline;gap:12px;margin-bottom:1.2rem;padding-bottom:12px;border-bottom:0.5px solid var(--subtle)}
+.f-group-title{font-family:"DM Serif Display",serif;font-size:1.1rem}
+.f-group-badge{font-size:0.65rem;padding:2px 8px;border-radius:10px;font-weight:600}
+.badge-html{background:rgba(99,91,255,0.1);color:#635BFF}
+.badge-video{background:rgba(192,57,43,0.08);color:var(--red)}
+.badge-ext{background:rgba(166,124,58,0.1);color:var(--gold)}
+.f-group-count{font-size:0.75rem;color:var(--muted);margin-left:auto}
 
-/* ── CONTENU PRINCIPAL ── */
-.main{background:var(--bg);display:flex;flex-direction:column;min-height:calc(100vh - 54px)}
+/* ── Module grid ── */
+.m-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
 
-/* Vue liste */
-.view-list{padding:2rem;flex:1}
-.welcome-head{margin-bottom:28px}
-.welcome-title{font-family:"DM Serif Display",serif;font-size:1.8rem;letter-spacing:-.02em;margin-bottom:4px}
-.welcome-sub{font-size:.88rem;color:var(--muted)}
-.f-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
-.f-card{
-  background:#fff;border:.5px solid var(--subtle);border-radius:12px;
-  overflow:hidden;cursor:pointer;transition:all .15s;
-}
-.f-card:hover{border-color:var(--ink);box-shadow:0 6px 20px rgba(0,0,0,.08);transform:translateY(-2px)}
-.f-card-cover{width:100%;height:180px;background:var(--dark);display:flex;align-items:center;justify-content:center;font-size:2.8rem;position:relative;overflow:hidden;border-radius:8px 8px 0 0}
-.f-card-cover::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(166,124,58,.15),transparent 60%)}
-.f-card-body{padding:16px}
-.f-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px}
-.f-card-title{font-size:.92rem;font-weight:500;line-height:1.3}
-.badge-prog{background:rgba(192,57,43,.1);color:var(--red);font-size:.6rem;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.badge-done{background:rgba(39,80,10,.1);color:#27500A;font-size:.6rem;font-weight:500;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0}
-.f-card-meta{font-size:.7rem;color:var(--muted);margin-bottom:10px;display:flex;gap:6px}
-.pbar{height:3px;background:var(--surface);border-radius:2px;overflow:hidden;margin-bottom:5px}
-.pfill{height:100%;background:var(--gold);border-radius:2px;transition:width .3s}
-.plabel{font-size:.68rem;color:var(--muted);display:flex;justify-content:space-between}
+/* ── Module card ── */
+.m-card{background:#fff;border-radius:12px;border:0.5px solid var(--subtle);overflow:hidden;cursor:pointer;transition:transform 0.15s,box-shadow 0.15s,border-color 0.15s;display:flex;flex-direction:column}
+.m-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.09);border-color:rgba(0,0,0,0.15)}
+.m-card-cover{width:100%;aspect-ratio:16/9;background:var(--dark);position:relative;overflow:hidden;flex-shrink:0}
+.m-card-cover img{width:100%;height:100%;object-fit:cover;object-position:top center;display:block}
+.m-card-cover-icon{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2.5rem}
+.m-card-cover-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.3))}
+.m-card-body{padding:16px;flex:1;display:flex;flex-direction:column;gap:8px}
+.m-card-title{font-size:0.92rem;font-weight:600;line-height:1.3;color:var(--ink)}
+.m-card-stats{font-size:0.72rem;color:var(--muted)}
+.m-card-divider{height:0.5px;background:var(--subtle)}
+.m-card-prog{display:flex;flex-direction:column;gap:4px}
+.prog-bar{height:5px;background:var(--subtle);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--gold);border-radius:3px;transition:width 0.4s}
+.prog-label{display:flex;justify-content:space-between;font-size:0.68rem;color:var(--muted)}
+.m-card-btn{display:flex;align-items:center;justify-content:center;gap:6px;background:var(--dark);color:#fff;padding:9px;border-radius:7px;font-size:0.8rem;font-weight:500;border:none;cursor:pointer;font-family:inherit;margin-top:auto;transition:background 0.15s;text-decoration:none}
+.m-card-btn:hover{background:#222}
+.m-card-btn.gold{background:var(--gold)}
+.m-card-btn.gold:hover{background:#8a6630}
 
-/* ── VUE DÉTAIL ── */
-.view-detail{display:none;flex:1;flex-direction:column}
-.detail-header{
-  padding:16px 2rem;background:#fff;
-  border-bottom:.5px solid var(--subtle);
-  display:flex;align-items:center;gap:12px;
-}
-.detail-back-btn{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted);cursor:pointer;border:none;background:none;padding:0;font-family:inherit;transition:color .15s;flex-shrink:0}
-.detail-back-btn:hover{color:var(--ink)}
-.detail-title{font-size:1rem;font-weight:500;flex:1}
-.detail-meta{font-size:.75rem;color:var(--muted);flex-shrink:0}
-
-.detail-layout{display:grid;grid-template-columns:1fr 300px;flex:1;overflow:hidden}
-
-/* Lecteur */
-.player-zone{overflow-y:auto;padding:2rem}
-.video-box{
-  width:100%;aspect-ratio:16/9;background:#1C1C1A;
-  border-radius:12px;overflow:hidden;position:relative;margin-bottom:20px;
-  cursor:pointer;
-}
-.video-box iframe{width:100%;height:100%;border:none;display:block}
+/* ── Vue détail (formations vidéo) ── */
+#viewDetail{display:none;height:calc(100vh - 54px);overflow:hidden}
+.detail-layout{display:grid;grid-template-columns:300px 1fr;height:100%;overflow:hidden}
+.detail-sidebar{border-right:0.5px solid var(--subtle);overflow-y:auto;display:flex;flex-direction:column}
+.detail-sidebar-head{padding:14px 16px;border-bottom:0.5px solid var(--subtle);position:sticky;top:0;background:var(--bg);z-index:1;flex-shrink:0}
+.detail-back{font-size:0.78rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.detail-back:hover{color:var(--ink)}
+.detail-title{font-family:"DM Serif Display",serif;font-size:1rem;line-height:1.3}
+.mod-section{padding:8px;border-bottom:0.5px solid var(--subtle)}
+.mod-section-title{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;color:var(--muted);padding:8px 8px 4px}
+.lecon-btn{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;cursor:pointer;transition:background 0.1s;width:100%;border:none;background:none;font-family:inherit;text-align:left}
+.lecon-btn:hover{background:var(--surface)}
+.lecon-btn.active{background:var(--ink);color:#fff}
+.lecon-btn-num{font-size:0.65rem;color:inherit;opacity:0.5;width:18px;flex-shrink:0;text-align:right}
+.lecon-btn-title{font-size:0.82rem;flex:1;line-height:1.3}
+.lecon-btn-done{font-size:0.7rem;color:#5DBE7A;flex-shrink:0}
+.detail-player{overflow-y:auto;display:flex;flex-direction:column}
+.video-box{width:100%;aspect-ratio:16/9;background:#000;position:relative}
+.no-video{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:rgba(255,255,255,.3);font-size:.82rem}
 .vthumb{width:100%;height:100%;position:relative;cursor:pointer}
 .vthumb img{width:100%;height:100%;object-fit:cover;display:block}
-.vthumb-overlay{position:absolute;inset:0;background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center}
-.vplay-big{width:64px;height:64px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,.4);transition:transform .15s}
-.vthumb:hover .vplay-big{transform:scale(1.08)}
-.vplay-tri{width:0;height:0;border-style:solid;border-width:12px 0 12px 20px;border-color:transparent transparent transparent #fff;margin-left:4px}
-.no-video{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:rgba(255,255,255,.25);font-size:.82rem}
-.lecon-body a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
-.lecon-body a:hover{opacity:.8}
-.tool-card-lecon{
-  display:flex;align-items:center;justify-content:space-between;gap:1rem;
-  padding:14px 18px;border:1px solid var(--subtle);border-radius:10px;
-  margin:1.2rem 0;text-decoration:none;color:inherit;
-  background:#fff;transition:border-color .15s;
-}
-.tool-card-lecon:hover{border-color:var(--gold)}
-.tool-card-lecon-name{font-weight:600;font-size:.9rem;margin-bottom:3px}
-.tool-card-lecon-desc{font-size:.75rem;color:var(--muted)}
-.tool-card-lecon-cta{
-  font-size:.78rem;font-weight:500;color:var(--gold);white-space:nowrap;
-  border:1px solid rgba(166,124,58,.3);padding:5px 12px;border-radius:5px;
-  flex-shrink:0;
-}
-.lecon-body blockquote{
-  border-left:3px solid var(--gold);padding:8px 14px;
-  background:rgba(166,124,58,.06);border-radius:0 6px 6px 0;
-  margin:1rem 0;font-size:.88rem;color:#555;
-}
+.vplay-overlay{position:absolute;inset:0;background:rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center}
+.vplay-btn{width:52px;height:52px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center}
+.vplay-tri{width:0;height:0;border-top:10px solid transparent;border-bottom:10px solid transparent;border-left:18px solid #fff;margin-left:4px}
+.lecon-content{padding:24px;flex:1}
+.lecon-content-title{font-family:"DM Serif Display",serif;font-size:1.2rem;margin-bottom:16px}
+.lecon-content-body{font-size:0.88rem;line-height:1.75;color:#333}
+.lecon-content-body h2{font-size:1rem;font-weight:600;margin:1.2rem 0 .5rem}
+.lecon-content-body h3{font-size:.9rem;font-weight:600;margin:1rem 0 .4rem}
+.lecon-content-body p{margin-bottom:.8rem}
+.lecon-content-body ul{margin:.4rem 0 .8rem 1.2rem}
+.lecon-content-body li{margin-bottom:.3rem}
+.lecon-content-body a{color:var(--gold);text-decoration:underline;text-underline-offset:2px}
+.lecon-content-body blockquote{border-left:3px solid var(--gold);padding:8px 14px;background:rgba(166,124,58,.06);border-radius:0 6px 6px 0;margin:1rem 0}
+.tool-card{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border:1px solid var(--subtle);border-radius:9px;margin:1rem 0;text-decoration:none;color:inherit;transition:border-color .15s}
+.tool-card:hover{border-color:var(--gold)}
+.tool-card-name{font-weight:600;font-size:.88rem;margin-bottom:2px}
+.tool-card-desc{font-size:.72rem;color:var(--muted)}
+.tool-card-cta{font-size:.75rem;font-weight:500;color:var(--gold);white-space:nowrap;border:1px solid rgba(166,124,58,.3);padding:4px 10px;border-radius:4px;flex-shrink:0}
+.done-bar{padding:14px 24px;border-top:0.5px solid var(--subtle);display:flex;gap:10px;flex-shrink:0}
+.btn-done{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;border:0.5px solid var(--subtle);background:var(--bg);font-family:inherit;transition:all .15s}
+.btn-done:hover{background:var(--surface)}
+.btn-done.completed{background:#f0faf4;border-color:#5DBE7A;color:#2d8a4e}
+.btn-next{display:flex;align-items:center;gap:6px;padding:9px 18px;border-radius:7px;font-size:.82rem;font-weight:500;cursor:pointer;border:none;background:var(--dark);color:#fff;font-family:inherit;transition:background .15s}
+.btn-next:hover{background:#222}
 
-.lecon-title-h{font-size:1.1rem;font-weight:500;margin-bottom:10px}
-.lecon-body{font-size:.88rem;line-height:1.78;color:#444}
-.lecon-body h2{font-size:1rem;font-weight:600;margin:1rem 0 .4rem}
-.lecon-body p{margin-bottom:.7rem}
-.lecon-body ul{margin:.4rem 0 .7rem 1.2rem}
-
-.action-bar{display:flex;gap:10px;margin-top:1.5rem}
-.btn-done{flex:1;background:var(--ink);color:#fff;border:none;padding:11px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:500;transition:opacity .15s;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-done:hover{opacity:.85}
-.btn-done.completed{background:#27500A}
-.btn-next{flex:1;background:var(--surface);color:var(--ink);border:.5px solid var(--subtle);padding:11px;border-radius:7px;cursor:pointer;font-family:inherit;font-size:.85rem;transition:all .15s;display:flex;align-items:center;justify-content:center;gap:6px}
-.btn-next:hover{background:var(--subtle)}
-
-/* Sidebar modules */
-.modules-panel{
-  background:var(--dark);border-left:1px solid rgba(255,255,255,.06);
-  overflow-y:auto;scrollbar-width:none;
-}
-.modules-panel::-webkit-scrollbar{display:none}
-.mods-head{padding:14px 16px;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;background:var(--dark);z-index:1}
-.mods-head-title{font-size:.72rem;font-weight:500;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-bottom:6px}
-.mods-global-bar{height:2px;background:rgba(255,255,255,.08);border-radius:1px;overflow:hidden;margin-bottom:4px}
-.mods-global-fill{height:100%;background:var(--gold);border-radius:1px;transition:width .4s}
-.mods-global-label{font-size:.68rem;color:rgba(255,255,255,.25)}
-
-/* Module accordion */
-.mod-block{border-bottom:1px solid rgba(255,255,255,.05)}
-.mod-head{
-  padding:10px 14px;display:flex;align-items:center;gap:8px;
-  cursor:pointer;transition:background .1s;
-}
-.mod-head:hover{background:rgba(255,255,255,.04)}
-.mod-arr{font-size:.58rem;color:rgba(255,255,255,.25);transition:transform .18s;flex-shrink:0}
-.mod-arr.open{transform:rotate(90deg)}
-.mod-num{font-size:.62rem;color:rgba(255,255,255,.3);width:22px;flex-shrink:0}
-.mod-name{font-size:.78rem;font-weight:500;color:rgba(255,255,255,.7);flex:1}
-.mod-done-count{font-size:.62rem;color:rgba(255,255,255,.2);flex-shrink:0}
-.mod-lessons{display:none}
-.mod-lessons.open{display:block}
-
-/* Leçon bouton */
-.lbtn{
-  display:flex;align-items:center;gap:8px;
-  padding:8px 14px 8px 28px;
-  width:100%;text-align:left;border:none;background:none;
-  font-family:inherit;cursor:pointer;transition:background .1s;
-}
-.lbtn:hover{background:rgba(255,255,255,.04)}
-.lbtn.active{background:rgba(192,57,43,.12)}
-.lbtn.done .l-title{color:rgba(255,255,255,.35)}
-.l-check{
-  width:14px;height:14px;border-radius:50%;
-  border:1.5px solid rgba(255,255,255,.15);flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;
-  font-size:.5rem;
-}
-.l-check.done{background:#27500A;border-color:#27500A;color:#fff}
-.l-check.active{border-color:var(--red)}
-.l-title{font-size:.75rem;color:rgba(255,255,255,.55);flex:1;text-align:left;line-height:1.35}
-.lbtn.active .l-title{color:#fff;font-weight:500}
-.l-yt{font-size:.6rem;color:var(--red);flex-shrink:0}
-.l-dur{font-size:.6rem;color:rgba(255,255,255,.2);flex-shrink:0}
-
-/* Vide */
-.no-formation{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--muted);font-size:.85rem;padding:3rem;text-align:center}
-.no-formation svg{opacity:.15}
-
-/* Mobile */
-/* ── MOBILE TOPBAR ── */
-.mobile-topbar{
-  display:none;background:var(--dark);
-  height:50px;padding:0 14px;
-  align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:100;flex-shrink:0;
-}
-.mob-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:.95rem;text-decoration:none}
-.mob-back{font-size:.75rem;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:inherit;transition:color .15s}
-.mob-back:hover{color:#fff}
-
-/* ── MOBILE BOTTOM NAV ── */
-.mob-bottom-nav{
-  display:none;position:fixed;bottom:0;left:0;right:0;
-  background:var(--dark);border-top:1px solid rgba(255,255,255,.08);
-  padding:6px 0 calc(6px + env(safe-area-inset-bottom));z-index:200;
-}
-.mob-nav-items{display:flex;justify-content:space-around}
-.mob-nav-btn{
-  display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:3px 6px;cursor:pointer;border:none;background:none;
-  color:rgba(255,255,255,.3);font-family:inherit;
-  font-size:.52rem;font-weight:500;text-transform:uppercase;letter-spacing:.03em;
-}
-.mob-nav-btn.act{color:var(--gold)}
-.mob-nav-btn .ico{font-size:1.15rem}
-
-/* ── TIROIR MODULES MOBILE ── */
-.mob-modules-drawer{
-  display:none;
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--dark);border-radius:16px 16px 0 0;
-  z-index:300;max-height:70vh;overflow-y:auto;
-  transform:translateY(100%);transition:transform .3s ease;
-}
-.mob-modules-drawer.open{transform:translateY(0)}
-.mob-drawer-handle{
-  width:36px;height:4px;background:rgba(255,255,255,.2);
-  border-radius:2px;margin:12px auto 0;
-}
-.mob-drawer-close{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:12px 16px 8px;
-}
-.mob-drawer-title{font-size:.82rem;font-weight:500;color:#fff}
-.mob-drawer-x{background:none;border:none;color:rgba(255,255,255,.4);font-size:1rem;cursor:pointer;padding:2px 6px}
-.mob-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.5);z-index:299;
-}
-.mob-overlay.on{display:block}
-
-/* ── STICKY ACTIONS MOBILE ── */
-.mob-sticky-actions{
-  display:none;
-  position:fixed;bottom:calc(52px + env(safe-area-inset-bottom));
-  left:0;right:0;padding:10px 14px;
-  background:rgba(250,250,248,.95);backdrop-filter:blur(8px);
-  border-top:.5px solid var(--subtle);z-index:150;
-  gap:8px;
-}
-.mob-plan-btn{
-  position:fixed;
-  bottom:calc(60px + env(safe-area-inset-bottom));
-  right:14px;z-index:160;
-  background:var(--dark);color:rgba(255,255,255,.7);
-  border:.5px solid rgba(255,255,255,.15);
-  border-radius:22px;padding:7px 14px;
-  font-size:.72rem;font-family:inherit;cursor:pointer;
-  display:none;align-items:center;gap:5px;
-  box-shadow:0 4px 16px rgba(0,0,0,.2);
-}
+/* ── Bottom nav mobile ── */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--dark);height:64px;padding:0 8px;align-items:center;justify-content:space-around;z-index:200;border-top:0.5px solid rgba(255,255,255,.08)}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;color:rgba(255,255,255,.4);cursor:pointer;font-size:.6rem;border:none;background:none;font-family:inherit}
+.bn-item.active{color:var(--gold)}
+.bn-item svg{width:22px;height:22px}
 
 @media(max-width:768px){
-  /* Cacher nav desktop */
-  nav{display:none}
-  .mobile-topbar{display:none} /* on utilise .mob-topbar */
-  .mob-top{display:flex !important}
-
-  .layout{grid-template-columns:1fr}
-  .sidebar{display:none}
-  .main{min-height:calc(100vh - 50px)}
-
-  /* VUE LISTE */
-  .view-list{padding:12px 12px 80px}
-  .welcome-title{font-size:1.3rem}
-  .welcome-sub{font-size:.78rem;margin-bottom:16px}
-  .f-grid{grid-template-columns:1fr;gap:10px}
-  .f-card-cover{height:160px;font-size:2rem}
-
-  /* VUE DÉTAIL */
-  .detail-header{
-    padding:8px 12px;position:sticky;top:50px;
-    background:#fff;z-index:10;
-    border-bottom:.5px solid var(--subtle);
-  }
-  .detail-meta{display:none}
-  .detail-title{font-size:.88rem}
-
-  .detail-layout{grid-template-columns:1fr;overflow:visible}
-
-  /* Vidéo pleine largeur */
-  .player-zone{padding:0 0 100px}
-  .video-box{
-    border-radius:0;
-    margin-bottom:0;
-    aspect-ratio:16/9;
-  }
-
-  /* Infos leçon sous la vidéo */
-  .lecon-title-h{font-size:.95rem;padding:14px 14px 6px}
-  .lecon-body{padding:0 14px;font-size:.83rem}
-
-  /* Actions sticky */
-  .action-bar{display:none}
-  .mob-sticky-actions{display:flex}
-  .btn-done,.btn-next{flex:1}
-
-  /* Modules panel → tiroir */
-  .modules-panel{display:none}
-  .mob-modules-drawer{display:block}
-  .mob-bottom-nav{display:block}
-  .mob-plan-btn{display:flex}
+  .main{padding:1.5rem 1rem}
+  .m-grid{grid-template-columns:1fr 1fr;gap:10px}
+  .detail-layout{grid-template-columns:1fr;grid-template-rows:auto 1fr}
+  .detail-sidebar{display:none}
+  .bottom-nav{display:flex}
+  body{padding-bottom:80px}
 }
-
-@media(max-width:380px){
-  .f-card-cover{height:160px}
+@media(max-width:480px){
+  .m-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- NAV DESKTOP -->
 <nav>
-  <a href="index.html" class="nav-logo">Start Business World</a>
+  <a href="client-dashboard.html" class="nav-logo">Start Business World</a>
   <div class="nav-right">
-    <a href="client-dashboard.html" class="nav-back">← Tableau de bord</a>
     <span class="nav-user" id="navUser"></span>
     <button class="btn-logout" id="logoutBtn">Déconnexion</button>
   </div>
 </nav>
 
-<!-- TOPBAR MOBILE -->
-<div style="display:none;background:var(--dark);height:50px;padding:0 14px;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-shrink:0" class="mob-top" id="mobTopbar">
-  <a href="index.html" style="font-family:'DM Serif Display',serif;color:#fff;font-size:.95rem;text-decoration:none">Start Business World</a>
-  <div style="display:flex;align-items:center;gap:10px">
-    <button onclick="window.location.href='client-dashboard.html'" style="font-size:.72rem;color:rgba(255,255,255,.5);background:none;border:none;cursor:pointer;font-family:inherit">← Dashboard</button>
-    <button id="logoutBtnMob" style="background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.45);padding:3px 10px;border-radius:4px;font-size:.7rem;cursor:pointer;font-family:inherit">Quitter</button>
+<!-- Vue liste -->
+<div id="viewList">
+  <div class="main">
+    <div class="page-head">
+      <div class="page-title">Mes formations</div>
+      <div class="page-sub">Toutes tes formations disponibles</div>
+    </div>
+    <div class="global-bar">
+      <div class="gbar-wrap"><div class="gbar-fill" id="gbarFill" style="width:0%"></div></div>
+      <div class="gbar-label" id="gbarLabel">0/0 leçons</div>
+      <div class="gbar-pct" id="gbarPct">0%</div>
+    </div>
+    <div id="formationsContainer">
+      <div style="color:var(--muted);font-size:.85rem">Chargement...</div>
+    </div>
   </div>
 </div>
 
-<div class="layout">
-
-  <!-- ── SIDEBAR FORMATIONS ── -->
-  <div class="sidebar">
-    <div class="sb-head">
-      <div class="sb-title">Mes formations</div>
-      <div class="sb-progress"><div class="sb-progress-fill" id="sbProgressFill" style="width:0%"></div></div>
-      <div class="sb-progress-label">
-        <span id="sbProgressLabel">0% global</span>
-        <span id="sbProgressCount">0/0 leçons</span>
-      </div>
-    </div>
-    <div class="f-list" id="sidebarList">
-      <div style="padding:1.5rem;color:rgba(255,255,255,.3);font-size:.8rem">Chargement...</div>
-    </div>
-  </div>
-
-  <!-- ── CONTENU ── -->
-  <div class="main" id="mainArea">
-
-    <!-- VUE LISTE -->
-    <div class="view-list" id="viewList">
-      <div class="welcome-head">
-        <div class="welcome-title">Mes formations 🎓</div>
-        <div class="welcome-sub" id="welcomeSub">Toutes les formations sont accessibles.</div>
-      </div>
-      <div class="f-grid" id="formationsGrid">
-        <div style="color:var(--muted);font-size:.85rem">Chargement...</div>
-      </div>
-    </div>
-
-    <!-- VUE DÉTAIL -->
-    <div class="view-detail" id="viewDetail">
-      <div class="detail-header">
-        <button class="detail-back-btn" id="backBtn">
-          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3L5 8l5 5"/></svg>
-          Retour
-        </button>
+<!-- Vue détail (formations vidéo) -->
+<div id="viewDetail">
+  <div class="detail-layout">
+    <div class="detail-sidebar">
+      <div class="detail-sidebar-head">
+        <div class="detail-back" onclick="backToList()">← Retour aux formations</div>
         <div class="detail-title" id="detailTitle"></div>
-        <div class="detail-meta" id="detailMeta"></div>
       </div>
-
-      <div class="detail-layout">
-
-        <!-- Lecteur + infos -->
-        <div class="player-zone">
-          <div class="video-box" id="videoBox">
-            <div class="no-video">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg>
-              <span>Sélectionne une leçon</span>
-            </div>
-          </div>
-          <div class="lecon-title-h" id="leconTitleH">Sélectionne une leçon pour commencer</div>
-          <div class="lecon-body" id="leconBody"></div>
-          <div class="action-bar">
-            <button class="btn-done" id="btnDone" style="display:none" onclick="markDone()">
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8"/></svg>
-              Marquer comme terminée
-            </button>
-            <button class="btn-next" id="btnNext" style="display:none" onclick="goNext()">
-              Leçon suivante
-              <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 3l5 5-5 5"/></svg>
-            </button>
-          </div>
+      <div id="detailModules"></div>
+    </div>
+    <div class="detail-player">
+      <div class="video-box" id="videoBox">
+        <div class="no-video">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg>
+          <span>Sélectionne une leçon</span>
         </div>
-
-        <!-- Modules panel -->
-        <div class="modules-panel">
-          <div class="mods-head">
-            <div class="mods-head-title" id="modsTitle">Plan de la formation</div>
-            <div class="mods-global-bar"><div class="mods-global-fill" id="modsGlobalFill" style="width:0%"></div></div>
-            <div class="mods-global-label" id="modsGlobalLabel">0% complété</div>
-          </div>
-          <div id="modsList"></div>
-        </div>
-
+      </div>
+      <div class="lecon-content" id="leconContent">
+        <div style="color:var(--muted);font-size:.85rem;padding:1rem 0">Sélectionne une leçon dans le menu de gauche.</div>
+      </div>
+      <div class="done-bar" id="doneBar" style="display:none">
+        <button class="btn-done" id="btnDone" onclick="toggleDone()">Marquer comme terminée</button>
+        <button class="btn-next" id="btnNext" onclick="nextLecon()" style="display:none">Suivante →</button>
       </div>
     </div>
-
   </div>
 </div>
 
-<!-- STICKY ACTIONS MOBILE -->
-<div class="mob-sticky-actions" id="mobActions">
-  <button class="btn-done" id="btnDoneMob" style="display:none" onclick="markDone()">
-    <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 8l4 4 8-8"/></svg>
-    Terminée
+<!-- Bottom nav mobile -->
+<div class="bottom-nav">
+  <button class="bn-item" onclick="window.location.href='client-dashboard.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Accueil
   </button>
-  <button class="btn-next" id="btnNextMob" style="display:none" onclick="goNext()">
-    Suivante →
+  <button class="bn-item active" onclick="window.location.href='membre-formations.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Formations
   </button>
-</div>
-
-<!-- BOUTON PLAN MOBILE -->
-<button class="mob-plan-btn" id="mobPlanBtn" onclick="openDrawer()">
-  📋 Plan <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6l5-4 5 4M3 10l5-4 5 4"/></svg>
-</button>
-
-<!-- OVERLAY -->
-<div class="mob-overlay" id="mobOverlay" onclick="closeDrawer()"></div>
-
-<!-- TIROIR MODULES MOBILE -->
-<div class="mob-modules-drawer" id="mobDrawer">
-  <div class="mob-drawer-handle"></div>
-  <div class="mob-drawer-close">
-    <div class="mob-drawer-title" id="mobDrawerTitle">Plan de la formation</div>
-    <button class="mob-drawer-x" onclick="closeDrawer()">✕</button>
-  </div>
-  <div style="padding:0 0 20px" id="mobModsList"></div>
-</div>
-
-<!-- BOTTOM NAV MOBILE -->
-<div class="mob-bottom-nav">
-  <div class="mob-nav-items">
-    <button class="mob-nav-btn" onclick="window.location.href='client-dashboard.html'">
-      <span class="ico">🏠</span><span>Accueil</span>
-    </button>
-    <button class="mob-nav-btn act">
-      <span class="ico">🎓</span><span>Formations</span>
-    </button>
-    <button class="mob-nav-btn" onclick="window.location.href='membre-chat.html'">
-      <span class="ico">💬</span><span>Chat</span>
-    </button>
-    <button class="mob-nav-btn" onclick="window.location.href='membre-prestige.html'">
-      <span class="ico">⭐</span><span>Prestige</span>
-    </button>
-    <button class="mob-nav-btn" onclick="window.location.href='membre-affiliation.html'">
-      <span class="ico">💸</span><span>Affil.</span>
-    </button>
-  </div>
+  <button class="bn-item" onclick="window.location.href='membre-chat.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>Chat
+  </button>
+  <button class="bn-item" onclick="window.location.href='membre-prestige.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Prestige
+  </button>
+  <button class="bn-item" onclick="window.location.href='membre-affiliation.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Affil.
+  </button>
 </div>
 
 <script>
 var SB = supabase.createClient(
-  "https://grwimhqsthcmfwblwdwg.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
+  'https://grwimhqsthcmfwblwdwg.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
 );
 
-var user = null;
-var allFormations = [];
-var curFormation = null;
-var curModules = [];
-var curLecon = null;
-var curModuleId = null;
-var prog = {};
-var EMOJIS = ["🧠","🇨🇳","🏛️","📦","✈️","💰","🔗","💼","🎯","🚀"];
+var user = null, prog = {}, allData = [];
+var curModule = null, curLecon = null, curModLecons = [];
+var EMOJIS = ['📚','🎯','⚡','🚀','💡','🌍','💼','🔥','📈','🎓'];
 
-// ── INIT ──
+// ═══ INIT ═══
 async function init() {
   var s = await SB.auth.getSession();
-  if (!s.data.session) { window.location.href = "client-login.html"; return; }
+  if (!s.data.session) { window.location.href = 'client-login.html'; return; }
   user = s.data.session.user;
-
-  document.getElementById("navUser").textContent = user.email.split("@")[0];
-  document.getElementById("welcomeSub").textContent = "Bienvenue " + user.email.split("@")[0] + " — toutes les formations sont accessibles.";
-  document.getElementById("logoutBtn").onclick = async function() { await SB.auth.signOut(); window.location.href = "client-login.html"; };
-  document.getElementById("backBtn").onclick = showList;
-
-  try { prog = JSON.parse(localStorage.getItem("sbw_p_" + user.id) || "{}"); } catch(e) { prog = {}; }
-
-  await loadFormations();
+  document.getElementById('navUser').textContent = user.email.split('@')[0];
+  document.getElementById('logoutBtn').onclick = async function() {
+    await SB.auth.signOut(); window.location.href = 'client-login.html';
+  };
+  try { prog = JSON.parse(localStorage.getItem('sbw_p_' + user.id) || '{}'); } catch(e) { prog = {}; }
+  await loadAll();
 }
 
-function saveProgress() {
-  try { localStorage.setItem("sbw_p_" + user.id, JSON.stringify(prog)); } catch(e) {}
+// ═══ CHARGEMENT ═══
+async function loadAll() {
+  // Charger toutes les formations publiées avec leurs modules et leçons
+  var r = await SB.from('formations')
+    .select('*, modules(*, lecons(*))')
+    .eq('status', 'published')
+    .order('position');
+
+  allData = (r.data || []).map(function(f) {
+    f.modules = (f.modules || [])
+      .sort(function(a,b){return a.position-b.position;})
+      .map(function(m) {
+        m.lecons = (m.lecons || []).sort(function(a,b){return a.position-b.position;});
+        return m;
+      });
+    return f;
+  });
+
+  renderAll();
 }
 
-// ── FORMATIONS ──
-async function loadFormations() {
-  var res = await SB.from("formations").select("id,title,description,cover_url,formation_url,extra_stats,status,position").eq("status", "published").order("position");
-  allFormations = res.data || [];
+// ═══ RENDER PRINCIPAL ═══
+function renderAll() {
+  var container = document.getElementById('formationsContainer');
+  var totalDone = 0, totalAll = 0;
 
-  // Charger les stats de progression — seulement pour les formations sans URL
-  var totalGlobal = 0, doneGlobal = 0;
-
-  for (var i = 0; i < allFormations.length; i++) {
-    var f = allFormations[i];
-    if (f.formation_url) {
-      // Formation externe — lire la progression depuis localStorage (SBW Tracker)
-      var filename = f.formation_url.split('/').pop().replace('.html', '');
-      var storageKey = 'sbw_tracker__' + filename;
-      var trackerData = {};
-      try { trackerData = JSON.parse(localStorage.getItem(storageKey) || '{}'); } catch(e) {}
-      var trackerTotal = trackerData._total || 0;
-      var trackerDone = Object.keys(trackerData).filter(function(k) {
-        return k !== '_total' && k !== '_updated' && trackerData[k] === true;
-      }).length;
-      f._tot = trackerTotal;
-      f._done = trackerDone;
-      f._pct = trackerTotal > 0 ? Math.round(trackerDone / trackerTotal * 100) : 0;
-      totalGlobal += trackerTotal;
-      doneGlobal += trackerDone;
-      continue;
-    }
-    var mr = await SB.from("modules").select("id, lecons(id)").eq("formation_id", f.id);
-    var mods = mr.data || [];
-    var tot = mods.reduce(function(s, m) { return s + (m.lecons || []).length; }, 0);
-    var done = 0;
-    mods.forEach(function(m) { (m.lecons || []).forEach(function(l) { if (prog[l.id]) done++; }); });
-    f._tot = tot;
-    f._done = done;
-    f._pct = tot > 0 ? Math.round(done / tot * 100) : 0;
-    totalGlobal += tot;
-    doneGlobal += done;
-  }
-
-  // Progress global sidebar
-  var gpct = totalGlobal > 0 ? Math.round(doneGlobal / totalGlobal * 100) : 0;
-  document.getElementById("sbProgressFill").style.width = gpct + "%";
-  document.getElementById("sbProgressLabel").textContent = gpct + "% global";
-  document.getElementById("sbProgressCount").textContent = doneGlobal + "/" + totalGlobal + " leçons";
-
-  renderSidebar();
-  renderGrid();
-}
-
-function renderSidebar() {
-  var el = document.getElementById("sidebarList");
-  if (!allFormations.length) {
-    el.innerHTML = '<div style="padding:2rem;color:rgba(255,255,255,.3);font-size:.78rem;text-align:center">Aucune formation disponible.</div>';
+  if (!allData.length) {
+    container.innerHTML = '<div style="color:var(--muted);font-size:.85rem">Aucune formation disponible pour le moment.</div>';
     return;
   }
-  el.innerHTML = "";
-  allFormations.forEach(function(f, i) {
-    var div = document.createElement("div");
-    div.className = "f-item" + (curFormation && curFormation.id === f.id ? " active" : "");
-    div.innerHTML =
-      '<div class="f-item-icon">' + EMOJIS[i % EMOJIS.length] + '</div>' +
-      '<div class="f-item-info">' +
-        '<div class="f-item-name">' + f.title + '</div>' +
-        '<div class="f-item-bar"><div class="f-item-fill" style="width:' + f._pct + '%"></div></div>' +
-        '<div class="f-item-pct">' + f._pct + "% · " + f._done + "/" + f._tot + "</div>" +
-      '</div>';
-    div.onclick = (function(fm) { return function() {
-      if (fm.formation_url) {
-        window.open(fm.formation_url, '_blank', 'noopener');
+
+  container.innerHTML = '';
+
+  allData.forEach(function(f, fi) {
+    var group = document.createElement('div');
+    group.className = 'f-group';
+
+    // Header du groupe
+    var typeLabel = f.type === 'html' ? '⚡ IA' : f.type === 'external' ? '🔗 Externe' : '▶ Vidéo';
+    var badgeClass = f.type === 'html' ? 'badge-html' : f.type === 'external' ? 'badge-ext' : 'badge-video';
+    var head = document.createElement('div');
+    head.className = 'f-group-head';
+    head.innerHTML =
+      '<span class="f-group-title">' + f.title + '</span>' +
+      '<span class="f-group-badge ' + badgeClass + '">' + typeLabel + '</span>';
+    group.appendChild(head);
+
+    var grid = document.createElement('div');
+    grid.className = 'm-grid';
+
+    // ── TYPE EXTERNE : 1 seule card ──
+    if (f.type === 'external') {
+      var card = makeExtCard(f, fi);
+      grid.appendChild(card);
+    }
+    // ── TYPE HTML ou VIDÉO : une card par module ──
+    else {
+      if (!f.modules.length) {
+        var empty = document.createElement('div');
+        empty.style.cssText = 'font-size:.82rem;color:var(--muted);grid-column:1/-1';
+        empty.textContent = 'Aucun module disponible.';
+        grid.appendChild(empty);
       } else {
-        openFormation(fm);
+        f.modules.forEach(function(m, mi) {
+          var prog_data = getModuleProgress(f, m);
+          totalDone += prog_data.done;
+          totalAll += prog_data.total;
+          var card = makeModuleCard(f, m, mi + fi * 10, prog_data);
+          grid.appendChild(card);
+        });
       }
-    }; })(f);
-    el.appendChild(div);
+    }
+
+    group.appendChild(grid);
+    container.appendChild(group);
   });
+
+  // Barre globale
+  var pct = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
+  document.getElementById('gbarFill').style.width = pct + '%';
+  document.getElementById('gbarLabel').textContent = totalDone + '/' + totalAll + ' leçons';
+  document.getElementById('gbarPct').textContent = pct + '%';
 }
 
-function renderGrid() {
-  var grid = document.getElementById("formationsGrid");
-  if (!allFormations.length) {
-    grid.innerHTML = '<div style="color:var(--muted);font-size:.85rem;padding:2rem">Aucune formation disponible pour le moment.</div>';
-    return;
+// ── Progression d'un module ──
+function getModuleProgress(f, m) {
+  if (f.type === 'html' && m.html_url) {
+    // Lire depuis localStorage (SBW Tracker)
+    var filename = m.html_url.split('/').pop().replace('.html', '');
+    var key = 'sbw_tracker__' + filename;
+    var data = {};
+    try { data = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) {}
+    var total = data._total || 0;
+    var done = Object.keys(data).filter(function(k) {
+      return k !== '_total' && k !== '_updated' && data[k] === true;
+    }).length;
+    return { done: done, total: total, pct: total > 0 ? Math.round(done / total * 100) : 0 };
+  } else if (f.type === 'video') {
+    // Lire depuis localStorage (prog)
+    var total = m.lecons.length;
+    var done = m.lecons.filter(function(l) { return !!prog[l.id]; }).length;
+    return { done: done, total: total, pct: total > 0 ? Math.round(done / total * 100) : 0 };
   }
-  grid.innerHTML = "";
-
-  allFormations.forEach(function(f, i) {
-    var hasUrl = !!f.formation_url;
-
-    // ── COVER ──
-    var coverHtml;
-    if (hasUrl && f.cover_url) {
-      // Image screenshot en haut
-      coverHtml =
-        '<div style="width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px 10px 0 0;background:var(--dark);position:relative">' +
-          '<img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;object-position:top center;display:block" loading="lazy">' +
-          '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,transparent 60%,rgba(0,0,0,.35))"></div>' +
-        '</div>';
-    } else if (hasUrl) {
-      coverHtml =
-        '<div style="width:100%;aspect-ratio:16/9;background:var(--dark);border-radius:10px 10px 0 0;display:flex;align-items:center;justify-content:center;font-size:3rem">' +
-          EMOJIS[i % EMOJIS.length] +
-        '</div>';
-    } else {
-      coverHtml =
-        '<div class="f-card-cover" style="border-radius:10px 10px 0 0">' +
-          (f.cover_url
-            ? '<img src="' + f.cover_url + '" style="width:100%;height:100%;object-fit:cover;position:absolute;inset:0" loading="lazy">'
-            : '<span style="font-size:2.2rem">' + EMOJIS[i % EMOJIS.length] + '</span>') +
-        '</div>';
-    }
-
-    // ── BODY ──
-    var bodyHtml =
-      '<div style="padding:16px 18px 18px">' +
-        // Titre
-        '<div style="font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:6px;line-height:1.3">' + f.title + '</div>' +
-        // Description
-        (f.description
-          ? '<div style="font-size:.78rem;color:var(--muted);margin-bottom:12px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + f.description + '</div>'
-          : '') +
-        // Séparateur
-        '<div style="height:.5px;background:var(--subtle);margin-bottom:12px"></div>' +
-        // Stats
-        '<div style="font-size:.72rem;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:6px">' +
-          (f.extra_stats
-            ? '<span>' + f.extra_stats + '</span>'
-            : '<span id="fmeta_' + f.id + '">—</span>') +
-        '</div>' +
-        // Bouton
-        (hasUrl
-          ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" class="btn-lancer" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:600;text-decoration:none">▶ Commencer la formation</a>'
-          : '<button class="btn-voir-contenu" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--dark);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
-        ) +
-      '</div>';
-
-    var card = document.createElement("div");
-    card.className = "f-card";
-    card.style.cssText = "border-radius:10px;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column";
-    card.innerHTML = coverHtml + bodyHtml;
-
-    card.onmouseover = function() { this.style.transform='translateY(-3px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)'; };
-    card.onmouseout = function() { this.style.transform=''; this.style.boxShadow=''; };
-
-    if (hasUrl) {
-      card.addEventListener("click", function() { window.open(f.formation_url, "_blank", "noopener"); });
-    } else {
-      card.addEventListener("click", (function(fm) { return function() { openFormation(fm); }; })(f));
-      var btnVoir = card.querySelector(".btn-voir-contenu");
-      if (btnVoir) {
-        btnVoir.addEventListener("click", (function(fm) { return function(e) {
-          e.stopPropagation();
-          openFormation(fm);
-        }; })(f));
-      }
-    }
-
-    grid.appendChild(card);
-  });
-
-  // Stats pour formations classiques
-  allFormations.forEach(function(f) {
-    if (f.extra_stats) return;
-    SB.from("modules").select("id", { count: "exact" }).eq("formation_id", f.id).then(function(r) {
-      var el = document.getElementById("fmeta_" + f.id);
-      if (el) el.textContent = (r.count || 0) + " module" + (r.count > 1 ? "s" : "") + " · " + f._tot + " leçon" + (f._tot > 1 ? "s" : "");
-    });
-  });
+  return { done: 0, total: 0, pct: 0 };
 }
 
-function scaleIframes() {
-  document.querySelectorAll(".cover-iframe-wrap").forEach(function(wrap) {
-    var iframe = wrap.querySelector("iframe");
-    if (!iframe) return;
-    var w = wrap.offsetWidth;
-    if (!w) return;
-    iframe.style.transform = "scale(" + (w / 1280) + ")";
+// ── Card module (html ou vidéo) ──
+function makeModuleCard(f, m, idx, progData) {
+  var card = document.createElement('div');
+  card.className = 'm-card';
+
+  // Cover
+  var cover = document.createElement('div');
+  cover.className = 'm-card-cover';
+  if (m.cover_url) {
+    cover.innerHTML = '<img src="' + m.cover_url + '" alt="" loading="lazy"><div class="m-card-cover-overlay"></div>';
+  } else {
+    cover.innerHTML = '<div class="m-card-cover-icon">' + EMOJIS[idx % EMOJIS.length] + '</div>';
+  }
+  card.appendChild(cover);
+
+  // Body
+  var body = document.createElement('div');
+  body.className = 'm-card-body';
+  body.innerHTML =
+    '<div class="m-card-title">' + m.title + '</div>' +
+    (m.extra_stats ? '<div class="m-card-stats">' + m.extra_stats + '</div>' : '') +
+    '<div class="m-card-divider"></div>' +
+    '<div class="m-card-prog">' +
+      '<div class="prog-bar"><div class="prog-fill" style="width:' + progData.pct + '%"></div></div>' +
+      '<div class="prog-label"><span>' + progData.pct + '% complété</span><span>' + progData.done + '/' + progData.total + '</span></div>' +
+    '</div>';
+
+  // Bouton
+  var btn;
+  if (f.type === 'html' && m.html_url) {
+    btn = document.createElement('a');
+    btn.href = m.html_url;
+    btn.target = '_blank';
+    btn.rel = 'noopener';
+    btn.className = 'm-card-btn gold';
+    btn.textContent = progData.pct > 0 ? '▶ Continuer' : '▶ Commencer';
+    btn.addEventListener('click', function(e) { e.stopPropagation(); });
+  } else if (f.type === 'video') {
+    btn = document.createElement('button');
+    btn.className = 'm-card-btn';
+    btn.textContent = progData.pct > 0 ? '▶ Continuer' : '▶ Voir les leçons';
+    btn.addEventListener('click', function(e) { e.stopPropagation(); openDetailModule(f, m); });
+  }
+  if (btn) body.appendChild(btn);
+  card.appendChild(body);
+
+  // Click card
+  card.addEventListener('click', function() {
+    if (f.type === 'html' && m.html_url) window.open(m.html_url, '_blank', 'noopener');
+    else if (f.type === 'video') openDetailModule(f, m);
   });
+
+  return card;
 }
 
+// ── Card externe ──
+function makeExtCard(f, idx) {
+  var card = document.createElement('div');
+  card.className = 'm-card';
+  card.style.cursor = 'pointer';
 
-// ── DÉTAIL FORMATION ──
-async function openFormation(f) {
-  curFormation = f;
+  var cover = document.createElement('div');
+  cover.className = 'm-card-cover';
+  if (f.cover_url) {
+    cover.innerHTML = '<img src="' + f.cover_url + '" alt="" loading="lazy"><div class="m-card-cover-overlay"></div>';
+  } else {
+    cover.innerHTML = '<div class="m-card-cover-icon">🔗</div>';
+  }
+  card.appendChild(cover);
+
+  var body = document.createElement('div');
+  body.className = 'm-card-body';
+  body.innerHTML =
+    '<div class="m-card-title">' + f.title + '</div>' +
+    (f.description ? '<div class="m-card-stats" style="color:var(--muted);font-size:.78rem;line-height:1.5">' + f.description + '</div>' : '') +
+    '<div class="m-card-divider"></div>';
+
+  var btn = document.createElement('a');
+  btn.href = f.external_url || '#';
+  btn.target = '_blank';
+  btn.rel = 'noopener';
+  btn.className = 'm-card-btn gold';
+  btn.textContent = '🔗 Accéder à la formation';
+  btn.addEventListener('click', function(e) { e.stopPropagation(); });
+  body.appendChild(btn);
+  card.appendChild(body);
+
+  card.addEventListener('click', function() {
+    if (f.external_url) window.open(f.external_url, '_blank', 'noopener');
+  });
+
+  return card;
+}
+
+// ═══ VUE DÉTAIL (vidéo) ═══
+function openDetailModule(f, m) {
+  curModule = m;
   curLecon = null;
+  curModLecons = m.lecons;
 
-  document.getElementById("viewList").style.display = "none";
-  var vd = document.getElementById("viewDetail");
-  vd.style.display = "flex";
+  document.getElementById('viewList').style.display = 'none';
+  document.getElementById('viewDetail').style.display = 'block';
+  document.getElementById('detailTitle').textContent = f.title + ' — ' + m.title;
 
-  document.getElementById("detailTitle").textContent = f.title;
-  document.getElementById("modsTitle").textContent = f.title;
+  renderDetailSidebar(f);
 
-  var res = await SB.from("modules").select("*, lecons(*)").eq("formation_id", f.id).order("position");
-  curModules = (res.data || []).map(function(m) {
-    m.lecons = (m.lecons || []).sort(function(a, b) { return a.position - b.position; });
-    return m;
-  });
-
-  var tot = curModules.reduce(function(s, m) { return s + m.lecons.length; }, 0);
-  var done = 0;
-  curModules.forEach(function(m) { m.lecons.forEach(function(l) { if (prog[l.id]) done++; }); });
-  var pct = tot > 0 ? Math.round(done / tot * 100) : 0;
-
-  document.getElementById("detailMeta").textContent = curModules.length + " modules · " + tot + " leçons";
-  document.getElementById("modsGlobalFill").style.width = pct + "%";
-  document.getElementById("modsGlobalLabel").textContent = pct + "% complété — " + done + "/" + tot;
-
-  renderSidebar();
-  renderModules();
-
-  // Auto-play première leçon non terminée
-  var first = null;
-  for (var i = 0; i < curModules.length && !first; i++) {
-    for (var j = 0; j < curModules[i].lecons.length && !first; j++) {
-      if (!prog[curModules[i].lecons[j].id]) first = curModules[i].lecons[j];
-    }
-  }
-  if (!first && curModules[0] && curModules[0].lecons[0]) first = curModules[0].lecons[0];
+  // Auto-ouvrir la première leçon non terminée
+  var first = m.lecons.find(function(l) { return !prog[l.id]; }) || m.lecons[0];
   if (first) playLecon(first);
 }
 
-function renderModules() {
-  var c = document.getElementById("modsList");
-  c.innerHTML = "";
-  curModules.forEach(function(m, mi) {
-    var done = m.lecons.filter(function(l) { return prog[l.id]; }).length;
-    var isOpen = true;
-    var block = document.createElement("div");
-    block.className = "mod-block";
+function renderDetailSidebar(f) {
+  var el = document.getElementById('detailModules');
+  el.innerHTML = '';
 
-    var head = document.createElement("div");
-    head.className = "mod-head";
-    head.innerHTML =
-      '<span class="mod-arr open" id="marr_' + m.id + '">▶</span>' +
-      '<span class="mod-num">M' + String(mi + 1).padStart(2, "0") + '</span>' +
-      '<span class="mod-name">' + m.title + '</span>' +
-      '<span class="mod-done-count">' + done + "/" + m.lecons.length + '</span>';
+  // Afficher tous les modules de la formation dans la sidebar
+  f.modules.forEach(function(m) {
+    if (!m.lecons.length) return;
+    var section = document.createElement('div');
+    section.className = 'mod-section';
+    var title = document.createElement('div');
+    title.className = 'mod-section-title';
+    title.textContent = m.title;
+    section.appendChild(title);
 
-    var list = document.createElement("div");
-    list.className = "mod-lessons open";
-    list.id = "ml_" + m.id;
-
-    head.onclick = (function(mid) {
-      return function() {
-        var el = document.getElementById("ml_" + mid);
-        var arr = document.getElementById("marr_" + mid);
-        var open = el.classList.toggle("open");
-        if (arr) arr.classList.toggle("open", open);
-      };
-    })(m.id);
-
-    m.lecons.forEach(function(l) {
-      var isActive = curLecon && curLecon.id === l.id;
-      var isDone = !!prog[l.id];
-      var btn = document.createElement("button");
-      btn.className = "lbtn" + (isActive ? " active" : "") + (isDone ? " done" : "");
-      var cc = isDone ? "done" : (isActive ? "active" : "");
+    m.lecons.forEach(function(l, li) {
+      var btn = document.createElement('button');
+      btn.className = 'lecon-btn' + (curLecon && curLecon.id === l.id ? ' active' : '');
       btn.innerHTML =
-        '<span class="l-check ' + cc + '">' + (isDone ? "✓" : "") + '</span>' +
-        '<span class="l-title">' + l.title + '</span>' +
-        (l.lecon_type === "html" ? '<span class="l-yt" style="color:#635BFF">⚡</span>' : l.youtube_id ? '<span class="l-yt">▶</span>' : "") +
-        (l.duration_min ? '<span class="l-dur">' + l.duration_min + "m</span>" : "");
-      btn.onclick = (function(lc) { return function() { playLecon(lc); }; })(l);
-      list.appendChild(btn);
+        '<span class="lecon-btn-num">' + String(li+1).padStart(2,'0') + '</span>' +
+        '<span class="lecon-btn-title">' + l.title + '</span>' +
+        (prog[l.id] ? '<span class="lecon-btn-done">✓</span>' : '');
+      btn.addEventListener('click', (function(lc) { return function() { playLecon(lc); }; })(l));
+      section.appendChild(btn);
     });
 
-    block.appendChild(head);
-    block.appendChild(list);
-    c.appendChild(block);
+    el.appendChild(section);
   });
 }
 
-// ── LECTEUR ──
+function backToList() {
+  document.getElementById('viewDetail').style.display = 'none';
+  document.getElementById('viewList').style.display = 'block';
+  renderAll(); // Refresh les progressions
+}
+
+// ═══ LECTEUR VIDÉO ═══
 function playLecon(l) {
   curLecon = l;
-  var box = document.getElementById("videoBox");
-  var type = l.lecon_type || (l.youtube_id ? "youtube" : "text");
+  var box = document.getElementById('videoBox');
 
-  if (type === "html" && l.html_content) {
-    // URL externe → bouton nouvel onglet
-    if (l.html_content.startsWith('URL:')) {
-      var url = l.html_content.slice(4);
-      box.innerHTML =
-        '<div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:#0C0C0A">' +
-          '<div style="font-size:2.5rem">⚡</div>' +
-          '<div style="font-size:1rem;font-weight:600;color:#F0ECE4">' + l.title + '</div>' +
-          '<div style="font-size:.82rem;color:#5A564E;max-width:320px;text-align:center">Cette formation interactive s&rsquo;ouvre en plein ecran dans un nouvel onglet.</div>' +
-          '<a href="' + url + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:#A67C3A;color:#fff;padding:12px 28px;border-radius:8px;font-size:.88rem;font-weight:600;text-decoration:none;margin-top:4px">▶ Lancer la formation</a>' +
-        '</div>';
-    } else {
-      var safeHtml = l.html_content.replace(/"/g, '&quot;').replace(/\n/g, ' ');
-      box.innerHTML = '<iframe srcdoc="' + safeHtml + '" style="width:100%;height:100%;border:none;display:block" sandbox="allow-scripts allow-same-origin"></iframe>';
-    }
-  } else if (type === "youtube" && l.youtube_id) {
-    var cleanId = l.youtube_id.split("?")[0];
+  if (l.youtube_id) {
+    var id = l.youtube_id.split('?')[0];
     box.innerHTML =
-      '<div class="vthumb" onclick="launchVideo(\'' + cleanId + '\', this)">' +
-        '<img src="https://i.ytimg.com/vi/' + cleanId + '/hqdefault.jpg" alt="">' +
-        '<div class="vthumb-overlay"><div class="vplay-big"><div class="vplay-tri"></div></div></div>' +
+      '<div class="vthumb" onclick="launchVideo(\'' + id + '\', this)">' +
+        '<img src="https://i.ytimg.com/vi/' + id + '/hqdefault.jpg" alt="">' +
+        '<div class="vplay-overlay"><div class="vplay-btn"><div class="vplay-tri"></div></div></div>' +
       '</div>';
   } else {
-    box.innerHTML = '<div class="no-video"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg><span>' + (type === "text" ? "Leçon texte" : "Pas de contenu vidéo") + '</span></div>';
+    box.innerHTML =
+      '<div class="no-video">' +
+        '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><rect x="2" y="2" width="20" height="20" rx="3"/><polygon points="10,8 16,12 10,16"/></svg>' +
+        '<span>Leçon texte</span>' +
+      '</div>';
   }
 
-  document.getElementById("leconTitleH").textContent = l.title;
-  var body = document.getElementById("leconBody");
+  // Contenu
+  var content = document.getElementById('leconContent');
+  content.innerHTML = '<div class="lecon-content-title">' + l.title + '</div>';
   if (l.content) {
-    body.innerHTML = "";
-    l.content.split("\n\n").forEach(function(p) {
-      p = p.trim();
-      if (!p) return;
-
-      // ── OUTIL CARD ──
-      if (p.startsWith("[OUTIL:") && p.endsWith("]")) {
-        var parts = p.slice(7, -1).split("|");
-        var nom = parts[0] || "";
-        var desc = parts[1] || "";
-        var ourl = parts[2] || "#";
-        var card = document.createElement("a");
-        card.href = ourl;
-        card.target = "_blank";
-        card.rel = "noopener";
-        card.className = "tool-card-lecon";
-        var left = document.createElement("div");
-        var nameEl = document.createElement("div");
-        nameEl.className = "tool-card-lecon-name";
-        nameEl.textContent = nom;
-        left.appendChild(nameEl);
-        if (desc) {
-          var descEl = document.createElement("div");
-          descEl.className = "tool-card-lecon-desc";
-          descEl.textContent = desc;
-          left.appendChild(descEl);
-        }
-        var cta = document.createElement("div");
-        cta.className = "tool-card-lecon-cta";
-        cta.textContent = "Découvrir →";
-        card.appendChild(left);
-        card.appendChild(cta);
-        body.appendChild(card);
-        return;
-      }
-
-      // ── TITRES ──
-      if (p.startsWith("## ")) { var h = document.createElement("h2"); h.textContent = p.slice(3); body.appendChild(h); return; }
-      if (p.startsWith("### ")) { var h = document.createElement("h3"); h.textContent = p.slice(4); body.appendChild(h); return; }
-
-      // ── CALLOUT ──
-      if (p.startsWith("> ")) {
-        var bq = document.createElement("blockquote");
-        bq.textContent = p.slice(2);
-        body.appendChild(bq);
-        return;
-      }
-
-      // ── LISTE ──
-      if (p.startsWith("- ")) {
-        var ul = document.createElement("ul");
-        p.split("\n").forEach(function(line) {
-          if (!line.startsWith("- ")) return;
-          var li = document.createElement("li");
-          li.innerHTML = fmtLecon(line.slice(2));
-          ul.appendChild(li);
-        });
-        body.appendChild(ul);
-        return;
-      }
-
-      // ── PARAGRAPHE ──
-      var el = document.createElement("p");
-      el.innerHTML = fmtLecon(p);
-      body.appendChild(el);
-    });
-  } else {
-    body.innerHTML = "";
+    var bodyDiv = document.createElement('div');
+    bodyDiv.className = 'lecon-content-body';
+    renderContent(l.content, bodyDiv);
+    content.appendChild(bodyDiv);
   }
 
-  var isDone = !!prog[l.id];
-  var btnDone = document.getElementById("btnDone");
-  var btnNext = document.getElementById("btnNext");
-  btnDone.style.display = "flex";
-  btnDone.textContent = isDone ? "✓ Leçon terminée" : "Marquer comme terminée";
-  btnDone.className = "btn-done" + (isDone ? " completed" : "");
-  btnNext.style.display = findNext() ? "flex" : "none";
+  // Barre done
+  document.getElementById('doneBar').style.display = 'flex';
+  var btnDone = document.getElementById('btnDone');
+  btnDone.textContent = prog[l.id] ? '✓ Terminée' : 'Marquer comme terminée';
+  btnDone.className = 'btn-done' + (prog[l.id] ? ' completed' : '');
 
-  renderModules();
-}
+  // Bouton suivant
+  var next = findNext();
+  document.getElementById('btnNext').style.display = next ? 'flex' : 'none';
 
-function fmtLecon(text) {
-  // Liens [texte](url)
-  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, function(m, t, u) {
-    return '<a href="' + u + '" target="_blank" rel="noopener">' + t + '</a>';
-  });
-  // Liens nus https://...
-  text = text.replace(/(https?:\/\/[^\s<"]+)/g, function(m, url) {
-    return '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
-  });
-  // Gras
-  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-  // Italique
-  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-  return text;
+  // Refresh sidebar
+  var f = allData.find(function(f) { return f.modules.some(function(m) { return m.id === curModule.id; }); });
+  if (f) renderDetailSidebar(f);
 }
 
 function launchVideo(id, el) {
   el.innerHTML = '<iframe src="https://www.youtube.com/embed/' + id + '?autoplay=1&rel=0" allowfullscreen allow="autoplay; encrypted-media" style="width:100%;height:100%;border:none;display:block"></iframe>';
-  el.style.cursor = "default";
+  el.style.cursor = 'default';
   el.onclick = null;
 }
 
-function markDone() {
-  if (!curLecon) return;
-  prog[curLecon.id] = true;
-  saveProgress();
-
-  var btn = document.getElementById("btnDone");
-  btn.textContent = "✓ Leçon terminée";
-  btn.className = "btn-done completed";
-
-  // Mettre à jour la progression
-  var f = curFormation;
-  var tot = curModules.reduce(function(s, m) { return s + m.lecons.length; }, 0);
-  var done = 0;
-  curModules.forEach(function(m) { m.lecons.forEach(function(l) { if (prog[l.id]) done++; }); });
-  var pct = tot > 0 ? Math.round(done / tot * 100) : 0;
-  document.getElementById("modsGlobalFill").style.width = pct + "%";
-  document.getElementById("modsGlobalLabel").textContent = pct + "% complété — " + done + "/" + tot;
-
-  renderModules();
-  loadFormations(); // refresh sidebar
-
-  var next = findNext();
-  if (next) setTimeout(function() { playLecon(next); }, 500);
-}
-
 function findNext() {
-  if (!curLecon) return null;
-  var found = false;
-  for (var i = 0; i < curModules.length; i++) {
-    for (var j = 0; j < curModules[i].lecons.length; j++) {
-      if (found) return curModules[i].lecons[j];
-      if (curModules[i].lecons[j].id === curLecon.id) found = true;
+  if (!curModule || !curLecon) return null;
+  var idx = curModLecons.findIndex(function(l) { return l.id === curLecon.id; });
+  return idx >= 0 && idx < curModLecons.length - 1 ? curModLecons[idx + 1] : null;
+}
+
+function nextLecon() {
+  var next = findNext();
+  if (next) playLecon(next);
+}
+
+function toggleDone() {
+  if (!curLecon) return;
+  if (prog[curLecon.id]) {
+    delete prog[curLecon.id];
+  } else {
+    prog[curLecon.id] = true;
+    // XP
+    SB.from('user_xp').select('*').eq('user_id', user.id).single().then(function(r) {
+      var xp = (r.data ? r.data.xp : 0) + 10;
+      SB.from('user_xp').upsert({ user_id: user.id, user_name: user.email.split('@')[0], xp: xp, lecons_done: (r.data?r.data.lecons_done:0)+1, last_active: new Date().toISOString() }).then(function(){});
+    });
+  }
+  saveProgress();
+  playLecon(curLecon);
+}
+
+function saveProgress() {
+  try { localStorage.setItem('sbw_p_' + user.id, JSON.stringify(prog)); } catch(e) {}
+}
+
+// ═══ RENDU CONTENU ═══
+function renderContent(text, container) {
+  text.split('\n\n').forEach(function(p) {
+    p = p.trim();
+    if (!p) return;
+
+    if (p.startsWith('[OUTIL:') && p.endsWith(']')) {
+      var parts = p.slice(7, -1).split('|');
+      var card = document.createElement('a');
+      card.href = parts[2] || '#';
+      card.target = '_blank';
+      card.rel = 'noopener';
+      card.className = 'tool-card';
+      var left = document.createElement('div');
+      var name = document.createElement('div'); name.className = 'tool-card-name'; name.textContent = parts[0] || '';
+      var desc = document.createElement('div'); desc.className = 'tool-card-desc'; desc.textContent = parts[1] || '';
+      left.appendChild(name); left.appendChild(desc);
+      var cta = document.createElement('div'); cta.className = 'tool-card-cta'; cta.textContent = 'Découvrir →';
+      card.appendChild(left); card.appendChild(cta);
+      container.appendChild(card); return;
     }
-  }
-  return null;
+
+    if (p.startsWith('## ')) { var h=document.createElement('h2');h.textContent=p.slice(3);container.appendChild(h);return; }
+    if (p.startsWith('### ')) { var h=document.createElement('h3');h.textContent=p.slice(4);container.appendChild(h);return; }
+    if (p.startsWith('> ')) { var bq=document.createElement('blockquote');bq.textContent=p.slice(2);container.appendChild(bq);return; }
+
+    if (p.startsWith('- ')) {
+      var ul=document.createElement('ul');
+      p.split('\n').forEach(function(line) {
+        if (!line.startsWith('- ')) return;
+        var li=document.createElement('li'); li.innerHTML=fmtInline(line.slice(2));ul.appendChild(li);
+      });
+      container.appendChild(ul); return;
+    }
+
+    var el=document.createElement('p'); el.innerHTML=fmtInline(p); container.appendChild(el);
+  });
 }
 
-function goNext() {
-  var n = findNext();
-  if (n) playLecon(n);
+function fmtInline(text) {
+  text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  text = text.replace(/(https?:\/\/[^\s<"]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+  text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+  return text;
 }
-
-function showList() {
-  curFormation = null;
-  curLecon = null;
-  document.getElementById("viewList").style.display = "block";
-  document.getElementById("viewDetail").style.display = "none";
-  renderSidebar();
-  loadFormations();
-}
-
-// ── MOBILE ──
-function isMobile() { return window.innerWidth <= 768; }
-
-function openDrawer() {
-  document.getElementById("mobDrawer").classList.add("open");
-  document.getElementById("mobOverlay").classList.add("on");
-  document.body.style.overflow = "hidden";
-  // Sync contenu
-  var src = document.getElementById("modsList").innerHTML;
-  document.getElementById("mobModsList").innerHTML = src;
-  if (curFormation) document.getElementById("mobDrawerTitle").textContent = curFormation.title;
-}
-
-function closeDrawer() {
-  document.getElementById("mobDrawer").classList.remove("open");
-  document.getElementById("mobOverlay").classList.remove("on");
-  document.body.style.overflow = "";
-}
-
-function syncMobileActions() {
-  if (!isMobile()) return;
-  var btnDone = document.getElementById("btnDone");
-  var btnNext = document.getElementById("btnNext");
-  var btnDoneMob = document.getElementById("btnDoneMob");
-  var btnNextMob = document.getElementById("btnNextMob");
-  if (btnDone && btnDoneMob) {
-    btnDoneMob.style.display = btnDone.style.display;
-    btnDoneMob.className = btnDone.className;
-    btnDoneMob.innerHTML = btnDone.innerHTML;
-  }
-  if (btnNext && btnNextMob) {
-    btnNextMob.style.display = btnNext.style.display;
-  }
-  var plan = document.getElementById("mobPlanBtn");
-  if (plan) plan.style.display = curFormation ? "flex" : "none";
-}
-
-// Sync après playLecon et markDone
-var _origPlay = playLecon;
-playLecon = function(l) {
-  _origPlay(l);
-  setTimeout(syncMobileActions, 50);
-  // Sur mobile scroll en haut
-  if (isMobile()) window.scrollTo({ top: 0, behavior: "smooth" });
-};
-
-var _origMark = markDone;
-markDone = function() {
-  _origMark();
-  setTimeout(syncMobileActions, 50);
-  // Resync le tiroir
-  if (document.getElementById("mobDrawer").classList.contains("open")) {
-    var src = document.getElementById("modsList").innerHTML;
-    document.getElementById("mobModsList").innerHTML = src;
-  }
-};
-
-// Logout mobile
-var logoutMob = document.getElementById("logoutBtnMob");
-if (logoutMob) logoutMob.onclick = async function() {
-  await SB.auth.signOut(); window.location.href = "client-login.html";
-};
-
-// Sync logoutBtn
-var lb = document.getElementById("logoutBtn");
-if (lb) lb.onclick = async function() {
-  await SB.auth.signOut(); window.location.href = "client-login.html";
-};
-
-// Swipe down pour fermer le tiroir
-var drawer = document.getElementById("mobDrawer");
-var startY = 0;
-drawer.addEventListener("touchstart", function(e) { startY = e.touches[0].clientY; }, { passive: true });
-drawer.addEventListener("touchmove", function(e) {
-  var diff = e.touches[0].clientY - startY;
-  if (diff > 60) closeDrawer();
-}, { passive: true });
 
 init();
 </script>

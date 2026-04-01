@@ -3,87 +3,72 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Formations \u2014 SBW Admin</title>
+<title>Formations — SBW Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>const PAGE_ID = 'articles'</script>
 <link rel="stylesheet" href="admin.css">
 <style>
-.formations-layout { display: grid; grid-template-columns: 280px 1fr; gap: 0; height: calc(100vh - 54px); overflow: hidden; }
-.formations-sidebar { border-right: 0.5px solid var(--subtle); overflow-y: auto; }
-.formations-main { overflow-y: auto; padding: 0; }
-
-/* Sidebar formations */
-.f-sidebar-head { padding: 16px; border-bottom: 0.5px solid var(--subtle); display: flex; align-items: center; justify-content: space-between; }
-.f-sidebar-title { font-size: 0.78rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-.f-list { padding: 8px; }
-.f-item { padding: 10px 12px; border-radius: 6px; cursor: pointer; transition: background 0.12s; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.f-item:hover { background: var(--surface); }
-.f-item.active { background: var(--ink); color: #fff; }
-.f-item-name { font-size: 0.85rem; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.f-item-meta { font-size: 0.68rem; color: var(--muted); flex-shrink: 0; }
-.f-item.active .f-item-meta { color: rgba(255,255,255,0.45); }
-.f-empty { padding: 2rem; text-align: center; color: var(--muted); font-size: 0.82rem; }
-
-/* Main panel */
-.f-main-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 1rem; color: var(--muted); }
-.f-main-empty svg { opacity: 0.2; }
-
-/* Formation editor */
-.f-editor { padding: 24px; }
-.f-editor-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 0.5px solid var(--subtle); }
-.f-editor-title-row { flex: 1; }
-.f-editor-title { font-size: 1.1rem; font-weight: 500; }
-.f-editor-status { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
-
-/* Modules */
-.modules-section { margin-bottom: 24px; }
-.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-.section-label { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); }
-
-.module-card { border: 0.5px solid var(--subtle); border-radius: 8px; margin-bottom: 10px; overflow: hidden; }
-.module-head { padding: 12px 16px; display: flex; align-items: center; gap: 10px; cursor: pointer; background: var(--surface); transition: background 0.12s; }
-.module-head:hover { background: var(--subtle); }
-.module-chevron { transition: transform 0.2s; font-size: 0.7rem; color: var(--muted); }
-.module-chevron.open { transform: rotate(90deg); }
-.module-name { font-size: 0.88rem; font-weight: 500; flex: 1; }
-.module-count { font-size: 0.7rem; color: var(--muted); }
-.module-actions { display: flex; gap: 4px; }
-.module-body { display: none; padding: 8px; background: var(--bg); }
-.module-body.open { display: block; }
-
-/* Le\u00e7ons */
-.lecon-item { padding: 10px 12px; border-radius: 6px; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.12s; }
-.lecon-item:hover { background: var(--surface); }
-.lecon-num { font-size: 0.68rem; color: var(--muted); width: 20px; flex-shrink: 0; }
-.lecon-title { font-size: 0.83rem; flex: 1; }
-.lecon-yt { font-size: 0.68rem; color: var(--red); }
-.lecon-dur { font-size: 0.68rem; color: var(--muted); }
-.lecon-add { padding: 8px 12px; font-size: 0.78rem; color: var(--muted); cursor: pointer; border-radius: 6px; border: none; background: none; width: 100%; text-align: left; transition: background 0.12s; }
-.lecon-add:hover { background: var(--surface); color: var(--ink); }
-
-/* MODALES */
-.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
-.overlay.on { display: flex; align-items: flex-start; justify-content: center; padding: 40px 20px; overflow-y: auto; }
-.modal-box { background: var(--bg); border-radius: 12px; padding: 24px; width: 100%; max-width: 540px; border: 0.5px solid var(--subtle); margin: auto; }
-.modal-head { font-size: 1rem; font-weight: 500; margin-bottom: 16px; }
-.field { margin-bottom: 12px; }
-.field label { display: block; font-size: 0.7rem; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
-.field input, .field select, .field textarea { width: 100%; padding: 8px 12px; border: 0.5px solid var(--subtle); border-radius: 6px; font-size: 0.85rem; font-family: "DM Sans", sans-serif; background: var(--bg); color: var(--ink); outline: none; }
-.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--ink); }
-.field textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
-.btn-row { display: flex; gap: 8px; margin-top: 16px; }
-
-/* Le\u00e7on editor panel */
-.lecon-panel { border-left: 0.5px solid var(--subtle); }
-
-/* Drag & Drop */
-.drag-handle { cursor: grab; color: var(--muted); padding: 0 4px; font-size: 1rem; flex-shrink: 0; opacity: 0.35; transition: opacity 0.15s; user-select: none; line-height: 1; }
-.drag-handle:hover { opacity: 0.8; cursor: grab; }
-.drag-handle:active { cursor: grabbing; }
-.dragging { opacity: 0.35; background: var(--surface) !important; }
-.drag-over-top { border-top: 2px solid var(--red) !important; }
-.drag-over-bottom { border-bottom: 2px solid var(--red) !important; }
+.f-layout{display:grid;grid-template-columns:260px 280px 1fr;height:calc(100vh - 54px);overflow:hidden}
+.f-col{border-right:0.5px solid var(--subtle);overflow-y:auto;display:flex;flex-direction:column}
+.f-col:last-child{border-right:none}
+.f-col-head{padding:12px 16px;border-bottom:0.5px solid var(--subtle);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--bg);z-index:2;flex-shrink:0}
+.f-col-label{font-size:0.72rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;color:var(--muted)}
+.f-list{padding:8px;flex:1}
+.f-empty{padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem}
+.f-item{padding:10px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.1s}
+.f-item:hover{background:var(--surface)}
+.f-item.active{background:var(--ink);color:#fff}
+.drag-h{cursor:grab;opacity:0.35;font-size:1rem;flex-shrink:0;user-select:none}
+.drag-h:hover{opacity:0.8}
+.f-item-name{font-size:0.85rem;font-weight:500;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.f-badge{font-size:0.62rem;padding:2px 7px;border-radius:10px;flex-shrink:0;font-weight:500}
+.badge-html{background:rgba(99,91,255,0.12);color:#635BFF}
+.badge-video{background:rgba(192,57,43,0.1);color:var(--red)}
+.badge-external{background:rgba(166,124,58,0.12);color:var(--gold)}
+.m-item{padding:9px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background 0.1s;border-bottom:0.5px solid rgba(0,0,0,0.04)}
+.m-item:hover{background:var(--surface)}
+.m-item.active{background:rgba(192,57,43,0.06);border-left:2px solid var(--red)}
+.m-item-info{flex:1;min-width:0}
+.m-item-title{font-size:0.83rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m-item-sub{font-size:0.68rem;color:var(--muted);margin-top:1px}
+.m-item-actions{display:flex;gap:3px;opacity:0;transition:opacity 0.15s;flex-shrink:0}
+.m-item:hover .m-item-actions{opacity:1}
+.l-item{padding:8px 12px 8px 36px;display:flex;align-items:center;gap:8px;cursor:pointer;border-bottom:0.5px solid rgba(0,0,0,0.04);transition:background 0.1s}
+.l-item:hover{background:var(--surface)}
+.l-item.active{background:rgba(192,57,43,0.06);border-left:2px solid var(--red)}
+.l-item-num{font-size:0.68rem;color:var(--muted);width:18px;flex-shrink:0}
+.l-item-title{font-size:0.82rem;flex:1}
+.l-item-badge{font-size:0.6rem;padding:2px 5px;border-radius:3px;background:rgba(192,57,43,0.1);color:var(--red);flex-shrink:0}
+.l-item-actions{display:flex;gap:3px;opacity:0;transition:opacity 0.15s;flex-shrink:0}
+.l-item:hover .l-item-actions{opacity:1}
+.add-btn{padding:8px 12px;font-size:0.78rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:6px;border:none;background:none;width:100%;text-align:left;transition:background 0.1s}
+.add-btn:hover{background:var(--surface);color:var(--ink)}
+.add-btn-l{padding-left:36px}
+.f-editor{padding:20px;overflow-y:auto;flex:1}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:0.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:8px 10px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.83rem;font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);outline:none}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ink)}
+.field textarea{resize:vertical;min-height:80px;line-height:1.6}
+.field-note{font-size:0.7rem;color:var(--muted);margin-top:3px}
+.type-btns{display:flex;gap:6px;margin-top:4px}
+.type-btn{flex:1;padding:8px 4px;border-radius:7px;font-size:0.75rem;font-family:inherit;cursor:pointer;border:0.5px solid var(--subtle);background:var(--bg);color:var(--muted);transition:all 0.15s;text-align:center}
+.type-btn.on{background:var(--ink);color:#fff;border-color:var(--ink);font-weight:500}
+.cover-prev{width:100%;height:100px;object-fit:cover;border-radius:6px;margin-top:6px;display:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.toolbar button{padding:3px 8px;border-radius:4px;border:0.5px solid var(--subtle);background:var(--bg);font-size:0.72rem;cursor:pointer;font-family:inherit}
+.toolbar button:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.col3-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:8px;font-size:0.85rem;padding:2rem;text-align:center;opacity:0.4}
+.info-box{background:var(--surface);border-radius:8px;padding:12px 14px;font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:12px}
+.dragging{opacity:0.35}
+.drag-over-top{border-top:2px solid var(--red) !important}
+.drag-over-bottom{border-bottom:2px solid var(--red) !important}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999}
+.overlay.on{display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.modal-box{background:var(--bg);border-radius:12px;padding:24px;width:100%;max-width:520px;border:0.5px solid var(--subtle);margin:auto}
+.modal-head{font-size:1rem;font-weight:500;margin-bottom:16px}
+.btn-row{display:flex;gap:8px;margin-top:16px}
 </style>
 </head>
 <body>
@@ -93,81 +78,46 @@
     <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
     <nav class="sidebar-nav">
       <div class="nav-section">Principal</div>
-      <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-        Dashboard
-      </a>
+      <a href="admin-dashboard.html" class="nav-item" data-access="dashboard"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>Dashboard</a>
       <div class="nav-section">Contenu</div>
-      <a href="admin-articles-list.html" class="nav-item" data-access="articles">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
-        Articles
-      </a>
-      <a href="admin-shorts.html" class="nav-item" data-access="shorts">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>
-        Shorts YouTube
-      </a>
-      <a href="admin-formations.html" class="nav-item active" data-access="articles">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
-        Formations
-      </a>
-      <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
-        Newsletter
-      </a>
-      <div class="nav-section">Communaut\u00e9</div>
-      <a href="admin-members.html" class="nav-item" data-access="members">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
-        Membres Club
-      </a>
-      <div class="nav-section">Mon\u00e9tisation</div>
-      <a href="admin-revenue.html" class="nav-item" data-access="revenue">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
-        Revenus
-      </a>
-      <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
-        Affiliation
-      </a>
+      <a href="admin-articles-list.html" class="nav-item" data-access="articles"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Articles</a>
+      <a href="admin-shorts.html" class="nav-item" data-access="shorts"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M6 4l6 4-6 4V4z"/></svg>Shorts</a>
+      <a href="admin-formations.html" class="nav-item active" data-access="articles"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>Formations</a>
+      <a href="admin-newsletter.html" class="nav-item" data-access="newsletter"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>Newsletter</a>
+      <div class="nav-section">Communauté</div>
+      <a href="admin-members.html" class="nav-item" data-access="members"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>Membres</a>
+      <div class="nav-section">Monétisation</div>
+      <a href="admin-revenue.html" class="nav-item" data-access="revenue"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>Revenus</a>
+      <a href="admin-affiliation.html" class="nav-item" data-access="affiliation"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>Affiliation</a>
       <div class="nav-section">Admin</div>
-      <a href="admin-team.html" class="nav-item" data-access="team">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
-        \u00c9quipe
-      </a>
-      <a href="admin-settings.html" class="nav-item" data-access="settings">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
-        Param\u00e8tres
-      </a>
+      <a href="admin-team.html" class="nav-item" data-access="team"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="4" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>Équipe</a>
+      <a href="admin-settings.html" class="nav-item" data-access="settings"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>Paramètres</a>
     </nav>
   </div>
   <div id="userInfo"></div>
 </aside>
 
-<main class="main-content" style="padding:0;overflow:hidden">
-  <div class="topbar" style="padding:0 24px">
-    <div>
-      <h1 class="page-title">Formations</h1>
-      <div class="page-date" id="countLine">\u2014</div>
-    </div>
+<main class="main-content" style="padding:0;overflow:hidden;display:flex;flex-direction:column">
+  <div class="topbar" style="padding:0 24px;flex-shrink:0">
+    <div><h1 class="page-title">Formations</h1><div class="page-date" id="countLine">—</div></div>
     <div class="topbar-actions">
-      <button class="btn-primary" id="addFormationBtn">+ Nouvelle formation</button>
+      <button class="btn-primary" onclick="openFormationModal(null)">+ Nouvelle formation</button>
     </div>
   </div>
-
-  <div class="formations-layout">
-    <!-- SIDEBAR FORMATIONS -->
-    <div class="formations-sidebar">
-      <div class="f-list" id="formationsList">
-        <div class="f-empty">Chargement...</div>
-      </div>
+  <div class="f-layout" style="flex:1;overflow:hidden">
+    <div class="f-col">
+      <div class="f-col-head"><span class="f-col-label">Formations</span></div>
+      <div class="f-list" id="formationsList"><div class="f-empty">Chargement...</div></div>
     </div>
-
-    <!-- PANEL PRINCIPAL -->
-    <div class="formations-main" id="formationsMain">
-      <div class="f-main-empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
-        <div>S\u00e9lectionne une formation</div>
-        <div style="font-size:0.78rem">ou cr\u00e9e-en une nouvelle</div>
+    <div class="f-col">
+      <div class="f-col-head">
+        <span class="f-col-label" id="col2Label">Modules</span>
+        <button class="btn-primary" id="addModuleBtn" onclick="openModuleModal(null)" style="font-size:0.72rem;padding:4px 10px;display:none">+ Module</button>
       </div>
+      <div id="modulesList"><div class="col3-empty"><div>Sélectionne une formation</div></div></div>
+    </div>
+    <div class="f-col" id="col3">
+      <div class="col3-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><div>Sélectionne un module</div></div>
     </div>
   </div>
 </main>
@@ -176,47 +126,36 @@
 <!-- MODAL FORMATION -->
 <div class="overlay" id="overlayFormation">
   <div class="modal-box">
-    <div class="modal-head" id="modalFormationHead">Nouvelle formation</div>
+    <div class="modal-head" id="mfHead">Nouvelle formation</div>
     <div class="field">
-      <label>Titre *</label>
-      <input type="text" id="fTitle" placeholder="Ex: Sourcer en Chine \u2014 Masterclass compl\u00e8te">
+      <label>Type</label>
+      <div class="type-btns">
+        <button class="type-btn on" id="ftbtn_html" onclick="setFType('html')">⚡ IA (HTML)</button>
+        <button class="type-btn" id="ftbtn_video" onclick="setFType('video')">▶ Vidéo</button>
+        <button class="type-btn" id="ftbtn_external" onclick="setFType('external')">🔗 Externe</button>
+      </div>
     </div>
-    <div class="field">
-      <label>Description</label>
-      <textarea id="fDesc" rows="3" placeholder="Ce que les membres vont apprendre..."></textarea>
-    </div>
-    <div class="field">
-      <label>URL de la formation (optionnel)</label>
-      <input type="text" id="fUrl" placeholder="https://start-business-world.vercel.app/shopify.html" oninput="autoCaptureCover(this.value)">
-      <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Si renseignée, les membres seront redirigés directement vers cette page.</div>
+    <div class="field"><label>Titre *</label><input type="text" id="fTitle" placeholder="Ex: E-commerce Shopify"></div>
+    <div class="field"><label>Description</label><textarea id="fDesc" rows="2" placeholder="Ce que les membres vont apprendre..."></textarea></div>
+    <div class="field" id="fExtField" style="display:none">
+      <label>URL externe *</label>
+      <input type="text" id="fExtUrl" placeholder="https://...">
+      <div class="field-note">Les membres seront redirigés vers cette URL.</div>
     </div>
     <div class="field">
       <label>Image de couverture</label>
-      <div style="display:flex;gap:8px;align-items:flex-start">
-        <div style="flex:1">
-          <input type="text" id="fCover" placeholder="Auto-générée depuis l'URL ou colle une URL d'image" oninput="previewCover(this.value)">
-        </div>
-        <button type="button" onclick="autoCaptureCover(document.getElementById('fUrl').value)" style="padding:7px 12px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);font-size:.72rem;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">📸 Capturer</button>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="fCover" placeholder="URL image" oninput="prevImg('fCover','fCoverPrev')" style="flex:1">
+        <button type="button" onclick="autoCap()" style="padding:7px 10px;border-radius:6px;border:0.5px solid var(--subtle);background:var(--bg);font-size:.72rem;cursor:pointer;font-family:inherit">📸</button>
       </div>
-      <div id="coverPreview" style="margin-top:8px;display:none">
-        <img id="coverPreviewImg" style="width:100%;height:120px;object-fit:cover;border-radius:6px;border:.5px solid var(--subtle)" alt="Aperçu">
-      </div>
+      <img id="fCoverPrev" class="cover-prev" alt="">
     </div>
-    <div class="field">
-      <label>Stats de la formation</label>
-      <input type="text" id="fStats" placeholder="Ex: 71 leçons · 11 sections · 8h de contenu">
-      <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Affiché sous la couverture dans l'espace membre.</div>
-    </div>
-    <div class="field">
-      <label>Statut</label>
-      <select id="fStatus">
-        <option value="draft">Brouillon \u2014 non visible</option>
-        <option value="published">Publi\u00e9 \u2014 visible aux membres</option>
-      </select>
+    <div class="field"><label>Statut</label>
+      <select id="fStatus"><option value="draft">Brouillon</option><option value="published">Publié</option></select>
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" style="flex:1" id="cancelFormationBtn">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" id="saveFormationBtn">Cr\u00e9er</button>
+      <button class="btn-ghost" style="flex:1" onclick="closeOv('overlayFormation')">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="fSaveBtn" onclick="saveFormation()">Créer</button>
     </div>
   </div>
 </div>
@@ -224,740 +163,538 @@
 <!-- MODAL MODULE -->
 <div class="overlay" id="overlayModule">
   <div class="modal-box">
-    <div class="modal-head" id="modalModuleHead">Nouveau module</div>
+    <div class="modal-head" id="mmHead">Nouveau module</div>
+    <div class="field"><label>Titre *</label><input type="text" id="mTitle" placeholder="Ex: Module 1 — Préparer son projet"></div>
+    <div class="field" id="mHtmlField">
+      <label>URL du fichier HTML</label>
+      <input type="text" id="mHtmlUrl" placeholder="https://start-business-world.vercel.app/fichier.html">
+      <div class="field-note">Fichier HTML hébergé sur Vercel.</div>
+    </div>
     <div class="field">
-      <label>Titre du module *</label>
-      <input type="text" id="mTitle" placeholder="Ex: Les bases du sourcing">
+      <label>Image de couverture</label>
+      <div style="display:flex;gap:6px">
+        <input type="text" id="mCover" placeholder="URL image ou auto-capture" oninput="prevImg('mCover','mCoverPrev')" style="flex:1">
+        <button type="button" onclick="autoCapMod()" style="padding:7px 10px;border-radius:6px;border:0.5px solid var(--subtle);background:var(--bg);font-size:.72rem;cursor:pointer;font-family:inherit">📸</button>
+      </div>
+      <img id="mCoverPrev" class="cover-prev" alt="">
+    </div>
+    <div class="field">
+      <label>Stats (optionnel)</label>
+      <input type="text" id="mStats" placeholder="Ex: 18 leçons · 3 sections · 2h">
     </div>
     <div class="btn-row">
-      <button class="btn-ghost" style="flex:1" id="cancelModuleBtn">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" id="saveModuleBtn">Cr\u00e9er</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL LEÇON -->
-<div class="overlay" id="overlayLecon">
-  <div class="modal-box" style="max-width:600px">
-    <div class="modal-head" id="modalLeconHead">Nouvelle leçon</div>
-    <div class="field">
-      <label>Titre *</label>
-      <input type="text" id="lTitle" placeholder="Ex: Trouver un fournisseur sur Alibaba">
-    </div>
-    <div class="field">
-      <label>Type de contenu</label>
-      <div style="display:flex;gap:6px;margin-top:4px">
-        <button id="typebtn_youtube" data-type="youtube" data-active="1" onclick="switchLeconType('youtube')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.78rem;font-family:inherit;cursor:pointer;font-weight:500">&#9654; Vidéo YouTube</button>
-        <button id="typebtn_html" data-type="html" data-active="0" onclick="switchLeconType('html')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#9889; Animation HTML</button>
-        <button id="typebtn_text" data-type="text" data-active="0" onclick="switchLeconType('text')" style="flex:1;padding:8px 4px;border-radius:7px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.78rem;font-family:inherit;cursor:pointer">&#128221; Texte seulement</button>
-      </div>
-    </div>
-    <div class="field" id="fieldYoutube">
-      <label>URL ou ID YouTube</label>
-      <input type="text" id="lYoutube" placeholder="https://youtu.be/ABC123 ou ABC123">
-    </div>
-    <div class="field" id="fieldHtml" style="display:none">
-      <!-- Onglets URL / Code -->
-      <div style="display:flex;gap:6px;margin-bottom:10px">
-        <button id="htmlTabUrl" onclick="switchHtmlTab('url')" style="flex:1;padding:6px;border-radius:6px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.75rem;font-family:inherit;cursor:pointer">🔗 URL du fichier</button>
-        <button id="htmlTabCode" onclick="switchHtmlTab('code')" style="flex:1;padding:6px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.75rem;font-family:inherit;cursor:pointer">💻 Code HTML</button>
-      </div>
-      <!-- Panel URL -->
-      <div id="htmlPanelUrl">
-        <label style="display:block;font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">URL du fichier .html</label>
-        <input type="text" id="lHtmlUrl" placeholder="https://start-business-world.vercel.app/shopify-module.html" style="width:100%;padding:8px 10px;border:.5px solid var(--subtle);border-radius:6px;font-size:.8rem;font-family:inherit;background:var(--bg);color:var(--ink);outline:none">
-        <div style="font-size:.7rem;color:var(--muted);margin-top:5px">📁 Dépose le fichier dans ton repo GitHub → Vercel le servira automatiquement à cette URL</div>
-      </div>
-      <!-- Panel Code -->
-      <div id="htmlPanelCode" style="display:none">
-        <label style="display:block;font-size:.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Code HTML</label>
-        <div style="display:flex;gap:6px;margin-bottom:6px">
-          <button onclick="document.getElementById('lHtmlFile').click()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">Importer .html</button>
-          <input type="file" id="lHtmlFile" accept=".html" style="display:none" onchange="importHtmlFile(this)">
-          <button onclick="previewHtmlModal()" style="font-size:.75rem;padding:5px 12px;border-radius:5px;border:.5px solid var(--subtle);background:var(--bg);cursor:pointer;font-family:inherit">👁 Prévisualiser</button>
-        </div>
-        <textarea id="lHtmlContent" rows="6" placeholder="Colle ici le code HTML complet..." style="font-family:monospace;font-size:.72rem"></textarea>
-        <div id="htmlPreviewBox" style="display:none;width:100%;aspect-ratio:16/9;border-radius:8px;overflow:hidden;margin-top:8px;border:.5px solid var(--subtle)">
-          <iframe id="htmlPreviewFrame" style="width:100%;height:100%;border:none" sandbox="allow-scripts"></iframe>
-        </div>
-      </div>
-    </div>
-    <div id="fieldTextOnly" style="display:none;padding:8px 12px;background:var(--surface);border-radius:6px;font-size:.78rem;color:var(--muted);margin-bottom:4px">
-      Cette leçon ne contiendra que du texte. Utilise la zone Notes ci-dessous.
-    </div>
-    <div class="field">
-      <label>Durée (minutes)</label>
-      <input type="number" id="lDuration" placeholder="10" min="1">
-    </div>
-    <div class="field">
-      <label>Notes & Ressources</label>
-      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">
-        <button type="button" onclick="leconTb('## ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">H2</button>
-        <button type="button" onclick="leconTb('### ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">H3</button>
-        <button type="button" onclick="leconTb('**','**')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit"><b>G</b></button>
-        <button type="button" onclick="leconTb('*','*')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit"><i>I</i></button>
-        <button type="button" onclick="leconTb('- ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">· Liste</button>
-        <button type="button" onclick="leconTb('> ','')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">💡 Note</button>
-        <button type="button" onclick="leconTb('[texte](https://)' ,'')" style="padding:3px 8px;border:.5px solid var(--subtle);border-radius:4px;font-size:.72rem;cursor:pointer;background:var(--bg);font-family:inherit">🔗 Lien</button>
-        <button type="button" onclick="insertOutil()" style="padding:3px 8px;border:.5px solid var(--gold);border-radius:4px;font-size:.72rem;cursor:pointer;background:rgba(166,124,58,.08);color:var(--gold);font-family:inherit;font-weight:500">🛠 Outil</button>
-      </div>
-      <textarea id="lContent" rows="6" placeholder="Texte de la leçon&#10;[texte](https://lien.com) pour les liens&#10;[OUTIL:Nom|Description|https://url.com] pour les outils"></textarea>
-    </div>
-    <div class="btn-row">
-      <button class="btn-ghost" style="flex:1" id="cancelLeconBtn">Annuler</button>
-      <button class="btn-primary" style="flex:1;justify-content:center" id="saveLeconBtn">Enregistrer</button>
+      <button class="btn-ghost" style="flex:1" onclick="closeOv('overlayModule')">Annuler</button>
+      <button class="btn-primary" style="flex:1;justify-content:center" id="mSaveBtn" onclick="saveModule()">Créer</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-
 <script src="admin-auth.js"></script>
 <script>
-var formations = [];
-var currentFormation = null;
-var modules = [];
-var editFormationId = null;
-var editModuleId = null;
-var editLeconId = null;
-var currentModuleId = null;
+var formations=[], modules=[], curF=null, curM=null, curL=null;
+var editFId=null, editMId=null, editLId=null, fType='html';
 
-// =====================
-// INIT
-// =====================
-initAuth().then(function(profile) {
-  if (!profile) return;
-  loadFormations();
+initAuth().then(function(p){ if(!p) return; loadFormations(); });
 
-  document.getElementById('addFormationBtn').addEventListener('click', function() { openFormationModal(null); });
-  document.getElementById('cancelFormationBtn').addEventListener('click', function() { closeOverlay('overlayFormation'); });
-  document.getElementById('saveFormationBtn').addEventListener('click', saveFormation);
-  document.getElementById('cancelModuleBtn').addEventListener('click', function() { closeOverlay('overlayModule'); });
-  document.getElementById('saveModuleBtn').addEventListener('click', saveModule);
-  document.getElementById('cancelLeconBtn').addEventListener('click', function() { closeOverlay('overlayLecon'); });
-  document.getElementById('saveLeconBtn').addEventListener('click', saveLecon);
-
-  ['overlayFormation','overlayModule','overlayLecon'].forEach(function(id) {
-    document.getElementById(id).addEventListener('click', function(e) {
-      if (e.target === this) closeOverlay(id);
-    });
-  });
-});
-
-// =====================
-// FORMATIONS
-// =====================
-async function loadFormations() {
-  var res = await sb.from('formations').select('*').order('position').order('created_at');
-  formations = res.data || [];
-  document.getElementById('countLine').textContent = formations.length + ' formation' + (formations.length > 1 ? 's' : '');
-  renderFormationsList();
+// ═══ FORMATIONS ═══
+async function loadFormations(){
+  var r=await sb.from('formations').select('*').order('position').order('created_at');
+  formations=r.data||[];
+  document.getElementById('countLine').textContent=formations.length+' formation'+(formations.length!==1?'s':'');
+  renderFormations();
 }
 
-function renderFormationsList() {
-  var el = document.getElementById('formationsList');
-  if (!formations.length) {
-    el.innerHTML = '<div class="f-empty">Aucune formation.<br>Cr\u00e9e-en une !</div>';
-    return;
-  }
-  el.innerHTML = '';
-  formations.forEach(function(f) {
-    var item = document.createElement('div');
-    item.className = 'f-item' + (currentFormation && currentFormation.id === f.id ? ' active' : '');
-    var pill = f.status === 'published' ? '\ud83d\udfe2' : '\u26aa';
-    item.setAttribute('draggable', 'true');
-    item.setAttribute('data-id', f.id);
-    item.innerHTML = '<span class="drag-handle" title="Déplacer">⠿</span><span class="f-item-name">' + f.title + '</span><span class="f-item-meta">' + pill + '</span>';
-    item.addEventListener('click', function(e) { if (!e.target.classList.contains('drag-handle')) selectFormation(f); });
+function renderFormations(){
+  var el=document.getElementById('formationsList');
+  if(!formations.length){el.innerHTML='<div class="f-empty">Aucune formation.<br>Crée-en une !</div>';return;}
+  el.innerHTML='';
+  formations.forEach(function(f){
+    var item=document.createElement('div');
+    item.className='f-item'+(curF&&curF.id===f.id?' active':'');
+    item.setAttribute('draggable','true');
+    item.setAttribute('data-id',f.id);
+    var tl=f.type==='html'?'⚡ IA':f.type==='external'?'🔗':' ▶';
+    var bc=f.type==='html'?'badge-html':f.type==='external'?'badge-external':'badge-video';
+    item.innerHTML=
+      '<span class="drag-h" onclick="event.stopPropagation()">⠿</span>'+
+      '<span class="f-item-name">'+f.title+'</span>'+
+      '<span class="f-badge '+bc+'">'+tl+'</span>';
+    item.addEventListener('click',function(e){if(!e.target.classList.contains('drag-h'))selF(f);});
     el.appendChild(item);
   });
-
-  // Délégation drag sur le container
-  initDragFormations(el);
+  initDragF(el);
 }
 
-function selectFormation(f) {
-  currentFormation = f;
-  renderFormationsList();
+function selF(f){
+  curF=f; curM=null; curL=null;
+  renderFormations();
   loadModules(f.id);
+  col3Empty();
 }
 
-function openFormationModal(f) {
-  editFormationId = f ? f.id : null;
-  document.getElementById('modalFormationHead').textContent = f ? 'Modifier la formation' : 'Nouvelle formation';
-  document.getElementById('fTitle').value = f ? f.title : '';
-  document.getElementById('fDesc').value = f ? (f.description || '') : '';
-  document.getElementById('fUrl').value = f ? (f.formation_url || '') : '';
-  document.getElementById('fCover').value = f ? (f.cover_url || '') : '';
-  if (f && f.cover_url) previewCover(f.cover_url); else { document.getElementById('coverPreview').style.display='none'; }
-  document.getElementById('fStats').value = f ? (f.extra_stats || '') : '';
-  document.getElementById('fStatus').value = f ? f.status : 'draft';
-  document.getElementById('saveFormationBtn').textContent = f ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
-  openOverlay('overlayFormation');
-  document.getElementById('fTitle').focus();
+function openFormationModal(f){
+  editFId=f?f.id:null;
+  document.getElementById('mfHead').textContent=f?'Modifier':'Nouvelle formation';
+  document.getElementById('fTitle').value=f?f.title:'';
+  document.getElementById('fDesc').value=f?(f.description||''):'';
+  document.getElementById('fExtUrl').value=f?(f.external_url||''):'';
+  document.getElementById('fCover').value=f?(f.cover_url||''):'';
+  document.getElementById('fStatus').value=f?f.status:'draft';
+  document.getElementById('fSaveBtn').textContent=f?'Mettre à jour':'Créer';
+  setFType(f?(f.type||'html'):'html');
+  prevImg('fCover','fCoverPrev');
+  openOv('overlayFormation');
+  setTimeout(function(){document.getElementById('fTitle').focus();},100);
 }
 
-async function saveFormation() {
-  var title = document.getElementById('fTitle').value.trim();
-  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
-  var data = {
-    title: title,
-    description: document.getElementById('fDesc').value.trim(),
-    formation_url: document.getElementById('fUrl').value.trim() || null,
-    extra_stats: document.getElementById('fStats').value.trim() || null,
-    cover_url: document.getElementById('fCover').value.trim() || null,
-    status: document.getElementById('fStatus').value
+function setFType(t){
+  fType=t;
+  ['html','video','external'].forEach(function(x){
+    var b=document.getElementById('ftbtn_'+x);
+    if(b) b.className='type-btn'+(x===t?' on':'');
+  });
+  document.getElementById('fExtField').style.display=t==='external'?'block':'none';
+}
+
+async function saveFormation(){
+  var title=document.getElementById('fTitle').value.trim();
+  if(!title){toast('Titre obligatoire.','error');return;}
+  var data={
+    title:title,
+    description:document.getElementById('fDesc').value.trim()||null,
+    type:fType,
+    external_url:fType==='external'?document.getElementById('fExtUrl').value.trim()||null:null,
+    cover_url:document.getElementById('fCover').value.trim()||null,
+    status:document.getElementById('fStatus').value
   };
   var res;
-  if (editFormationId) {
-    res = await sb.from('formations').update(data).eq('id', editFormationId);
-  } else {
-    data.position = formations.length;
-    res = await sb.from('formations').insert(data);
-  }
-  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(editFormationId ? 'Formation mise \u00e0 jour !' : 'Formation cr\u00e9\u00e9e !', 'success');
-  closeOverlay('overlayFormation');
+  if(editFId){res=await sb.from('formations').update(data).eq('id',editFId);}
+  else{data.position=formations.length;res=await sb.from('formations').insert(data);}
+  if(res.error){toast('Erreur : '+res.error.message,'error');return;}
+  toast(editFId?'Formation mise à jour !':'Formation créée !','success');
+  closeOv('overlayFormation');
   await loadFormations();
-  if (!editFormationId && formations.length) {
-    selectFormation(formations[formations.length - 1]);
-  }
+  if(!editFId&&formations.length) selF(formations[formations.length-1]);
+  else if(editFId&&curF&&curF.id===editFId){curF=formations.find(function(f){return f.id===editFId;})||curF;}
 }
 
-async function deleteFormation(id) {
-  if (!confirm('Supprimer cette formation et tous ses modules ?')) return;
-  await sb.from('formations').delete().eq('id', id);
-  currentFormation = null;
-  document.getElementById('formationsMain').innerHTML = '<div class="f-main-empty"><div>Formation supprim\u00e9e</div></div>';
-  loadFormations();
-  showToast('Supprim\u00e9e.', 'success');
+async function delFormation(id){
+  if(!confirm('Supprimer cette formation ?')) return;
+  await sb.from('formations').delete().eq('id',id);
+  curF=null; curM=null; col3Empty();
+  document.getElementById('modulesList').innerHTML='<div class="col3-empty"><div>Sélectionne une formation</div></div>';
+  await loadFormations();
+  toast('Supprimée.','success');
 }
 
-// =====================
-// MODULES
-// =====================
-async function loadModules(formationId) {
-  var res = await sb.from('modules').select('*, lecons(*)').eq('formation_id', formationId).order('position');
-  modules = res.data || [];
-  renderEditor();
-}
-
-function toggleModule(id) {
-  var body = document.getElementById(id);
-  var idx = id.replace('mod','');
-  var chev = document.getElementById('chev' + idx);
-  if (body) {
-    body.classList.toggle('open');
-    if (chev) chev.style.transform = body.classList.contains('open') ? 'rotate(90deg)' : '';
-  }
-}
-
-function openModuleModal(m) {
-  editModuleId = m ? m.id : null;
-  document.getElementById('modalModuleHead').textContent = m ? 'Modifier le module' : 'Nouveau module';
-  document.getElementById('mTitle').value = m ? m.title : '';
-  document.getElementById('saveModuleBtn').textContent = m ? 'Mettre \u00e0 jour' : 'Cr\u00e9er';
-  openOverlay('overlayModule');
-  document.getElementById('mTitle').focus();
-}
-
-async function saveModule() {
-  var title = document.getElementById('mTitle').value.trim();
-  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
-  var res;
-  if (editModuleId) {
-    res = await sb.from('modules').update({ title: title }).eq('id', editModuleId);
-  } else {
-    res = await sb.from('modules').insert({ title: title, formation_id: currentFormation.id, position: modules.length });
-  }
-  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(editModuleId ? 'Module mis \u00e0 jour !' : 'Module cr\u00e9\u00e9 !', 'success');
-  closeOverlay('overlayModule');
-  loadModules(currentFormation.id);
-}
-
-async function deleteModule(id) {
-  if (!confirm('Supprimer ce module et ses le\u00e7ons ?')) return;
-  await sb.from('modules').delete().eq('id', id);
-  loadModules(currentFormation.id);
-  showToast('Module supprim\u00e9.', 'success');
-}
-
-// =====================
-// LE\u00c7ONS
-// =====================
-function openLeconModal(l, moduleId) {
-  editLeconId = l ? l.id : null;
-  currentModuleId = moduleId;
-  document.getElementById('modalLeconHead').textContent = l ? 'Modifier la leçon' : 'Nouvelle leçon';
-  document.getElementById('lTitle').value = l ? l.title : '';
-  document.getElementById('lYoutube').value = l ? (l.youtube_id || '') : '';
-  document.getElementById('lDuration').value = l ? (l.duration_min || '') : '';
-  document.getElementById('lContent').value = l ? (l.content || '') : '';
-  var hcRaw = l ? (l.html_content || '') : '';
-  var isUrl = hcRaw.startsWith('URL:');
-  document.getElementById('lHtmlUrl').value = isUrl ? hcRaw.slice(4) : '';
-  document.getElementById('lHtmlContent').value = isUrl ? '' : hcRaw;
-  document.getElementById('htmlPreviewBox').style.display = 'none';
-  // Init onglet
-  if (isUrl) {
-    document.getElementById('htmlTabUrl').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.75rem;font-family:inherit;cursor:pointer';
-    document.getElementById('htmlTabCode').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.75rem;font-family:inherit;cursor:pointer';
-    document.getElementById('htmlPanelUrl').style.display = 'block';
-    document.getElementById('htmlPanelCode').style.display = 'none';
-  } else {
-    document.getElementById('htmlTabCode').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--ink);background:var(--ink);color:#fff;font-size:.75rem;font-family:inherit;cursor:pointer';
-    document.getElementById('htmlTabUrl').style.cssText = 'flex:1;padding:6px;border-radius:6px;border:.5px solid var(--subtle);background:var(--bg);color:var(--muted);font-size:.75rem;font-family:inherit;cursor:pointer';
-    document.getElementById('htmlPanelCode').style.display = 'block';
-    document.getElementById('htmlPanelUrl').style.display = 'none';
-  }
-  document.getElementById('saveLeconBtn').textContent = l ? 'Mettre à jour' : 'Ajouter';
-  switchLeconType(l ? (l.lecon_type || 'youtube') : 'youtube');
-  openOverlay('overlayLecon');
-  document.getElementById('lTitle').focus();
-}
-
-function switchLeconType(type) {
-  ['youtube','html','text'].forEach(function(t) {
-    var btn = document.getElementById('typebtn_' + t);
-    if (!btn) return;
-    var active = t === type;
-    btn.style.background = active ? 'var(--ink)' : 'var(--bg)';
-    btn.style.color = active ? '#fff' : 'var(--muted)';
-    btn.style.borderColor = active ? 'var(--ink)' : 'var(--subtle)';
-    btn.style.fontWeight = active ? '500' : '400';
-    btn.setAttribute('data-active', active ? '1' : '0');
+// ═══ MODULES ═══
+async function loadModules(fid){
+  var r=await sb.from('modules').select('*, lecons(*)').eq('formation_id',fid).order('position');
+  modules=(r.data||[]).map(function(m){
+    m.lecons=(m.lecons||[]).sort(function(a,b){return a.position-b.position;});
+    return m;
   });
-  document.getElementById('fieldYoutube').style.display = type === 'youtube' ? 'block' : 'none';
-  document.getElementById('fieldHtml').style.display = type === 'html' ? 'block' : 'none';
-  document.getElementById('fieldTextOnly').style.display = type === 'text' ? 'block' : 'none';
+  renderModules();
 }
 
-function switchHtmlTab(tab) {
-  var btnUrl = document.getElementById('htmlTabUrl');
-  var btnCode = document.getElementById('htmlTabCode');
-  var panelUrl = document.getElementById('htmlPanelUrl');
-  var panelCode = document.getElementById('htmlPanelCode');
-  if (!btnUrl) return;
-  if (tab === 'url') {
-    btnUrl.style.background = 'var(--ink)'; btnUrl.style.color = '#fff'; btnUrl.style.borderColor = 'var(--ink)';
-    btnCode.style.background = 'var(--bg)'; btnCode.style.color = 'var(--muted)'; btnCode.style.borderColor = 'var(--subtle)';
-    panelUrl.style.display = 'block'; panelCode.style.display = 'none';
-  } else {
-    btnCode.style.background = 'var(--ink)'; btnCode.style.color = '#fff'; btnCode.style.borderColor = 'var(--ink)';
-    btnUrl.style.background = 'var(--bg)'; btnUrl.style.color = 'var(--muted)'; btnUrl.style.borderColor = 'var(--subtle)';
-    panelCode.style.display = 'block'; panelUrl.style.display = 'none';
+function renderModules(){
+  var el=document.getElementById('modulesList');
+  var label=document.getElementById('col2Label');
+  var addBtn=document.getElementById('addModuleBtn');
+
+  if(!curF){el.innerHTML='<div class="col3-empty"><div>Sélectionne une formation</div></div>';addBtn.style.display='none';return;}
+
+  if(curF.type==='external'){
+    label.textContent='Externe';
+    addBtn.style.display='none';
+    el.innerHTML=
+      '<div class="info-box" style="margin:12px">'+
+        '🔗 <strong>Formation externe</strong><br>'+
+        '<a href="'+(curF.external_url||'#')+'" target="_blank" style="color:var(--gold);word-break:break-all">'+(curF.external_url||'URL non définie')+'</a><br><br>'+
+        'Les membres cliquent sur la card et sont redirigés directement.'+
+        '<div style="margin-top:12px;display:flex;gap:8px">'+
+          '<button class="row-action" onclick="openFormationModal(curF)">✏️ Modifier</button>'+
+          '<button class="row-action" onclick="delFormation(\''+curF.id+'\')" style="color:var(--red)">Supprimer</button>'+
+        '</div>'+
+      '</div>';
+    return;
   }
+
+  label.textContent='Modules ('+modules.length+')';
+  addBtn.style.display='flex';
+  el.innerHTML='';
+
+  // Barre d'actions formation
+  var bar=document.createElement('div');
+  bar.style.cssText='padding:8px 12px;display:flex;gap:6px;border-bottom:0.5px solid var(--subtle);flex-shrink:0';
+  bar.innerHTML='<button class="row-action" onclick="openFormationModal(curF)">✏️ Modifier la formation</button><button class="row-action" onclick="delFormation(\''+curF.id+'\')" style="color:var(--red)">Supprimer</button>';
+  el.appendChild(bar);
+
+  if(!modules.length){
+    var e=document.createElement('div');e.className='f-empty';e.textContent='Aucun module.';el.appendChild(e);
+  } else {
+    modules.forEach(function(m){
+      var item=document.createElement('div');
+      item.className='m-item'+(curM&&curM.id===m.id?' active':'');
+      item.setAttribute('draggable','true');
+      item.setAttribute('data-module-id',m.id);
+      var sub=m.html_url?('⚡ '+m.html_url.split('/').pop()):(m.lecons.length+' leçon'+(m.lecons.length!==1?'s':''));
+      item.innerHTML=
+        '<span class="drag-h" onclick="event.stopPropagation()">⠿</span>'+
+        '<div class="m-item-info"><div class="m-item-title">'+m.title+'</div><div class="m-item-sub">'+sub+'</div></div>'+
+        '<div class="m-item-actions">'+
+          '<button class="row-action" onclick="event.stopPropagation();openModuleModal(modules.find(function(x){return x.id===\''+m.id+'\'}))">✏️</button>'+
+          '<button class="row-action" onclick="event.stopPropagation();delModule(\''+m.id+'\')" style="color:var(--red)">✕</button>'+
+        '</div>';
+      item.addEventListener('click',function(e){if(e.target.classList.contains('drag-h'))return;selM(m);});
+      el.appendChild(item);
+
+      // Leçons (type vidéo, module ouvert)
+      if(curF.type==='video'&&curM&&curM.id===m.id){
+        m.lecons.forEach(function(l,li){
+          var li_el=document.createElement('div');
+          li_el.className='l-item'+(curL&&curL.id===l.id?' active':'');
+          li_el.setAttribute('draggable','true');
+          li_el.setAttribute('data-lecon-id',l.id);
+          li_el.setAttribute('data-module-id',m.id);
+          var ico=l.youtube_id?'▶':l.lecon_type==='html'?'⚡':'📝';
+          li_el.innerHTML=
+            '<span class="drag-h" onclick="event.stopPropagation()">⠿</span>'+
+            '<span class="l-item-num">'+String(li+1).padStart(2,'0')+'</span>'+
+            '<span class="l-item-title">'+l.title+'</span>'+
+            '<span class="l-item-badge">'+ico+'</span>'+
+            '<div class="l-item-actions">'+
+              '<button class="row-action" onclick="event.stopPropagation();openLeconEd(\''+l.id+'\',null)" style="font-size:.7rem">✏️</button>'+
+              '<button class="row-action" onclick="event.stopPropagation();delLecon(\''+l.id+'\')" style="color:var(--red);font-size:.7rem">✕</button>'+
+            '</div>';
+          li_el.addEventListener('click',function(e){if(e.target.classList.contains('drag-h'))return;curL=l;openLeconEd(null,l);});
+          el.appendChild(li_el);
+        });
+        var addL=document.createElement('button');
+        addL.className='add-btn add-btn-l';addL.textContent='+ Ajouter une leçon';
+        addL.onclick=function(){curL=null;openLeconEd(null,null,m.id);};
+        el.appendChild(addL);
+      }
+    });
+  }
+
+  var addM=document.createElement('button');
+  addM.className='add-btn';addM.textContent='+ Nouveau module';
+  addM.onclick=function(){openModuleModal(null);};
+  el.appendChild(addM);
+
+  initDragM(el);
+  initDragL(el);
 }
 
-function importHtmlFile(input) {
-  var file = input.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    document.getElementById('lHtmlContent').value = e.target.result;
-    previewHtmlModal();
+function selM(m){
+  curM=m; curL=null;
+  renderModules();
+  if(curF.type==='html') renderHtmlModEd(m);
+  else col3Empty();
+}
+
+// ═══ MODULE MODAL ═══
+function openModuleModal(m){
+  editMId=m?m.id:null;
+  document.getElementById('mmHead').textContent=m?'Modifier le module':'Nouveau module';
+  document.getElementById('mTitle').value=m?m.title:'';
+  document.getElementById('mHtmlUrl').value=m?(m.html_url||''):'';
+  document.getElementById('mCover').value=m?(m.cover_url||''):'';
+  document.getElementById('mStats').value=m?(m.extra_stats||''):'';
+  document.getElementById('mSaveBtn').textContent=m?'Mettre à jour':'Créer';
+  document.getElementById('mHtmlField').style.display=curF&&curF.type==='html'?'block':'none';
+  prevImg('mCover','mCoverPrev');
+  openOv('overlayModule');
+  setTimeout(function(){document.getElementById('mTitle').focus();},100);
+}
+
+async function saveModule(){
+  var title=document.getElementById('mTitle').value.trim();
+  if(!title){toast('Titre obligatoire.','error');return;}
+  var data={
+    title:title,
+    html_url:document.getElementById('mHtmlUrl').value.trim()||null,
+    cover_url:document.getElementById('mCover').value.trim()||null,
+    extra_stats:document.getElementById('mStats').value.trim()||null
   };
-  reader.readAsText(file);
-}
-
-function previewHtmlModal() {
-  var html = document.getElementById('lHtmlContent').value.trim();
-  if (!html) return;
-  var box = document.getElementById('htmlPreviewBox');
-  box.style.display = 'block';
-  document.getElementById('htmlPreviewFrame').srcdoc = html;
-}
-
-async function saveLecon() {
-  var title = document.getElementById('lTitle').value.trim();
-  if (!title) { showToast('Le titre est obligatoire.', 'error'); return; }
-
-  // Déterminer le type actif via data-active
-  var leconType = document.querySelector('[data-active="1"]') ? document.querySelector('[data-active="1"]').getAttribute('data-type') : 'youtube';
-
-  // YouTube ID
-  var ytId = null;
-  if (leconType === 'youtube') {
-    var ytRaw = document.getElementById('lYoutube').value.trim();
-    if (ytRaw) {
-      var m = ytRaw.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([a-zA-Z0-9_-]{11})/);
-      ytId = m ? m[1] : (ytRaw.length === 11 ? ytRaw : null);
-    }
-  }
-
-  var htmlContent = null;
-  if (leconType === 'html') {
-    var urlEl = document.getElementById('lHtmlUrl');
-    var codeEl = document.getElementById('lHtmlContent');
-    var urlVal = urlEl ? urlEl.value.trim() : '';
-    var codeVal = codeEl ? codeEl.value.trim() : '';
-    htmlContent = urlVal ? 'URL:' + urlVal : (codeVal || null);
-  }
-
-  var data = {
-    title: title,
-    lecon_type: leconType,
-    youtube_id: ytId || null,
-    html_content: htmlContent || null,
-    duration_min: parseInt(document.getElementById('lDuration').value) || 0,
-    content: document.getElementById('lContent').value.trim()
-  };
-
   var res;
-  if (editLeconId) {
-    res = await sb.from('lecons').update(data).eq('id', editLeconId);
-  } else {
-    // Compter les le\u00e7ons existantes pour la position
-    var mod = modules.find(function(m) { return m.id === currentModuleId; });
-    data.module_id = currentModuleId;
-    data.position = mod ? (mod.lecons || []).length : 0;
-    res = await sb.from('lecons').insert(data);
+  if(editMId){res=await sb.from('modules').update(data).eq('id',editMId);}
+  else{data.formation_id=curF.id;data.position=modules.length;res=await sb.from('modules').insert(data);}
+  if(res.error){toast('Erreur : '+res.error.message,'error');return;}
+  toast(editMId?'Module mis à jour !':'Module créé !','success');
+  closeOv('overlayModule');
+  await loadModules(curF.id);
+}
+
+async function delModule(id){
+  if(!confirm('Supprimer ce module ?')) return;
+  await sb.from('modules').delete().eq('id',id);
+  if(curM&&curM.id===id){curM=null;col3Empty();}
+  await loadModules(curF.id);
+  toast('Module supprimé.','success');
+}
+
+// ═══ ÉDITEUR MODULE HTML ═══
+function renderHtmlModEd(m){
+  document.getElementById('col3').innerHTML=
+    '<div class="f-editor">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--subtle)">'+
+        '<div style="font-size:.9rem;font-weight:500">Module ⚡ HTML</div>'+
+        '<button class="row-action" onclick="openModuleModal(curM)">✏️ Modifier</button>'+
+      '</div>'+
+      (m.cover_url?'<img src="'+m.cover_url+'" style="width:100%;height:130px;object-fit:cover;border-radius:8px;margin-bottom:12px">':'')+
+      '<div class="info-box">'+
+        '<strong>'+m.title+'</strong><br>'+
+        (m.extra_stats?'<span style="color:var(--muted)">'+m.extra_stats+'</span><br>':'')+
+        (m.html_url?'🔗 <a href="'+m.html_url+'" target="_blank" style="color:var(--gold);word-break:break-all">'+m.html_url+'</a>':'⚠️ Aucune URL HTML définie')+
+      '</div>'+
+      '<div class="info-box">La progression est suivie automatiquement via <strong>sbw-tracker.js</strong>.</div>'+
+    '</div>';
+}
+
+// ═══ ÉDITEUR LEÇON VIDÉO ═══
+function openLeconEd(id, l, moduleId){
+  if(id){
+    // Trouver la leçon par ID
+    modules.forEach(function(m){m.lecons.forEach(function(lc){if(lc.id===id){l=lc;moduleId=lc.module_id;}});});
   }
+  curL=l;
+  var ytId=l?(l.youtube_id||''):'';
+  var lType=l?(l.lecon_type||'youtube'):'youtube';
+  var mid=moduleId||(l?l.module_id:'');
 
-  if (res.error) { showToast('Erreur : ' + res.error.message, 'error'); return; }
-  showToast(editLeconId ? 'Le\u00e7on mise \u00e0 jour !' : 'Le\u00e7on ajout\u00e9e !', 'success');
-  closeOverlay('overlayLecon');
-  loadModules(currentFormation.id);
+  document.getElementById('col3').innerHTML=
+    '<div class="f-editor">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:0.5px solid var(--subtle)">'+
+        '<div style="font-size:.9rem;font-weight:500">'+(l?'Modifier la leçon':'Nouvelle leçon')+'</div>'+
+        (l?'<button class="row-action" onclick="delLecon(\''+l.id+'\')" style="color:var(--red)">Supprimer</button>':'')+
+      '</div>'+
+      '<div class="field"><label>Titre *</label><input type="text" id="lTitle" value="'+(l?l.title.replace(/"/g,'&quot;'):'')+'" placeholder="Titre de la leçon"></div>'+
+      '<div class="field"><label>Type</label><div class="type-btns">'+
+        '<button class="type-btn'+(lType==='youtube'?' on':'')+'" id="ltbtn_yt" onclick="setLType(\'youtube\')">▶ YouTube</button>'+
+        '<button class="type-btn'+(lType==='text'?' on':'')+'" id="ltbtn_txt" onclick="setLType(\'text\')">📝 Texte</button>'+
+      '</div></div>'+
+      '<div id="lYtField" style="'+(lType!=='youtube'?'display:none':'')+'">'+
+        '<div class="field"><label>URL YouTube</label><input type="text" id="lYt" value="'+ytId+'" placeholder="https://youtu.be/..."></div>'+
+      '</div>'+
+      '<div class="field"><label>Durée (min)</label><input type="number" id="lDur" value="'+(l&&l.duration_min?l.duration_min:'')+'" placeholder="10" min="0"></div>'+
+      '<div class="field"><label>Notes & Ressources</label>'+
+        '<div class="toolbar">'+
+          '<button onclick="lTb(\'## \',\'\')">H2</button>'+
+          '<button onclick="lTb(\'### \',\'\')">H3</button>'+
+          '<button onclick="lTb(\'**\',\'**\')"><b>G</b></button>'+
+          '<button onclick="lTb(\'*\',\'*\')"><i>I</i></button>'+
+          '<button onclick="lTb(\'- \',\'\')">Liste</button>'+
+          '<button onclick="lTb(\'> \',\'\')">💡</button>'+
+          '<button onclick="lTb(\'[texte](https://)\',\'\')">🔗</button>'+
+          '<button onclick="insOutil()" style="color:var(--gold);border-color:rgba(166,124,58,.3)">🛠 Outil</button>'+
+        '</div>'+
+        '<textarea id="lCont" rows="6" placeholder="Notes, ressources, liens...">'+(l&&l.content?l.content:'')+'</textarea>'+
+      '</div>'+
+      '<div style="display:flex;gap:8px">'+
+        '<button class="btn-ghost" style="flex:1" onclick="col3Empty()">Annuler</button>'+
+        '<button class="btn-primary" style="flex:1;justify-content:center" onclick="saveLecon(\''+mid+'\')">💾 Enregistrer</button>'+
+      '</div>'+
+    '</div>';
 }
 
-// Insérer un outil d'affiliation dans le contenu de la leçon
-function leconTb(before, after) {
-  var ta = document.getElementById('lContent');
-  if (!ta) return;
-  var s = ta.selectionStart, e = ta.selectionEnd;
-  var sel = ta.value.substring(s, e);
-  var ins = before + (sel || 'texte') + after;
-  ta.value = ta.value.substring(0, s) + ins + ta.value.substring(e);
-  ta.focus();
-  ta.setSelectionRange(s + ins.length, s + ins.length);
+function setLType(t){
+  ['yt','txt'].forEach(function(x){
+    var b=document.getElementById('ltbtn_'+x);
+    if(b) b.className='type-btn'+(( x==='yt'&&t==='youtube')||(x==='txt'&&t==='text')?' on':'');
+  });
+  var yf=document.getElementById('lYtField');
+  if(yf) yf.style.display=t==='youtube'?'block':'none';
 }
 
-function insertOutil() {
-  var nom = prompt("Nom de l'outil (ex: LegalPlace) :");
-  if (!nom) return;
-  var desc = prompt("Description courte :");
-  if (desc === null) return;
-  var url = prompt("URL d'affiliation :");
-  if (!url) return;
-  var ta = document.getElementById('lContent');
-  if (!ta) return;
-  var insert = '\n\n[OUTIL:' + nom + '|' + desc + '|' + url + ']\n\n';
-  var pos = ta.selectionStart;
-  ta.value = ta.value.substring(0, pos) + insert + ta.value.substring(pos);
-  ta.focus();
-  ta.setSelectionRange(pos + insert.length, pos + insert.length);
+function lTb(before,after){
+  var ta=document.getElementById('lCont'); if(!ta) return;
+  var s=ta.selectionStart,e=ta.selectionEnd;
+  var ins=before+(ta.value.substring(s,e)||'texte')+after;
+  ta.value=ta.value.substring(0,s)+ins+ta.value.substring(e);
+  ta.focus(); ta.setSelectionRange(s+ins.length,s+ins.length);
 }
 
-// ── AUTO COVER depuis URL ──
-function autoCaptureCover(url) {
-  if (!url || !url.startsWith('http')) return;
-  // WordPress mShots — 1280x720 (16:9 natif)
-  var screenshotUrl = 'https://s0.wordpress.com/mshots/v1/' + encodeURIComponent(url) + '?w=1280&h=720&screen_width=1280';
-  document.getElementById('fCover').value = screenshotUrl;
-  previewCover(screenshotUrl);
+function insOutil(){
+  var n=prompt('Nom de l\'outil :');if(!n)return;
+  var d=prompt('Description :');if(d===null)return;
+  var u=prompt('URL :');if(!u)return;
+  var ta=document.getElementById('lCont');if(!ta)return;
+  var pos=ta.selectionStart;
+  ta.value=ta.value.substring(0,pos)+'\n\n[OUTIL:'+n+'|'+d+'|'+u+']\n\n'+ta.value.substring(pos);
 }
 
-function previewCover(url) {
-  var box = document.getElementById('coverPreview');
-  var img = document.getElementById('coverPreviewImg');
-  if (!url) { box.style.display = 'none'; return; }
-  img.src = url;
-  box.style.display = 'block';
-  img.onerror = function() { box.style.display = 'none'; };
-}
-
-// =====================
-// DRAG & DROP — Délégation d'événements
-// =====================
-var dragSrcId = null;
-var dragModuleId = null;
-var dragLeconId = null;
-var dragLeconSrcModuleId = null;
-
-// ── FORMATIONS ──
-function renderEditor() {
-  if (!currentFormation) return;
-  var f = currentFormation;
-  var html = '<div class="f-editor">';
-
-  html += '<div class="f-editor-head">';
-  html += '<div class="f-editor-title-row">';
-  html += '<div class="f-editor-title">' + f.title + '</div>';
-  html += '<div class="f-editor-status">' + (f.status === 'published' ? '\ud83d\udfe2 Publi\u00e9e' : '\u26aa Brouillon') + ' \u00b7 ' + modules.length + ' module' + (modules.length > 1 ? 's' : '') + '</div>';
-  html += '</div>';
-  html += '<div style="display:flex;gap:6px">';
-  html += '<button class="row-action" onclick="openFormationModal(currentFormation)">\u270f\ufe0f Modifier</button>';
-  html += '<button class="row-action" style="color:var(--red)" onclick="deleteFormation(\'' + f.id + '\')">Supprimer</button>';
-  html += '</div></div>';
-
-  html += '<div class="modules-section">';
-  html += '<div class="section-head"><span class="section-label">Modules</span>';
-  html += '<button class="btn-primary" style="font-size:0.75rem;padding:5px 12px" onclick="openModuleModal(null)">+ Module</button>';
-  html += '</div>';
-
-  if (!modules.length) {
-    html += '<div style="padding:2rem;text-align:center;color:var(--muted);font-size:0.82rem;border:1px dashed var(--subtle);border-radius:8px">Aucun module \u2014 commence par en cr\u00e9er un</div>';
-  } else {
-    modules.forEach(function(m, mi) {
-      var lecons = (m.lecons || []).sort(function(a,b){return a.position-b.position;});
-      html += '<div class="module-card" data-module-id="' + m.id + '" draggable="true">';
-      html += '<div class="module-head" onclick="toggleModule(\'mod' + mi + '\')">';
-      html += '<span class="drag-handle" onclick="event.stopPropagation()" title="D\u00e9placer">\u2807</span>';
-      html += '<span class="module-chevron" id="chev' + mi + '">\u25b6</span>';
-      html += '<span class="module-name">' + m.title + '</span>';
-      html += '<span class="module-count">' + lecons.length + ' le\u00e7on' + (lecons.length > 1 ? 's' : '') + '</span>';
-      html += '<div class="module-actions" onclick="event.stopPropagation()">';
-      html += '<button class="row-action" onclick="openModuleModal(' + JSON.stringify(m).replace(/"/g, '&quot;') + ')">\u270f\ufe0f</button>';
-      html += '<button class="row-action" style="color:var(--red)" onclick="deleteModule(\'' + m.id + '\')">\u2715</button>';
-      html += '</div></div>';
-      html += '<div class="module-body" id="mod' + mi + '">';
-      lecons.forEach(function(l, li) {
-        html += '<div class="lecon-item" draggable="true" data-lecon-id="' + l.id + '" data-module-id="' + m.id + '" onclick="openLeconModal(' + JSON.stringify(l).replace(/"/g, '&quot;') + ', \'' + m.id + '\')">';
-        html += '<span class="drag-handle" onclick="event.stopPropagation()" title="D\u00e9placer">\u2807</span>';
-        html += '<span class="lecon-num">' + String(li+1).padStart(2,'0') + '</span>';
-        html += '<span class="lecon-title">' + l.title + '</span>';
-        if (l.lecon_type === 'html') html += '<span class="lecon-yt" style="color:#635BFF">\u26a1 HTML</span>';
-        else if (l.youtube_id) html += '<span class="lecon-yt">\u25b6 YouTube</span>';
-        if (l.duration_min) html += '<span class="lecon-dur">' + l.duration_min + ' min</span>';
-        html += '</div>';
-      });
-      html += '<button class="lecon-add" onclick="openLeconModal(null, \'' + m.id + '\')">+ Ajouter une le\u00e7on</button>';
-      html += '</div></div>';
-    });
+async function saveLecon(mid){
+  var title=document.getElementById('lTitle').value.trim();
+  if(!title){toast('Titre obligatoire.','error');return;}
+  var isYt=document.getElementById('ltbtn_yt')&&document.getElementById('ltbtn_yt').classList.contains('on');
+  var ytRaw=document.getElementById('lYt')?document.getElementById('lYt').value.trim():'';
+  var ytId=null;
+  if(ytRaw){var mm=ytRaw.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([a-zA-Z0-9_-]{11})/);ytId=mm?mm[1]:(ytRaw.length===11?ytRaw:null);}
+  var data={
+    title:title,
+    lecon_type:isYt?'youtube':'text',
+    youtube_id:ytId||null,
+    duration_min:parseInt(document.getElementById('lDur').value)||0,
+    content:document.getElementById('lCont').value.trim()
+  };
+  var res;
+  if(curL){res=await sb.from('lecons').update(data).eq('id',curL.id);}
+  else{
+    data.module_id=mid;
+    var mod=modules.find(function(m){return m.id===mid;});
+    data.position=mod?mod.lecons.length:0;
+    res=await sb.from('lecons').insert(data);
   }
-  html += '</div></div>';
-
-  document.getElementById('formationsMain').innerHTML = html;
-  initDragModules();
-  initDragLecons();
+  if(res.error){toast('Erreur : '+res.error.message,'error');return;}
+  toast(curL?'Leçon mise à jour !':'Leçon ajoutée !','success');
+  await loadModules(curF.id);
 }
 
-function initDragFormations(container) {
-  var dragging = null;
+async function delLecon(id){
+  if(!confirm('Supprimer cette leçon ?')) return;
+  await sb.from('lecons').delete().eq('id',id);
+  if(curL&&curL.id===id){curL=null;col3Empty();}
+  await loadModules(curF.id);
+  toast('Leçon supprimée.','success');
+}
 
-  container.addEventListener('dragstart', function(e) {
-    var item = e.target.closest('.f-item[draggable]');
-    if (!item) return;
-    dragging = item;
-    dragSrcId = item.getAttribute('data-id');
-    setTimeout(function() { item.classList.add('dragging'); }, 0);
-    e.dataTransfer.effectAllowed = 'move';
+// ═══ COVER ═══
+function prevImg(inputId,imgId){
+  var url=document.getElementById(inputId).value.trim();
+  var img=document.getElementById(imgId);
+  if(!url){img.style.display='none';return;}
+  img.src=url;img.style.display='block';
+  img.onerror=function(){img.style.display='none';};
+}
+function autoCap(){
+  var url=document.getElementById('fExtUrl').value.trim();
+  if(!url||!url.startsWith('http')) return;
+  var ss='https://s0.wordpress.com/mshots/v1/'+encodeURIComponent(url)+'?w=1280&h=720&screen_width=1280';
+  document.getElementById('fCover').value=ss; prevImg('fCover','fCoverPrev');
+}
+function autoCapMod(){
+  var url=document.getElementById('mHtmlUrl').value.trim();
+  if(!url||!url.startsWith('http')) return;
+  var ss='https://s0.wordpress.com/mshots/v1/'+encodeURIComponent(url)+'?w=1280&h=720&screen_width=1280';
+  document.getElementById('mCover').value=ss; prevImg('mCover','mCoverPrev');
+}
+
+// ═══ DRAG FORMATIONS ═══
+function initDragF(container){
+  var dragging=null;
+  container.addEventListener('dragstart',function(e){
+    var item=e.target.closest('.f-item[draggable]');if(!item)return;
+    dragging=item;setTimeout(function(){item.classList.add('dragging');},0);e.dataTransfer.effectAllowed='move';
   });
-
-  container.addEventListener('dragover', function(e) {
+  container.addEventListener('dragover',function(e){
+    var item=e.target.closest('.f-item[draggable]');if(!item||item===dragging)return;
     e.preventDefault();
-    var item = e.target.closest('.f-item[draggable]');
-    if (!item || item === dragging) return;
-    container.querySelectorAll('.drag-over-top,.drag-over-bottom').forEach(function(el){
-      el.classList.remove('drag-over-top','drag-over-bottom');
-    });
-    var rect = item.getBoundingClientRect();
-    item.classList.add(e.clientY < rect.top + rect.height/2 ? 'drag-over-top' : 'drag-over-bottom');
+    container.querySelectorAll('.drag-over-top,.drag-over-bottom').forEach(function(el){el.classList.remove('drag-over-top','drag-over-bottom');});
+    var r=item.getBoundingClientRect();item.classList.add(e.clientY<r.top+r.height/2?'drag-over-top':'drag-over-bottom');
   });
-
-  container.addEventListener('drop', function(e) {
+  container.addEventListener('drop',function(e){
+    var item=e.target.closest('.f-item[draggable]');if(!item||!dragging||item===dragging)return;
     e.preventDefault();
-    var item = e.target.closest('.f-item[draggable]');
-    if (!item || !dragging || item === dragging) return;
-    var rect = item.getBoundingClientRect();
-    var insertAfter = e.clientY >= rect.top + rect.height/2;
-    var targetId = item.getAttribute('data-id');
-
-    var srcF = formations.find(function(f){return f.id===dragSrcId;});
-    var tgtF = formations.find(function(f){return f.id===targetId;});
-    if (!srcF || !tgtF) return;
-
-    var srcIdx = formations.indexOf(srcF);
-    formations.splice(srcIdx, 1);
-    var tgtIdx = formations.indexOf(tgtF);
-    formations.splice(insertAfter ? tgtIdx+1 : tgtIdx, 0, srcF);
-    formations.forEach(function(f,i){ f.position=i; });
-
-    renderFormationsList();
-    saveFormationsOrder();
+    var after=e.clientY>=item.getBoundingClientRect().top+item.getBoundingClientRect().height/2;
+    var sF=formations.find(function(f){return f.id===dragging.getAttribute('data-id');});
+    var tF=formations.find(function(f){return f.id===item.getAttribute('data-id');});
+    if(!sF||!tF)return;
+    formations.splice(formations.indexOf(sF),1);var ti=formations.indexOf(tF);
+    formations.splice(after?ti+1:ti,0,sF);
+    formations.forEach(function(f,i){f.position=i;});
+    renderFormations();
+    formations.forEach(function(f,i){sb.from('formations').update({position:i}).eq('id',f.id).then(function(){});});
+    toast('Ordre sauvegardé !','success');
   });
-
-  container.addEventListener('dragend', function() {
-    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){
-      el.classList.remove('dragging','drag-over-top','drag-over-bottom');
-    });
-    dragging = null;
+  container.addEventListener('dragend',function(){
+    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){el.classList.remove('dragging','drag-over-top','drag-over-bottom');});
+    dragging=null;
   });
 }
 
-async function saveFormationsOrder() {
-  for (var i=0; i<formations.length; i++) {
-    await sb.from('formations').update({position:i}).eq('id',formations[i].id);
-  }
-  showToast('Ordre sauvegardé !', 'success');
-}
-
-// ── MODULES ──
-function initDragModules() {
-  var container = document.getElementById('formationsMain');
-  if (!container) return;
-  var dragging = null;
-
-  container.addEventListener('dragstart', function(e) {
-    var item = e.target.closest('.module-card[draggable]');
-    if (!item) return;
-    dragging = item;
-    dragModuleId = item.getAttribute('data-module-id');
-    setTimeout(function() { item.classList.add('dragging'); }, 0);
-    e.dataTransfer.effectAllowed = 'move';
-    e.stopPropagation();
+// ═══ DRAG MODULES ═══
+function initDragM(container){
+  var dragging=null,dMId=null;
+  container.addEventListener('dragstart',function(e){
+    var item=e.target.closest('.m-item[draggable]');if(!item)return;
+    dragging=item;dMId=item.getAttribute('data-module-id');
+    setTimeout(function(){item.classList.add('dragging');},0);e.dataTransfer.effectAllowed='move';e.stopPropagation();
   });
-
-  container.addEventListener('dragover', function(e) {
-    var item = e.target.closest('.module-card[draggable]');
-    if (!item || item === dragging) return;
+  container.addEventListener('dragover',function(e){
+    var item=e.target.closest('.m-item[draggable]');if(!item||item===dragging)return;
     e.preventDefault();
-    container.querySelectorAll('.module-card.drag-over-top,.module-card.drag-over-bottom').forEach(function(el){
-      el.classList.remove('drag-over-top','drag-over-bottom');
-    });
-    var rect = item.getBoundingClientRect();
-    item.classList.add(e.clientY < rect.top + rect.height/2 ? 'drag-over-top' : 'drag-over-bottom');
+    container.querySelectorAll('.m-item.drag-over-top,.m-item.drag-over-bottom').forEach(function(el){el.classList.remove('drag-over-top','drag-over-bottom');});
+    var r=item.getBoundingClientRect();item.classList.add(e.clientY<r.top+r.height/2?'drag-over-top':'drag-over-bottom');
   });
-
-  container.addEventListener('drop', function(e) {
-    var item = e.target.closest('.module-card[draggable]');
-    if (!item || !dragging || item === dragging) return;
+  container.addEventListener('drop',function(e){
+    var item=e.target.closest('.m-item[draggable]');if(!item||!dragging||item===dragging)return;
     e.preventDefault();
-    var rect = item.getBoundingClientRect();
-    var insertAfter = e.clientY >= rect.top + rect.height/2;
-    var targetModId = item.getAttribute('data-module-id');
-
-    var srcMod = modules.find(function(m){return m.id===dragModuleId;});
-    var tgtMod = modules.find(function(m){return m.id===targetModId;});
-    if (!srcMod || !tgtMod) return;
-
-    var srcIdx = modules.indexOf(srcMod);
-    modules.splice(srcIdx, 1);
-    var tgtIdx = modules.indexOf(tgtMod);
-    modules.splice(insertAfter ? tgtIdx+1 : tgtIdx, 0, srcMod);
-    modules.forEach(function(m,i){ m.position=i; });
-
-    renderEditor();
-    saveModulesOrder();
+    var after=e.clientY>=item.getBoundingClientRect().top+item.getBoundingClientRect().height/2;
+    var sM=modules.find(function(m){return m.id===dMId;});
+    var tM=modules.find(function(m){return m.id===item.getAttribute('data-module-id');});
+    if(!sM||!tM)return;
+    modules.splice(modules.indexOf(sM),1);var ti=modules.indexOf(tM);
+    modules.splice(after?ti+1:ti,0,sM);
+    modules.forEach(function(m,i){m.position=i;});
+    renderModules();
+    modules.forEach(function(m,i){sb.from('modules').update({position:i}).eq('id',m.id).then(function(){});});
+    toast('Ordre sauvegardé !','success');
   });
-
-  container.addEventListener('dragend', function() {
-    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){
-      el.classList.remove('dragging','drag-over-top','drag-over-bottom');
-    });
-    dragging = null;
+  container.addEventListener('dragend',function(){
+    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){el.classList.remove('dragging','drag-over-top','drag-over-bottom');});
+    dragging=null;
   });
 }
 
-async function saveModulesOrder() {
-  for (var i=0; i<modules.length; i++) {
-    await sb.from('modules').update({position:i}).eq('id',modules[i].id);
-  }
-  showToast('Ordre sauvegardé !', 'success');
-}
-
-// ── LEÇONS ──
-function initDragLecons() {
-  var container = document.getElementById('formationsMain');
-  if (!container) return;
-  var dragging = null;
-
-  container.addEventListener('dragstart', function(e) {
-    var item = e.target.closest('.lecon-item[draggable]');
-    if (!item) return;
-    dragging = item;
-    dragLeconId = item.getAttribute('data-lecon-id');
-    dragLeconSrcModuleId = item.getAttribute('data-module-id');
-    setTimeout(function() { item.classList.add('dragging'); }, 0);
-    e.dataTransfer.effectAllowed = 'move';
-    e.stopPropagation();
+// ═══ DRAG LEÇONS ═══
+function initDragL(container){
+  var dragging=null,dLId=null,dLMId=null;
+  container.addEventListener('dragstart',function(e){
+    var item=e.target.closest('.l-item[draggable]');if(!item)return;
+    dragging=item;dLId=item.getAttribute('data-lecon-id');dLMId=item.getAttribute('data-module-id');
+    setTimeout(function(){item.classList.add('dragging');},0);e.dataTransfer.effectAllowed='move';e.stopPropagation();
   });
-
-  container.addEventListener('dragover', function(e) {
-    var item = e.target.closest('.lecon-item[draggable]');
-    if (!item || item === dragging) return;
+  container.addEventListener('dragover',function(e){
+    var item=e.target.closest('.l-item[draggable]');if(!item||item===dragging)return;
     e.preventDefault();
-    container.querySelectorAll('.lecon-item.drag-over-top,.lecon-item.drag-over-bottom').forEach(function(el){
-      el.classList.remove('drag-over-top','drag-over-bottom');
-    });
-    var rect = item.getBoundingClientRect();
-    item.classList.add(e.clientY < rect.top + rect.height/2 ? 'drag-over-top' : 'drag-over-bottom');
+    container.querySelectorAll('.l-item.drag-over-top,.l-item.drag-over-bottom').forEach(function(el){el.classList.remove('drag-over-top','drag-over-bottom');});
+    var r=item.getBoundingClientRect();item.classList.add(e.clientY<r.top+r.height/2?'drag-over-top':'drag-over-bottom');
   });
-
-  container.addEventListener('drop', function(e) {
-    var item = e.target.closest('.lecon-item[draggable]');
-    if (!item || !dragging || item === dragging) return;
+  container.addEventListener('drop',function(e){
+    var item=e.target.closest('.l-item[draggable]');if(!item||!dragging||item===dragging)return;
     e.preventDefault();
-    var rect = item.getBoundingClientRect();
-    var insertAfter = e.clientY >= rect.top + rect.height/2;
-    var targetLeconId = item.getAttribute('data-lecon-id');
-    var targetModuleId = item.getAttribute('data-module-id');
-
-    var srcMod = modules.find(function(m){return m.id===dragLeconSrcModuleId;});
-    var tgtMod = modules.find(function(m){return m.id===targetModuleId;});
-    if (!srcMod || !tgtMod) return;
-
-    var srcLecon = (srcMod.lecons||[]).find(function(l){return l.id===dragLeconId;});
-    if (!srcLecon) return;
-
-    // Retirer de la source
-    srcMod.lecons = (srcMod.lecons||[]).filter(function(l){return l.id!==dragLeconId;});
-
-    // Insérer dans la cible
-    if (!tgtMod.lecons) tgtMod.lecons = [];
-    var tgtIdx = tgtMod.lecons.findIndex(function(l){return l.id===targetLeconId;});
-    tgtMod.lecons.splice(insertAfter ? tgtIdx+1 : tgtIdx, 0, srcLecon);
-
-    // Mise à jour positions
-    tgtMod.lecons.forEach(function(l,i){ l.position=i; l.module_id=tgtMod.id; });
-    srcMod.lecons.forEach(function(l,i){ l.position=i; });
-
-    renderEditor();
-    saveLeçonsOrder(srcMod, tgtMod);
+    var after=e.clientY>=item.getBoundingClientRect().top+item.getBoundingClientRect().height/2;
+    var tLId=item.getAttribute('data-lecon-id'),tMId=item.getAttribute('data-module-id');
+    var sM=modules.find(function(m){return m.id===dLMId;}),tM=modules.find(function(m){return m.id===tMId;});
+    if(!sM||!tM)return;
+    var sL=(sM.lecons||[]).find(function(l){return l.id===dLId;});if(!sL)return;
+    sM.lecons=sM.lecons.filter(function(l){return l.id!==dLId;});
+    var ti=(tM.lecons||[]).findIndex(function(l){return l.id===tLId;});
+    tM.lecons.splice(after?ti+1:ti,0,sL);
+    tM.lecons.forEach(function(l,i){l.position=i;l.module_id=tM.id;});
+    sM.lecons.forEach(function(l,i){l.position=i;});
+    renderModules();
+    tM.lecons.forEach(function(l,i){sb.from('lecons').update({position:i,module_id:tM.id}).eq('id',l.id).then(function(){});});
+    if(sM.id!==tM.id) sM.lecons.forEach(function(l,i){sb.from('lecons').update({position:i,module_id:sM.id}).eq('id',l.id).then(function(){});});
+    toast('Ordre sauvegardé !','success');
   });
-
-  container.addEventListener('dragend', function() {
-    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){
-      el.classList.remove('dragging','drag-over-top','drag-over-bottom');
-    });
-    dragging = null;
+  container.addEventListener('dragend',function(){
+    container.querySelectorAll('.dragging,.drag-over-top,.drag-over-bottom').forEach(function(el){el.classList.remove('dragging','drag-over-top','drag-over-bottom');});
+    dragging=null;
   });
 }
 
-async function saveLeçonsOrder(srcMod, tgtMod) {
-  var toUpdate = [];
-  (tgtMod.lecons||[]).forEach(function(l,i){ toUpdate.push({id:l.id,position:i,module_id:tgtMod.id}); });
-  if (srcMod.id !== tgtMod.id) {
-    (srcMod.lecons||[]).forEach(function(l,i){ toUpdate.push({id:l.id,position:i,module_id:srcMod.id}); });
-  }
-  for (var i=0; i<toUpdate.length; i++) {
-    await sb.from('lecons').update({position:toUpdate[i].position,module_id:toUpdate[i].module_id}).eq('id',toUpdate[i].id);
-  }
-  showToast('Ordre sauvegardé !', 'success');
+// ═══ HELPERS ═══
+function col3Empty(){
+  curL=null;
+  document.getElementById('col3').innerHTML='<div class="col3-empty"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg><div>Sélectionne un module</div></div>';
 }
-
-// =====================
-// HELPERS
-// =====================
-function openOverlay(id) { document.getElementById(id).classList.add('on'); }
-function closeOverlay(id) { document.getElementById(id).classList.remove('on'); }
-
-function showToast(msg, type) {
-  var t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast ' + (type || 'success') + ' show';
-  setTimeout(function() { t.classList.remove('show'); }, 2500);
-}
+function openOv(id){document.getElementById(id).classList.add('on');}
+function closeOv(id){document.getElementById(id).classList.remove('on');}
+function toast(msg,type){var t=document.getElementById('toast');t.textContent=msg;t.className='toast '+(type||'success')+' show';setTimeout(function(){t.classList.remove('show');},2500);}
 </script>
 </body>
 </html>
-"
-    },
-    "message": "Page admin formations",
-    "integration_name": null,
-    "integration_icon_url": null,
-    "icon_name": "file",
-    "context": null,
-    "display_content": {
-      "type": "json_block
