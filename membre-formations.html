@@ -635,7 +635,7 @@ function renderGrid() {
         '</div>' +
         // Bouton
         (hasUrl
-          ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:600;text-decoration:none;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">▶ Commencer la formation</a>'
+          ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" class="btn-lancer" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:600;text-decoration:none">▶ Commencer la formation</a>'
           : '<button class="btn-voir-contenu" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--dark);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
         ) +
       '</div>';
