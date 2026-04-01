@@ -10,7 +10,7 @@
 :root{
   --bg:#0C0C0A;--surface:#141412;--border:rgba(255,255,255,.08);
   --white:#F0ECE4;--muted:rgba(240,236,228,.45);--faint:rgba(240,236,228,.07);
-  --gold:#3B82F6;--gold-light:#60A5FA;--green:#4ECB71;--red:#E05252;--site-gold:#A67C3A;--site-gold-light:#C49A4E;
+  --gold:#3B82F6;--gold-rgb:59,130,246;--gold-light:#60A5FA;--green:#4ECB71;--red:#E05252;--site-gold:#A67C3A;--site-gold-light:#C49A4E;
   --sidebar:240px;--header:52px;
 }
 html,body{height:100%;overflow:hidden}
@@ -154,6 +154,23 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--faint);border-radius:2px}
+
+/* Animations slides */
+@keyframes fadeSlideIn{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+@keyframes fadeSlideInLeft{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+.slide-enter{animation:fadeSlideIn .28s cubic-bezier(.22,1,.36,1)}
+.slide-enter-back{animation:fadeSlideInLeft .28s cubic-bezier(.22,1,.36,1)}
+
+/* Concept enrichi */
+.concept-card{background:var(--faint);border:0.5px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:12px}
+.concept-highlight{background:linear-gradient(135deg,rgba(var(--gold-rgb),.12),transparent);border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:12px 16px;margin:14px 0;font-size:.9rem;line-height:1.7;color:var(--white)}
+.key-point{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border)}
+.key-point:last-child{border-bottom:none}
+.key-point-icon{font-size:1.3rem;flex-shrink:0;margin-top:2px}
+.key-point-text{font-size:.87rem;color:rgba(240,236,228,.85);line-height:1.6}
+.slide-eyebrow{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.slide-eyebrow-icon{font-size:1.8rem}
+.slide-eyebrow-tag{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold)}
 @media(max-width:600px){
   .sidebar{display:none}
   .slide-area{padding:20px}
@@ -378,7 +395,26 @@ function render(){
   if(t==='intro'){
     h='<div class="slide-intro"><div class="slide-num">Leçon '+L.id+' / '+LESSONS.length+'</div><span class="slide-emoji-big">'+(sl.emoji||'')+'</span><div class="slide-intro-title">'+sl.title.replace(/\\n|\n/g,'<br>')+'</div>'+(sl.sub?'<div class="slide-intro-sub">'+sl.sub+'</div>':'')+'</div>';
   } else if(t==='concept'){
-    h='<div class="slide-block">'+(sl.tag?'<div class="slide-tag">'+sl.tag+'</div>':'')+'<div class="slide-title">'+sl.title+'</div><div class="slide-body">'+sl.body+'</div></div>';
+    // Extraire les lignes fortes du body pour les mettre en valeur
+    var bodyFmt = (sl.body||'').replace(/<br><br>/g,'</p><p>');
+    // Détecter les éléments ✅ ❌ ⚠️ 🔴 etc pour les transformer en key-points
+    var hasKeyPoints = /^[✅❌⚠️🔴🟢•▪]/.test(sl.body||'');
+    var bodyHtml;
+    if(hasKeyPoints){
+      var klines = (sl.body||'').split('<br>').filter(Boolean);
+      var kpts = klines.map(function(l){
+        var icon = l.match(/^(\S+)\s*/);
+        var txt = icon ? l.replace(icon[0],'') : l;
+        return '<div class="key-point"><div class="key-point-icon">'+(icon?icon[1]:'▸')+'</div><div class="key-point-text">'+txt+'</div></div>';
+      }).join('');
+      bodyHtml = '<div class="concept-card">'+kpts+'</div>';
+    } else {
+      // Mettre les parties <strong>...</strong> en highlight
+      var highlighted = (sl.body||'').replace(/<strong>(.*?)<\/strong>/g,'</p><div class="concept-highlight">$1</div><p>');
+      bodyHtml = '<div class="slide-body">'+highlighted+'</div>';
+    }
+    var eyebrow = sl.emoji ? '<div class="slide-eyebrow"><span class="slide-eyebrow-icon">'+sl.emoji+'</span>'+(sl.tag?'<span class="slide-eyebrow-tag">'+sl.tag+'</span>':'')+'</div>' : (sl.tag?'<div class="slide-tag">'+sl.tag+'</div>':'');
+    h='<div class="slide-block">'+eyebrow+'<div class="slide-title">'+sl.title+'</div>'+bodyHtml+'</div>';
   } else if(t==='cards'){
     var items=sl.items.map(function(it){return'<div class="card-item"><div class="card-emoji">'+it.emoji+'</div><div><div class="card-name">'+it.name+'</div><div class="card-sub">'+it.sub+'</div></div></div>';}).join('');
     h='<div class="slide-block"><div class="slide-title">'+sl.title+'</div><div class="cards-grid">'+items+'</div></div>';
@@ -408,7 +444,12 @@ function render(){
     var pts=sl.points.map(function(p){return'<div class="recap-item"><span class="recap-dot">◆</span><span>'+p+'</span></div>';}).join('');
     h='<div class="slide-block"><div class="recap-title">'+sl.title+'</div><div class="recap-list">'+pts+'</div></div>';
   }
-  a.innerHTML=h;a.scrollTop=0;
+  a.classList.remove('slide-enter','slide-enter-back');
+  a.innerHTML=h;
+  void a.offsetWidth; // force reflow
+  a.classList.add(window._slideDir==='prev'?'slide-enter-back':'slide-enter');
+  window._slideDir='next';
+  a.scrollTop=0;
   updateNav();updatePbars();updateSidebar();
 }
 
@@ -509,6 +550,7 @@ function next(){autoPlay=false;stopVoix();
   document.getElementById('playIcon').style.display='block';
   document.getElementById('pauseIcon').style.display='none';
   document.getElementById('playBtn').classList.remove('playing');
+  window._slideDir='next';
   var L=LESSONS[curL];
   if(curS<L.slides.length-1){curS++;render();}
   else if(curL<LESSONS.length-1){markDone(curL);curL++;curS=0;render();}
@@ -518,6 +560,7 @@ function prev(){autoPlay=false;stopVoix();
   document.getElementById('playIcon').style.display='block';
   document.getElementById('pauseIcon').style.display='none';
   document.getElementById('playBtn').classList.remove('playing');
+  window._slideDir='prev';
   if(curS>0){curS--;render();}
   else if(curL>0){curL--;curS=LESSONS[curL].slides.length-1;render();}
 }
@@ -570,6 +613,7 @@ function togglePlay() {
 
 function autoAdvance() {
   if (!autoPlay) return;
+  window._slideDir='next';
   // Avancer au slide suivant
   var L = LESSONS[curL];
   if (curS < L.slides.length - 1) {
@@ -595,33 +639,39 @@ function playVoix(text) {
     || voices.find(function(v) { return v.lang.startsWith('fr'); });
   if (frVoice) utterance.voice = frVoice;
 
-  // Sous-titres — découpage en phrases
+  // Sous-titres synchronisés via boundary event
   var subs = document.getElementById('subtitlesText');
-  var sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
-  var idx = 0;
-  function showNext() {
-    if (idx < sentences.length) {
-      subs.classList.remove('hidden');
-      subs.textContent = sentences[idx].trim();
-      idx++;
-    } else {
-      subs.classList.add('hidden');
-      subs.textContent = '';
-    }
-  }
-  // Estimer le timing : ~13 caractères par seconde à 1.05x
-  var cps = 13;
-  var delay = 0;
-  sentences.forEach(function(s, i) {
-    setTimeout(function() { showNext(); }, delay * 1000);
-    delay += s.length / cps;
+  var sentences = text.match(/[^.!?…]+[.!?…]+\s*/g) || [text];
+  // Précalculer les positions de début de chaque phrase
+  var positions = [];
+  var pos = 0;
+  sentences.forEach(function(s) {
+    positions.push(pos);
+    pos += s.length;
   });
-  setTimeout(function() { subs.classList.add('hidden'); subs.textContent = ''; }, delay * 1000);
+
+  utterance.onboundary = function(e) {
+    if (e.name !== 'word' && e.name !== 'sentence') return;
+    var ci = e.charIndex;
+    // Trouver la phrase qui contient cet index
+    var phraseIdx = 0;
+    for (var i = positions.length - 1; i >= 0; i--) {
+      if (ci >= positions[i]) { phraseIdx = i; break; }
+    }
+    subs.classList.remove('hidden');
+    subs.textContent = sentences[phraseIdx].trim();
+  };
 
   utterance.onend = function() {
-    subs.classList.add('hidden'); subs.textContent = '';
+    subs.classList.add('hidden');
+    subs.textContent = '';
     if (autoPlay) setTimeout(autoAdvance, 400);
   };
+  utterance.onerror = function() {
+    subs.classList.add('hidden');
+    subs.textContent = '';
+  };
+
   synth.speak(utterance);
 }
 
