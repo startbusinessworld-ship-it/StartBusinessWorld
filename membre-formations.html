@@ -594,7 +594,13 @@ function renderSidebar() {
         '<div class="f-item-bar"><div class="f-item-fill" style="width:' + f._pct + '%"></div></div>' +
         '<div class="f-item-pct">' + f._pct + "% · " + f._done + "/" + f._tot + "</div>" +
       '</div>';
-    div.onclick = (function(fm) { return function() { openFormation(fm); }; })(f);
+    div.onclick = (function(fm) { return function() {
+      if (fm.formation_url) {
+        window.open(fm.formation_url, '_blank', 'noopener');
+      } else {
+        openFormation(fm);
+      }
+    }; })(f);
     el.appendChild(div);
   });
 }
