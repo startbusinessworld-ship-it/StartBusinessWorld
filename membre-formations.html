@@ -533,11 +533,16 @@ async function loadFormations() {
   var res = await SB.from("formations").select("id,title,description,cover_url,formation_url,extra_stats,status,position").eq("status", "published").order("position");
   allFormations = res.data || [];
 
-  // Charger les stats de progression pour chaque formation
+  // Charger les stats de progression — seulement pour les formations sans URL
   var totalGlobal = 0, doneGlobal = 0;
 
   for (var i = 0; i < allFormations.length; i++) {
     var f = allFormations[i];
+    if (f.formation_url) {
+      // Formation externe — pas de progression à calculer
+      f._tot = 0; f._done = 0; f._pct = 0;
+      continue;
+    }
     var mr = await SB.from("modules").select("id, lecons(id)").eq("formation_id", f.id);
     var mods = mr.data || [];
     var tot = mods.reduce(function(s, m) { return s + (m.lecons || []).length; }, 0);
