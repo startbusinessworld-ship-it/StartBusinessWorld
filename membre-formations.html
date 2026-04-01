@@ -702,7 +702,11 @@ init();
 
 <!-- Overlay formation HTML — plein écran, fermeture via X dans la formation -->
 <div id="formationOverlay">
-  <iframe id="overlayFrame" src="" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+  <div class="overlay-bar">
+    <span class="overlay-bar-title" id="overlayTitle"></span>
+    <button class="overlay-close" onclick="closeFormationOverlay()" title="Fermer">✕</button>
+  </div>
+  <iframe id="overlayFrame" src="" allowfullscreen allow="autoplay; encrypted-media; microphone"></iframe>
 </div>
 
 </body>
