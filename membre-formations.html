@@ -636,7 +636,7 @@ function renderGrid() {
         // Bouton
         (hasUrl
           ? '<a href="' + f.formation_url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:600;text-decoration:none;transition:opacity .15s" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">▶ Commencer la formation</a>'
-          : '<button onclick="event.stopPropagation();openFormation(' + JSON.stringify({id:f.id,title:f.title}).replace(/"/g,'&quot;') + ')" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--dark);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
+          : '<button class="btn-voir-contenu" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;background:var(--dark);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500;border:none;cursor:pointer;font-family:inherit">Voir le contenu →</button>'
         ) +
       '</div>';
 
@@ -652,6 +652,13 @@ function renderGrid() {
       card.addEventListener("click", function() { window.open(f.formation_url, "_blank", "noopener"); });
     } else {
       card.addEventListener("click", (function(fm) { return function() { openFormation(fm); }; })(f));
+      var btnVoir = card.querySelector(".btn-voir-contenu");
+      if (btnVoir) {
+        btnVoir.addEventListener("click", (function(fm) { return function(e) {
+          e.stopPropagation();
+          openFormation(fm);
+        }; })(f));
+      }
     }
 
     grid.appendChild(card);
