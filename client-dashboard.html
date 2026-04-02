@@ -453,26 +453,49 @@
       <div class="brand-badge">Le Club SBW</div>
     </div>
     <nav class="sidebar-nav">
+      <div class="nav-label">Mon espace</div>
       <div class="nav-item active" onclick="showSection('dashboard', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
-        Accueil
+        Tableau de bord
       </div>
       <div class="nav-item" onclick="window.location.href='membre-formations.html'">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1L1 5l7 4 7-4-7-4z"/><path d="M1 10l7 4 7-4"/><path d="M1 7.5l7 4 7-4"/></svg>
         Formations
         <span class="nav-badge-new">30</span>
       </div>
+      <div class="nav-item" onclick="window.location.href='blog.html'">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+        Articles & Ressources
+      </div>
+      <div class="nav-item" onclick="window.location.href='membre-annuaire.html'">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
+        Fournisseurs & Contacts
+      </div>
+      <div class="nav-label">Communauté</div>
       <div class="nav-item" onclick="window.location.href='membre-chat.html'">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/><path d="M11 3c1.5.5 2.5 1.9 2.5 3.5S12.5 9.5 11 10"/><path d="M13 14c1-1 2-2 2-4"/></svg>
-        Groupe
+        Groupe privé
+      </div>
+      <div class="nav-item" onclick="window.location.href='membre-live.html'">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><polygon points="6.5 5.5 11.5 8 6.5 10.5 6.5 5.5"/></svg>
+        Live mensuel
+      </div>
+      <div class="nav-item" onclick="showSection('bonsplans', this)">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+        Bons Plans membres
+      </div>
+      <div class="nav-label">Mon compte</div>
+      <div class="nav-item" onclick="window.location.href='membre-prestige.html'">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1l1.8 3.6L14 5.6l-3 2.9.7 4.1L8 10.5l-3.7 2.1.7-4.1-3-2.9 4.2-.6z"/></svg>
+        Prestige & XP
       </div>
       <div class="nav-item" onclick="window.location.href='membre-affiliation.html'">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3c1.5.5 2.5 2 2.5 3.5S11.5 9.5 10 10M6 6c-1.5.5-2.5 2-2.5 3.5S4.5 12.5 6 13"/><circle cx="10" cy="4" r="2"/><circle cx="6" cy="12" r="2"/><line x1="8.5" y1="5.5" x2="7.5" y2="10.5"/></svg>
-        Affiliation
+        Affiliation — 25€
       </div>
       <div class="nav-item" onclick="showSection('compte', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="5" r="3"/><path d="M2 14s1-5 6-5 6 5 6 5"/></svg>
-        Mon compte
+        Profil & Abonnement
       </div>
     </nav>
     <div class="sidebar-user">
@@ -560,89 +583,36 @@
           </div>
         </div>
 
-        <!-- ACCÈS RAPIDE -->
-        <div style="margin-bottom:20px">
-          <div style="font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:12px">Accès rapide</div>
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px" id="quickAccessGrid">
 
-            <a href="membre-formations.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">🎓</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Formations</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Tous tes modules disponibles — IA et vidéo.</div>
-              </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Accéder →</div>
-            </a>
+        <div class="content-grid">
+          <div>
 
-            <a href="membre-annuaire.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">📦</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Fournisseurs & Contacts</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Fournisseurs, logistique, création société, visa et plus.</div>
+            <!-- 1. LIVE MENSUEL -->
+            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-live.html'">
+              <div class="card-head">
+                <div class="card-title">Live mensuel<span style="font-size:.55rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);border:1px solid rgba(166,124,58,.25);padding:1px 7px;border-radius:8px;margin-left:6px">Business</span></div>
+                <div class="card-link">Voir →</div>
               </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Voir l'annuaire →</div>
-            </a>
-
-            <a href="membre-chat.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">💬</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Groupe privé</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Échange avec les membres Business — questions sérieuses.</div>
+              <div class="module-row">
+                <div class="module-icon">📅</div>
+                <div class="module-info">
+                  <div class="module-name">Prochain live</div>
+                  <div class="module-meta" id="dashNextLiveDate">Date à confirmer</div>
+                </div>
+                <span class="module-status status-inprogress">À venir</span>
               </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Rejoindre →</div>
-            </a>
-
-            <a href="membre-live.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">🎥</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Live mensuel</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Pose tes questions — réponses en direct chaque mois.</div>
+              <div class="module-row">
+                <div class="module-icon">❓</div>
+                <div class="module-info">
+                  <div class="module-name">Pose ta question</div>
+                  <div class="module-meta">Soumets ta question avant le live</div>
+                </div>
+                <div class="card-link">Participer →</div>
               </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Voir le live →</div>
-            </a>
-
-            <a href="blog.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">📝</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Articles & Blog</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Guides, analyses et ressources pour entrepreneurs.</div>
-              </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Lire →</div>
-            </a>
-
-            <a href="membre-prestige.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">⭐</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Prestige & XP</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Progresse, débloque des récompenses et grimpe dans le classement.</div>
-              </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Mon prestige →</div>
-            </a>
-
-            <a href="membre-affiliation.html" style="text-decoration:none;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">💸</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Affiliation</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Gagne 25€ par membre parrainé. Partage ton lien.</div>
-              </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Mon lien →</div>
-            </a>
-
-            <div onclick="showSection('bonsplans', null)" style="cursor:pointer;background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:1.2rem;display:flex;flex-direction:column;gap:10px;transition:all .15s" onmouseover="this.style.borderColor='var(--gold)';this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--subtle)';this.style.transform='translateY(0)'">
-              <div style="font-size:1.8rem">⚡</div>
-              <div>
-                <div style="font-size:.88rem;font-weight:600;color:var(--ink);margin-bottom:3px">Bons Plans</div>
-                <div style="font-size:.72rem;color:var(--muted);line-height:1.5">Offres exclusives membres — LegalPlace, Shopify, Airwallex et plus.</div>
-              </div>
-              <div style="font-size:.72rem;font-weight:500;color:var(--gold);margin-top:auto">Voir les offres →</div>
             </div>
 
-          </div>
-        </div>
-
-        <div class="content-grid">          <div>
-            <!-- FORMATIONS EN COURS -->
-            <div class="card">
+            <!-- 2. FORMATIONS — CONTINUER -->
+            <div class="card" style="margin-bottom:16px">
               <div class="card-head">
                 <div class="card-title">Formations — continuer</div>
                 <div class="card-link" onclick="window.location.href='membre-formations.html'">Voir tout →</div>
@@ -709,8 +679,8 @@
               </div>
             </div>
 
-            <!-- ARTICLES RÉCENTS -->
-            <div class="card">
+            <!-- 2. DERNIERS ARTICLES -->
+            <div class="card" style="margin-bottom:16px">
               <div class="card-head">
                 <div class="card-title">Derniers articles</div>
                 <a href="blog.html" class="card-link">Voir le blog →</a>
@@ -720,7 +690,7 @@
                   <div class="article-cat">Business Chine</div>
                   <div class="article-title">Sourcer en Chine sans se faire arnaquer : le guide complet 2026</div>
                 </div>
-                <span class="article-yt">▶ Vidéo</span>
+                <span class="article-yt">▶</span>
                 <div class="article-time">18 min</div>
               </div>
               <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=hong-kong-vs-france'">
@@ -733,9 +703,9 @@
               <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=dubai-2026'">
                 <div style="flex:1;min-width:0">
                   <div class="article-cat">Expatriation</div>
-                  <div class="article-title">S'expatrier à Dubai en 2026 : visa, résidence fiscale, coût de vie réel</div>
+                  <div class="article-title">S'expatrier à Dubai en 2026 : visa, résidence fiscale, coût réel</div>
                 </div>
-                <span class="article-yt">▶ Vidéo</span>
+                <span class="article-yt">▶</span>
                 <div class="article-time">10 min</div>
               </div>
               <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=amazon-fba-2026'">
@@ -746,12 +716,134 @@
                 <div class="article-time">9 min</div>
               </div>
             </div>
+
+            <!-- 3. FOURNISSEURS -->
+            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-annuaire.html'">
+              <div class="card-head">
+                <div class="card-title">Fournisseurs & Contacts<span style="font-size:.55rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);border:1px solid rgba(166,124,58,.25);padding:1px 7px;border-radius:8px;margin-left:6px">Pro</span></div>
+                <div class="card-link">Voir l'annuaire →</div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🏭</div>
+                <div class="module-info">
+                  <div class="module-name">Fournisseurs</div>
+                  <div class="module-meta">Fabricants & grossistes — Chine, Inde, Turquie et plus</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🚢</div>
+                <div class="module-info">
+                  <div class="module-name">Logistique & Transport</div>
+                  <div class="module-meta">Agents, transitaires, fret maritime et aérien</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🏢</div>
+                <div class="module-info">
+                  <div class="module-name">Création de société</div>
+                  <div class="module-meta">Hong Kong, Dubai, offshore — contacts vérifiés SBW</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🛂</div>
+                <div class="module-info">
+                  <div class="module-name">Visa & Expatriation</div>
+                  <div class="module-meta">Agents visa, cabinets immigration, résidence fiscale</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 4. AFFILIATION -->
+            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-affiliation.html'">
+              <div class="card-head">
+                <div class="card-title">Affiliation — 25€ par filleul</div>
+                <div class="card-link">Mon lien →</div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🤝</div>
+                <div class="module-info">
+                  <div class="module-name">Mes filleuls</div>
+                  <div class="module-meta">Membres parrainés via ton lien unique</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">💰</div>
+                <div class="module-info">
+                  <div class="module-name">Commissions</div>
+                  <div class="module-meta">25€ versés pour chaque membre actif parrainé</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🔗</div>
+                <div class="module-info">
+                  <div class="module-name">Partager mon lien</div>
+                  <div class="module-meta">Copie et diffuse ton lien de parrainage</div>
+                </div>
+                <div class="card-link">Copier →</div>
+              </div>
+            </div>
+
+            <!-- 5. GROUPE PRIVÉ -->
+            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-chat.html'">
+              <div class="card-head">
+                <div class="card-title">Groupe privé<span style="font-size:.55rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);border:1px solid rgba(166,124,58,.25);padding:1px 7px;border-radius:8px;margin-left:6px">Business</span></div>
+                <div class="card-link">Rejoindre →</div>
+              </div>
+              <div class="module-row">
+                <div style="display:flex;margin-right:4px">
+                  <div class="community-avatar" style="margin-left:0">TM</div>
+                  <div class="community-avatar">SL</div>
+                  <div class="community-avatar">AK</div>
+                  <div class="community-avatar">JB</div>
+                  <div class="community-avatar" style="background:var(--surface);color:var(--muted);font-size:.55rem">+85</div>
+                </div>
+                <div class="module-info">
+                  <div class="module-name">Membres Business actifs</div>
+                  <div class="module-meta">Entrepreneurs sérieux — questions de fond, zéro bruit</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">💬</div>
+                <div class="module-info">
+                  <div class="module-name">Discussions en cours</div>
+                  <div class="module-meta">Sourcing, fiscalité, création société, expat et plus</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 7. PRESTIGE -->
+            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-prestige.html'">
+              <div class="card-head">
+                <div class="card-title">Prestige & XP</div>
+                <div class="card-link">Mon prestige →</div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon" id="dashLevelBadge2" style="font-size:1.2rem">⚪</div>
+                <div class="module-info">
+                  <div class="module-name" id="dashLevelTitle2">Débutant</div>
+                  <div class="module-meta" id="dashXP2">0 XP accumulés</div>
+                </div>
+                <div style="width:90px;flex-shrink:0">
+                  <div style="height:4px;background:var(--subtle);border-radius:2px;overflow:hidden;margin-bottom:3px">
+                    <div id="dashXpBar2" style="height:100%;background:linear-gradient(90deg,var(--gold),#C9A84C);border-radius:2px;width:0%;transition:width 1s ease"></div>
+                  </div>
+                  <div style="font-size:.62rem;color:var(--muted);text-align:right" id="dashXpNext2">150 XP → Apprenti</div>
+                </div>
+              </div>
+              <div class="module-row">
+                <div class="module-icon">🎁</div>
+                <div class="module-info">
+                  <div class="module-name">Récompenses disponibles</div>
+                  <div class="module-meta">Accès Agent IA, jours Pro offerts et plus</div>
+                </div>
+                <div class="card-link">Voir →</div>
+              </div>
+            </div>
+
           </div>
 
-          <!-- RIGHT SIDEBAR -->
+          <!-- RIGHT SIDEBAR — desktop uniquement -->
           <div class="right-sidebar">
-
-            <!-- ABONNEMENT -->
             <div class="sub-card" style="cursor:pointer" onclick="window.location.href='membre-prestige.html'">
               <div class="sub-label">Mon Prestige</div>
               <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
@@ -765,14 +857,12 @@
               <div style="height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:5px">
                 <div id="dashXpBar" style="height:100%;border-radius:2px;width:0%;transition:width 1s ease;background:linear-gradient(90deg,#A67C3A,#C9A84C)"></div>
               </div>
-              <div style="font-size:.68rem;color:rgba(255,255,255,.25)" id="dashXpNext">Encore 100 XP pour Apprenti</div>
+              <div style="font-size:.68rem;color:rgba(255,255,255,.25)" id="dashXpNext">Encore 150 XP pour Apprenti</div>
               <div class="sub-btn" style="margin-top:14px">Voir mon prestige →</div>
             </div>
-
-            <!-- COMMUNAUTÉ -->
             <div class="community-card">
               <div class="community-header">
-                <div class="card-title">Groupe privé Business</div>
+                <div class="card-title">Groupe privé<span style="font-size:.55rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);border:1px solid rgba(166,124,58,.25);padding:1px 7px;border-radius:8px;margin-left:6px">Business</span></div>
                 <div class="card-link" style="color:var(--gold)">Business</div>
               </div>
               <div class="community-body">
@@ -784,11 +874,9 @@
                   <div class="community-avatar" style="background:var(--surface);color:var(--muted);font-size:0.58rem">+85</div>
                 </div>
                 <div class="community-text">Des entrepreneurs sérieux, des questions de fond, zéro bruit.</div>
-                <div class="community-btn" onclick="accessGroupe()">Rejoindre le groupe →</div>
+                <div class="community-btn" onclick="window.location.href='membre-chat.html'">Rejoindre le groupe →</div>
               </div>
             </div>
-
-            <!-- BONS PLANS -->
             <div class="card">
               <div class="card-head">
                 <div class="card-title">Bons Plans du moment</div>
@@ -796,40 +884,24 @@
               </div>
               <div class="deal-row">
                 <div class="deal-icon">💳</div>
-                <div>
-                  <div class="deal-name">Airwallex</div>
-                  <div class="deal-desc">Compte multi-devises offert</div>
-                </div>
+                <div><div class="deal-name">Airwallex</div><div class="deal-desc">Compte multi-devises offert</div></div>
                 <div class="deal-link">→</div>
               </div>
               <div class="deal-row">
                 <div class="deal-icon">💸</div>
-                <div>
-                  <div class="deal-name">Wise</div>
-                  <div class="deal-desc">Frais offerts sur 1er virement</div>
-                </div>
+                <div><div class="deal-name">Wise</div><div class="deal-desc">Frais offerts sur 1er virement</div></div>
                 <div class="deal-link">→</div>
               </div>
               <div class="deal-row">
                 <div class="deal-icon">🏢</div>
-                <div>
-                  <div class="deal-name">LegalPlace</div>
-                  <div class="deal-desc">-20% sur la création de société</div>
-                </div>
+                <div><div class="deal-name">LegalPlace</div><div class="deal-desc">-20% sur la création de société</div></div>
                 <div class="deal-link">→</div>
               </div>
             </div>
+          </div>
 
-            </div>
+        </div>
 
-            <!-- FOURNISSEURS -->
-            <div style="background:#fff;border:0.5px solid rgba(0,0,0,0.08);border-radius:10px;padding:1.2rem;cursor:pointer" onclick="accessFournisseurs & Contacts Business()">
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem">
-                <div style="font-size:0.82rem;font-weight:500">📦 Fournisseurs & Contacts Business</div>
-                <div style="font-size:0.6rem;font-weight:600;background:rgba(166,124,58,0.1);color:var(--gold);border:1px solid rgba(166,124,58,0.2);padding:2px 8px;border-radius:10px">Pro</div>
-              </div>
-              <div style="font-size:0.75rem;color:var(--muted);line-height:1.55;margin-bottom:0.8rem">Fournisseurs & Contacts Business vérifiés SBW mis à jour chaque mois — textile, électronique, cosmétique et plus.</div>
-              <div style="font-size:0.75rem;font-weight:500;color:var(--gold)">Voir l'annuaire →</div>
             </div>
 
             <!-- UPGRADE -->
@@ -978,17 +1050,13 @@
       <span class="icon">🎓</span>
       <span>Formations</span>
     </button>
-    <button class="mobile-nav-item" onclick="window.location.href='membre-annuaire.html'">
-      <span class="icon">📦</span>
-      <span>Contacts</span>
-    </button>
     <button class="mobile-nav-item" onclick="window.location.href='membre-chat.html'">
       <span class="icon">💬</span>
       <span>Groupe</span>
     </button>
-    <button class="mobile-nav-item" onclick="window.location.href='membre-prestige.html'">
-      <span class="icon">⭐</span>
-      <span>Prestige</span>
+    <button class="mobile-nav-item" onclick="window.location.href='membre-affiliation.html'">
+      <span class="icon">💸</span>
+      <span>Affiliation</span>
     </button>
     <button class="mobile-nav-item" id="mbn-compte" onclick="showSection('compte', this)">
       <span class="icon">👤</span>
@@ -1060,6 +1128,20 @@
         if (next) next.textContent = "🌟 Niveau maximum atteint !";
       }
 
+      // Sync vers carte Prestige du dashboard (mobile)
+      var b2 = document.getElementById("dashLevelBadge2"); if (b2) b2.textContent = l.badge;
+      var t2 = document.getElementById("dashLevelTitle2"); if (t2) t2.textContent = l.title;
+      var x2 = document.getElementById("dashXP2"); if (x2) x2.textContent = xp + " XP";
+      var bar2 = document.getElementById("dashXpBar2");
+      var next2 = document.getElementById("dashXpNext2");
+      if (bar2 && nextL) {
+        setTimeout(function() { bar2.style.width = Math.min(100, Math.round((xp - l.xp) / (nextL.xp - l.xp) * 100)) + "%"; }, 200);
+        if (next2) next2.textContent = (nextL.xp - xp) + " XP → " + nextL.title;
+      } else if (bar2) {
+        bar2.style.width = "100%";
+        if (next2) next2.textContent = "🌟 Max atteint !";
+      }
+
       // Sync vers le bloc XP du welcome banner (mobile)
       var wEmoji = document.getElementById("welcomeXpEmoji");
       var wNum = document.getElementById("welcomeXpNum");
@@ -1103,6 +1185,21 @@
     renderStats()
     renderModuleProgress()
     loadDashPrestige()
+    loadDashLive()
+  }
+
+  async function loadDashLive() {
+    var el = document.getElementById('dashNextLiveDate')
+    if (!el) return
+    try {
+      const { data } = await sb.from('lives').select('titre,live_date').eq('statut','upcoming').order('live_date').limit(1).maybeSingle()
+      if (data?.live_date) {
+        var d = new Date(data.live_date)
+        el.textContent = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }) + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
+      } else {
+        el.textContent = 'Date à confirmer prochainement'
+      }
+    } catch(e) { el.textContent = 'Date à confirmer' }
   }
 
   function renderUser() {
