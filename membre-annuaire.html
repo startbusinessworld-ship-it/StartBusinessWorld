@@ -418,9 +418,11 @@ function revealContact(id) {
   var btn = document.getElementById('btn-' + id);
 
   contactEl.innerHTML =
-    (f.email ? '<div class="contact-row"><span class="contact-label">Email</span><span class="contact-val">' + escHtml(f.email) + '</span></div>' : '') +
-    (f.wechat ? '<div class="contact-row"><span class="contact-label">WeChat</span><span class="contact-val">' + escHtml(f.wechat) + '</span></div>' : '') +
-    (f.site ? '<div class="contact-row"><span class="contact-label">Site</span><a href="https://' + escHtml(f.site) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.site) + ' ↗</a></div>' : '');
+    (f.phone || f['Téléphone'] ? '<div class="contact-row"><span class="contact-label">📱 WhatsApp</span><span class="contact-val">' + escHtml(f.phone || f['Téléphone'] || '') + '</span></div>' : '') +
+    (f.email ? '<div class="contact-row"><span class="contact-label">📧 Email</span><span class="contact-val">' + escHtml(f.email) + '</span></div>' : '') +
+    (f.wechat ? '<div class="contact-row"><span class="contact-label">💬 WeChat</span><span class="contact-val">' + escHtml(f.wechat) + '</span></div>' : '') +
+    (f.linkedin ? '<div class="contact-row"><span class="contact-label">🔗 LinkedIn</span><a href="https://' + escHtml(f.linkedin) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.linkedin) + ' ↗</a></div>' : '') +
+    (f.site ? '<div class="contact-row"><span class="contact-label">🌐 Site</span><a href="https://' + escHtml(f.site) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.site) + ' ↗</a></div>' : '');
 
   btn.className = 'reveal-btn revealed';
   btn.innerHTML = '✓ Coordonnées affichées';
