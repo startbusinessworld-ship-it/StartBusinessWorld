@@ -1217,14 +1217,7 @@
   }
 
   function accessFournisseurs() {
-    if (currentMember?.plan === 'pro' || currentMember?.plan === 'business') {
-      window.location.href = 'membre-fournisseurs.html'
-    } else {
-      document.getElementById('modalIcon').textContent = '📦'
-      document.getElementById('modalTitle').textContent = 'Accède à l\'annuaire fournisseurs'
-      document.getElementById('modalDesc').textContent = 'Des fournisseurs vérifiés par SBW — textile, électronique, cosmétique et plus. Mis à jour chaque mois. Inclus dans le plan Pro.'
-      document.getElementById('modalBusiness').style.display = 'flex'
-    }
+    window.location.href = 'membre-fournisseurs.html'
   }
     if (currentMember?.plan === 'business') {
       window.location.href = 'membre-chat.html'
