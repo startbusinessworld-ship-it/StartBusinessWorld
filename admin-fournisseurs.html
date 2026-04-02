@@ -286,7 +286,7 @@ function applyFilters() {
   let list = allData.filter(f => {
     const matchSearch = !search ||
       (f.nom||'').toLowerCase().includes(search) ||
-      (f.desc||'').toLowerCase().includes(search) ||
+      (f.description||'').toLowerCase().includes(search) ||
       (f.pays||'').toLowerCase().includes(search) ||
       (f.region||'').toLowerCase().includes(search);
     const matchCat = !cat || f.categorie === cat;
@@ -337,7 +337,7 @@ function render(list) {
           </div>
         </div>
       </div>
-      <div class="f-card-body">${f.desc || '—'}</div>
+      <div class="f-card-body">${f.description || '—'}</div>
       <div class="f-card-specs">
         ${f.pays ? `<span class="f-spec">📍 ${f.pays}${f.region ? ' · ' + f.region : ''}</span>` : ''}
         ${f.type ? `<span class="f-spec">${f.type}</span>` : ''}
@@ -390,7 +390,7 @@ async function saveFournisseur() {
     moq: document.getElementById('fMoq').value.trim(),
     delai: document.getElementById('fDelai').value.trim(),
     prix_range: document.getElementById('fPrix').value.trim(),
-    desc: document.getElementById('fDesc').value.trim(),
+    description: document.getElementById('fDesc').value.trim(),
     email: document.getElementById('fEmail').value.trim(),
     phone: document.getElementById('fPhone').value.trim(),
     wechat: document.getElementById('fWechat').value.trim(),
@@ -400,12 +400,21 @@ async function saveFournisseur() {
     nouveaute: document.getElementById('fNouveaute').checked,
   };
   if (!payload.nom) { alert('Le nom est obligatoire.'); return; }
+
+  let res;
   if (id) {
-    await sb.from('annuaire').update(payload).eq('id', id);
+    res = await sb.from('annuaire').update(payload).eq('id', id);
   } else {
     payload.created_at = new Date().toISOString();
-    await sb.from('annuaire').insert(payload);
+    res = await sb.from('annuaire').insert(payload);
   }
+
+  if (res.error) {
+    alert('Erreur Supabase : ' + res.error.message);
+    console.error(res.error);
+    return;
+  }
+
   closeModal();
   load();
 }
