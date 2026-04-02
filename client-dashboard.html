@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="sbw-tracker.js"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -465,15 +466,15 @@
         Articles & Ressources
       </div>
       <div class="nav-label">Communauté</div>
-      <div class="nav-item" onclick="window.location.href='membre-chat.html'" style="opacity:0.45;cursor:not-allowed" title="Plan Business requis">
+      <div class="nav-item" onclick="accessGroupe()">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/><path d="M11 3c1.5.5 2.5 1.9 2.5 3.5S12.5 9.5 11 10"/><path d="M13 14c1-1 2-2 2-4"/></svg>
         Groupe privé
-        <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">🔒</span>
+        <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">Business</span>
       </div>
-      <div class="nav-item" onclick="showSection('live', this)" style="opacity:0.45;cursor:not-allowed" title="Plan Business requis">
+      <div class="nav-item" onclick="accessLive()">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><polygon points="6.5 5.5 11.5 8 6.5 10.5 6.5 5.5"/></svg>
         Live mensuel
-        <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">🔒</span>
+        <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">Business</span>
       </div>
       <div class="nav-item" onclick="showSection('bonsplans', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
@@ -712,7 +713,7 @@
             <div class="community-card">
               <div class="community-header">
                 <div class="card-title">Groupe privé Business</div>
-                <div class="card-link" style="color:var(--gold)">Plan Business</div>
+                <div class="card-link" style="color:var(--gold)">Business</div>
               </div>
               <div class="community-body">
                 <div class="community-avatars">
@@ -722,8 +723,8 @@
                   <div class="community-avatar">JB</div>
                   <div class="community-avatar" style="background:var(--surface);color:var(--muted);font-size:0.58rem">+85</div>
                 </div>
-                <div class="community-text">Réservé aux membres Business — entrepreneurs sérieux, questions de fond, zéro bruit.</div>
-                <div class="community-btn" style="opacity:0.4;cursor:not-allowed;background:rgba(255,255,255,0.05);color:rgba(240,237,228,0.4);border:1px solid rgba(255,255,255,0.08)">🔒 Disponible en plan Business (149€/mois)</div>
+                <div class="community-text">Des entrepreneurs sérieux, des questions de fond, zéro bruit.</div>
+                <div class="community-btn" onclick="accessGroupe()">Rejoindre le groupe →</div>
               </div>
             </div>
 
@@ -867,6 +868,33 @@
   </main>
 </div>
 
+<!-- MODAL UPSELL BUSINESS -->
+<div id="modalBusiness" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1.5rem">
+  <div style="background:#111008;border:1px solid rgba(166,124,58,0.3);border-radius:14px;padding:2.5rem;max-width:420px;width:100%;position:relative">
+    <button onclick="closeModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(240,237,228,0.3);font-size:1.2rem;cursor:pointer">✕</button>
+    <div style="font-size:2rem;margin-bottom:1rem" id="modalIcon">💬</div>
+    <div style="font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem">Plan Business requis</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1.2;margin-bottom:0.8rem;color:#F0EDE4" id="modalTitle">Accède au groupe privé</div>
+    <div style="font-size:0.82rem;color:rgba(240,237,228,0.45);line-height:1.7;margin-bottom:2rem" id="modalDesc">Le groupe privé est réservé aux membres Business. Des entrepreneurs sérieux, des questions de fond, zéro bruit.</div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:1rem;margin-bottom:1.5rem">
+      <div style="font-size:0.75rem;color:rgba(240,237,228,0.4);margin-bottom:0.3rem">Plan Business</div>
+      <div style="display:flex;align-items:baseline;gap:0.3rem">
+        <span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">149€</span>
+        <span style="font-size:0.8rem;color:rgba(240,237,228,0.3)">/mois</span>
+      </div>
+      <div style="font-size:0.72rem;color:rgba(240,237,228,0.3);margin-top:0.3rem">Groupe privé · Live mensuel · Avant-première contenu · Sans engagement</div>
+    </div>
+    <button onclick="handleUpgrade(event,'business')" style="width:100%;background:var(--gold);color:#fff;border:none;padding:1rem;border-radius:7px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">Passer au plan Business →</button>
+    <div style="font-size:0.65rem;color:rgba(240,237,228,0.2);text-align:center;margin-top:0.7rem">Sans engagement · Annulation en 1 clic</div>
+  </div>
+</div>
+
+<script>
+  document.getElementById('modalBusiness').addEventListener('click', function(e) {
+    if (e.target === this) closeModal()
+  })
+</script>
+
 <div class="toast" id="toast"></div>
 
 <!-- BOTTOM NAV MOBILE -->
@@ -919,14 +947,22 @@
 
   async function loadDashPrestige() {
     try {
-      var prog = {};
-      try { prog = JSON.parse(localStorage.getItem("sbw_p_" + currentUser.id) || "{}"); } catch(e) {}
-      var leconsCount = Object.values(prog).filter(Boolean).length;
+      // Progression formations
+      var prog = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { totalDone: 0 };
+      var leconsCount = prog.totalDone;
 
+      // Messages depuis Supabase
       var msgRes = await sb.from("messages").select("id", { count:"exact", head:true }).eq("user_id", currentUser.id);
       var msgCount = msgRes.count || 0;
 
-      var xp = (leconsCount * 10) + (msgCount * 2);
+      // Filleuls
+      var affRes = await sb.from("affiliations").select("conversions").eq("user_id", currentUser.id).single();
+      var filleuls = affRes.data ? (affRes.data.conversions || 0) : 0;
+
+      // XP unifié
+      var xp = window.SBW_calcXP ? SBW_calcXP(currentUser.id, msgCount, filleuls)
+        : (leconsCount * 10) + (msgCount * 2);
+
       var level = 1;
       for (var i = DASH_LEVELS.length - 1; i >= 0; i--) {
         if (xp >= DASH_LEVELS[i].xp) { level = DASH_LEVELS[i].num; break; }
@@ -1046,34 +1082,30 @@
   }
 
   function renderStats() {
-    // Calcul réel depuis localStorage
+    // Progression toutes formations confondues
     try {
-      const prog = JSON.parse(localStorage.getItem('sbw_p_' + currentUser.id) || '{}')
-      const leconsVues = Object.values(prog).filter(Boolean).length
-
-      // Estimation temps : 8 min par leçon en moyenne
-      const totalMin = leconsVues * 8
-      const heures = Math.floor(totalMin / 60)
-      const mins = totalMin % 60
-      const tempsLabel = heures > 0 ? `${heures}h${mins > 0 ? mins : ''}` : `${mins}min`
-
-      document.getElementById('statModules').textContent = leconsVues
-      document.getElementById('statTime').textContent = leconsVues > 0 ? tempsLabel : '0min'
+      var prog = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { totalDone: 0, pct: 0 };
+      var totalMin = prog.totalDone * 8
+      var heures = Math.floor(totalMin / 60)
+      var mins = totalMin % 60
+      var tempsLabel = heures > 0 ? (heures + 'h' + (mins > 0 ? mins : '')) : (prog.totalDone > 0 ? mins + 'min' : '0min')
+      document.getElementById('statModules').textContent = prog.totalDone
+      document.getElementById('statTime').textContent = tempsLabel
+      // Progression globale dans le banner
+      document.getElementById('globalProgress').style.width = prog.pct + '%'
+      document.getElementById('globalProgressPct').textContent = prog.pct + '% complété'
     } catch(e) {
       document.getElementById('statModules').textContent = '0'
       document.getElementById('statTime').textContent = '0min'
     }
 
-    // Articles lus depuis localStorage
-    try {
-      const articlesLus = JSON.parse(localStorage.getItem('sbw_articles_' + currentUser.id) || '[]')
-      document.getElementById('statArticles').textContent = articlesLus.length
-    } catch(e) {
-      document.getElementById('statArticles').textContent = '0'
-    }
+    // Articles lus
+    var articlesRead = window.SBW_getArticlesRead ? SBW_getArticlesRead(currentUser.id) : 0
+    document.getElementById('statArticles').textContent = articlesRead
 
     document.getElementById('statSince').textContent = formatDate(currentMember?.created_at)
-    document.getElementById('statPlan').textContent = currentMember?.plan === 'trial' ? 'Période d\'essai' :
+    document.getElementById('statPlan').textContent =
+      currentMember?.plan === 'trial' ? 'Période d\'essai' :
       currentMember?.plan === 'pro' ? 'Plan Pro' :
       currentMember?.plan === 'business' ? 'Plan Business' : 'Plan Basic'
   }
@@ -1131,33 +1163,60 @@
 
   function renderModuleProgress() {
     try {
-      const prog = JSON.parse(localStorage.getItem('sbw_p_' + currentUser.id) || '{}')
+      var allProg = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { byFormation: {} };
+      var by = allProg.byFormation || {};
 
-      // Mapping module → préfixe des clés localStorage + nombre de leçons
-      const modules = [
-        { id: 'mindset',  prefix: 'mindset',   total: 20 },
-        { id: 'fiscalite',prefix: 'fiscalite',  total: 16 },
-        { id: 'hk',       prefix: 'hk',         total: 15 },
-        { id: 'ecom',     prefix: 'ecom',        total: 30 },
-      ]
+      var modules = [
+        { id: 'mindset',   key: 'formation-mindset',               total: 20 },
+        { id: 'fiscalite', key: 'formation-creation-entreprise',   total: 16 },
+        { id: 'hk',        key: 'formation-hong-kong',             total: 15 },
+        { id: 'ecom',      key: 'formation-ecom-module-1',         total: 30 },
+      ];
 
       modules.forEach(function(m) {
-        const done = Object.keys(prog).filter(k => k.startsWith(m.prefix) && prog[k]).length
-        const pct = m.total > 0 ? Math.round(done / m.total * 100) : 0
+        var data = by[m.key] || { done: 0, total: m.total, pct: 0 };
+        var pct = data.pct || 0;
+        var done = data.done || 0;
 
-        const barEl = document.getElementById('prog-' + m.id)
-        const pctEl = document.getElementById('pct-' + m.id)
-        const statusEl = document.getElementById('status-' + m.id)
+        var barEl = document.getElementById('prog-' + m.id);
+        var pctEl = document.getElementById('pct-' + m.id);
+        var statusEl = document.getElementById('status-' + m.id);
 
-        if (barEl) barEl.style.width = pct + '%'
-        if (pctEl) pctEl.textContent = pct + '%'
+        if (barEl) barEl.style.width = pct + '%';
+        if (pctEl) pctEl.textContent = pct + '%';
         if (statusEl) {
           if (pct === 0) { statusEl.textContent = 'À commencer'; statusEl.className = 'module-status'; }
-          else if (pct === 100) { statusEl.textContent = 'Terminé ✓'; statusEl.className = 'module-status status-done'; }
+          else if (pct >= 100) { statusEl.textContent = 'Terminé ✓'; statusEl.className = 'module-status status-done'; }
           else { statusEl.textContent = 'En cours'; statusEl.className = 'module-status status-inprogress'; }
         }
-      })
-    } catch(e) { console.log('Module progress error:', e) }
+      });
+    } catch(e) { console.log('Module progress error:', e); }
+  }
+
+  function accessGroupe() {
+    if (currentMember?.plan === 'business') {
+      window.location.href = 'membre-chat.html'
+    } else {
+      document.getElementById('modalIcon').textContent = '💬'
+      document.getElementById('modalTitle').textContent = 'Accède au groupe privé'
+      document.getElementById('modalDesc').textContent = 'Le groupe privé est réservé aux membres Business. Des entrepreneurs sérieux, des questions de fond, zéro bruit de fond.'
+      document.getElementById('modalBusiness').style.display = 'flex'
+    }
+  }
+
+  function accessLive() {
+    if (currentMember?.plan === 'business') {
+      showSection('live', null)
+    } else {
+      document.getElementById('modalIcon').textContent = '🎥'
+      document.getElementById('modalTitle').textContent = 'Accède au live mensuel'
+      document.getElementById('modalDesc').textContent = 'Chaque mois, pose tes questions en avance et retrouve les réponses en live. Réservé aux membres Business uniquement.'
+      document.getElementById('modalBusiness').style.display = 'flex'
+    }
+  }
+
+  function closeModal() {
+    document.getElementById('modalBusiness').style.display = 'none'
   }
 
   function handleUpgrade(e, plan) {

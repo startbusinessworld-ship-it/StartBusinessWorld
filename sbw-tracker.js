@@ -89,4 +89,104 @@
 
   window.SBWTracker = SBWTracker;
 
+  /**
+   * ─── FONCTIONS GLOBALES (utilisées par dashboard et prestige) ───
+   */
+
+  /**
+   * Agrège la progression de TOUTES les formations depuis localStorage
+   * Retourne { totalDone, totalLessons, pct, byFormation }
+   */
+  window.SBW_getAllFormationsProgress = function() {
+    var totalDone = 0;
+    var totalLessons = 0;
+    var byFormation = {};
+
+    for (var i = 0; i < localStorage.length; i++) {
+      var key = localStorage.key(i);
+      if (!key || !key.startsWith('sbw_tracker__')) continue;
+      try {
+        var data = JSON.parse(localStorage.getItem(key) || '{}');
+        var total = data._total || 0;
+        var done = Object.keys(data).filter(function(k) {
+          return k !== '_total' && k !== '_updated' && data[k] === true;
+        }).length;
+        totalDone += done;
+        totalLessons += total;
+        byFormation[key.replace('sbw_tracker__', '')] = {
+          done: done, total: total,
+          pct: total > 0 ? Math.round(done / total * 100) : 0
+        };
+      } catch(e) {}
+    }
+
+    return {
+      totalDone: totalDone,
+      totalLessons: totalLessons,
+      pct: totalLessons > 0 ? Math.round(totalDone / totalLessons * 100) : 0,
+      byFormation: byFormation
+    };
+  };
+
+  /**
+   * Nombre d'articles lus (stocké comme nombre entier)
+   */
+  window.SBW_getArticlesRead = function(userId) {
+    try { return parseInt(localStorage.getItem('sbw_articles_' + userId) || '0'); } catch(e) { return 0; }
+  };
+
+  /**
+   * Marquer un article comme lu et incrémenter le compteur
+   */
+  window.SBW_markArticleRead = function(userId) {
+    try {
+      var count = parseInt(localStorage.getItem('sbw_articles_' + userId) || '0');
+      localStorage.setItem('sbw_articles_' + userId, String(count + 1));
+    } catch(e) {}
+  };
+
+  /**
+   * Streak (jours consécutifs de connexion)
+   */
+  window.SBW_getStreak = function(userId) {
+    try {
+      var data = JSON.parse(localStorage.getItem('sbw_streak_' + userId) || '{"count":0}');
+      var lastDate = data.lastDate ? new Date(data.lastDate) : null;
+      var today = new Date();
+      today.setHours(0,0,0,0);
+      if (lastDate) {
+        var diffDays = Math.round((today - lastDate) / 86400000);
+        if (diffDays === 1) {
+          // Jour consécutif
+          data.count = (data.count || 0) + 1;
+          data.lastDate = today.toISOString();
+          localStorage.setItem('sbw_streak_' + userId, JSON.stringify(data));
+        } else if (diffDays > 1) {
+          // Streak cassé
+          data.count = 1;
+          data.lastDate = today.toISOString();
+          localStorage.setItem('sbw_streak_' + userId, JSON.stringify(data));
+        }
+        // diffDays === 0 = déjà connecté aujourd'hui, on ne change rien
+      } else {
+        data = { count: 1, lastDate: today.toISOString() };
+        localStorage.setItem('sbw_streak_' + userId, JSON.stringify(data));
+      }
+      return data.count || 0;
+    } catch(e) { return 0; }
+  };
+
+  /**
+   * Calcule le XP total d'un utilisateur
+   * @param {string} userId - ID Supabase de l'utilisateur
+   * @param {number} msgCount - nombre de messages envoyés (depuis Supabase)
+   * @param {number} filleuls - nombre de filleuls (depuis Supabase)
+   */
+  window.SBW_calcXP = function(userId, msgCount, filleuls) {
+    var prog = SBW_getAllFormationsProgress();
+    var articlesRead = SBW_getArticlesRead(userId);
+    var streak = SBW_getStreak(userId);
+    return (prog.totalDone * 10) + (msgCount * 2) + (articlesRead * 5) + (streak * 15) + ((filleuls || 0) * 50);
+  };
+
 })();

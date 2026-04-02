@@ -6,6 +6,7 @@
 <title>Mon Prestige — Club SBW</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="sbw-tracker.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);--muted:#888;--gold:#A67C3A;--red:#C0392B;--dark:#0E0D0B}
@@ -339,33 +340,35 @@ async function init() {
 }
 
 async function loadMyXp() {
-  // Compter les messages envoyés
+  // Messages envoyés depuis Supabase
   var msgRes = await SB.from("messages").select("id", { count:"exact", head:true }).eq("user_id", user.id);
   var msgCount = msgRes.count || 0;
-
-  // Compter les leçons terminées depuis localStorage
-  var prog = {};
-  try { prog = JSON.parse(localStorage.getItem("sbw_p_" + user.id) || "{}"); } catch(e) {}
-  var leconsCount = Object.values(prog).filter(Boolean).length;
-
-  // Compter les articles lus
-  var articlesRead = 0;
-  try { articlesRead = parseInt(localStorage.getItem("sbw_articles_" + user.id) || "0"); } catch(e) {}
-
-  // Streak (jours consécutifs)
-  var streak = 0;
-  try { streak = parseInt(localStorage.getItem("sbw_streak_" + user.id) || "0"); } catch(e) {}
 
   // Filleuls parrainés
   var affRes = await SB.from("affiliations").select("conversions").eq("user_id", user.id).single();
   var filleuls = affRes.data ? (affRes.data.conversions || 0) : 0;
 
-  // Calculer XP total
+  // Progression formations (toutes formations confondues)
+  var prog = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { totalDone: 0 };
+  var leconsCount = prog.totalDone;
+
+  // Articles lus
+  var articlesRead = window.SBW_getArticlesRead ? SBW_getArticlesRead(user.id) : 0;
+
+  // Streak
+  var streak = window.SBW_getStreak ? SBW_getStreak(user.id) : 0;
+
+  // XP total
   var xp = (leconsCount * 10) + (msgCount * 2) + (articlesRead * 5) + (streak * 15) + (filleuls * 50);
+
   var level = 1;
   for (var i = LEVELS.length - 1; i >= 0; i--) {
     if (xp >= LEVELS[i].xp) { level = LEVELS[i].num; break; }
   }
+
+  // Prénom depuis metadata ou email
+  var fullName = user.user_metadata?.full_name || '';
+  var displayName = fullName ? fullName.split(' ')[0] : user.email.split('@')[0];
 
   myXp = {
     xp: xp, level: level,
@@ -374,7 +377,7 @@ async function loadMyXp() {
     articles_read: articlesRead,
     streak: streak,
     filleuls: filleuls,
-    user_name: user.email.split("@")[0]
+    user_name: displayName
   };
 
   // Upsert dans Supabase pour le Hall of Fame
@@ -388,7 +391,6 @@ async function loadMyXp() {
     streak: streak,
     updated_at: new Date().toISOString()
   }, { onConflict: "user_id" });
-  // Mettre à jour le compteur filleuls dans affiliations (déjà dans la table)
 }
 
 function renderHero() {
