@@ -318,6 +318,42 @@
     .toast.show { opacity: 1; transform: translateY(0); }
     .toast.success { border-left: 3px solid #3B6D11; }
 
+    /* UPGRADE CARD */
+    .upgrade-card {
+      background: linear-gradient(135deg, #111008 0%, #0E0D0B 100%);
+      border: 1px solid rgba(166,124,58,0.25);
+      border-radius: 10px; padding: 1.5rem;
+    }
+    .upgrade-label {
+      font-size: 0.6rem; font-weight: 600; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 0.8rem;
+    }
+    .upgrade-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.15rem; line-height: 1.2; margin-bottom: 0.6rem;
+    }
+    .upgrade-title i { color: var(--gold); font-style: italic; }
+    .upgrade-desc {
+      font-size: 0.75rem; color: rgba(240,237,228,0.38);
+      line-height: 1.6; font-weight: 300; margin-bottom: 1.2rem;
+    }
+    .upgrade-plans { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.2rem; }
+    .upgrade-plan {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 7px; padding: 0.8rem 1rem;
+      cursor: pointer; transition: border-color 0.15s, background 0.15s;
+      text-decoration: none; color: inherit;
+    }
+    .upgrade-plan:hover { border-color: rgba(166,124,58,0.3); background: rgba(166,124,58,0.05); }
+    .upgrade-plan.featured { border-color: rgba(166,124,58,0.35); background: rgba(166,124,58,0.06); }
+    .upgrade-plan-name { font-size: 0.82rem; font-weight: 500; }
+    .upgrade-plan-desc { font-size: 0.68rem; color: rgba(240,237,228,0.35); margin-top: 1px; }
+    .upgrade-plan-price { font-family: 'DM Serif Display', serif; font-size: 1.1rem; color: var(--gold); }
+    .upgrade-plan-price span { font-size: 0.65rem; color: rgba(240,237,228,0.3); font-family: 'DM Sans', sans-serif; }
+    .upgrade-note { font-size: 0.65rem; color: rgba(240,237,228,0.2); text-align: center; }
+    .status-pro { background: rgba(166,124,58,0.12); color: var(--gold); border: 1px solid rgba(166,124,58,0.2); }
+
     /* RESPONSIVE */
     /* ── BOTTOM NAV MOBILE ── */
     .mobile-nav {
@@ -525,7 +561,7 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
                   <div class="module-progress-pct">0%</div>
                 </div>
-                <span class="module-status status-locked">À débloquer</span>
+                <span class="module-status status-pro">Plan Pro ↑</span>
               </div>
               <div class="module-row">
                 <div class="module-icon">🏛️</div>
@@ -537,7 +573,7 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
                   <div class="module-progress-pct">0%</div>
                 </div>
-                <span class="module-status status-locked">À débloquer</span>
+                <span class="module-status status-pro">Plan Pro ↑</span>
               </div>
               <div class="module-row">
                 <div class="module-icon">📦</div>
@@ -549,7 +585,7 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
                   <div class="module-progress-pct">0%</div>
                 </div>
-                <span class="module-status status-locked">À débloquer</span>
+                <span class="module-status status-pro">Plan Pro ↑</span>
               </div>
               <div class="module-row">
                 <div class="module-icon">✈️</div>
@@ -561,7 +597,7 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
                   <div class="module-progress-pct">0%</div>
                 </div>
-                <span class="module-status status-locked">À débloquer</span>
+                <span class="module-status status-pro">Plan Pro ↑</span>
               </div>
             </div>
 
@@ -676,11 +712,35 @@
               </div>
             </div>
 
+            </div>
+
+            <!-- UPGRADE -->
+            <div class="upgrade-card">
+              <div class="upgrade-label">◆ Passe au niveau supérieur</div>
+              <div class="upgrade-title">Tu veux aller<br><i>plus loin ?</i></div>
+              <div class="upgrade-desc">Accède aux formations vidéo, aux fournisseurs mis à jour et au groupe privé.</div>
+              <div class="upgrade-plans">
+                <a href="#" class="upgrade-plan featured" onclick="handleUpgrade(event,'pro')">
+                  <div>
+                    <div class="upgrade-plan-name">Plan Pro</div>
+                    <div class="upgrade-plan-desc">Vidéos + fournisseurs + outils</div>
+                  </div>
+                  <div class="upgrade-plan-price">79€<span>/mois</span></div>
+                </a>
+                <a href="#" class="upgrade-plan" onclick="handleUpgrade(event,'business')">
+                  <div>
+                    <div class="upgrade-plan-name">Plan Business</div>
+                    <div class="upgrade-plan-desc">Pro + groupe privé + live mensuel</div>
+                  </div>
+                  <div class="upgrade-plan-price">149€<span>/mois</span></div>
+                </a>
+              </div>
+              <div class="upgrade-note">Sans engagement · Prix plein immédiat · Annulation 1 clic</div>
+            </div>
+
           </div>
         </div>
       </div>
-
-      <!-- PLACEHOLDER SECTIONS -->
       <div id="sectionFormations" style="display:none">
         <div class="card" style="padding:3rem;text-align:center">
           <div style="font-size:2rem;margin-bottom:1rem">🎬</div>
@@ -947,6 +1007,13 @@
   async function handleLogout() {
     await sb.auth.signOut()
     window.location.href = 'index.html'
+  }
+
+  function handleUpgrade(e, plan) {
+    e.preventDefault()
+    const prices = { pro: '79€/mois', business: '149€/mois' }
+    // TODO: Connecter Stripe
+    alert('Upgrade vers le plan ' + plan.charAt(0).toUpperCase() + plan.slice(1) + ' (' + prices[plan] + ') — Stripe à connecter !')
   }
 
   function formatDate(str) {
