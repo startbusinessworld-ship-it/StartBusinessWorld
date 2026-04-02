@@ -317,17 +317,20 @@ async function init() {
 }
 
 async function loadFournisseurs() {
-  // Essaie de charger depuis Supabase
   var res = await SB.from('annuaire').select('*').order('created_at', { ascending: false });
 
-  if (res.data && res.data.length > 0) {
+  if (res.error) {
+    console.error('Supabase error:', res.error);
+    document.getElementById('totalCount').textContent = 'Erreur: ' + res.error.message;
+    allFournisseurs = SAMPLE_DATA;
+  } else if (res.data && res.data.length > 0) {
     allFournisseurs = res.data;
   } else {
-    // Données de démonstration
+    // Table vide — afficher données de démo
     allFournisseurs = SAMPLE_DATA;
   }
 
-  document.getElementById('totalCount').textContent = allFournisseurs.length + ' fournisseurs';
+  document.getElementById('totalCount').textContent = allFournisseurs.length + ' contacts';
   renderGrid(allFournisseurs);
 }
 
@@ -344,7 +347,7 @@ function applyFilters() {
     var matchCat = currentFilter === 'tous' || f.categorie === currentFilter;
     var matchSearch = !search ||
       f.nom.toLowerCase().includes(search) ||
-      (f.desc || '').toLowerCase().includes(search) ||
+      (f.description || '').toLowerCase().includes(search) ||
       (f.region || '').toLowerCase().includes(search);
     return matchCat && matchSearch;
   });
@@ -385,7 +388,7 @@ function makeCard(f) {
       '<div class="fourn-location">📍 ' + escHtml(f.region || f.pays || '') + ' · ' + escHtml(f.type || '') + '</div>' +
     '</div>' +
     '<div class="fourn-card-body">' +
-      '<div class="fourn-desc">' + escHtml(f.desc || '') + '</div>' +
+      '<div class="fourn-desc">' + escHtml(f.description || '') + '</div>' +
       '<div class="fourn-specs">' +
         '<div class="fourn-spec"><span class="fourn-spec-label">Tarif / MOQ</span><span class="fourn-spec-val">' + escHtml(f.moq || '—') + '</span></div>' +
         '<div class="fourn-spec"><span class="fourn-spec-label">Délai</span><span class="fourn-spec-val">' + escHtml(f.delai || '—') + '</span></div>' +
