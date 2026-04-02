@@ -368,6 +368,51 @@ function renderGrid(list) {
   });
 }
 
+function getFlag(pays) {
+  var flags = {
+    'Chine': '🇨🇳', 'China': '🇨🇳',
+    'Hong Kong': '🇭🇰',
+    'France': '🇫🇷',
+    'Émirats Arabes Unis': '🇦🇪', 'Dubai': '🇦🇪', 'EAU': '🇦🇪',
+    'Inde': '🇮🇳', 'India': '🇮🇳',
+    'Turquie': '🇹🇷', 'Turkey': '🇹🇷',
+    'Bangladesh': '🇧🇩',
+    'Vietnam': '🇻🇳',
+    'Maroc': '🇲🇦', 'Morocco': '🇲🇦',
+    'Sénégal': '🇸🇳',
+    'Portugal': '🇵🇹',
+    'Espagne': '🇪🇸',
+    'Italie': '🇮🇹',
+    'Allemagne': '🇩🇪',
+    'Royaume-Uni': '🇬🇧',
+    'International': '🌍',
+  };
+  if (!pays) return '🌍';
+  for (var key in flags) {
+    if (pays.toLowerCase().includes(key.toLowerCase())) return flags[key];
+  }
+  return '🌍';
+}
+
+function cleanPhone(phone) {
+  // Convertit +8613... en format international WhatsApp
+  if (!phone) return '';
+  return phone.replace(/\s+/g, '');
+}
+
+function makeWhatsAppUrl(phone) {
+  var clean = cleanPhone(phone);
+  // Supprimer le + pour l'URL WhatsApp
+  var num = clean.replace(/^\+/, '');
+  return 'https://wa.me/' + num;
+}
+
+function cleanSiteUrl(site) {
+  if (!site) return '';
+  // Supprimer https:// ou http:// s'il est déjà présent
+  return site.replace(/^https?:\/\//i, '');
+}
+
 function makeCard(f) {
   var card = document.createElement('div');
   card.className = 'fourn-card';
@@ -376,6 +421,7 @@ function makeCard(f) {
   var catEmojis = {fournisseur:'🏭',logistique:'🚢',societe:'🏢',visa:'🛂',finance:'💳',sourcing:'🤝',juridique:'⚖️',autre:'📦'};
   var catEmoji = catEmojis[f.categorie] || '📦';
   var catLabel = f.categorie ? f.categorie.charAt(0).toUpperCase() + f.categorie.slice(1) : '';
+  var flag = getFlag(f.pays);
 
   card.innerHTML =
     '<div class="fourn-card-top">' +
@@ -385,7 +431,7 @@ function makeCard(f) {
         (f.nouveaute ? '<span style="font-size:.6rem;font-weight:600;background:rgba(166,124,58,.1);color:var(--gold);padding:2px 8px;border-radius:10px">🆕 Nouveau</span>' : '') +
       '</div>' +
       '<div class="fourn-name">' + escHtml(f.nom) + '</div>' +
-      '<div class="fourn-location">📍 ' + escHtml(f.region || f.pays || '') + ' · ' + escHtml(f.type || '') + '</div>' +
+      '<div class="fourn-location">' + flag + ' ' + escHtml(f.region || f.pays || '') + (f.type ? ' · ' + escHtml(f.type) : '') + '</div>' +
     '</div>' +
     '<div class="fourn-card-body">' +
       '<div class="fourn-desc">' + escHtml(f.description || '') + '</div>' +
@@ -403,10 +449,8 @@ function makeCard(f) {
       '</button>' +
     '</div>';
 
-  // Stocker les données pour reveal
   card._data = f;
   card.dataset.id = f.id;
-
   return card;
 }
 
@@ -414,15 +458,29 @@ function revealContact(id) {
   var f = allFournisseurs.find(function(x) { return x.id == id; });
   if (!f) return;
 
+  var phone = f.phone || f['Téléphone'] || '';
+  var site = cleanSiteUrl(f.site || '');
+
   var contactEl = document.getElementById('contact-' + id);
   var btn = document.getElementById('btn-' + id);
 
   contactEl.innerHTML =
-    (f.phone || f['Téléphone'] ? '<div class="contact-row"><span class="contact-label">📱 WhatsApp</span><span class="contact-val">' + escHtml(f.phone || f['Téléphone'] || '') + '</span></div>' : '') +
-    (f.email ? '<div class="contact-row"><span class="contact-label">📧 Email</span><span class="contact-val">' + escHtml(f.email) + '</span></div>' : '') +
-    (f.wechat ? '<div class="contact-row"><span class="contact-label">💬 WeChat</span><span class="contact-val">' + escHtml(f.wechat) + '</span></div>' : '') +
-    (f.linkedin ? '<div class="contact-row"><span class="contact-label">🔗 LinkedIn</span><a href="https://' + escHtml(f.linkedin) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.linkedin) + ' ↗</a></div>' : '') +
-    (f.site ? '<div class="contact-row"><span class="contact-label">🌐 Site</span><a href="https://' + escHtml(f.site) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.site) + ' ↗</a></div>' : '');
+    (phone ?
+      '<div class="contact-row"><span class="contact-label">📱 WhatsApp</span>' +
+      '<a href="' + makeWhatsAppUrl(phone) + '" target="_blank" style="color:#16a34a;font-weight:600;font-size:.78rem;display:flex;align-items:center;gap:4px">' +
+      escHtml(phone) + ' <span style="font-size:.65rem;background:#16a34a;color:#fff;padding:2px 6px;border-radius:4px">Ouvrir →</span></a></div>' : '') +
+    (f.email ?
+      '<div class="contact-row"><span class="contact-label">📧 Email</span>' +
+      '<a href="mailto:' + escHtml(f.email) + '" style="color:var(--gold);font-size:.75rem;font-weight:500">' + escHtml(f.email) + '</a></div>' : '') +
+    (f.wechat ?
+      '<div class="contact-row"><span class="contact-label">💬 WeChat</span>' +
+      '<span class="contact-val">' + escHtml(f.wechat) + '</span></div>' : '') +
+    (f.linkedin ?
+      '<div class="contact-row"><span class="contact-label">🔗 LinkedIn</span>' +
+      '<a href="https://' + escHtml(cleanSiteUrl(f.linkedin)) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.linkedin) + ' ↗</a></div>' : '') +
+    (site ?
+      '<div class="contact-row"><span class="contact-label">🌐 Site</span>' +
+      '<a href="https://' + escHtml(site) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(site) + ' ↗</a></div>' : '');
 
   btn.className = 'reveal-btn revealed';
   btn.innerHTML = '✓ Coordonnées affichées';
