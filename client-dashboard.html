@@ -151,6 +151,28 @@
     }
     .welcome-text h2 i { color: var(--gold); font-style: italic; }
     .welcome-text p { font-size: 0.82rem; color: rgba(240,237,228,0.45); font-weight: 300; }
+    .welcome-xp {
+      display: none; /* caché sur desktop — visible sur mobile */
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px; padding: 0.75rem 1rem;
+      cursor: pointer; transition: border-color 0.15s;
+      text-decoration: none; color: inherit;
+    }
+    .welcome-xp:hover { border-color: rgba(166,124,58,0.3); }
+    .welcome-xp-top { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.5rem; }
+    .welcome-xp-badge { font-size: 1.2rem; }
+    .welcome-xp-info { flex: 1; }
+    .welcome-xp-level { font-size: 0.65rem; color: rgba(240,237,228,0.3); text-transform: uppercase; letter-spacing: 0.08em; }
+    .welcome-xp-name { font-size: 0.88rem; font-weight: 500; }
+    .welcome-xp-pts { font-size: 0.72rem; color: var(--gold); font-weight: 500; }
+    .welcome-xp-bar-wrap { height: 3px; background: rgba(255,255,255,0.08); border-radius: 2px; overflow: hidden; margin-bottom: 0.3rem; }
+    .welcome-xp-bar-fill { height: 100%; background: linear-gradient(90deg, #A67C3A, #C9A84C); border-radius: 2px; transition: width 1s ease; }
+    .welcome-xp-next { font-size: 0.62rem; color: rgba(240,237,228,0.25); display: flex; justify-content: space-between; }
+    @media (max-width: 768px) {
+      .welcome-xp { display: block; }
+    }
     .welcome-progress { text-align: right; flex-shrink: 0; }
     .progress-label { font-size: 0.65rem; color: rgba(240,237,228,0.3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.5rem; }
     .progress-bar-wrap { width: 160px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
@@ -443,9 +465,15 @@
         Articles & Ressources
       </div>
       <div class="nav-label">Communauté</div>
-      <div class="nav-item" onclick="window.location.href='membre-chat.html'">
+      <div class="nav-item" onclick="window.location.href='membre-chat.html'" style="opacity:0.45;cursor:not-allowed" title="Plan Business requis">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/><path d="M11 3c1.5.5 2.5 1.9 2.5 3.5S12.5 9.5 11 10"/><path d="M13 14c1-1 2-2 2-4"/></svg>
-        Groupe d'entraide
+        Groupe privé
+        <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">🔒</span>
+      </div>
+      <div class="nav-item" onclick="showSection('live', this)" style="opacity:0.45;cursor:not-allowed" title="Plan Business requis">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><polygon points="6.5 5.5 11.5 8 6.5 10.5 6.5 5.5"/></svg>
+        Live mensuel
+        <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">🔒</span>
       </div>
       <div class="nav-item" onclick="showSection('bonsplans', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
@@ -493,11 +521,29 @@
       <!-- DASHBOARD -->
       <div id="sectionDashboard">
 
-        <!-- WELCOME -->
         <div class="welcome-banner">
           <div class="welcome-text">
             <h2>Bonjour, <i id="welcomeName">membre</i> 👋</h2>
             <p>Continue là où tu t'es arrêté — tu as encore du contenu à explorer.</p>
+
+            <!-- XP inline — visible mobile uniquement -->
+            <a href="membre-prestige.html" class="welcome-xp" id="welcomeXpBlock">
+              <div class="welcome-xp-top">
+                <div class="welcome-xp-badge" id="welcomeXpEmoji">⚪</div>
+                <div class="welcome-xp-info">
+                  <div class="welcome-xp-level">Niveau <span id="welcomeXpNum">1</span></div>
+                  <div class="welcome-xp-name" id="welcomeXpTitle">Débutant</div>
+                </div>
+                <div class="welcome-xp-pts" id="welcomeXpPts">0 XP</div>
+              </div>
+              <div class="welcome-xp-bar-wrap">
+                <div class="welcome-xp-bar-fill" id="welcomeXpBar" style="width:0%"></div>
+              </div>
+              <div class="welcome-xp-next">
+                <span>Progression</span>
+                <span id="welcomeXpNextLabel">Encore 150 XP pour débloquer l'Agent IA</span>
+              </div>
+            </a>
           </div>
           <div class="welcome-progress">
             <div class="progress-label">Progression globale</div>
@@ -665,8 +711,8 @@
             <!-- COMMUNAUTÉ -->
             <div class="community-card">
               <div class="community-header">
-                <div class="card-title">Groupe d'entraide</div>
-                <div class="card-link" style="color:var(--gold)">Actif</div>
+                <div class="card-title">Groupe privé Business</div>
+                <div class="card-link" style="color:var(--gold)">Plan Business</div>
               </div>
               <div class="community-body">
                 <div class="community-avatars">
@@ -676,8 +722,8 @@
                   <div class="community-avatar">JB</div>
                   <div class="community-avatar" style="background:var(--surface);color:var(--muted);font-size:0.58rem">+85</div>
                 </div>
-                <div class="community-text">89 membres actifs dans le groupe. Pose tes questions, partage tes avancées.</div>
-                <div class="community-btn" onclick="window.location.href='membre-chat.html'">Rejoindre le groupe →</div>
+                <div class="community-text">Réservé aux membres Business — entrepreneurs sérieux, questions de fond, zéro bruit.</div>
+                <div class="community-btn" style="opacity:0.4;cursor:not-allowed;background:rgba(255,255,255,0.05);color:rgba(240,237,228,0.4);border:1px solid rgba(255,255,255,0.08)">🔒 Disponible en plan Business (149€/mois)</div>
               </div>
             </div>
 
@@ -762,10 +808,23 @@
 
       <div id="sectionCommunaute" style="display:none">
         <div class="card" style="padding:3rem;text-align:center">
-          <div style="font-size:2rem;margin-bottom:1rem">💬</div>
-          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Groupe d'entraide privé</div>
-          <div style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem">Rejoins la communauté des membres actifs du Club SBW.</div>
-          <a href="membre-chat.html" class="btn-gold" style="display:inline-block">Accéder au groupe →</a>
+          <div style="font-size:2rem;margin-bottom:1rem">🔒</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Groupe privé Business</div>
+          <div style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;max-width:400px;margin-left:auto;margin-right:auto">Le groupe privé est réservé aux membres du plan Business. Des entrepreneurs sérieux, des questions de fond, zéro bruit.</div>
+          <div onclick="handleUpgrade(event,'business')" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-size:0.85rem;cursor:pointer;font-family:'DM Sans',sans-serif">Passer au plan Business — 149€/mois →</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:12px">Sans engagement · Annulation en 1 clic</div>
+        </div>
+      </div>
+
+      <div id="sectionLive" style="display:none">
+        <div class="card" style="padding:3rem;text-align:center">
+          <div style="font-size:2rem;margin-bottom:1rem">🎥</div>
+          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Live mensuel</div>
+          <div style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem;max-width:420px;margin-left:auto;margin-right:auto">Chaque mois, pose tes questions en avance et retrouve les réponses en live. Réservé aux membres Business.</div>
+          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(166,124,58,0.1);border:1px solid rgba(166,124,58,0.25);color:var(--gold);padding:8px 16px;border-radius:20px;font-size:0.75rem;margin:1.5rem 0">🔒 Réservé Plan Business</div>
+          <br>
+          <div onclick="handleUpgrade(event,'business')" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-size:0.85rem;cursor:pointer;font-family:'DM Sans',sans-serif">Passer au plan Business — 149€/mois →</div>
+          <div style="font-size:0.7rem;color:var(--muted);margin-top:12px">Sans engagement · Annulation en 1 clic</div>
         </div>
       </div>
 
@@ -894,6 +953,26 @@
         bar.style.width = "100%";
         if (next) next.textContent = "🌟 Niveau maximum atteint !";
       }
+
+      // Sync vers le bloc XP du welcome banner (mobile)
+      var wEmoji = document.getElementById("welcomeXpEmoji");
+      var wNum = document.getElementById("welcomeXpNum");
+      var wTitle = document.getElementById("welcomeXpTitle");
+      var wPts = document.getElementById("welcomeXpPts");
+      var wBar = document.getElementById("welcomeXpBar");
+      var wNext = document.getElementById("welcomeXpNextLabel");
+      if (wEmoji) wEmoji.textContent = l.badge;
+      if (wNum) wNum.textContent = level;
+      if (wTitle) wTitle.textContent = l.title;
+      if (wPts) wPts.textContent = xp + " XP";
+      if (wBar && nextL) {
+        var wPct = Math.min(100, Math.round((xp - l.xp) / (nextL.xp - l.xp) * 100));
+        setTimeout(function() { wBar.style.width = wPct + "%"; }, 300);
+        if (wNext) wNext.textContent = "Encore " + (nextL.xp - xp) + " XP pour " + nextL.title;
+      } else if (wBar) {
+        wBar.style.width = "100%";
+        if (wNext) wNext.textContent = "🌟 Niveau maximum atteint !";
+      }
     } catch(e) { console.log("Prestige error:", e); }
   }
 
@@ -966,8 +1045,8 @@
     var mbn = document.getElementById('mbn-' + name);
     if (mbn) mbn.classList.add('active');
 
-    const sections = ['Dashboard', 'Formations', 'Articles', 'Communaute', 'Bonsplans', 'Compte']
-    sections.forEach(s => {
+    const sections = ['Dashboard', 'Formations', 'Articles', 'Communaute', 'Bonsplans', 'Compte', 'Live']
+      sections.forEach(s => {
       const elem = document.getElementById('section' + s)
       if (elem) elem.style.display = 'none'
     })
@@ -981,9 +1060,10 @@
       dashboard: ['Tableau de bord', 'Bienvenue dans le Club SBW'],
       formations: ['Formations', 'Tous tes modules vidéo'],
       articles: ['Articles & Ressources', 'Le blog Start Business World'],
-      communaute: ["Groupe d'entraide", 'La communauté des membres'],
+      communaute: ['Groupe privé Business', 'Réservé aux membres Business'],
       bonsplans: ['Bons Plans', 'Offres exclusives membres'],
-      compte: ['Mon compte', 'Profil & abonnement']
+      compte: ['Mon compte', 'Profil & abonnement'],
+      live: ['Live mensuel', 'Réservé aux membres Business']
     }
     const t = titles[name] || ['', '']
     document.getElementById('topbarTitle').textContent = t[0]
