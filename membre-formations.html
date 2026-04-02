@@ -6,6 +6,7 @@
 <title>Formations — Club SBW</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="sbw-tracker.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);--muted:#888;--gold:#A67C3A;--red:#C0392B;--dark:#0E0D0B}
@@ -235,7 +236,9 @@ async function init() {
   var s = await SB.auth.getSession();
   if (!s.data.session) { window.location.href = 'client-login.html'; return; }
   user = s.data.session.user;
-  document.getElementById('navUser').textContent = user.email.split('@')[0];
+  var fullName = user.user_metadata?.full_name || '';
+  var firstName = fullName ? fullName.split(' ')[0] : user.email.split('@')[0];
+  document.getElementById('navUser').textContent = firstName;
   document.getElementById('logoutBtn').onclick = async function() {
     await SB.auth.signOut(); window.location.href = 'client-login.html';
   };
@@ -303,10 +306,50 @@ function renderAll() {
 
   container.appendChild(grid);
 
-  // Barre globale
-  var pct = totalAll > 0 ? Math.round(totalDone / totalAll * 100) : 0;
-  document.getElementById('gbarFill').style.width = pct + '%';
-  document.getElementById('gbarLabel').textContent = totalDone + '/' + totalAll + ' leçons';
+  // Section formations vidéo Pro — bientôt disponible
+  var proSection = document.createElement('div');
+  proSection.className = 'f-group';
+  proSection.style.marginTop = '3rem';
+  proSection.innerHTML =
+    '<div class="f-group-head">' +
+      '<div class="f-group-title">Formations vidéo</div>' +
+      '<span class="f-group-badge badge-video">Plan Pro</span>' +
+      '<div class="f-group-count">En production</div>' +
+    '</div>' +
+    '<div style="background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:2.5rem;text-align:center">' +
+      '<div style="font-size:2.5rem;margin-bottom:1rem">🎬</div>' +
+      '<div style="font-family:\'DM Serif Display\',serif;font-size:1.3rem;margin-bottom:0.5rem">Les formations vidéo arrivent bientôt</div>' +
+      '<div style="font-size:0.85rem;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 1.5rem">' +
+        'Business Chine, B2B, Fiscalité avancée, Expatriation — filmées en ce moment. ' +
+        'Les membres Pro y auront accès en avant-première dès leur sortie.' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:600px;margin:0 auto 1.5rem">' +
+        '<div style="background:var(--surface);border-radius:8px;padding:14px;opacity:0.6">' +
+          '<div style="font-size:1.5rem;margin-bottom:6px">🇨🇳</div>' +
+          '<div style="font-size:0.8rem;font-weight:600">Business Chine</div>' +
+          '<div style="font-size:0.68rem;color:var(--muted);margin-top:2px">En cours de tournage</div>' +
+        '</div>' +
+        '<div style="background:var(--surface);border-radius:8px;padding:14px;opacity:0.6">' +
+          '<div style="font-size:1.5rem;margin-bottom:6px">🏛️</div>' +
+          '<div style="font-size:0.8rem;font-weight:600">Fiscalité avancée</div>' +
+          '<div style="font-size:0.68rem;color:var(--muted);margin-top:2px">En cours de tournage</div>' +
+        '</div>' +
+        '<div style="background:var(--surface);border-radius:8px;padding:14px;opacity:0.6">' +
+          '<div style="font-size:1.5rem;margin-bottom:6px">✈️</div>' +
+          '<div style="font-size:0.8rem;font-weight:600">Expatriation</div>' +
+          '<div style="font-size:0.68rem;color:var(--muted);margin-top:2px">En cours de tournage</div>' +
+        '</div>' +
+      '</div>' +
+      '<a href="club.html#plans" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:10px 24px;border-radius:7px;font-size:0.85rem;font-weight:500">' +
+        'Passer au plan Pro — 79€/mois →' +
+      '</a>' +
+      '<div style="font-size:0.68rem;color:var(--muted);margin-top:10px">Sans engagement · Accès immédiat dès la sortie</div>' +
+    '</div>';
+  container.appendChild(proSection);
+  var globalProg = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { totalDone: totalDone, totalLessons: totalAll, pct: totalAll > 0 ? Math.round(totalDone/totalAll*100) : 0 };
+  var pct = globalProg.pct;
+  setTimeout(function() { document.getElementById('gbarFill').style.width = pct + '%'; }, 200);
+  document.getElementById('gbarLabel').textContent = globalProg.totalDone + '/' + (globalProg.totalLessons || totalAll) + ' leçons';
   document.getElementById('gbarPct').textContent = pct + '%';
 }
 
