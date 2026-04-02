@@ -345,7 +345,7 @@ async function loadMyXp() {
   var msgCount = msgRes.count || 0;
 
   // Filleuls parrainés
-  var affRes = await SB.from("affiliations").select("conversions").eq("user_id", user.id).single();
+  var affRes = await SB.from("affiliations").select("conversions").eq("user_id", user.id).maybeSingle();
   var filleuls = affRes.data ? (affRes.data.conversions || 0) : 0;
 
   // Progression formations (toutes formations confondues)

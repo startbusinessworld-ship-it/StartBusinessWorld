@@ -956,7 +956,7 @@
       var msgCount = msgRes.count || 0;
 
       // Filleuls
-      var affRes = await sb.from("affiliations").select("conversions").eq("user_id", currentUser.id).single();
+      var affRes = await sb.from("affiliations").select("conversions").eq("user_id", currentUser.id).maybeSingle();
       var filleuls = affRes.data ? (affRes.data.conversions || 0) : 0;
 
       // XP unifié
@@ -1054,30 +1054,35 @@
     document.getElementById('userPlan').textContent = plan
     document.getElementById('welcomeName').textContent = firstName
 
-    // Abonnement
+    // Abonnement — éléments optionnels (section compte)
     const planLabel = currentMember?.plan === 'trial' ? '1€/mois — Période d\'essai' :
                       currentMember?.plan === 'pro' ? '79€/mois — Plan Pro' :
                       currentMember?.plan === 'business' ? '149€/mois — Plan Business' : '29€/mois — Plan Basic'
-    document.getElementById('subPrice').innerHTML = currentMember?.plan === 'trial'
+    var subPriceEl = document.getElementById('subPrice')
+    if (subPriceEl) subPriceEl.innerHTML = currentMember?.plan === 'trial'
       ? '1€<small>/mois</small>'
       : currentMember?.plan === 'pro' ? '79€<small>/mois</small>'
       : currentMember?.plan === 'business' ? '149€<small>/mois</small>'
       : '29€<small>/mois</small>'
-    document.getElementById('subRenewal').textContent = currentMember?.plan === 'trial'
+    var subRenewalEl = document.getElementById('subRenewal')
+    if (subRenewalEl) subRenewalEl.textContent = currentMember?.plan === 'trial'
       ? 'Période d\'essai · 3 mois'
       : 'Abonnement actif · sans engagement'
 
     // Affiche bouton upgrade si trial
-    if (currentMember?.plan === 'trial') {
-      document.getElementById('upgradeBtn').style.display = 'inline-flex'
+    var upgradeBtn = document.getElementById('upgradeBtn')
+    if (upgradeBtn && currentMember?.plan === 'trial') {
+      upgradeBtn.style.display = 'inline-flex'
     }
 
     // Profil
-    if (document.getElementById('profileName')) {
-      document.getElementById('profileName').value = currentMember?.full_name || ''
-      document.getElementById('profileEmail').value = email
-      document.getElementById('compteSubInfo').textContent =
-        `Plan : ${planLabel} · Membre depuis ${formatDate(currentMember?.created_at)}`
+    var profileName = document.getElementById('profileName')
+    if (profileName) {
+      profileName.value = currentMember?.full_name || ''
+      var profileEmail = document.getElementById('profileEmail')
+      if (profileEmail) profileEmail.value = email
+      var compteSubInfo = document.getElementById('compteSubInfo')
+      if (compteSubInfo) compteSubInfo.textContent = `Plan : ${planLabel} · Membre depuis ${formatDate(currentMember?.created_at)}`
     }
   }
 
@@ -1166,23 +1171,23 @@
       var allProg = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { byFormation: {} };
       var by = allProg.byFormation || {};
 
+      // Les clés sont normalisées avec tirets dans byFormation
       var modules = [
-        { id: 'mindset',   key: 'formation-mindset',               total: 20 },
-        { id: 'fiscalite', key: 'formation-creation-entreprise',   total: 16 },
-        { id: 'hk',        key: 'formation-hong-kong',             total: 15 },
-        { id: 'ecom',      key: 'formation-ecom-module-1',         total: 30 },
+        { id: 'mindset',   key: 'formation-mindset',             total: 20 },
+        { id: 'fiscalite', key: 'formation-creation-entreprise', total: 16 },
+        { id: 'hk',        key: 'formation-hong-kong',           total: 15 },
+        { id: 'ecom',      key: 'formation-ecom-module-1',       total: 30 },
       ];
 
       modules.forEach(function(m) {
         var data = by[m.key] || { done: 0, total: m.total, pct: 0 };
         var pct = data.pct || 0;
-        var done = data.done || 0;
 
         var barEl = document.getElementById('prog-' + m.id);
         var pctEl = document.getElementById('pct-' + m.id);
         var statusEl = document.getElementById('status-' + m.id);
 
-        if (barEl) barEl.style.width = pct + '%';
+        if (barEl) setTimeout(function(b,p){ b.style.width = p + '%'; }, 300, barEl, pct);
         if (pctEl) pctEl.textContent = pct + '%';
         if (statusEl) {
           if (pct === 0) { statusEl.textContent = 'À commencer'; statusEl.className = 'module-status'; }

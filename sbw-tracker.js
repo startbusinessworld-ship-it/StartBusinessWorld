@@ -113,7 +113,9 @@
         }).length;
         totalDone += done;
         totalLessons += total;
-        byFormation[key.replace('sbw_tracker__', '')] = {
+        // Normalise la clé : tirets et underscores sont équivalents
+        var normalKey = key.replace('sbw_tracker__', '').replace(/_/g, '-');
+        byFormation[normalKey] = {
           done: done, total: total,
           pct: total > 0 ? Math.round(done / total * 100) : 0
         };
