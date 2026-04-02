@@ -586,65 +586,65 @@
                 <div class="card-title">Formations — continuer</div>
                 <div class="card-link" onclick="window.location.href='membre-formations.html'">Voir tout →</div>
               </div>
-              <div class="module-row">
+              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-mindset.html'">
                 <div class="module-icon">🧠</div>
                 <div class="module-info">
                   <div class="module-name">Mindset & Fondations</div>
                   <div class="module-meta">6 modules · 2h30</div>
                 </div>
                 <div class="module-progress-wrap">
-                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:65%"></div></div>
-                  <div class="module-progress-pct">65%</div>
+                  <div class="module-progress-bar"><div class="module-progress-fill" id="prog-mindset" style="width:0%"></div></div>
+                  <div class="module-progress-pct" id="pct-mindset">0%</div>
                 </div>
-                <span class="module-status status-inprogress">En cours</span>
+                <span class="module-status status-inprogress" id="status-mindset">À commencer</span>
               </div>
-              <div class="module-row">
-                <div class="module-icon">🇨🇳</div>
-                <div class="module-info">
-                  <div class="module-name">Business avec la Chine</div>
-                  <div class="module-meta">9 modules · 4h15</div>
-                </div>
-                <div class="module-progress-wrap">
-                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
-                  <div class="module-progress-pct">0%</div>
-                </div>
-                <span class="module-status status-pro">Plan Pro ↑</span>
-              </div>
-              <div class="module-row">
+              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-creation-entreprise.html'">
                 <div class="module-icon">🏛️</div>
                 <div class="module-info">
                   <div class="module-name">Fiscalité & Structure</div>
-                  <div class="module-meta">8 modules · 3h45</div>
+                  <div class="module-meta">16 leçons · 3h45</div>
                 </div>
                 <div class="module-progress-wrap">
-                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
-                  <div class="module-progress-pct">0%</div>
+                  <div class="module-progress-bar"><div class="module-progress-fill" id="prog-fiscalite" style="width:0%"></div></div>
+                  <div class="module-progress-pct" id="pct-fiscalite">0%</div>
                 </div>
-                <span class="module-status status-pro">Plan Pro ↑</span>
+                <span class="module-status status-inprogress" id="status-fiscalite">À commencer</span>
               </div>
-              <div class="module-row">
+              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-hong-kong.html'">
+                <div class="module-icon">🇭🇰</div>
+                <div class="module-info">
+                  <div class="module-name">Hong Kong</div>
+                  <div class="module-meta">Module complet</div>
+                </div>
+                <div class="module-progress-wrap">
+                  <div class="module-progress-bar"><div class="module-progress-fill" id="prog-hk" style="width:0%"></div></div>
+                  <div class="module-progress-pct" id="pct-hk">0%</div>
+                </div>
+                <span class="module-status status-inprogress" id="status-hk">À commencer</span>
+              </div>
+              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-ecom-module-1.html'">
                 <div class="module-icon">📦</div>
                 <div class="module-info">
                   <div class="module-name">E-commerce</div>
-                  <div class="module-meta">7 modules · 3h20</div>
+                  <div class="module-meta">Module complet</div>
                 </div>
                 <div class="module-progress-wrap">
-                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
-                  <div class="module-progress-pct">0%</div>
+                  <div class="module-progress-bar"><div class="module-progress-fill" id="prog-ecom" style="width:0%"></div></div>
+                  <div class="module-progress-pct" id="pct-ecom">0%</div>
                 </div>
-                <span class="module-status status-pro">Plan Pro ↑</span>
+                <span class="module-status status-inprogress" id="status-ecom">À commencer</span>
               </div>
-              <div class="module-row">
-                <div class="module-icon">✈️</div>
+              <div class="module-row" style="opacity:0.5">
+                <div class="module-icon">🎬</div>
                 <div class="module-info">
-                  <div class="module-name">Expatriation</div>
-                  <div class="module-meta">6 modules · 2h50</div>
+                  <div class="module-name">Formations vidéo Pro</div>
+                  <div class="module-meta">En production</div>
                 </div>
                 <div class="module-progress-wrap">
                   <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
-                  <div class="module-progress-pct">0%</div>
+                  <div class="module-progress-pct">—</div>
                 </div>
-                <span class="module-status status-pro">Plan Pro ↑</span>
+                <span class="module-status status-pro">Bientôt</span>
               </div>
             </div>
 
@@ -652,9 +652,9 @@
             <div class="card">
               <div class="card-head">
                 <div class="card-title">Derniers articles</div>
-                <a href="index.html#articles" class="card-link">Voir le blog →</a>
+                <a href="blog.html" class="card-link">Voir le blog →</a>
               </div>
-              <div class="article-row">
+              <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=sourcing-chine-2026'">
                 <div style="flex:1;min-width:0">
                   <div class="article-cat">Business Chine</div>
                   <div class="article-title">Sourcer en Chine sans se faire arnaquer : le guide complet 2026</div>
@@ -662,22 +662,22 @@
                 <span class="article-yt">▶ Vidéo</span>
                 <div class="article-time">18 min</div>
               </div>
-              <div class="article-row">
+              <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=hong-kong-vs-france'">
                 <div style="flex:1;min-width:0">
                   <div class="article-cat">Fiscalité</div>
                   <div class="article-title">Société Hong Kong vs France : comparatif honnête</div>
                 </div>
                 <div class="article-time">12 min</div>
               </div>
-              <div class="article-row">
+              <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=dubai-2026'">
                 <div style="flex:1;min-width:0">
                   <div class="article-cat">Expatriation</div>
-                  <div class="article-title">Dubai 2026 : visa, résidence fiscale, coût de vie réel</div>
+                  <div class="article-title">S'expatrier à Dubai en 2026 : visa, résidence fiscale, coût de vie réel</div>
                 </div>
                 <span class="article-yt">▶ Vidéo</span>
                 <div class="article-time">10 min</div>
               </div>
-              <div class="article-row">
+              <div class="article-row" style="cursor:pointer" onclick="window.location.href='article.html?id=amazon-fba-2026'">
                 <div style="flex:1;min-width:0">
                   <div class="article-cat">E-commerce</div>
                   <div class="article-title">Amazon FBA en 2026 : toujours rentable ?</div>
@@ -995,23 +995,37 @@
 
     renderUser()
     renderStats()
+    renderModuleProgress()
     loadDashPrestige()
   }
 
   function renderUser() {
-    const name = currentMember?.full_name || currentUser.email
-    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-    const plan = currentMember?.plan === 'trial' ? '1€/mois — Essai' : '29€/mois'
+    const fullName = currentMember?.full_name || currentUser.user_metadata?.full_name || ''
+    const email = currentUser.email
+    // Prénom : premier mot du nom complet, sinon partie avant @ de l'email
+    const firstName = fullName
+      ? fullName.split(' ')[0]
+      : email.split('@')[0].replace(/[._-]/g, ' ').split(' ')[0]
+    const displayName = fullName || email
+    const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    const plan = currentMember?.plan === 'trial' ? '1€/mois — Essai' :
+                 currentMember?.plan === 'pro' ? 'Plan Pro — 79€/mois' :
+                 currentMember?.plan === 'business' ? 'Plan Business — 149€/mois' : '29€/mois'
 
     document.getElementById('userInitials').textContent = initials
     var mav = document.getElementById('mobileUserAv'); if(mav) mav.textContent = initials;
-    document.getElementById('userName').textContent = name
+    document.getElementById('userName').textContent = displayName
     document.getElementById('userPlan').textContent = plan
-    document.getElementById('welcomeName').textContent = name.split(' ')[0]
+    document.getElementById('welcomeName').textContent = firstName
 
     // Abonnement
+    const planLabel = currentMember?.plan === 'trial' ? '1€/mois — Période d\'essai' :
+                      currentMember?.plan === 'pro' ? '79€/mois — Plan Pro' :
+                      currentMember?.plan === 'business' ? '149€/mois — Plan Business' : '29€/mois — Plan Basic'
     document.getElementById('subPrice').innerHTML = currentMember?.plan === 'trial'
       ? '1€<small>/mois</small>'
+      : currentMember?.plan === 'pro' ? '79€<small>/mois</small>'
+      : currentMember?.plan === 'business' ? '149€<small>/mois</small>'
       : '29€<small>/mois</small>'
     document.getElementById('subRenewal').textContent = currentMember?.plan === 'trial'
       ? 'Période d\'essai · 3 mois'
@@ -1025,18 +1039,43 @@
     // Profil
     if (document.getElementById('profileName')) {
       document.getElementById('profileName').value = currentMember?.full_name || ''
-      document.getElementById('profileEmail').value = currentUser.email
+      document.getElementById('profileEmail').value = email
       document.getElementById('compteSubInfo').textContent =
-        `Plan : ${plan} · Membre depuis ${formatDate(currentMember?.created_at)}`
+        `Plan : ${planLabel} · Membre depuis ${formatDate(currentMember?.created_at)}`
     }
   }
 
   function renderStats() {
-    document.getElementById('statModules').textContent = '2'
-    document.getElementById('statTime').textContent = '1h30'
-    document.getElementById('statArticles').textContent = '3'
+    // Calcul réel depuis localStorage
+    try {
+      const prog = JSON.parse(localStorage.getItem('sbw_p_' + currentUser.id) || '{}')
+      const leconsVues = Object.values(prog).filter(Boolean).length
+
+      // Estimation temps : 8 min par leçon en moyenne
+      const totalMin = leconsVues * 8
+      const heures = Math.floor(totalMin / 60)
+      const mins = totalMin % 60
+      const tempsLabel = heures > 0 ? `${heures}h${mins > 0 ? mins : ''}` : `${mins}min`
+
+      document.getElementById('statModules').textContent = leconsVues
+      document.getElementById('statTime').textContent = leconsVues > 0 ? tempsLabel : '0min'
+    } catch(e) {
+      document.getElementById('statModules').textContent = '0'
+      document.getElementById('statTime').textContent = '0min'
+    }
+
+    // Articles lus depuis localStorage
+    try {
+      const articlesLus = JSON.parse(localStorage.getItem('sbw_articles_' + currentUser.id) || '[]')
+      document.getElementById('statArticles').textContent = articlesLus.length
+    } catch(e) {
+      document.getElementById('statArticles').textContent = '0'
+    }
+
     document.getElementById('statSince').textContent = formatDate(currentMember?.created_at)
-    document.getElementById('statPlan').textContent = currentMember?.plan === 'trial' ? 'Période d\'essai' : 'Membre actif'
+    document.getElementById('statPlan').textContent = currentMember?.plan === 'trial' ? 'Période d\'essai' :
+      currentMember?.plan === 'pro' ? 'Plan Pro' :
+      currentMember?.plan === 'business' ? 'Plan Business' : 'Plan Basic'
   }
 
   function showSection(name, el) {
@@ -1088,6 +1127,37 @@
   async function handleLogout() {
     await sb.auth.signOut()
     window.location.href = 'index.html'
+  }
+
+  function renderModuleProgress() {
+    try {
+      const prog = JSON.parse(localStorage.getItem('sbw_p_' + currentUser.id) || '{}')
+
+      // Mapping module → préfixe des clés localStorage + nombre de leçons
+      const modules = [
+        { id: 'mindset',  prefix: 'mindset',   total: 20 },
+        { id: 'fiscalite',prefix: 'fiscalite',  total: 16 },
+        { id: 'hk',       prefix: 'hk',         total: 15 },
+        { id: 'ecom',     prefix: 'ecom',        total: 30 },
+      ]
+
+      modules.forEach(function(m) {
+        const done = Object.keys(prog).filter(k => k.startsWith(m.prefix) && prog[k]).length
+        const pct = m.total > 0 ? Math.round(done / m.total * 100) : 0
+
+        const barEl = document.getElementById('prog-' + m.id)
+        const pctEl = document.getElementById('pct-' + m.id)
+        const statusEl = document.getElementById('status-' + m.id)
+
+        if (barEl) barEl.style.width = pct + '%'
+        if (pctEl) pctEl.textContent = pct + '%'
+        if (statusEl) {
+          if (pct === 0) { statusEl.textContent = 'À commencer'; statusEl.className = 'module-status'; }
+          else if (pct === 100) { statusEl.textContent = 'Terminé ✓'; statusEl.className = 'module-status status-done'; }
+          else { statusEl.textContent = 'En cours'; statusEl.className = 'module-status status-inprogress'; }
+        }
+      })
+    } catch(e) { console.log('Module progress error:', e) }
   }
 
   function handleUpgrade(e, plan) {
