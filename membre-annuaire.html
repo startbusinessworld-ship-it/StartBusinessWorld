@@ -153,6 +153,13 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
 
 @media(max-width:900px){.fourn-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:560px){.fourn-grid{grid-template-columns:1fr}.bottom-nav{display:flex}}
+
+/* FILTRES PAYS */
+.filters-pays{display:flex;gap:6px;flex-wrap:wrap;margin-top:.8rem}
+.pays-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:20px;font-size:.85rem;cursor:pointer;border:0.5px solid var(--subtle);background:#fff;transition:all .15s;color:var(--ink);font-family:"DM Sans",sans-serif;white-space:nowrap}
+.pays-btn:hover{border-color:var(--gold);background:rgba(166,124,58,.05)}
+.pays-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.pays-count{font-size:.65rem;opacity:.55;margin-left:2px}
 </style>
 </head>
 <body>
@@ -182,7 +189,7 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <div>De nouveaux contacts business sont ajoutés chaque mois — fournisseurs, agents, cabinets, logistique.</div>
   </div>
 
-  <!-- FILTRES -->
+  <!-- FILTRES CATÉGORIE -->
   <div class="filters">
     <input class="filter-search" type="text" placeholder="🔍 Rechercher..." id="searchInput" oninput="applyFilters()">
     <button class="filter-btn active" onclick="setFilter('tous', this)">Tous</button>
@@ -194,6 +201,9 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <button class="filter-btn" onclick="setFilter('sourcing', this)">🤝 Sourcing</button>
     <button class="filter-btn" onclick="setFilter('juridique', this)">⚖️ Juridique</button>
   </div>
+
+  <!-- FILTRES PAYS -->
+  <div class="filters-pays" id="paysFiltres"></div>
 
   <!-- GRILLE -->
   <div class="fourn-grid" id="fournGrid">
@@ -232,6 +242,66 @@ var SB = supabase.createClient(
 var user = null;
 var allFournisseurs = [];
 var currentFilter = 'tous';
+var currentPays = 'tous';
+
+var PAYS_FLAGS = {
+  'Chine': '🇨🇳', 'China': '🇨🇳',
+  'Hong Kong': '🇭🇰',
+  'France': '🇫🇷',
+  'Émirats Arabes Unis': '🇦🇪', 'Dubai': '🇦🇪', 'EAU': '🇦🇪',
+  'Inde': '🇮🇳', 'India': '🇮🇳',
+  'Turquie': '🇹🇷', 'Turkey': '🇹🇷',
+  'Bangladesh': '🇧🇩',
+  'Vietnam': '🇻🇳',
+  'Maroc': '🇲🇦', 'Morocco': '🇲🇦',
+  'Sénégal': '🇸🇳',
+  'Portugal': '🇵🇹',
+  'Espagne': '🇪🇸',
+  'Italie': '🇮🇹',
+  'Allemagne': '🇩🇪',
+  'Royaume-Uni': '🇬🇧',
+  'International': '🌍',
+};
+
+function getFlagForPays(pays) {
+  if (!pays) return '🌍';
+  for (var key in PAYS_FLAGS) {
+    if (pays.toLowerCase().includes(key.toLowerCase())) return PAYS_FLAGS[key];
+  }
+  return '🌍';
+}
+
+function renderPaysFilters(data) {
+  // Compter les contacts par pays
+  var counts = {};
+  data.forEach(function(f) {
+    var p = f.pays || 'International';
+    counts[p] = (counts[p] || 0) + 1;
+  });
+
+  // Trier par nombre décroissant
+  var paysListe = Object.keys(counts).sort(function(a, b) { return counts[b] - counts[a]; });
+
+  var container = document.getElementById('paysFiltres');
+  if (!container) return;
+
+  var html = '<button class="pays-btn active" id="pays-tous" onclick="setPays(\'tous\', this)">🌍 Tous <span class="pays-count">(' + data.length + ')</span></button>';
+  paysListe.forEach(function(pays) {
+    var flag = getFlagForPays(pays);
+    var id = 'pays-' + pays.replace(/\s+/g, '-');
+    html += '<button class="pays-btn" id="' + id + '" onclick="setPays(\'' + pays.replace(/'/g, "\\'") + '\', this)">' +
+      flag + ' ' + pays + ' <span class="pays-count">(' + counts[pays] + ')</span></button>';
+  });
+
+  container.innerHTML = html;
+}
+
+function setPays(pays, btn) {
+  currentPays = pays;
+  document.querySelectorAll('.pays-btn').forEach(function(b) { b.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  applyFilters();
+}
 
 // ── Données de test ──
 var SAMPLE_DATA = [
@@ -331,13 +401,14 @@ async function loadFournisseurs() {
   }
 
   document.getElementById('totalCount').textContent = allFournisseurs.length + ' contacts';
+  renderPaysFilters(allFournisseurs);
   renderGrid(allFournisseurs);
 }
 
 function setFilter(cat, btn) {
   currentFilter = cat;
   document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
-  btn.classList.add('active');
+  if (btn) btn.classList.add('active');
   applyFilters();
 }
 
@@ -345,11 +416,12 @@ function applyFilters() {
   var search = document.getElementById('searchInput').value.toLowerCase();
   var filtered = allFournisseurs.filter(function(f) {
     var matchCat = currentFilter === 'tous' || f.categorie === currentFilter;
+    var matchPays = currentPays === 'tous' || (f.pays || 'International') === currentPays;
     var matchSearch = !search ||
-      f.nom.toLowerCase().includes(search) ||
+      (f.nom||'').toLowerCase().includes(search) ||
       (f.description || '').toLowerCase().includes(search) ||
       (f.region || '').toLowerCase().includes(search);
-    return matchCat && matchSearch;
+    return matchCat && matchPays && matchSearch;
   });
   renderGrid(filtered);
 }
