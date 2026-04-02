@@ -69,7 +69,7 @@
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
           Formations
         </a>
-        <a href="admin-fournisseurs.html" class="nav-item" data-access="fournisseurs">
+        <a href="admin-annuaire.html" class="nav-item" data-access="fournisseurs">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/></svg>
           Fournisseurs
         </a>
@@ -148,6 +148,11 @@
       </div>
     </div>
     <div class="form-row">
+      <label>Lien Google Meet (live en direct)</label>
+      <input type="text" id="lMeet" placeholder="https://meet.google.com/xxx-xxxx-xxx">
+      <div class="form-hint">Ce lien sera affiché aux membres Business le jour du live uniquement.</div>
+    </div>
+    <div class="form-row">
       <label>ID YouTube (replay)</label>
       <input type="text" id="lYoutube" placeholder="Ex: dQw4w9WgXcQ">
       <div class="form-hint">L'ID est la partie après v= dans l'URL YouTube</div>
@@ -223,7 +228,8 @@ function renderLives(list) {
           <div class="live-title">${l.titre}</div>
           <div class="live-meta">
             ${l.duree ? `⏱ ${l.duree} min` : ''}
-            ${l.youtube_id ? `· 📺 YouTube: ${l.youtube_id}` : '· Pas encore de replay'}
+            ${l.meet_url ? `· <a href="${l.meet_url}" target="_blank" style="color:#16a34a;font-weight:500">🎥 Lien Meet</a>` : '· Pas de lien Meet'}
+            ${l.youtube_id ? `· 📺 Replay: ${l.youtube_id}` : '· Pas encore de replay'}
           </div>
           ${l.desc ? `<div style="font-size:.75rem;color:#666;margin-top:.4rem">${l.desc}</div>` : ''}
           <div class="live-actions">
@@ -243,6 +249,7 @@ function openModal(data) {
   document.getElementById('lTitre').value = data?.titre || '';
   document.getElementById('lDate').value = data?.live_date ? data.live_date.slice(0,16) : '';
   document.getElementById('lDuree').value = data?.duree || '';
+  document.getElementById('lMeet').value = data?.meet_url || '';
   document.getElementById('lYoutube').value = data?.youtube_id || '';
   document.getElementById('lDesc').value = data?.desc || '';
   document.getElementById('lStatut').value = data?.statut || 'upcoming';
@@ -258,6 +265,7 @@ async function saveLive() {
     titre: document.getElementById('lTitre').value.trim(),
     live_date: document.getElementById('lDate').value,
     duree: parseInt(document.getElementById('lDuree').value) || null,
+    meet_url: document.getElementById('lMeet').value.trim() || null,
     youtube_id: document.getElementById('lYoutube').value.trim() || null,
     desc: document.getElementById('lDesc').value.trim(),
     statut: document.getElementById('lStatut').value,

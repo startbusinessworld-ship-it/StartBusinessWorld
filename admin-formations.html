@@ -85,7 +85,7 @@
       <a href="admin-formations.html" class="nav-item active" data-access="articles"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>Formations</a>
       <a href="admin-newsletter.html" class="nav-item" data-access="newsletter"><svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>Newsletter</a>
       
-        <a href="admin-fournisseurs.html" class="nav-item" data-access="fournisseurs">
+        <a href="admin-annuaire.html" class="nav-item" data-access="fournisseurs">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
           Fournisseurs
         </a>
@@ -162,6 +162,14 @@
     <div class="field"><label>Statut</label>
       <select id="fStatus"><option value="draft">Brouillon</option><option value="published">Publié</option></select>
     </div>
+    <div class="field">
+      <label>Plan requis</label>
+      <div class="type-btns">
+        <button class="type-btn on" id="fplanbtn_basic" onclick="setFPlan('basic')">🆓 Basic (inclus)</button>
+        <button class="type-btn" id="fplanbtn_pro" onclick="setFPlan('pro')">⭐ Pro uniquement</button>
+      </div>
+      <div class="field-note" id="fPlanNote" style="margin-top:4px;font-size:.7rem;color:#888">Inclus dans tous les abonnements.</div>
+    </div>
     <div class="btn-row">
       <button class="btn-ghost" style="flex:1" onclick="closeOv('overlayFormation')">Annuler</button>
       <button class="btn-primary" style="flex:1;justify-content:center" id="fSaveBtn" onclick="saveFormation()">Créer</button>
@@ -225,9 +233,11 @@ function renderFormations(){
     item.setAttribute('data-id',f.id);
     var tl=f.type==='html'?'⚡ IA':f.type==='external'?'🔗':' ▶';
     var bc=f.type==='html'?'badge-html':f.type==='external'?'badge-external':'badge-video';
+    var planBadge=f.plan==='pro'?'<span class="f-badge" style="background:rgba(166,124,58,0.12);color:#A67C3A">⭐ Pro</span>':'';
     item.innerHTML=
       '<span class="drag-h" onclick="event.stopPropagation()">⠿</span>'+
       '<span class="f-item-name">'+f.title+'</span>'+
+      planBadge+
       '<span class="f-badge '+bc+'">'+tl+'</span>';
     item.addEventListener('click',function(e){if(!e.target.classList.contains('drag-h'))selF(f);});
     el.appendChild(item);
@@ -252,6 +262,7 @@ function openFormationModal(f){
   document.getElementById('fStatus').value=f?f.status:'draft';
   document.getElementById('fSaveBtn').textContent=f?'Mettre à jour':'Créer';
   setFType(f?(f.type||'html'):'html');
+  setFPlan(f?(f.plan||'basic'):'basic');
   prevImg('fCover','fCoverPrev');
   openOv('overlayFormation');
   setTimeout(function(){document.getElementById('fTitle').focus();},100);
@@ -266,6 +277,17 @@ function setFType(t){
   document.getElementById('fExtField').style.display=t==='external'?'block':'none';
 }
 
+var fPlan='basic';
+function setFPlan(p){
+  fPlan=p;
+  ['basic','pro'].forEach(function(x){
+    var b=document.getElementById('fplanbtn_'+x);
+    if(b) b.className='type-btn'+(x===p?' on':'');
+  });
+  var note=document.getElementById('fPlanNote');
+  if(note) note.textContent=p==='pro'?'⭐ Réservé aux membres Plan Pro (79€/mois).':'Inclus dans tous les abonnements.';
+}
+
 async function saveFormation(){
   var title=document.getElementById('fTitle').value.trim();
   if(!title){toast('Titre obligatoire.','error');return;}
@@ -273,6 +295,7 @@ async function saveFormation(){
     title:title,
     description:document.getElementById('fDesc').value.trim()||null,
     type:fType,
+    plan:fPlan,
     external_url:fType==='external'?document.getElementById('fExtUrl').value.trim()||null:null,
     cover_url:document.getElementById('fCover').value.trim()||null,
     status:document.getElementById('fStatus').value

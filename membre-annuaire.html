@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Annuaire Business — Club SBW</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF8;--ink:#111110;--surface:#F2F0EC;--subtle:rgba(0,0,0,0.08);--muted:#888;--gold:#A67C3A;--dark:#0E0D0B;--green:#16a34a}
+body{font-family:"DM Sans",sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;padding-bottom:100px}
+a{text-decoration:none;color:inherit}
+
+/* NAV */
+nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:"DM Serif Display",serif;color:#fff;font-size:1.1rem}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-back{font-size:.78rem;color:rgba(255,255,255,.5);transition:color .15s}
+.nav-back:hover{color:#fff}
+.btn-sm{background:none;border:.5px solid rgba(255,255,255,.15);color:rgba(255,255,255,.5);padding:4px 12px;border-radius:4px;font-size:.72rem;cursor:pointer;font-family:inherit}
+.btn-sm:hover{color:#fff;border-color:rgba(255,255,255,.4)}
+
+/* PAGE */
+.page{max-width:1100px;margin:0 auto;padding:2rem 1.5rem}
+
+/* HEADER */
+.page-head{margin-bottom:2rem}
+.page-title{font-family:"DM Serif Display",serif;font-size:1.8rem;margin-bottom:4px}
+.page-sub{font-size:.85rem;color:var(--muted)}
+.page-meta{display:flex;align-items:center;gap:1rem;margin-top:.8rem;flex-wrap:wrap}
+.meta-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--gold);border:1px solid rgba(166,124,58,.3);
+  padding:3px 10px;border-radius:20px;
+}
+.meta-update{font-size:.72rem;color:var(--muted)}
+
+/* FILTRES */
+.filters{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:1.5rem;flex-wrap:wrap;
+}
+.filter-btn{
+  padding:6px 14px;border-radius:20px;font-size:.75rem;font-weight:500;
+  border:0.5px solid var(--subtle);background:#fff;cursor:pointer;
+  font-family:inherit;transition:all .15s;color:var(--ink);
+}
+.filter-btn:hover{border-color:var(--gold);color:var(--gold)}
+.filter-btn.active{background:var(--dark);color:#fff;border-color:var(--dark)}
+.filter-search{
+  flex:1;min-width:200px;max-width:300px;
+  border:0.5px solid var(--subtle);border-radius:20px;
+  padding:6px 14px;font-family:"DM Sans",sans-serif;
+  font-size:.78rem;outline:none;background:#fff;
+  transition:border-color .15s;
+}
+.filter-search:focus{border-color:var(--gold)}
+
+/* GRID */
+.fourn-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+
+/* FICHE */
+.fourn-card{
+  background:#fff;border:0.5px solid var(--subtle);
+  border-radius:12px;overflow:hidden;
+  transition:transform .15s,box-shadow .15s,border-color .15s;
+}
+.fourn-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.08);border-color:rgba(0,0,0,.15)}
+.fourn-card-top{
+  padding:1.2rem 1.2rem .8rem;
+  border-bottom:0.5px solid var(--subtle);
+  position:relative;
+}
+.fourn-badges{display:flex;gap:6px;margin-bottom:.8rem;flex-wrap:wrap}
+.fourn-cat{
+  font-size:.6rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 8px;border-radius:10px;
+}
+.cat-textile{background:rgba(59,130,246,.1);color:#2563eb}
+.cat-electronique{background:rgba(168,85,247,.1);color:#7c3aed}
+.cat-cosmetique{background:rgba(236,72,153,.1);color:#be185d}
+.cat-alimentaire{background:rgba(34,197,94,.1);color:#15803d}
+.cat-maison{background:rgba(234,88,12,.1);color:#c2410c}
+.cat-sport{background:rgba(6,182,212,.1);color:#0e7490}
+.cat-jouets{background:rgba(250,204,21,.12);color:#92400e}
+.cat-automobile{background:rgba(75,85,99,.1);color:#374151}
+.fourn-verified{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:.6rem;font-weight:600;color:var(--green);
+  background:rgba(22,163,74,.08);padding:2px 8px;border-radius:10px;
+}
+.fourn-name{font-size:1rem;font-weight:600;margin-bottom:.25rem;line-height:1.3}
+.fourn-location{display:flex;align-items:center;gap:4px;font-size:.75rem;color:var(--muted)}
+.fourn-card-body{padding:1rem 1.2rem}
+.fourn-desc{font-size:.78rem;color:#555;line-height:1.6;margin-bottom:.8rem}
+.fourn-specs{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem}
+.fourn-spec{display:flex;justify-content:space-between;align-items:center;font-size:.72rem}
+.fourn-spec-label{color:var(--muted)}
+.fourn-spec-val{font-weight:500;color:var(--ink)}
+.fourn-divider{height:0.5px;background:var(--subtle);margin-bottom:1rem}
+.fourn-contact{display:flex;flex-direction:column;gap:6px}
+.contact-row{
+  display:flex;align-items:center;justify-content:space-between;
+  font-size:.75rem;
+}
+.contact-label{color:var(--muted)}
+.contact-val{font-weight:500;font-family:monospace;font-size:.72rem;color:var(--ink)}
+.contact-hidden{
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+  color:var(--gold);font-size:.75rem;font-weight:500;
+}
+.contact-hidden:hover{opacity:.8}
+.reveal-btn{
+  width:100%;margin-top:.8rem;
+  background:var(--dark);color:#fff;border:none;
+  padding:9px;border-radius:7px;font-size:.78rem;font-weight:500;
+  cursor:pointer;font-family:inherit;transition:background .15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.reveal-btn:hover{background:#222}
+.reveal-btn.revealed{background:rgba(22,163,74,.1);color:var(--green);border:0.5px solid rgba(22,163,74,.2);cursor:default}
+
+/* EMPTY */
+.fourn-empty{
+  grid-column:1/-1;text-align:center;
+  padding:3rem;color:var(--muted);font-size:.88rem;
+}
+
+/* MISE À JOUR BANNER */
+.update-banner{
+  background:rgba(166,124,58,.06);border:1px solid rgba(166,124,58,.15);
+  border-radius:10px;padding:1rem 1.2rem;
+  display:flex;align-items:center;gap:.8rem;
+  margin-bottom:1.5rem;font-size:.78rem;color:var(--ink);
+}
+.update-banner-icon{font-size:1.2rem;flex-shrink:0}
+
+/* MOBILE */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--dark);height:64px;padding:0 8px;align-items:center;justify-content:space-around;z-index:200;border-top:0.5px solid rgba(255,255,255,.08)}
+.bn-item{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 12px;color:rgba(255,255,255,.4);cursor:pointer;font-size:.6rem;border:none;background:none;font-family:inherit}
+.bn-item.active{color:var(--gold)}
+.bn-item svg{width:22px;height:22px}
+
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark);color:#fff;padding:10px 20px;border-radius:8px;font-size:.82rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1}
+
+@media(max-width:900px){.fourn-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.fourn-grid{grid-template-columns:1fr}.bottom-nav{display:flex}}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="client-dashboard.html" class="nav-logo">Start Business World</a>
+  <div class="nav-right">
+    <a href="client-dashboard.html" class="nav-back">← Dashboard</a>
+    <button class="btn-sm" id="logoutBtn">Déconnexion</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <div class="page-head">
+    <div class="page-title">Annuaire Business</div>
+    <div class="page-sub">Contacts &amp; ressources vérifiés SBW — fournisseurs, logistique, création société, visa et plus.</div>
+    <div class="page-meta">
+      <div class="meta-badge">◆ Plan Pro</div>
+      <div class="meta-update" id="lastUpdate">Dernière mise à jour : avril 2026</div>
+      <div class="meta-update" id="totalCount"></div>
+    </div>
+  </div>
+
+  <div class="update-banner">
+    <div class="update-banner-icon">🔄</div>
+    <div>De nouveaux contacts business sont ajoutés chaque mois — fournisseurs, agents, cabinets, logistique.</div>
+  </div>
+
+  <!-- FILTRES -->
+  <div class="filters">
+    <input class="filter-search" type="text" placeholder="🔍 Rechercher..." id="searchInput" oninput="applyFilters()">
+    <button class="filter-btn active" onclick="setFilter('tous', this)">Tous</button>
+    <button class="filter-btn" onclick="setFilter('fournisseur', this)">🏭 Fournisseurs</button>
+    <button class="filter-btn" onclick="setFilter('logistique', this)">🚢 Logistique</button>
+    <button class="filter-btn" onclick="setFilter('societe', this)">🏢 Création société</button>
+    <button class="filter-btn" onclick="setFilter('visa', this)">🛂 Visa & Expat</button>
+    <button class="filter-btn" onclick="setFilter('finance', this)">💳 Finance</button>
+    <button class="filter-btn" onclick="setFilter('sourcing', this)">🤝 Sourcing</button>
+    <button class="filter-btn" onclick="setFilter('juridique', this)">⚖️ Juridique</button>
+  </div>
+
+  <!-- GRILLE -->
+  <div class="fourn-grid" id="fournGrid">
+    <div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--muted)">Chargement...</div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="bn-item" onclick="window.location.href='client-dashboard.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Accueil
+  </button>
+  <button class="bn-item" onclick="window.location.href='membre-formations.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Formations
+  </button>
+  <button class="bn-item active" onclick="window.location.href='membre-fournisseurs.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>Fourn.
+  </button>
+  <button class="bn-item" onclick="window.location.href='membre-prestige.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>Prestige
+  </button>
+  <button class="bn-item" onclick="window.location.href='membre-affiliation.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Affil.
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var SB = supabase.createClient(
+  'https://grwimhqsthcmfwblwdwg.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+);
+
+var user = null;
+var allFournisseurs = [];
+var currentFilter = 'tous';
+
+// ── Données de test ──
+var SAMPLE_DATA = [
+  {
+    id: 1, nom: "Guangzhou Texprint Co.", categorie: "textile",
+    pays: "Chine", region: "Guangzhou, Guangdong",
+    type: "Fabricant", moq: "200 pièces", verified: true,
+    desc: "Spécialiste vêtements sport et streetwear. Travaille avec des marques européennes depuis 2015. Certifié ISO 9001.",
+    delai: "25-35 jours", prix_range: "3€ - 18€ / pièce",
+    email: "info@texprint-gz.com", wechat: "texprint_gz", site: "texprint-gz.com",
+    nouveaute: true
+  },
+  {
+    id: 2, nom: "Shenzhen ElecPro Ltd.", categorie: "electronique",
+    pays: "Chine", region: "Shenzhen, Guangdong",
+    type: "Fabricant", moq: "500 unités", verified: true,
+    desc: "Accessoires électroniques, écouteurs, chargeurs et smartwatchs. Certifications CE et FCC disponibles.",
+    delai: "20-30 jours", prix_range: "2€ - 45€ / unité",
+    email: "sales@elecpro-sz.com", wechat: "elecpro_sales", site: "elecpro-sz.com",
+    nouveaute: false
+  },
+  {
+    id: 3, nom: "Yiwu Beauty Source", categorie: "cosmetique",
+    pays: "Chine", region: "Yiwu, Zhejiang",
+    type: "Grossiste", moq: "100 unités par ref.", verified: true,
+    desc: "Cosmétiques, soins visage et corps, maquillage. Produits OEM possible avec votre marque dès 500 unités.",
+    delai: "15-20 jours", prix_range: "0.8€ - 12€ / unité",
+    email: "contact@yiwubeauty.cn", wechat: "yiwu_beauty", site: "yiwubeauty.cn",
+    nouveaute: true
+  },
+  {
+    id: 4, nom: "Foshan Home Design", categorie: "maison",
+    pays: "Chine", region: "Foshan, Guangdong",
+    type: "Fabricant", moq: "50 pièces", verified: true,
+    desc: "Mobilier, décoration et articles de maison. Spécialiste du bois massif et des matériaux éco-responsables.",
+    delai: "40-60 jours", prix_range: "15€ - 350€ / pièce",
+    email: "export@foshanhomedesi.com", wechat: "foshan_home", site: "foshanhomedesi.com",
+    nouveaute: false
+  },
+  {
+    id: 5, nom: "Qingdao Sport Factory", categorie: "sport",
+    pays: "Chine", region: "Qingdao, Shandong",
+    type: "Fabricant", moq: "300 unités", verified: true,
+    desc: "Équipements sportifs, balles, sacs de sport et protections. Fournisseur officiel de plusieurs fédérations asiatiques.",
+    delai: "30-45 jours", prix_range: "4€ - 80€ / unité",
+    email: "biz@qdsport-factory.com", wechat: "qdsport_biz", site: "qdsport-factory.com",
+    nouveaute: false
+  },
+  {
+    id: 6, nom: "Hangzhou Food Export", categorie: "alimentaire",
+    pays: "Chine", region: "Hangzhou, Zhejiang",
+    type: "Grossiste", moq: "500 kg", verified: true,
+    desc: "Thés, épices, produits secs et snacks asiatiques. Certifications HACCP et BIO disponibles. Export Europe régulier.",
+    delai: "15-25 jours", prix_range: "2€ - 25€ / kg",
+    email: "export@hzfood.cn", wechat: "hzfood_export", site: "hzfood.cn",
+    nouveaute: false
+  }
+];
+
+async function init() {
+  var s = await SB.auth.getSession();
+  if (!s.data.session) { window.location.href = 'client-login.html'; return; }
+  user = s.data.session.user;
+
+  document.getElementById('logoutBtn').onclick = async function() {
+    await SB.auth.signOut(); window.location.href = 'client-login.html';
+  };
+
+  // Vérifier le plan
+  var memberRes = await SB.from('members').select('plan').eq('email', user.email).maybeSingle();
+  var plan = memberRes.data?.plan;
+  var hasAccess = (plan === 'pro' || plan === 'business');
+
+  if (!hasAccess) {
+    showLockScreen();
+    return;
+  }
+
+  // Charger depuis Supabase ou données de test
+  await loadFournisseurs();
+}
+
+async function loadFournisseurs() {
+  // Essaie de charger depuis Supabase
+  var res = await SB.from('annuaire').select('*').order('created_at', { ascending: false });
+
+  if (res.data && res.data.length > 0) {
+    allFournisseurs = res.data;
+  } else {
+    // Données de démonstration
+    allFournisseurs = SAMPLE_DATA;
+  }
+
+  document.getElementById('totalCount').textContent = allFournisseurs.length + ' fournisseurs';
+  renderGrid(allFournisseurs);
+}
+
+function setFilter(cat, btn) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyFilters();
+}
+
+function applyFilters() {
+  var search = document.getElementById('searchInput').value.toLowerCase();
+  var filtered = allFournisseurs.filter(function(f) {
+    var matchCat = currentFilter === 'tous' || f.categorie === currentFilter;
+    var matchSearch = !search ||
+      f.nom.toLowerCase().includes(search) ||
+      (f.desc || '').toLowerCase().includes(search) ||
+      (f.region || '').toLowerCase().includes(search);
+    return matchCat && matchSearch;
+  });
+  renderGrid(filtered);
+}
+
+function renderGrid(list) {
+  var grid = document.getElementById('fournGrid');
+  grid.innerHTML = '';
+
+  if (!list.length) {
+    grid.innerHTML = '<div class="fourn-empty">Aucun fournisseur trouvé pour ces critères.</div>';
+    return;
+  }
+
+  list.forEach(function(f) {
+    grid.appendChild(makeCard(f));
+  });
+}
+
+function makeCard(f) {
+  var card = document.createElement('div');
+  card.className = 'fourn-card';
+
+  var catClass = 'cat-' + (f.categorie || 'autre');
+  var catEmojis = {fournisseur:'🏭',logistique:'🚢',societe:'🏢',visa:'🛂',finance:'💳',sourcing:'🤝',juridique:'⚖️',autre:'📦'};
+  var catEmoji = catEmojis[f.categorie] || '📦';
+  var catLabel = f.categorie ? f.categorie.charAt(0).toUpperCase() + f.categorie.slice(1) : '';
+
+  card.innerHTML =
+    '<div class="fourn-card-top">' +
+      '<div class="fourn-badges">' +
+        '<span class="fourn-cat ' + catClass + '">' + catEmoji + ' ' + catLabel + '</span>' +
+        (f.verified ? '<span class="fourn-verified">✓ Vérifié SBW</span>' : '') +
+        (f.nouveaute ? '<span style="font-size:.6rem;font-weight:600;background:rgba(166,124,58,.1);color:var(--gold);padding:2px 8px;border-radius:10px">🆕 Nouveau</span>' : '') +
+      '</div>' +
+      '<div class="fourn-name">' + escHtml(f.nom) + '</div>' +
+      '<div class="fourn-location">📍 ' + escHtml(f.region || f.pays || '') + ' · ' + escHtml(f.type || '') + '</div>' +
+    '</div>' +
+    '<div class="fourn-card-body">' +
+      '<div class="fourn-desc">' + escHtml(f.desc || '') + '</div>' +
+      '<div class="fourn-specs">' +
+        '<div class="fourn-spec"><span class="fourn-spec-label">Tarif / MOQ</span><span class="fourn-spec-val">' + escHtml(f.moq || '—') + '</span></div>' +
+        '<div class="fourn-spec"><span class="fourn-spec-label">Délai</span><span class="fourn-spec-val">' + escHtml(f.delai || '—') + '</span></div>' +
+        '<div class="fourn-spec"><span class="fourn-spec-label">Prix</span><span class="fourn-spec-val">' + escHtml(f.prix_range || '—') + '</span></div>' +
+      '</div>' +
+      '<div class="fourn-divider"></div>' +
+      '<div class="fourn-contact" id="contact-' + f.id + '">' +
+        '<div style="font-size:.7rem;color:var(--muted)">Coordonnées masquées</div>' +
+      '</div>' +
+      '<button class="reveal-btn" id="btn-' + f.id + '" onclick="revealContact(' + f.id + ')">' +
+        '🔓 Voir les coordonnées' +
+      '</button>' +
+    '</div>';
+
+  // Stocker les données pour reveal
+  card._data = f;
+  card.dataset.id = f.id;
+
+  return card;
+}
+
+function revealContact(id) {
+  var f = allFournisseurs.find(function(x) { return x.id == id; });
+  if (!f) return;
+
+  var contactEl = document.getElementById('contact-' + id);
+  var btn = document.getElementById('btn-' + id);
+
+  contactEl.innerHTML =
+    (f.email ? '<div class="contact-row"><span class="contact-label">Email</span><span class="contact-val">' + escHtml(f.email) + '</span></div>' : '') +
+    (f.wechat ? '<div class="contact-row"><span class="contact-label">WeChat</span><span class="contact-val">' + escHtml(f.wechat) + '</span></div>' : '') +
+    (f.site ? '<div class="contact-row"><span class="contact-label">Site</span><a href="https://' + escHtml(f.site) + '" target="_blank" style="color:var(--gold);font-size:.72rem;font-weight:500">' + escHtml(f.site) + ' ↗</a></div>' : '');
+
+  btn.className = 'reveal-btn revealed';
+  btn.innerHTML = '✓ Coordonnées affichées';
+  btn.onclick = null;
+
+  showToast('Coordonnées révélées ✓');
+}
+
+function showLockScreen() {
+  document.querySelector('.page').innerHTML = `
+    <div style="max-width:460px;margin:4rem auto;text-align:center">
+      <div style="font-size:3rem;margin-bottom:1rem">🔒</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:.6rem">Accès fournisseurs</div>
+      <div style="font-size:.9rem;color:var(--muted);line-height:1.7;margin-bottom:.5rem">
+        L'annuaire Business est inclus dans le plan Pro.
+      </div>
+      <div style="font-size:.82rem;color:var(--muted);line-height:1.7;margin-bottom:2rem">
+        Fournisseurs, agents logistique, cabinets création société, agents visa — tout ce qu'il faut pour ton business international.
+      </div>
+      <a href="client-dashboard.html" style="display:inline-flex;align-items:center;gap:6px;background:#A67C3A;color:#fff;padding:12px 28px;border-radius:8px;font-size:.9rem;font-weight:500;text-decoration:none;margin-bottom:1rem">
+        Passer au plan Pro — 79€/mois →
+      </a>
+      <br>
+      <a href="client-dashboard.html" style="font-size:.78rem;color:var(--muted)">← Retour au dashboard</a>
+    </div>`;
+}
+
+function escHtml(t) {
+  return (t || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+init();
+</script>
+</body>
+</html>

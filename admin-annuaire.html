@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Annuaire Business — SBW Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>const PAGE_ID = 'fournisseurs'</script>
+  <link rel="stylesheet" href="admin.css">
+  <style>
+    .f-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:1.5rem}
+    .f-card{background:#fff;border:0.5px solid var(--subtle);border-radius:10px;padding:1.2rem;position:relative}
+    .f-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.8rem}
+    .f-card-name{font-weight:600;font-size:.95rem}
+    .f-card-cat{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:2px 8px;border-radius:10px;background:rgba(166,124,58,.1);color:#A67C3A}
+    .f-card-body{font-size:.78rem;color:#666;line-height:1.5;margin-bottom:.8rem}
+    .f-card-specs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.8rem}
+    .f-spec{font-size:.7rem;background:#F5F5F3;padding:3px 8px;border-radius:4px;color:#555}
+    .f-card-actions{display:flex;gap:8px}
+    .btn-edit{font-size:.75rem;padding:5px 12px;border-radius:5px;border:0.5px solid var(--subtle);background:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
+    .btn-edit:hover{border-color:#333;background:#333;color:#fff}
+    .btn-del{font-size:.75rem;padding:5px 12px;border-radius:5px;border:0.5px solid rgba(192,57,43,.3);background:#fff;color:#c0392b;cursor:pointer;font-family:inherit;transition:all .15s}
+    .btn-del:hover{background:#c0392b;color:#fff}
+    .badge-new{font-size:.6rem;font-weight:600;background:rgba(166,124,58,.1);color:#A67C3A;padding:2px 6px;border-radius:8px;margin-left:6px}
+    .badge-verified{font-size:.6rem;font-weight:600;background:rgba(22,163,74,.1);color:#16a34a;padding:2px 6px;border-radius:8px}
+    /* MODAL */
+    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:1.5rem}
+    .modal-overlay.open{display:flex}
+    .modal{background:#fff;border-radius:14px;padding:2rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+    .modal-title{font-family:"DM Serif Display",serif;font-size:1.3rem;margin-bottom:1.5rem}
+    .form-row{margin-bottom:1rem}
+    .form-row label{display:block;font-size:.75rem;font-weight:500;margin-bottom:4px;color:#555}
+    .form-row input,.form-row select,.form-row textarea{width:100%;border:0.5px solid #ddd;border-radius:7px;padding:8px 12px;font-family:"DM Sans",sans-serif;font-size:.85rem;outline:none;transition:border-color .15s}
+    .form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:#A67C3A}
+    .form-row textarea{min-height:70px;resize:vertical}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .form-check{display:flex;align-items:center;gap:8px;font-size:.82rem}
+    .modal-actions{display:flex;gap:10px;margin-top:1.5rem;justify-content:flex-end}
+    .btn-cancel{padding:8px 20px;border-radius:7px;border:0.5px solid #ddd;background:#fff;cursor:pointer;font-family:inherit;font-size:.85rem}
+    .btn-save{padding:8px 24px;border-radius:7px;border:none;background:#0E0D0B;color:#fff;cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:500}
+    .btn-save:hover{background:#333}
+    .empty-state{text-align:center;padding:3rem;color:#888;font-size:.88rem}
+  </style>
+</head>
+<body>
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="sidebar-top">
+      <div class="sidebar-logo"><div class="logo-text">SBW</div><div class="logo-sub">Admin</div></div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <a href="admin-dashboard.html" class="nav-item" data-access="dashboard">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="1" y="1" width="6" height="6" rx="1.5"/><rect x="9" y="1" width="6" height="6" rx="1.5"/><rect x="1" y="9" width="6" height="6" rx="1.5"/><rect x="9" y="9" width="6" height="6" rx="1.5"/></svg>
+          Dashboard
+        </a>
+        <div class="nav-section">Contenu</div>
+        <a href="admin-articles-list.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+          Articles
+        </a>
+        <a href="admin-formations.html" class="nav-item" data-access="articles">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
+          Formations
+        </a>
+        <a href="admin-annuaire.html" class="nav-item active" data-access="fournisseurs">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
+          Fournisseurs
+        </a>
+        <a href="admin-live.html" class="nav-item" data-access="live">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><polygon points="6.5 5.5 11.5 8 6.5 10.5"/></svg>
+          Lives
+        </a>
+        <a href="admin-newsletter.html" class="nav-item" data-access="newsletter">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M14 2H2v10h3l3 2 3-2h3V2z"/></svg>
+          Newsletter
+        </a>
+        <div class="nav-section">Communauté</div>
+        <a href="admin-members.html" class="nav-item" data-access="members">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="6" cy="5" r="3"/><path d="M1 14s1-4 5-4 5 4 5 4"/></svg>
+          Membres Club
+        </a>
+        <div class="nav-section">Monétisation</div>
+        <a href="admin-revenue.html" class="nav-item" data-access="revenue">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M8 1v14M5 4h4.5a2.5 2.5 0 010 5H5M5 9h5a2.5 2.5 0 010 5H5"/></svg>
+          Revenus
+        </a>
+        <a href="admin-affiliation.html" class="nav-item" data-access="affiliation">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
+          Affiliation
+        </a>
+        <div class="nav-section">Admin</div>
+        <a href="admin-settings.html" class="nav-item" data-access="settings">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="2.5"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
+          Paramètres
+        </a>
+      </nav>
+    </div>
+    <div id="userInfo"></div>
+  </aside>
+
+  <main class="main-content">
+    <div class="topbar">
+      <div>
+        <h1 class="page-title">Annuaire Business</h1>
+        <div class="page-date">Contacts &amp; Ressources Business — mis à jour chaque mois</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-primary" onclick="openModal()">+ Ajouter un contact</button>
+      </div>
+    </div>
+
+    <div class="f-grid" id="fGrid">
+      <div class="empty-state" style="grid-column:1/-1">Chargement...</div>
+    </div>
+  </main>
+</div>
+
+<!-- MODAL AJOUT/ÉDITION -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2 class="modal-title" id="modalTitle">Ajouter un contact</h2>
+    <input type="hidden" id="fId">
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Nom du contact / entreprise *</label>
+        <input type="text" id="fNom" placeholder="Ex: Luminos HK, Express Logistique, Me Dupont...">
+      </div>
+      <div class="form-row">
+        <label>Catégorie *</label>
+        <select id="fCat">
+          <option value="fournisseur">🏭 Fournisseur</option>
+          <option value="logistique">🚢 Logistique &amp; Transport</option>
+          <option value="societe">🏢 Création de société</option>
+          <option value="visa">🛂 Visa &amp; Expatriation</option>
+          <option value="finance">💳 Finance &amp; Paiement</option>
+          <option value="sourcing">🤝 Agent sourcing</option>
+          <option value="juridique">⚖️ Juridique &amp; Comptabilité</option>
+          <option value="autre">📦 Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Pays</label>
+        <input type="text" id="fPays" value="Chine">
+      </div>
+      <div class="form-row">
+        <label>Région / Ville</label>
+        <input type="text" id="fRegion" placeholder="Ex: Guangzhou, Guangdong">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Type</label>
+        <select id="fType">
+          <option value="Fabricant">Fabricant</option>
+          <option value="Grossiste">Grossiste</option>
+          <option value="Agent sourcing">Agent sourcing</option>
+          <option value="Transitaire">Transitaire</option>
+          <option value="Cabinet juridique">Cabinet juridique</option>
+          <option value="Agent visa">Agent visa</option>
+          <option value="Comptable">Comptable</option>
+          <option value="Banque / Fintech">Banque / Fintech</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="form-row">
+        <label>Tarif minimum / MOQ</label>
+        <input type="text" id="fMoq" placeholder="Ex: 200 pièces / À partir de 500€ / Gratuit">
+      </div>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Délai de production</label>
+        <input type="text" id="fDelai" placeholder="Ex: 25-35 jours">
+      </div>
+      <div class="form-row">
+        <label>Fourchette de prix</label>
+        <input type="text" id="fPrix" placeholder="Ex: 3€ - 18€ / pièce">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Description</label>
+      <textarea id="fDesc" placeholder="Description du fournisseur, spécialités, certifications..."></textarea>
+    </div>
+    <div class="form-grid">
+      <div class="form-row">
+        <label>Email</label>
+        <input type="email" id="fEmail" placeholder="contact@fournisseur.com">
+      </div>
+      <div class="form-row">
+        <label>WeChat</label>
+        <input type="text" id="fWechat" placeholder="ID WeChat">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Site web</label>
+      <input type="text" id="fSite" placeholder="fournisseur.com (sans https://)">
+    </div>
+    <div style="display:flex;gap:1.5rem;margin-top:.5rem">
+      <label class="form-check"><input type="checkbox" id="fVerified" checked> ✓ Vérifié SBW</label>
+      <label class="form-check"><input type="checkbox" id="fNouveaute"> 🆕 Nouveau ce mois</label>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Annuler</button>
+      <button class="btn-save" onclick="saveFournisseur()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<script src="admin-auth.js"></script>
+<script>
+const SB = supabase.createClient(
+  'https://grwimhqsthcmfwblwdwg.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+);
+
+async function load() {
+  const { data } = await sb.from('annuaire').select('*').order('created_at', { ascending: false });
+  render(data || []);
+}
+
+function render(list) {
+  const grid = document.getElementById('fGrid');
+  if (!list.length) {
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Aucun fournisseur. Clique sur "+ Ajouter" pour commencer.</div>';
+    return;
+  }
+  const catEmojis = {fournisseur:'🏭',logistique:'🚢',societe:'🏢',visa:'🛂',finance:'💳',sourcing:'🤝',juridique:'⚖️',autre:'📦'};
+  grid.innerHTML = list.map(f => `
+    <div class="f-card">
+      <div class="f-card-head">
+        <div>
+          <div class="f-card-name">${f.nom}${f.nouveaute ? '<span class="badge-new">Nouveau</span>' : ''}</div>
+          <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
+            <span class="f-card-cat">${catEmojis[f.categorie]||'📦'} ${f.categorie}</span>
+            ${f.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
+          </div>
+        </div>
+      </div>
+      <div class="f-card-body">${f.desc || '—'}</div>
+      <div class="f-card-specs">
+        ${f.region ? `<span class="f-spec">📍 ${f.region}</span>` : ''}
+        ${f.type ? `<span class="f-spec">${f.type}</span>` : ''}
+        ${f.moq ? `<span class="f-spec">MOQ: ${f.moq}</span>` : ''}
+        ${f.delai ? `<span class="f-spec">⏱ ${f.delai}</span>` : ''}
+        ${f.prix_range ? `<span class="f-spec">💰 ${f.prix_range}</span>` : ''}
+      </div>
+      <div style="font-size:.72rem;color:#888;margin-bottom:.8rem">
+        ${f.email ? `📧 ${f.email}` : ''} ${f.wechat ? `· WeChat: ${f.wechat}` : ''} ${f.site ? `· ${f.site}` : ''}
+      </div>
+      <div class="f-card-actions">
+        <button class="btn-edit" onclick='editFournisseur(${JSON.stringify(f)})'>Modifier</button>
+        <button class="btn-del" onclick="delFournisseur(${f.id})">Supprimer</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openModal(data) {
+  document.getElementById('modalTitle').textContent = data ? 'Modifier le contact' : 'Ajouter un contact';
+  document.getElementById('fId').value = data?.id || '';
+  document.getElementById('fNom').value = data?.nom || '';
+  document.getElementById('fCat').value = data?.categorie || 'textile';
+  document.getElementById('fPays').value = data?.pays || 'Chine';
+  document.getElementById('fRegion').value = data?.region || '';
+  document.getElementById('fType').value = data?.type || 'Fabricant';
+  document.getElementById('fMoq').value = data?.moq || '';
+  document.getElementById('fDelai').value = data?.delai || '';
+  document.getElementById('fPrix').value = data?.prix_range || '';
+  document.getElementById('fDesc').value = data?.desc || '';
+  document.getElementById('fEmail').value = data?.email || '';
+  document.getElementById('fWechat').value = data?.wechat || '';
+  document.getElementById('fSite').value = data?.site || '';
+  document.getElementById('fVerified').checked = data ? !!data.verified : true;
+  document.getElementById('fNouveaute').checked = !!data?.nouveaute;
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+
+function editFournisseur(f) { openModal(f); }
+
+async function saveFournisseur() {
+  const id = document.getElementById('fId').value;
+  const payload = {
+    nom: document.getElementById('fNom').value.trim(),
+    categorie: document.getElementById('fCat').value,
+    pays: document.getElementById('fPays').value.trim(),
+    region: document.getElementById('fRegion').value.trim(),
+    type: document.getElementById('fType').value,
+    moq: document.getElementById('fMoq').value.trim(),
+    delai: document.getElementById('fDelai').value.trim(),
+    prix_range: document.getElementById('fPrix').value.trim(),
+    desc: document.getElementById('fDesc').value.trim(),
+    email: document.getElementById('fEmail').value.trim(),
+    wechat: document.getElementById('fWechat').value.trim(),
+    site: document.getElementById('fSite').value.trim(),
+    verified: document.getElementById('fVerified').checked,
+    nouveaute: document.getElementById('fNouveaute').checked,
+  };
+  if (!payload.nom) { alert('Le nom est obligatoire.'); return; }
+  if (id) {
+    await sb.from('annuaire').update(payload).eq('id', id);
+  } else {
+    payload.created_at = new Date().toISOString();
+    await sb.from('annuaire').insert(payload);
+  }
+  closeModal();
+  load();
+}
+
+async function delFournisseur(id) {
+  if (!confirm('Supprimer ce contact ?')) return;
+  await sb.from('annuaire').delete().eq('id', id);
+  load();
+}
+
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+load();
+</script>
+</body>
+</html>

@@ -269,6 +269,7 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <div class="next-live-body">
       <div class="next-live-theme">Thème du mois</div>
       <div class="next-live-subject" id="nextLiveSubject">Business international, structure juridique, sourcing Chine — toutes les questions sont acceptées.</div>
+      <div id="meetBtnContainer" style="margin-bottom:1.2rem"></div>
       <div class="question-form">
         <label class="question-form-label">📝 Pose ta question pour le prochain live</label>
         <textarea class="question-textarea" id="questionText" placeholder="Ex: Comment choisir entre une SASU et une société Hong Kong pour mon e-commerce ?" maxlength="500"></textarea>
@@ -331,8 +332,31 @@ var isBusiness = false;
 // Prochain live — à mettre à jour chaque mois
 var NEXT_LIVE = {
   date: new Date('2026-05-08T19:00:00'),
-  subject: 'Business international, structure juridique, sourcing Chine — toutes les questions sont acceptées.'
+  subject: 'Business international — toutes les questions sont acceptées.',
+  meet_url: null,
+  titre: 'Live mensuel'
 };
+
+function renderMeetButton() {
+  var container = document.getElementById('meetBtnContainer');
+  if (!container) return;
+  if (!isBusiness) {
+    container.innerHTML = '';
+    return;
+  }
+  if (NEXT_LIVE.meet_url) {
+    container.innerHTML = `
+      <a href="${NEXT_LIVE.meet_url}" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:#16a34a;color:#fff;padding:10px 22px;border-radius:8px;font-size:.88rem;font-weight:500;text-decoration:none;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+        🎥 Rejoindre le live Google Meet →
+      </a>
+      <div style="font-size:.7rem;color:var(--muted);margin-top:6px">Lien actif le jour du live uniquement.</div>`;
+  } else {
+    container.innerHTML = `
+      <div style="font-size:.8rem;color:var(--muted);background:rgba(0,0,0,.04);border-radius:7px;padding:.8rem 1rem">
+        🔗 Le lien Google Meet sera disponible ici le jour du live.
+      </div>`;
+  }
+}
 
 async function init() {
   var s = await SB.auth.getSession();
@@ -360,11 +384,25 @@ async function init() {
   document.getElementById('heroLiveCount').textContent = '0';
   document.getElementById('heroQuestionsCount').textContent = '0';
 
+  // Charger le prochain live depuis Supabase
+  var liveRes = await SB.from('lives').select('*').eq('statut','upcoming').order('live_date').limit(1).maybeSingle();
+  var nextLive = liveRes.data;
+
+  if (nextLive) {
+    NEXT_LIVE.date = new Date(nextLive.live_date);
+    NEXT_LIVE.subject = nextLive.desc || 'Business international — toutes les questions sont acceptées.';
+    NEXT_LIVE.meet_url = nextLive.meet_url || null;
+    NEXT_LIVE.titre = nextLive.titre || 'Live mensuel';
+  }
+
   // Date prochain live
   document.getElementById('nextLiveDate').textContent = NEXT_LIVE.date.toLocaleDateString('fr-FR', {
     weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
   });
   document.getElementById('nextLiveSubject').textContent = NEXT_LIVE.subject;
+
+  // Bouton Meet si Business et lien disponible
+  renderMeetButton();
 
   // Countdown
   startCountdown();

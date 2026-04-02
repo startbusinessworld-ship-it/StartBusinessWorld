@@ -465,9 +465,9 @@
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
         Articles & Ressources
       </div>
-      <div class="nav-item" onclick="window.location.href='membre-fournisseurs.html'">
+      <div class="nav-item" onclick="window.location.href='membre-annuaire.html'">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M6 7h4"/></svg>
-        Fournisseurs
+        Annuaire Business
         <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">Pro</span>
       </div>
       <div class="nav-label">Communauté</div>
@@ -768,12 +768,12 @@
             </div>
 
             <!-- FOURNISSEURS -->
-            <div style="background:#fff;border:0.5px solid rgba(0,0,0,0.08);border-radius:10px;padding:1.2rem;cursor:pointer" onclick="accessFournisseurs()">
+            <div style="background:#fff;border:0.5px solid rgba(0,0,0,0.08);border-radius:10px;padding:1.2rem;cursor:pointer" onclick="accessAnnuaire Business()">
               <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.6rem">
-                <div style="font-size:0.82rem;font-weight:500">📦 Fournisseurs</div>
+                <div style="font-size:0.82rem;font-weight:500">📦 Annuaire Business</div>
                 <div style="font-size:0.6rem;font-weight:600;background:rgba(166,124,58,0.1);color:var(--gold);border:1px solid rgba(166,124,58,0.2);padding:2px 8px;border-radius:10px">Pro</div>
               </div>
-              <div style="font-size:0.75rem;color:var(--muted);line-height:1.55;margin-bottom:0.8rem">Fournisseurs vérifiés SBW mis à jour chaque mois — textile, électronique, cosmétique et plus.</div>
+              <div style="font-size:0.75rem;color:var(--muted);line-height:1.55;margin-bottom:0.8rem">Annuaire Business vérifiés SBW mis à jour chaque mois — textile, électronique, cosmétique et plus.</div>
               <div style="font-size:0.75rem;font-weight:500;color:var(--gold)">Voir l'annuaire →</div>
             </div>
 
@@ -1217,8 +1217,8 @@
     } catch(e) { console.log('Module progress error:', e); }
   }
 
-  function accessFournisseurs() {
-    window.location.href = 'membre-fournisseurs.html'
+  function accessAnnuaire Business() {
+    window.location.href = 'membre-annuaire.html'
   }
     if (currentMember?.plan === 'business') {
       window.location.href = 'membre-chat.html'
