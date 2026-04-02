@@ -9,7 +9,7 @@
   <script>const PAGE_ID = 'fournisseurs'</script>
   <link rel="stylesheet" href="admin.css">
   <style>
-    .f-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:1.5rem}
+    .f-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:1rem}
     .f-card{background:#fff;border:0.5px solid var(--subtle);border-radius:10px;padding:1.2rem;position:relative}
     .f-card-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.8rem}
     .f-card-name{font-weight:600;font-size:.95rem}
@@ -17,17 +17,29 @@
     .f-card-body{font-size:.78rem;color:#666;line-height:1.5;margin-bottom:.8rem}
     .f-card-specs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:.8rem}
     .f-spec{font-size:.7rem;background:#F5F5F3;padding:3px 8px;border-radius:4px;color:#555}
-    .f-card-actions{display:flex;gap:8px}
+    .f-card-actions{display:flex;gap:8px;flex-wrap:wrap}
     .btn-edit{font-size:.75rem;padding:5px 12px;border-radius:5px;border:0.5px solid var(--subtle);background:#fff;cursor:pointer;font-family:inherit;transition:all .15s}
     .btn-edit:hover{border-color:#333;background:#333;color:#fff}
     .btn-del{font-size:.75rem;padding:5px 12px;border-radius:5px;border:0.5px solid rgba(192,57,43,.3);background:#fff;color:#c0392b;cursor:pointer;font-family:inherit;transition:all .15s}
     .btn-del:hover{background:#c0392b;color:#fff}
     .badge-new{font-size:.6rem;font-weight:600;background:rgba(166,124,58,.1);color:#A67C3A;padding:2px 6px;border-radius:8px;margin-left:6px}
     .badge-verified{font-size:.6rem;font-weight:600;background:rgba(22,163,74,.1);color:#16a34a;padding:2px 6px;border-radius:8px}
+    /* FILTRES ADMIN */
+    .admin-filters{display:flex;gap:10px;margin-top:1.2rem;flex-wrap:wrap;align-items:center}
+    .admin-filter-search{flex:1;min-width:200px;border:0.5px solid var(--subtle);border-radius:7px;padding:7px 12px;font-family:"DM Sans",sans-serif;font-size:.82rem;outline:none;background:#fff}
+    .admin-filter-search:focus{border-color:#A67C3A}
+    .admin-filter-select{border:0.5px solid var(--subtle);border-radius:7px;padding:7px 10px;font-family:"DM Sans",sans-serif;font-size:.78rem;outline:none;background:#fff;cursor:pointer}
+    .admin-filter-select:focus{border-color:#A67C3A}
+    .admin-stats{font-size:.75rem;color:var(--muted);padding:4px 0}
+    /* CONTACTS INFO */
+    .f-contacts{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:.8rem}
+    .f-contact-chip{display:inline-flex;align-items:center;gap:4px;font-size:.68rem;padding:3px 8px;border-radius:5px;background:#F5F5F3;color:#444}
+    .f-contact-chip a{color:inherit;text-decoration:none}
+    .f-contact-chip a:hover{color:#A67C3A}
     /* MODAL */
     .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:1.5rem}
     .modal-overlay.open{display:flex}
-    .modal{background:#fff;border-radius:14px;padding:2rem;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+    .modal{background:#fff;border-radius:14px;padding:2rem;max-width:600px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
     .modal-title{font-family:"DM Serif Display",serif;font-size:1.3rem;margin-bottom:1.5rem}
     .form-row{margin-bottom:1rem}
     .form-row label{display:block;font-size:.75rem;font-weight:500;margin-bottom:4px;color:#555}
@@ -110,6 +122,37 @@
       </div>
     </div>
 
+    <!-- FILTRES -->
+    <div class="admin-filters">
+      <input class="admin-filter-search" type="text" id="searchInput" placeholder="🔍 Rechercher nom, pays, description..." oninput="applyFilters()">
+      <select class="admin-filter-select" id="filterCat" onchange="applyFilters()">
+        <option value="">Toutes catégories</option>
+        <option value="fournisseur">🏭 Fournisseur</option>
+        <option value="logistique">🚢 Logistique</option>
+        <option value="societe">🏢 Création société</option>
+        <option value="visa">🛂 Visa & Expat</option>
+        <option value="finance">💳 Finance</option>
+        <option value="sourcing">🤝 Sourcing</option>
+        <option value="juridique">⚖️ Juridique</option>
+        <option value="autre">📦 Autre</option>
+      </select>
+      <select class="admin-filter-select" id="filterPays" onchange="applyFilters()">
+        <option value="">Tous pays</option>
+        <option value="Chine">🇨🇳 Chine</option>
+        <option value="Hong Kong">🇭🇰 Hong Kong</option>
+        <option value="Émirats Arabes Unis">🇦🇪 Dubai / EAU</option>
+        <option value="France">🇫🇷 France</option>
+        <option value="International">🌍 International</option>
+      </select>
+      <select class="admin-filter-select" id="filterSort" onchange="applyFilters()">
+        <option value="recent">Récents d'abord</option>
+        <option value="alpha">A → Z</option>
+        <option value="cat">Par catégorie</option>
+        <option value="pays">Par pays</option>
+      </select>
+      <div class="admin-stats" id="adminStats"></div>
+    </div>
+
     <div class="f-grid" id="fGrid">
       <div class="empty-state" style="grid-column:1/-1">Chargement...</div>
     </div>
@@ -187,16 +230,26 @@
     <div class="form-grid">
       <div class="form-row">
         <label>Email</label>
-        <input type="email" id="fEmail" placeholder="contact@fournisseur.com">
+        <input type="email" id="fEmail" placeholder="contact@exemple.com">
       </div>
+      <div class="form-row">
+        <label>Téléphone / WhatsApp</label>
+        <input type="text" id="fPhone" placeholder="+86 138 0000 0000">
+      </div>
+    </div>
+    <div class="form-grid">
       <div class="form-row">
         <label>WeChat</label>
         <input type="text" id="fWechat" placeholder="ID WeChat">
       </div>
+      <div class="form-row">
+        <label>LinkedIn</label>
+        <input type="text" id="fLinkedin" placeholder="linkedin.com/in/...">
+      </div>
     </div>
     <div class="form-row">
       <label>Site web</label>
-      <input type="text" id="fSite" placeholder="fournisseur.com (sans https://)">
+      <input type="text" id="fSite" placeholder="exemple.com (sans https://)">
     </div>
     <div style="display:flex;gap:1.5rem;margin-top:.5rem">
       <label class="form-check"><input type="checkbox" id="fVerified" checked> ✓ Vérifié SBW</label>
@@ -216,53 +269,96 @@ const SB = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
 );
 
+var allData = [];
+
 async function load() {
   const { data } = await sb.from('annuaire').select('*').order('created_at', { ascending: false });
-  render(data || []);
+  allData = data || [];
+  applyFilters();
+}
+
+function applyFilters() {
+  const search = document.getElementById('searchInput')?.value.toLowerCase() || '';
+  const cat = document.getElementById('filterCat')?.value || '';
+  const pays = document.getElementById('filterPays')?.value || '';
+  const sort = document.getElementById('filterSort')?.value || 'recent';
+
+  let list = allData.filter(f => {
+    const matchSearch = !search ||
+      (f.nom||'').toLowerCase().includes(search) ||
+      (f.desc||'').toLowerCase().includes(search) ||
+      (f.pays||'').toLowerCase().includes(search) ||
+      (f.region||'').toLowerCase().includes(search);
+    const matchCat = !cat || f.categorie === cat;
+    const matchPays = !pays || (f.pays||'').includes(pays);
+    return matchSearch && matchCat && matchPays;
+  });
+
+  // Tri
+  if (sort === 'alpha') list.sort((a,b) => (a.nom||'').localeCompare(b.nom||''));
+  else if (sort === 'cat') list.sort((a,b) => (a.categorie||'').localeCompare(b.categorie||''));
+  else if (sort === 'pays') list.sort((a,b) => (a.pays||'').localeCompare(b.pays||''));
+
+  const stats = document.getElementById('adminStats');
+  if (stats) stats.textContent = list.length + ' contact' + (list.length > 1 ? 's' : '');
+
+  render(list);
 }
 
 function render(list) {
   const grid = document.getElementById('fGrid');
   if (!list.length) {
-    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Aucun fournisseur. Clique sur "+ Ajouter" pour commencer.</div>';
+    grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1">Aucun contact trouvé. Modifie tes filtres ou clique sur "+ Ajouter".</div>';
     return;
   }
   const catEmojis = {fournisseur:'🏭',logistique:'🚢',societe:'🏢',visa:'🛂',finance:'💳',sourcing:'🤝',juridique:'⚖️',autre:'📦'};
-  grid.innerHTML = list.map(f => `
+  const catLabels = {fournisseur:'Fournisseur',logistique:'Logistique',societe:'Création société',visa:'Visa & Expat',finance:'Finance',sourcing:'Sourcing',juridique:'Juridique',autre:'Autre'};
+
+  grid.innerHTML = list.map(f => {
+    const catEmoji = catEmojis[f.categorie] || '📦';
+    const catLabel = catLabels[f.categorie] || f.categorie || '';
+
+    const contacts = [
+      f.email ? `<span class="f-contact-chip">📧 <a href="mailto:${f.email}">${f.email}</a></span>` : '',
+      f.phone ? `<span class="f-contact-chip">📱 ${f.phone}</span>` : '',
+      f.wechat ? `<span class="f-contact-chip">💬 WeChat: ${f.wechat}</span>` : '',
+      f.linkedin ? `<span class="f-contact-chip">🔗 <a href="https://${f.linkedin}" target="_blank">LinkedIn</a></span>` : '',
+      f.site ? `<span class="f-contact-chip">🌐 <a href="https://${f.site}" target="_blank">${f.site}</a></span>` : '',
+    ].filter(Boolean).join('');
+
+    return `
     <div class="f-card">
       <div class="f-card-head">
         <div>
           <div class="f-card-name">${f.nom}${f.nouveaute ? '<span class="badge-new">Nouveau</span>' : ''}</div>
           <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
-            <span class="f-card-cat">${catEmojis[f.categorie]||'📦'} ${f.categorie}</span>
+            <span class="f-card-cat">${catEmoji} ${catLabel}</span>
             ${f.verified ? '<span class="badge-verified">✓ Vérifié</span>' : ''}
           </div>
         </div>
       </div>
       <div class="f-card-body">${f.desc || '—'}</div>
       <div class="f-card-specs">
-        ${f.region ? `<span class="f-spec">📍 ${f.region}</span>` : ''}
+        ${f.pays ? `<span class="f-spec">📍 ${f.pays}${f.region ? ' · ' + f.region : ''}</span>` : ''}
         ${f.type ? `<span class="f-spec">${f.type}</span>` : ''}
-        ${f.moq ? `<span class="f-spec">MOQ: ${f.moq}</span>` : ''}
+        ${f.moq ? `<span class="f-spec">💰 ${f.moq}</span>` : ''}
         ${f.delai ? `<span class="f-spec">⏱ ${f.delai}</span>` : ''}
-        ${f.prix_range ? `<span class="f-spec">💰 ${f.prix_range}</span>` : ''}
+        ${f.prix_range ? `<span class="f-spec">${f.prix_range}</span>` : ''}
       </div>
-      <div style="font-size:.72rem;color:#888;margin-bottom:.8rem">
-        ${f.email ? `📧 ${f.email}` : ''} ${f.wechat ? `· WeChat: ${f.wechat}` : ''} ${f.site ? `· ${f.site}` : ''}
-      </div>
+      ${contacts ? `<div class="f-contacts">${contacts}</div>` : ''}
       <div class="f-card-actions">
-        <button class="btn-edit" onclick='editFournisseur(${JSON.stringify(f)})'>Modifier</button>
-        <button class="btn-del" onclick="delFournisseur(${f.id})">Supprimer</button>
+        <button class="btn-edit" onclick='editContact(${JSON.stringify(f).replace(/'/g, "&#39;")})'>Modifier</button>
+        <button class="btn-del" onclick="delContact(${f.id})">Supprimer</button>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function openModal(data) {
   document.getElementById('modalTitle').textContent = data ? 'Modifier le contact' : 'Ajouter un contact';
   document.getElementById('fId').value = data?.id || '';
   document.getElementById('fNom').value = data?.nom || '';
-  document.getElementById('fCat').value = data?.categorie || 'textile';
+  document.getElementById('fCat').value = data?.categorie || 'fournisseur';
   document.getElementById('fPays').value = data?.pays || 'Chine';
   document.getElementById('fRegion').value = data?.region || '';
   document.getElementById('fType').value = data?.type || 'Fabricant';
@@ -271,7 +367,9 @@ function openModal(data) {
   document.getElementById('fPrix').value = data?.prix_range || '';
   document.getElementById('fDesc').value = data?.desc || '';
   document.getElementById('fEmail').value = data?.email || '';
+  document.getElementById('fPhone').value = data?.phone || '';
   document.getElementById('fWechat').value = data?.wechat || '';
+  document.getElementById('fLinkedin').value = data?.linkedin || '';
   document.getElementById('fSite').value = data?.site || '';
   document.getElementById('fVerified').checked = data ? !!data.verified : true;
   document.getElementById('fNouveaute').checked = !!data?.nouveaute;
@@ -279,8 +377,7 @@ function openModal(data) {
 }
 
 function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
-
-function editFournisseur(f) { openModal(f); }
+function editContact(f) { openModal(f); }
 
 async function saveFournisseur() {
   const id = document.getElementById('fId').value;
@@ -295,7 +392,9 @@ async function saveFournisseur() {
     prix_range: document.getElementById('fPrix').value.trim(),
     desc: document.getElementById('fDesc').value.trim(),
     email: document.getElementById('fEmail').value.trim(),
+    phone: document.getElementById('fPhone').value.trim(),
     wechat: document.getElementById('fWechat').value.trim(),
+    linkedin: document.getElementById('fLinkedin').value.trim(),
     site: document.getElementById('fSite').value.trim(),
     verified: document.getElementById('fVerified').checked,
     nouveaute: document.getElementById('fNouveaute').checked,
@@ -311,7 +410,7 @@ async function saveFournisseur() {
   load();
 }
 
-async function delFournisseur(id) {
+async function delContact(id) {
   if (!confirm('Supprimer ce contact ?')) return;
   await sb.from('annuaire').delete().eq('id', id);
   load();
