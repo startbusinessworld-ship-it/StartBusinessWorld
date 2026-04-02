@@ -211,7 +211,7 @@ const SB = supabase.createClient(
 );
 
 async function load() {
-  const { data } = await SB.from('fournisseurs').select('*').order('created_at', { ascending: false });
+  const { data } = await sb.from('fournisseurs').select('*').order('created_at', { ascending: false });
   render(data || []);
 }
 
@@ -296,10 +296,10 @@ async function saveFournisseur() {
   };
   if (!payload.nom) { alert('Le nom est obligatoire.'); return; }
   if (id) {
-    await SB.from('fournisseurs').update(payload).eq('id', id);
+    await sb.from('fournisseurs').update(payload).eq('id', id);
   } else {
     payload.created_at = new Date().toISOString();
-    await SB.from('fournisseurs').insert(payload);
+    await sb.from('fournisseurs').insert(payload);
   }
   closeModal();
   load();
@@ -307,7 +307,7 @@ async function saveFournisseur() {
 
 async function delFournisseur(id) {
   if (!confirm('Supprimer ce fournisseur ?')) return;
-  await SB.from('fournisseurs').delete().eq('id', id);
+  await sb.from('fournisseurs').delete().eq('id', id);
   load();
 }
 

@@ -11,7 +11,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
 // Rôles et leurs accès
 const ROLE_ACCESS = {
-  admin:  ['dashboard', 'articles', 'shorts', 'newsletter', 'members', 'revenue', 'affiliation', 'settings', 'team'],
+  admin:  ['dashboard', 'articles', 'shorts', 'newsletter', 'members', 'revenue', 'affiliation', 'settings', 'team', 'fournisseurs', 'live'],
   writer: ['articles', 'shorts'],
   contributor: ['articles', 'shorts', 'newsletter'],
   editor: ['newsletter']
