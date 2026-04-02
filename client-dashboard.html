@@ -475,8 +475,7 @@
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><polygon points="6.5 5.5 11.5 8 6.5 10.5 6.5 5.5"/></svg>
         Live mensuel
         <span style="font-size:0.55rem;background:rgba(166,124,58,0.15);color:var(--gold);border:1px solid rgba(166,124,58,0.25);padding:1px 6px;border-radius:8px;margin-left:auto">Business</span>
-      </div>
-      <div class="nav-item" onclick="showSection('bonsplans', this)">
+      </div>      <div class="nav-item" onclick="showSection('bonsplans', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
         Bons Plans membres
       </div>
@@ -908,9 +907,13 @@
       <span class="icon">🎓</span>
       <span>Formations</span>
     </button>
-    <button class="mobile-nav-item" id="mbn-communaute" onclick="window.location.href='membre-chat.html'">
+    <button class="mobile-nav-item" id="mbn-communaute" onclick="accessGroupe()">
       <span class="icon">💬</span>
-      <span>Chat</span>
+      <span>Groupe</span>
+    </button>
+    <button class="mobile-nav-item" onclick="accessLive()">
+      <span class="icon">🎥</span>
+      <span>Live</span>
     </button>
     <button class="mobile-nav-item" id="mbn-prestige" onclick="window.location.href='membre-prestige.html'">
       <span class="icon">⭐</span>
@@ -1211,7 +1214,7 @@
 
   function accessLive() {
     if (currentMember?.plan === 'business') {
-      showSection('live', null)
+      window.location.href = 'membre-live.html'
     } else {
       document.getElementById('modalIcon').textContent = '🎥'
       document.getElementById('modalTitle').textContent = 'Accède au live mensuel'
