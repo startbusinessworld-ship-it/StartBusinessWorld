@@ -753,12 +753,28 @@
     }
   }
 
-  // Si l'utilisateur revient après connexion avec intention checkout
+  // Déclencher le checkout si on revient après connexion
   window.addEventListener('load', async () => {
-    const afterLogin = sessionStorage.getItem('sbw_after_login')
     const urlParams = new URLSearchParams(window.location.search)
-    if (afterLogin === 'checkout' || urlParams.get('checkout') === '1') {
-      sessionStorage.removeItem('sbw_after_login')
+    const isCheckout = urlParams.get('checkout') === '1' || sessionStorage.getItem('sbw_after_login') === 'checkout'
+    if (!isCheckout) return
+
+    sessionStorage.removeItem('sbw_after_login')
+
+    // Attendre que la session Supabase soit établie (magic link en cours de traitement)
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+    // Écouter l'événement SIGNED_IN qui arrive après traitement du magic link
+    sb.auth.onAuthStateChange(async (event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
+        handleJoin(new Event('click'))
+      }
+    })
+
+    // Vérifier si session déjà active
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) {
       handleJoin(new Event('click'))
     }
   })

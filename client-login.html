@@ -180,7 +180,9 @@ async function handleSubmit() {
     var { error } = await sb.auth.signInWithOtp({
       email: email,
       options: {
-        emailRedirectTo: getRedirectUrl(),
+        // Inscription → toujours vers le paiement
+        // Connexion → vers le dashboard (ou checkout si param)
+        emailRedirectTo: isLoginMode ? getRedirectUrl() : window.location.origin + "/club.html?checkout=1",
         data: isLoginMode ? {} : { full_name: prenom, prenom: prenom }
       }
     });
@@ -202,7 +204,10 @@ async function handleSubmit() {
 async function loginGoogle() {
   var { error } = await sb.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: getRedirectUrl() }
+    options: {
+      // Inscription → checkout, Connexion → dashboard
+      redirectTo: isLoginMode ? getRedirectUrl() : window.location.origin + "/club.html?checkout=1"
+    }
   });
   if (error) showError(error.message);
 }
