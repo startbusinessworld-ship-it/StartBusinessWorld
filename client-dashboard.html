@@ -1241,6 +1241,17 @@
 
     currentMember = member
 
+    // Vérifier si le membre a un plan actif
+    const planActif = member?.plan && member.plan !== 'trial' && member.plan !== null
+    const statusActif = !member?.stripe_subscription_status || 
+                        member?.stripe_subscription_status === 'active' ||
+                        member?.stripe_subscription_status === 'trialing'
+
+    if (!planActif || !statusActif) {
+      window.location.href = 'plans.html'
+      return
+    }
+
     renderUser()
     renderStats()
     renderModuleProgress()
