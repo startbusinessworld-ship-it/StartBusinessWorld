@@ -35,19 +35,50 @@ serve(async (req) => {
     // Paiement réussi — abonnement créé
     case "checkout.session.completed": {
       const session = event.data.object
-      const supabaseId = session.metadata?.supabase_id || session.subscription_data?.metadata?.supabase_id
+      const supabaseId = session.metadata?.supabase_id
       const plan = session.metadata?.plan || "basic"
       const customerId = session.customer
+      const subscriptionId = session.subscription
+      const isIntro = session.metadata?.is_intro === "true"
 
       if (supabaseId) {
         await sb.from("members").update({
           plan,
           stripe_customer_id: customerId,
-          stripe_subscription_id: session.subscription,
+          stripe_subscription_id: subscriptionId,
           plan_updated_at: new Date().toISOString(),
         }).eq("id", supabaseId)
         console.log(`Plan mis à jour : ${supabaseId} → ${plan}`)
       }
+
+      // Si offre intro → créer Subscription Schedule pour basculer sur 29€ après 3 mois
+      if (isIntro && subscriptionId) {
+        const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!
+        const BASIC_PRICE_ID = "price_1TIM9hLBxNkjNd236Z3AfvoS"
+
+        const scheduleRes = await fetch("https://api.stripe.com/v1/subscription_schedules", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({
+            from_subscription: subscriptionId,
+            "phases[0][items][0][price]": "price_1TIQSWLBxNkjNd23gtGJ3LKp",
+            "phases[0][items][0][quantity]": "1",
+            "phases[0][iterations]": "3", // 3 mois à 1€
+            "phases[1][items][0][price]": BASIC_PRICE_ID,
+            "phases[1][items][0][quantity]": "1",
+          }),
+        })
+        const schedule = await scheduleRes.json()
+        if (schedule.error) {
+          console.error("Erreur Schedule:", schedule.error.message)
+        } else {
+          console.log("Subscription Schedule créée:", schedule.id)
+        }
+      }
+
       break
     }
 
