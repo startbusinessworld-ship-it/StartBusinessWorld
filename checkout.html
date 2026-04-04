@@ -49,8 +49,8 @@ function showError(msg) {
 
 async function startCheckout(session) {
   try {
+    // Lire le plan AVANT tout — et ne pas le supprimer tout de suite
     const plan = sessionStorage.getItem('sbw_plan') || 'basic'
-    sessionStorage.removeItem('sbw_plan')
 
     const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
       method: 'POST',
@@ -67,6 +67,7 @@ async function startCheckout(session) {
     })
     const data = await res.json()
     if (data.url) {
+      sessionStorage.removeItem('sbw_plan') // supprimer seulement si succès
       window.location.href = data.url
     } else {
       showError('Erreur paiement : ' + (data.error || 'Réessaie dans quelques instants.'))
@@ -79,32 +80,31 @@ async function startCheckout(session) {
 async function init() {
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
-  // Attendre la session avec retry
   let attempts = 0
   const maxAttempts = 10
+  let started = false // empêcher double appel
 
   async function tryGetSession() {
     attempts++
     const { data: { session } } = await sb.auth.getSession()
 
-    if (session) {
+    if (session && !started) {
+      started = true
       startCheckout(session)
       return
     }
 
-    if (attempts < maxAttempts) {
-      // Réessayer toutes les 500ms pendant 5 secondes
+    if (!started && attempts < maxAttempts) {
       setTimeout(tryGetSession, 500)
-    } else {
-      // Pas de session après 5 secondes → retour login
-      window.location.href = 'client-login.html?redirect=checkout'
+    } else if (!started) {
+      window.location.href = 'client-login.html'
     }
   }
 
-  // Écouter aussi onAuthStateChange pour attraper la session dès qu'elle arrive
   sb.auth.onAuthStateChange((event, session) => {
-    if (session && attempts <= maxAttempts) {
-      attempts = maxAttempts + 1 // stopper les retries
+    if (session && !started) {
+      started = true
+      attempts = maxAttempts + 1
       startCheckout(session)
     }
   })
