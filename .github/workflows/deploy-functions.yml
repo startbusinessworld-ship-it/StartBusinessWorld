@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch:
+    paths:
+      - 'supabase/functions/**'
 
 jobs:
   deploy:
@@ -23,5 +24,10 @@ jobs:
 
       - name: Deploy stripe-webhook
         run: supabase functions deploy stripe-webhook --project-ref grwimhqsthcmfwblwdwg
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy get-stripe-stats
+        run: supabase functions deploy get-stripe-stats --no-verify-jwt --project-ref grwimhqsthcmfwblwdwg
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
