@@ -753,30 +753,57 @@
     }
   }
 
-  // Déclencher le checkout si on revient après connexion
+  // Déclencher le checkout automatiquement si ?checkout=1
   window.addEventListener('load', async () => {
     const urlParams = new URLSearchParams(window.location.search)
-    const isCheckout = urlParams.get('checkout') === '1' || sessionStorage.getItem('sbw_after_login') === 'checkout'
-    if (!isCheckout) return
+    if (urlParams.get('checkout') !== '1') return
 
-    sessionStorage.removeItem('sbw_after_login')
+    // Nettoyer l'URL
+    history.replaceState({}, '', 'club.html')
 
-    // Attendre que la session Supabase soit établie (magic link en cours de traitement)
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    var checkoutStarted = false
 
-    // Écouter l'événement SIGNED_IN qui arrive après traitement du magic link
-    sb.auth.onAuthStateChange(async (event, session) => {
-      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session) {
-        handleJoin(new Event('click'))
+    async function startCheckout() {
+      if (checkoutStarted) return
+      checkoutStarted = true
+
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+      const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      const { data: { session } } = await _sb.auth.getSession()
+
+      if (!session) {
+        // Pas de session — retour login
+        window.location.href = 'client-login.html?redirect=checkout'
+        return
       }
-    })
 
-    // Vérifier si session déjà active
-    const { data: { session } } = await sb.auth.getSession()
-    if (session) {
-      handleJoin(new Event('click'))
+      // Session active — lancer Stripe
+      try {
+        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            plan: 'basic',
+            email: session.user.email,
+            userId: session.user.id,
+            isIntro: true,
+          }),
+        })
+        const data = await res.json()
+        if (data.url) {
+          window.location.href = data.url
+        } else {
+          alert('Erreur : ' + (data.error || 'Impossible de créer le paiement'))
+        }
+      } catch(err) {
+        alert('Erreur de connexion. Réessaie.')
+      }
     }
+
+    startCheckout()
   })
 
   // Intersection Observer pour animations au scroll
