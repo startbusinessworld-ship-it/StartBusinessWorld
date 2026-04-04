@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement — Club SBW</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{background:#0C0C0A;color:#F0EDE4;font-family:"DM Sans",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+    :root{--gold:#A67C3A}
+    .wrap{text-align:center;max-width:360px}
+    .logo{font-family:"DM Serif Display",serif;font-size:1.3rem;margin-bottom:.4rem}
+    .badge{font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2.5rem}
+    .spinner{width:40px;height:40px;border:3px solid rgba(166,124,58,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1.5rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .title{font-family:"DM Serif Display",serif;font-size:1.3rem;margin-bottom:.5rem}
+    .sub{font-size:.82rem;color:rgba(240,237,228,.4);line-height:1.6}
+    .error-box{background:rgba(192,57,43,.12);border:0.5px solid rgba(192,57,43,.3);border-radius:10px;padding:1.2rem;margin-top:1.5rem;display:none}
+    .error-box p{font-size:.82rem;color:#F09595;margin-bottom:1rem}
+    .btn{display:inline-block;padding:10px 24px;background:var(--gold);color:#fff;border:none;border-radius:7px;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none}
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Start Business World</div>
+  <div class="badge">Le Club SBW</div>
+  <div class="spinner"></div>
+  <div class="title">Redirection vers le paiement...</div>
+  <div class="sub">Tu vas être redirigé vers notre page de paiement sécurisé.</div>
+  <div class="error-box" id="errorBox">
+    <p id="errorMsg">Une erreur est survenue.</p>
+    <a href="club.html" class="btn">Réessayer →</a>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+
+function showError(msg) {
+  document.querySelector('.spinner').style.display = 'none'
+  document.querySelector('.title').textContent = 'Oups...'
+  document.querySelector('.sub').textContent = ''
+  document.getElementById('errorMsg').textContent = msg
+  document.getElementById('errorBox').style.display = 'block'
+}
+
+async function startCheckout(session) {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({
+        plan: 'basic',
+        email: session.user.email,
+        userId: session.user.id,
+        isIntro: true,
+      }),
+    })
+    const data = await res.json()
+    if (data.url) {
+      window.location.href = data.url
+    } else {
+      showError('Erreur paiement : ' + (data.error || 'Réessaie dans quelques instants.'))
+    }
+  } catch(e) {
+    showError('Erreur de connexion. Vérifie ta connexion internet.')
+  }
+}
+
+async function init() {
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+  // Attendre la session avec retry
+  let attempts = 0
+  const maxAttempts = 10
+
+  async function tryGetSession() {
+    attempts++
+    const { data: { session } } = await sb.auth.getSession()
+
+    if (session) {
+      startCheckout(session)
+      return
+    }
+
+    if (attempts < maxAttempts) {
+      // Réessayer toutes les 500ms pendant 5 secondes
+      setTimeout(tryGetSession, 500)
+    } else {
+      // Pas de session après 5 secondes → retour login
+      window.location.href = 'client-login.html?redirect=checkout'
+    }
+  }
+
+  // Écouter aussi onAuthStateChange pour attraper la session dès qu'elle arrive
+  sb.auth.onAuthStateChange((event, session) => {
+    if (session && attempts <= maxAttempts) {
+      attempts = maxAttempts + 1 // stopper les retries
+      startCheckout(session)
+    }
+  })
+
+  tryGetSession()
+}
+
+init()
+</script>
+</body>
+</html>

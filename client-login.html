@@ -90,12 +90,12 @@ var sb = supabase.createClient(
 var isLoginMode = false;
 
 function getCheckoutUrl() {
-  return window.location.origin + "/club.html?checkout=1";
+  return window.location.origin + "/checkout.html";
 }
 function getDashboardUrl() {
   var params = new URLSearchParams(window.location.search);
   var r = params.get("redirect");
-  return window.location.origin + (r === "checkout" ? "/club.html?checkout=1" : "/client-dashboard.html");
+  return window.location.origin + (r === "checkout" ? "/checkout.html" : "/client-dashboard.html");
 }
 
 // Session existante
