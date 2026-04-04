@@ -5,11 +5,15 @@ const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY")!
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
+// Prix normaux
 const PRICE_IDS: Record<string, string> = {
-  basic:    "price_1TIM9hLBxNkjNd236Z3AfvoS",
-  pro:      "price_1TIMA8LBxNkjNd23sNkSycog",
-  business: "price_1TIMAPLBxNkjNd23KR5yVvdf",
+  basic:    "price_1TIM9hLBxNkjNd236Z3AfvoS", // 29€/mois
+  pro:      "price_1TIMA8LBxNkjNd23sNkSycog", // 79€/mois
+  business: "price_1TIMAPLBxNkjNd23KR5yVvdf", // 149€/mois
 }
+
+// Prix d'entrée 1€/mois
+const INTRO_PRICE_ID = "price_1TIQSWLBxNkjNd23gtGJ3LKp"
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -46,7 +50,7 @@ serve(async (req) => {
     const plan = body.plan || "basic"
     const email = body.email || user.email
     const userId = body.userId || user.id
-    const priceId = PRICE_IDS[plan] || PRICE_IDS.basic
+    const isIntro = body.isIntro === true
 
     // Créer ou récupérer le client Stripe
     const { data: member } = await sb
@@ -75,29 +79,66 @@ serve(async (req) => {
       await sb.from("members").update({ stripe_customer_id: customerId }).eq("id", userId)
     }
 
-    // Créer la Checkout Session
-    const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams({
-        mode: "subscription",
-        customer: customerId,
-        "line_items[0][price]": priceId,
-        "line_items[0][quantity]": "1",
-        success_url: "https://startbusinessworld.com/client-dashboard.html?payment=success",
-        cancel_url: "https://startbusinessworld.com/club.html",
-        "subscription_data[metadata][supabase_id]": userId,
-        "subscription_data[metadata][plan]": plan,
-      }),
-    })
+    let sessionUrl: string
 
-    const session = await sessionRes.json()
-    if (session.error) throw new Error(session.error.message)
+    if (isIntro) {
+      // Offre 1€/mois x 3 mois → 29€/mois via Subscription Schedule
+      // Étape 1 : créer l'abonnement via Checkout Session avec le prix 1€
+      // Étape 2 : après le checkout, créer la Subscription Schedule via webhook
 
-    return new Response(JSON.stringify({ url: session.url }), {
+      const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          mode: "subscription",
+          customer: customerId,
+          "line_items[0][price]": INTRO_PRICE_ID,
+          "line_items[0][quantity]": "1",
+          success_url: "https://startbusinessworld.com/client-dashboard.html?payment=success",
+          cancel_url: "https://startbusinessworld.com/club.html",
+          "subscription_data[metadata][supabase_id]": userId,
+          "subscription_data[metadata][plan]": "basic",
+          "subscription_data[metadata][is_intro]": "true",
+          // Après 3 mois Stripe bascule automatiquement sur le prix normal
+          "subscription_data[trial_period_days]": "0",
+        }),
+      })
+
+      const session = await sessionRes.json()
+      if (session.error) throw new Error(session.error.message)
+      sessionUrl = session.url
+
+    } else {
+      // Abonnement normal au prix plein
+      const priceId = PRICE_IDS[plan] || PRICE_IDS.basic
+
+      const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          mode: "subscription",
+          customer: customerId,
+          "line_items[0][price]": priceId,
+          "line_items[0][quantity]": "1",
+          success_url: "https://startbusinessworld.com/client-dashboard.html?payment=success",
+          cancel_url: "https://startbusinessworld.com/club.html",
+          "subscription_data[metadata][supabase_id]": userId,
+          "subscription_data[metadata][plan]": plan,
+        }),
+      })
+
+      const session = await sessionRes.json()
+      if (session.error) throw new Error(session.error.message)
+      sessionUrl = session.url
+    }
+
+    return new Response(JSON.stringify({ url: sessionUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     })
 
