@@ -454,7 +454,7 @@
   <div class="mobile-topbar-logo">Start Business World</div>
   <div class="mobile-topbar-right">
     <div class="mobile-user-av" id="mobileUserAv">—</div>
-    <button class="btn-outline" onclick="handleLogout()" style="font-size:0.7rem;padding:4px 10px;border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)">Quitter</button>
+    <button class="btn-outline" onclick="handleLogout()" style="font-size:0.7rem;padding:4px 10px;border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.6)">⏻ Déco</button>
   </div>
 </div>
 
@@ -997,32 +997,76 @@
       </div>
 
       <div id="sectionCompte" style="display:none">
-        <div class="card" style="padding:2rem;max-width:500px">
-          <div class="card-head" style="padding:0 0 16px;margin-bottom:16px;border-bottom:0.5px solid var(--subtle)">
+
+        <!-- PROFIL -->
+        <div class="card" style="margin-bottom:16px;max-width:560px">
+          <div class="card-head">
             <div class="card-title">Mon profil</div>
+            <div class="card-link" onclick="saveProfile()" style="color:var(--gold);cursor:pointer">Sauvegarder →</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:12px">
-            <div>
-              <div style="font-size:0.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Nom complet</div>
-              <input type="text" id="profileName" style="width:100%;padding:8px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.88rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);outline:none">
+          <div class="module-row">
+            <div class="module-icon">👤</div>
+            <div class="module-info">
+              <div class="module-name">Prénom / Nom</div>
+              <div class="module-meta">Affiché dans ton espace membre</div>
             </div>
-            <div>
-              <div style="font-size:0.7rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:4px">Email</div>
-              <input type="email" id="profileEmail" disabled style="width:100%;padding:8px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.88rem;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--muted);outline:none">
+            <input type="text" id="profileName" placeholder="Ton prénom et nom"
+              style="border:0.5px solid var(--subtle);border-radius:6px;padding:7px 10px;font-size:.82rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);outline:none;width:160px;flex-shrink:0"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'">
+          </div>
+          <div class="module-row">
+            <div class="module-icon">📧</div>
+            <div class="module-info">
+              <div class="module-name">Email</div>
+              <div class="module-meta">Non modifiable — identifiant de connexion</div>
             </div>
-            <button class="btn-gold" onclick="saveProfile()" style="width:fit-content">Sauvegarder</button>
-          </div>
-          <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--subtle)">
-            <div style="font-size:0.85rem;font-weight:500;margin-bottom:0.5rem">Mon abonnement</div>
-            <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem" id="compteSubInfo">—</div>
-            <button style="font-size:0.78rem;color:var(--red);background:none;border:0.5px solid rgba(192,57,43,0.3);padding:6px 14px;border-radius:5px;cursor:pointer" onclick="cancelSub()">Annuler mon abonnement</button>
-          </div>
-          <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--subtle)">
-            <button onclick="handleLogout()" style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:rgba(240,237,228,0.5);background:none;border:0.5px solid var(--subtle);padding:9px 18px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" onmouseover="this.style.color='#F0EDE4';this.style.borderColor='rgba(255,255,255,.3)'" onmouseout="this.style.color='rgba(240,237,228,0.5)';this.style.borderColor='var(--subtle)'">
-              <span>⏻</span> Se déconnecter
-            </button>
+            <input type="email" id="profileEmail" disabled
+              style="border:0.5px solid var(--subtle);border-radius:6px;padding:7px 10px;font-size:.82rem;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--muted);outline:none;width:160px;flex-shrink:0">
           </div>
         </div>
+
+        <!-- ABONNEMENT -->
+        <div class="card" style="margin-bottom:16px;max-width:560px">
+          <div class="card-head">
+            <div class="card-title">Mon abonnement</div>
+          </div>
+          <div class="module-row">
+            <div class="module-icon">💳</div>
+            <div class="module-info">
+              <div class="module-name" id="compteSubPlan">Chargement...</div>
+              <div class="module-meta" id="compteSubInfo">—</div>
+            </div>
+            <span class="module-status status-done" id="compteSubBadge">Actif</span>
+          </div>
+          <div class="module-row" style="cursor:pointer" onclick="handleUpgrade(event,'pro')">
+            <div class="module-icon">⭐</div>
+            <div class="module-info">
+              <div class="module-name">Changer de plan</div>
+              <div class="module-meta">Basic 29€ · Pro 79€ · Business 149€</div>
+            </div>
+            <div class="card-link">Voir →</div>
+          </div>
+          <div class="module-row" style="cursor:pointer" onclick="cancelSub()">
+            <div class="module-icon" style="background:rgba(192,57,43,.08);border-color:rgba(192,57,43,.2)">🚫</div>
+            <div class="module-info">
+              <div class="module-name" style="color:var(--red)">Annuler mon abonnement</div>
+              <div class="module-meta">Tu gardes l'accès jusqu'à la fin de la période</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DÉCONNEXION -->
+        <div class="card" style="max-width:560px">
+          <div class="module-row" style="cursor:pointer" onclick="handleLogout()">
+            <div class="module-icon" style="background:rgba(255,255,255,.03)">⏻</div>
+            <div class="module-info">
+              <div class="module-name">Se déconnecter</div>
+              <div class="module-meta">Quitter ton espace membre en toute sécurité</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
       </div>
 
     </div>
@@ -1268,8 +1312,16 @@
       profileName.value = currentMember?.full_name || ''
       var profileEmail = document.getElementById('profileEmail')
       if (profileEmail) profileEmail.value = email
+      var compteSubPlan = document.getElementById('compteSubPlan')
+      if (compteSubPlan) compteSubPlan.textContent = planLabel
       var compteSubInfo = document.getElementById('compteSubInfo')
-      if (compteSubInfo) compteSubInfo.textContent = `Plan : ${planLabel} · Membre depuis ${formatDate(currentMember?.created_at)}`
+      if (compteSubInfo) compteSubInfo.textContent = 'Membre depuis ' + formatDate(currentMember?.created_at)
+      var compteSubBadge = document.getElementById('compteSubBadge')
+      if (compteSubBadge) {
+        var status = currentMember?.stripe_subscription_status || 'active'
+        compteSubBadge.textContent = status === 'canceled' ? 'Annulé' : status === 'past_due' ? 'Impayé' : 'Actif'
+        compteSubBadge.className = 'module-status ' + (status === 'active' || !status ? 'status-done' : 'status-inprogress')
+      }
     }
   }
 
