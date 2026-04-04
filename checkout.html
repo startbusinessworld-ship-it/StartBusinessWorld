@@ -49,6 +49,9 @@ function showError(msg) {
 
 async function startCheckout(session) {
   try {
+    const plan = sessionStorage.getItem('sbw_plan') || 'basic'
+    sessionStorage.removeItem('sbw_plan')
+
     const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
       method: 'POST',
       headers: {
@@ -56,10 +59,10 @@ async function startCheckout(session) {
         'Authorization': `Bearer ${session.access_token}`,
       },
       body: JSON.stringify({
-        plan: 'basic',
+        plan: plan,
         email: session.user.email,
         userId: session.user.id,
-        isIntro: true,
+        isIntro: false,
       }),
     })
     const data = await res.json()
