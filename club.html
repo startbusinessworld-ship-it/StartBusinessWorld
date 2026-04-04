@@ -397,55 +397,8 @@
     Formations complètes, groupe d'entraide actif et bons plans négociés — tout ce qu'il faut pour construire un business qui pense global.
   </p>
 
-  <!-- 3 PLANS -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:800px;margin:2.5rem auto;width:100%">
-
-    <!-- BASIC -->
-    <div style="background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.1);border-radius:14px;padding:1.8rem 1.4rem;text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'" onclick="handleJoin(event,'basic')">
-      <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,228,.4);margin-bottom:1rem">Basic</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:#F0EDE4;margin-bottom:.2rem">29€</div>
-      <div style="font-size:.75rem;color:rgba(240,237,228,.35);margin-bottom:1.4rem">/mois · sans engagement</div>
-      <div style="font-size:.75rem;color:rgba(240,237,228,.55);line-height:1.8;margin-bottom:1.6rem;text-align:left">
-        ✓ Formations IA complètes<br>
-        ✓ Articles & ressources<br>
-        ✓ Agent IA SBW<br>
-        ✓ Mises à jour mensuelles
-      </div>
-      <div style="background:rgba(255,255,255,.08);color:#F0EDE4;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500">Commencer →</div>
-    </div>
-
-    <!-- PRO -->
-    <div style="background:rgba(166,124,58,.08);border:1px solid var(--gold);border-radius:14px;padding:1.8rem 1.4rem;text-align:center;cursor:pointer;transition:all .2s;position:relative" onmouseover="this.style.background='rgba(166,124,58,.14)'" onmouseout="this.style.background='rgba(166,124,58,.08)'" onclick="handleJoin(event,'pro')">
-      <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.6rem;font-weight:700;letter-spacing:.08em;padding:3px 12px;border-radius:10px;white-space:nowrap">LE PLUS POPULAIRE</div>
-      <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem">Pro</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:#F0EDE4;margin-bottom:.2rem">79€</div>
-      <div style="font-size:.75rem;color:rgba(240,237,228,.35);margin-bottom:1.4rem">/mois · sans engagement</div>
-      <div style="font-size:.75rem;color:rgba(240,237,228,.55);line-height:1.8;margin-bottom:1.6rem;text-align:left">
-        ✓ Tout le plan Basic<br>
-        ✓ Formations vidéo Pro<br>
-        ✓ Annuaire fournisseurs & contacts<br>
-        ✓ Mises à jour mensuelles
-      </div>
-      <div style="background:var(--gold);color:#fff;padding:10px;border-radius:7px;font-size:.82rem;font-weight:600">Commencer →</div>
-    </div>
-
-    <!-- BUSINESS -->
-    <div style="background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.1);border-radius:14px;padding:1.8rem 1.4rem;text-align:center;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'" onclick="handleJoin(event,'business')">
-      <div style="font-size:.65rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,228,.4);margin-bottom:1rem">Business</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:2.2rem;color:#F0EDE4;margin-bottom:.2rem">149€</div>
-      <div style="font-size:.75rem;color:rgba(240,237,228,.35);margin-bottom:1.4rem">/mois · sans engagement</div>
-      <div style="font-size:.75rem;color:rgba(240,237,228,.55);line-height:1.8;margin-bottom:1.6rem;text-align:left">
-        ✓ Tout le plan Pro<br>
-        ✓ Groupe privé Business<br>
-        ✓ Live mensuel en direct<br>
-        ✓ Accompagnement prioritaire
-      </div>
-      <div style="background:rgba(255,255,255,.08);color:#F0EDE4;padding:10px;border-radius:7px;font-size:.82rem;font-weight:500">Commencer →</div>
-    </div>
-
-  </div>
-
-  <div style="font-size:.72rem;color:rgba(240,237,228,.25);text-align:center;margin-bottom:2rem">Sans engagement · Annulation en 1 clic · Accès immédiat</div>
+  <a href="client-login.html" class="hero-cta">Rejoindre le Club SBW →</a>
+  <div class="hero-cta-note">Sans engagement · Accès immédiat · Annulation en 1 clic</div>
 
   <div class="hero-stats">
     <div class="hero-stat">
@@ -457,8 +410,8 @@
       <div class="hero-stat-l">Modules de formation</div>
     </div>
     <div class="hero-stat">
-      <div class="hero-stat-n">29€</div>
-      <div class="hero-stat-l">Pour démarrer</div>
+      <div class="hero-stat-n">100+</div>
+      <div class="hero-stat-l">Entrepreneurs membres</div>
     </div>
     <div class="hero-stat">
       <div class="hero-stat-n">0</div>
@@ -699,13 +652,9 @@
 <!-- CTA FINAL -->
 <section class="cta-final" id="rejoindre">
   <h2>Prêt à penser<br><em>global ?</em></h2>
-  <p>Choisis ton plan et rejoins le Club SBW — accès immédiat.</p>
-  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin:2rem 0">
-    <button onclick="handleJoin(event,'basic')" style="background:rgba(255,255,255,.08);color:#F0EDE4;border:0.5px solid rgba(255,255,255,.2);padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer">Basic — 29€/mois</button>
-    <button onclick="handleJoin(event,'pro')" style="background:var(--gold);color:#fff;border:none;padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:600;cursor:pointer">Pro — 79€/mois ★</button>
-    <button onclick="handleJoin(event,'business')" style="background:rgba(255,255,255,.08);color:#F0EDE4;border:0.5px solid rgba(255,255,255,.2);padding:12px 28px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;font-weight:500;cursor:pointer">Business — 149€/mois</button>
-  </div>
-  <div class="hero-cta-note">Sans engagement · Annulation en 1 clic</div>
+  <p>Rejoins le Club SBW et commence à construire ton business international dès aujourd'hui.</p>
+  <a href="client-login.html" class="hero-cta" style="display:inline-block;margin-top:1.5rem">Rejoindre le Club SBW →</a>
+  <div class="hero-cta-note" style="margin-top:1rem">Sans engagement · Accès immédiat · Annulation en 1 clic</div>
 </section>
 
 <!-- FOOTER MINI -->
