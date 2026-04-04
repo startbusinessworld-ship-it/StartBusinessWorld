@@ -41,7 +41,7 @@
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12v2H2zM2 7h8M2 11h10"/><rect x="10" y="7" width="4" height="4" rx="1"/></svg>
           Formations
         </a>
-        <a href="admin-fournisseurs.html" class="nav-item" data-access="fournisseurs">
+        <a href="admin-annuaire.html" class="nav-item" data-access="fournisseurs">
           <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
           Fournisseurs
         </a>
@@ -227,10 +227,21 @@
     document.getElementById('metricSubscribers').textContent = (subCount || 0).toLocaleString('fr-FR')
     document.getElementById('metricSubDelta').textContent = '+64 cette semaine'
 
-    // Membres Club
-    const { count: memberCount } = await sb.from('members').select('*', {count:'exact',head:true}).eq('status','active')
+    // Membres Club actifs
+    const { count: memberCount } = await sb.from('members')
+      .select('*', { count: 'exact', head: true })
+      .not('plan', 'eq', 'trial')
+      .not('plan', 'is', null)
+
+    const { count: memberCountLastMonth } = await sb.from('members')
+      .select('*', { count: 'exact', head: true })
+      .not('plan', 'eq', 'trial')
+      .not('plan', 'is', null)
+      .lt('plan_updated_at', startOfMonth.toISOString())
+
     document.getElementById('metricMembers').textContent = (memberCount || 0).toLocaleString('fr-FR')
-    document.getElementById('metricMembersDelta').textContent = '+7 ce mois'
+    const newMembers = (memberCount || 0) - (memberCountLastMonth || 0)
+    document.getElementById('metricMembersDelta').textContent = (newMembers > 0 ? '+' : '') + newMembers + ' ce mois'
 
     // Revenus (somme des paiements du mois)
     const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0)
@@ -239,9 +250,25 @@
     document.getElementById('metricRevenue').textContent = revenue.toLocaleString('fr-FR', {style:'currency',currency:'EUR'})
     document.getElementById('metricRevenueDelta').textContent = '+12% vs mois dernier'
 
-    // Visites (depuis ta table analytics ou Plausible)
-    document.getElementById('metricVisits').textContent = '4 821'
-    document.getElementById('metricVisitsDelta').textContent = '+18% vs mois dernier'
+    // Visites réelles depuis page_views
+    const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0)
+    const lastMonth = new Date(startOfMonth); lastMonth.setMonth(lastMonth.getMonth() - 1)
+
+    const { count: visitsThisMonth } = await sb.from('page_views')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', startOfMonth.toISOString())
+
+    const { count: visitsLastMonth } = await sb.from('page_views')
+      .select('*', { count: 'exact', head: true })
+      .gte('created_at', lastMonth.toISOString())
+      .lt('created_at', startOfMonth.toISOString())
+
+    const visitsDelta = visitsLastMonth > 0
+      ? Math.round(((visitsThisMonth - visitsLastMonth) / visitsLastMonth) * 100)
+      : 0
+
+    document.getElementById('metricVisits').textContent = (visitsThisMonth || 0).toLocaleString('fr-FR')
+    document.getElementById('metricVisitsDelta').textContent = (visitsDelta >= 0 ? '+' : '') + visitsDelta + '% vs mois dernier'
 
     // Brouillons pour badge sidebar
     const { count: drafts } = await sb.from('articles').select('*', {count:'exact',head:true}).eq('status','draft')
