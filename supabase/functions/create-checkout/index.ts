@@ -102,8 +102,6 @@ serve(async (req) => {
           "subscription_data[metadata][supabase_id]": userId,
           "subscription_data[metadata][plan]": "basic",
           "subscription_data[metadata][is_intro]": "true",
-          // Après 3 mois Stripe bascule automatiquement sur le prix normal
-          "subscription_data[trial_period_days]": "0",
         }),
       })
 
