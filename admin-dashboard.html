@@ -243,12 +243,46 @@
     const newMembers = (memberCount || 0) - (memberCountLastMonth || 0)
     document.getElementById('metricMembersDelta').textContent = (newMembers > 0 ? '+' : '') + newMembers + ' ce mois'
 
-    // Revenus (somme des paiements du mois)
-    const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0)
-    const { data: payments } = await sb.from('payments').select('amount').gte('created_at', startOfMonth.toISOString())
-    const revenue = (payments || []).reduce((s, p) => s + (p.amount || 0), 0)
-    document.getElementById('metricRevenue').textContent = revenue.toLocaleString('fr-FR', {style:'currency',currency:'EUR'})
-    document.getElementById('metricRevenueDelta').textContent = '+12% vs mois dernier'
+    // Revenus réels depuis Stripe via Edge Function
+    try {
+      const { data: { session } } = await sb.auth.getSession()
+      if (session) {
+        const statsRes = await fetch(`${SUPABASE_URL}/functions/v1/get-stripe-stats`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        })
+        const stats = await statsRes.json()
+        if (!stats.error) {
+          document.getElementById('metricRevenue').textContent =
+            stats.revenueThisMonth.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+          document.getElementById('metricRevenueDelta').textContent =
+            (stats.revenueDelta >= 0 ? '+' : '') + stats.revenueDelta + '% vs mois dernier'
+
+          // Afficher MRR si l'élément existe
+          const mrrEl = document.getElementById('metricMRR')
+          if (mrrEl) mrrEl.textContent = stats.mrr.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
+
+          // Afficher les derniers paiements
+          const paymentsEl = document.getElementById('recentPayments')
+          if (paymentsEl && stats.recentPayments?.length) {
+            paymentsEl.innerHTML = stats.recentPayments.map(p => `
+              <div class="list-row">
+                <div class="row-info">
+                  <div class="row-title">${p.email}</div>
+                  <div class="row-meta">${formatDate(p.date)}</div>
+                </div>
+                <span class="plan-badge">${p.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
+              </div>
+            `).join('')
+          }
+        }
+      }
+    } catch(e) {
+      console.log('Stripe stats non disponibles:', e.message)
+    }
 
     // Visites réelles depuis page_views
     const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0)
