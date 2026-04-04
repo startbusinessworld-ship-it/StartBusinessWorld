@@ -1069,7 +1069,8 @@
   const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
   const { createClient } = supabase
-  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  window.sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const sb = window.sb
 
   let currentUser = null
   let currentMember = null
@@ -1282,8 +1283,7 @@
       currentMember?.plan === 'business' ? 'Plan Business' : 'Plan Basic'
   }
 
-  function showSection(name, el) {
-    // Sync bottom nav
+  window.showSection = function(name, el) {
     document.querySelectorAll('.mobile-nav-item').forEach(function(i) { i.classList.remove('active'); });
     var mbn = document.getElementById('mbn-' + name);
     if (mbn) mbn.classList.add('active');
@@ -1313,7 +1313,7 @@
     document.getElementById('topbarSub').textContent = t[1]
   }
 
-  async function saveProfile() {
+  window.saveProfile = async function() {
     const name = document.getElementById('profileName').value.trim()
     if (!name) return
     await sb.from('members').update({ full_name: name }).eq('email', currentUser.email)
@@ -1321,16 +1321,18 @@
     renderUser()
   }
 
-  async function cancelSub() {
+  window.cancelSub = async function() {
     if (!confirm('Annuler ton abonnement ? Tu perdras l\'accès à la fin du mois.')) return
     await sb.from('members').update({ plan: 'cancelled', status: 'inactive' }).eq('email', currentUser.email)
     showToast('Abonnement annulé.')
-    setTimeout(() => window.location.href = 'index.html', 2000)
+    setTimeout(() => window.location.href = 'club.html', 2000)
   }
 
-  async function handleLogout() {
-    await sb.auth.signOut()
-    window.location.href = 'index.html'
+  window.handleLogout = async function() {
+    try {
+      await sb.auth.signOut()
+    } catch(e) {}
+    window.location.href = 'client-login.html'
   }
 
   function renderModuleProgress() {
