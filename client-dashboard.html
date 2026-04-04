@@ -438,7 +438,8 @@
       .content-grid { grid-template-columns: 1fr; }
       .right-sidebar { display: none; }
       #quickAccessGrid { grid-template-columns: repeat(2, 1fr) !important; }
-      #sectionCompte .plan-grid { grid-template-columns: 1fr !important; }
+      #sectionCompte .plan-grid,
+      #sectionCompte [style*="grid-template-columns:repeat(3"] { grid-template-columns: 1fr !important; }
       .welcome-banner { padding: 1.4rem; flex-direction: column; align-items: flex-start; gap: 14px; }
       .welcome-progress { width: 100%; }
       .progress-bar-wrap { width: 100%; }
@@ -998,7 +999,6 @@
       </div>
 
       <div id="sectionCompte" style="display:none">
-        <div style="max-width:600px">
 
           <!-- PROFIL -->
           <div class="card" style="margin-bottom:16px">
@@ -1006,8 +1006,8 @@
               <div class="card-title">Mon profil</div>
               <div class="card-link" onclick="saveProfile()" style="color:var(--gold);cursor:pointer;font-weight:500">Sauvegarder →</div>
             </div>
-            <div style="padding:16px">
-              <div style="margin-bottom:14px">
+            <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+              <div>
                 <div style="font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Prénom / Nom</div>
                 <input type="text" id="profileName" placeholder="Ton prénom et nom"
                   style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-size:.88rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);outline:none;box-sizing:border-box"
@@ -1027,14 +1027,14 @@
             <div class="card-head">
               <div class="card-title">Mon abonnement</div>
             </div>
-            <div style="padding:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:0.5px solid var(--subtle)">
               <div>
                 <div style="font-size:.95rem;font-weight:600;margin-bottom:3px" id="compteSubPlan">Chargement...</div>
                 <div style="font-size:.75rem;color:var(--muted)" id="compteSubInfo">—</div>
               </div>
               <span class="module-status status-done" id="compteSubBadge" style="font-size:.72rem;padding:4px 12px">Actif</span>
             </div>
-            <div style="padding:0 16px 16px">
+            <div style="padding:12px 16px">
               <button onclick="cancelSub()"
                 style="font-size:.78rem;color:var(--red);background:none;border:0.5px solid rgba(192,57,43,.3);padding:7px 16px;border-radius:6px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s"
                 onmouseover="this.style.background='rgba(192,57,43,.08)'" onmouseout="this.style.background='none'">
@@ -1048,41 +1048,38 @@
             <div class="card-head">
               <div class="card-title">Changer de plan</div>
             </div>
-            <div style="padding:12px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-              <!-- Basic -->
-              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .15s"
+            <div style="padding:14px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s"
                 onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--subtle)'"
                 onclick="handleUpgrade(event,'basic')">
-                <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Basic</div>
+                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Basic</div>
                 <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">29€</div>
-                <div style="font-size:.65rem;color:var(--muted);margin-bottom:10px">/mois</div>
-                <div style="font-size:.68rem;color:var(--muted);line-height:1.5">Formations IA · Articles</div>
+                <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/mois</div>
+                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Formations IA · Articles</div>
               </div>
-              <!-- Pro -->
-              <div style="border:1px solid var(--gold);border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;background:rgba(166,124,58,.04);position:relative;transition:all .15s"
-                onmouseover="this.style.background='rgba(166,124,58,.08)'" onmouseout="this.style.background='rgba(166,124,58,.04)'"
+              <div style="border:1px solid var(--gold);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;background:rgba(166,124,58,.04);position:relative;transition:all .15s"
+                onmouseover="this.style.background='rgba(166,124,58,.1)'" onmouseout="this.style.background='rgba(166,124,58,.04)'"
                 onclick="handleUpgrade(event,'pro')">
                 <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap">POPULAIRE</div>
-                <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:6px">Pro</div>
+                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:6px">Pro</div>
                 <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">79€</div>
-                <div style="font-size:.65rem;color:var(--muted);margin-bottom:10px">/mois</div>
-                <div style="font-size:.68rem;color:var(--muted);line-height:1.5">Basic · Fournisseurs · Vidéos</div>
+                <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/mois</div>
+                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Basic · Fournisseurs · Vidéos</div>
               </div>
-              <!-- Business -->
-              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 12px;text-align:center;cursor:pointer;transition:all .15s"
+              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s"
                 onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--subtle)'"
                 onclick="handleUpgrade(event,'business')">
-                <div style="font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Business</div>
+                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Business</div>
                 <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">149€</div>
-                <div style="font-size:.65rem;color:var(--muted);margin-bottom:10px">/mois</div>
-                <div style="font-size:.68rem;color:var(--muted);line-height:1.5">Pro · Groupe · Live</div>
+                <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/mois</div>
+                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Pro · Groupe · Live</div>
               </div>
             </div>
             <div style="padding:0 16px 14px;font-size:.7rem;color:var(--muted);text-align:center">Sans engagement · Annulation en 1 clic</div>
           </div>
 
           <!-- DÉCONNEXION -->
-          <div class="card">
+          <div class="card" style="margin-bottom:16px">
             <div class="module-row" style="cursor:pointer" onclick="handleLogout()"
               onmouseover="this.style.background='var(--surface)'" onmouseout="this.style.background=''">
               <div class="module-icon">⏻</div>
@@ -1093,7 +1090,6 @@
             </div>
           </div>
 
-        </div>
       </div>
       </div>
 
