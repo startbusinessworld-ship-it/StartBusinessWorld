@@ -312,6 +312,9 @@
     el.innerHTML = data.map(m => {
       const name = m.full_name || m.email
       const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
+      const planLabels = { basic: 'Basic 29€', pro: 'Pro 79€', business: 'Business 149€', trial: 'Essai', active: 'Actif', cancelled: 'Annulé' }
+      const planLabel = planLabels[m.plan] || m.plan || '—'
+      const isTrial = m.plan === 'trial'
       return `
         <div class="list-row">
           <div class="member-avatar">${initials}</div>
@@ -319,7 +322,7 @@
             <div class="row-title">${name}</div>
             <div class="row-meta">Depuis ${formatDate(m.created_at)}</div>
           </div>
-          <span class="plan-badge ${m.plan === 'trial' ? 'trial' : ''}">${m.plan === 'trial' ? '1€/mois' : '29€/mois'}</span>
+          <span class="plan-badge ${isTrial ? 'trial' : ''}">${planLabel}</span>
         </div>
       `
     }).join('')
