@@ -1391,9 +1391,11 @@
     } catch(e) { console.log('Module progress error:', e); }
   }
 
-  function accessFournisseurs & Contacts Business() {
+  window.accessFournisseurs = function() {
     window.location.href = 'membre-annuaire.html'
   }
+
+  window.accessGroupe = function() {
     if (currentMember?.plan === 'business') {
       window.location.href = 'membre-chat.html'
     } else {
