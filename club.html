@@ -365,12 +365,12 @@
   <div class="hamburger" id="ham" style="color:#F0EDE4"><span></span><span></span><span></span></div>
   <div class="nav-logo">Start Business World</div>
   <div class="nav-right">
-    <a href="#rejoindre" class="nav-cta">Rejoindre — 1€</a>
+    <a href="#" class="nav-cta" onclick="handleJoin(event)">Rejoindre — 1€</a>
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mm-section">
       <a href="client-login.html" class="mm-link secondary">Se connecter</a>
-      <a href="#rejoindre" class="mm-link primary">Rejoindre — 1€ →</a>
+      <a href="#" class="mm-link primary" onclick="handleJoin(event)">Rejoindre — 1€ →</a>
     </div>
     <div class="mm-section">
       <a href="index.html" class="mm-link" style="color:#F0EDE4">🏠 Accueil</a>
@@ -408,7 +408,7 @@
     </div>
   </div>
 
-  <a href="#rejoindre" class="hero-cta">Rejoindre le Club SBW →</a>
+  <a href="#" class="hero-cta" onclick="handleJoin(event)">Rejoindre le Club SBW →</a>
   <div class="hero-cta-note">Sans engagement · Accès immédiat · Annulation en 1 clic</div>
 
   <div class="hero-stats">
@@ -691,26 +691,39 @@
   const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
 
+  // Désactive tous les boutons pendant le chargement
+  function setLoading(loading) {
+    document.querySelectorAll('.hero-cta, .nav-cta, .mm-link.primary').forEach(btn => {
+      if (loading) {
+        btn.dataset.original = btn.textContent
+        btn.textContent = 'Chargement...'
+        btn.style.opacity = '0.7'
+        btn.style.pointerEvents = 'none'
+      } else {
+        btn.textContent = btn.dataset.original || 'Rejoindre le Club SBW →'
+        btn.style.opacity = '1'
+        btn.style.pointerEvents = 'auto'
+      }
+    })
+  }
+
   async function handleJoin(e) {
     e.preventDefault()
-    const btn = document.querySelector('.hero-cta')
-    btn.textContent = 'Chargement...'
-    btn.style.opacity = '0.7'
-    btn.style.pointerEvents = 'none'
+    setLoading(true)
 
     try {
-      // Vérifier si l'utilisateur est connecté
       const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
       const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       const { data: { session } } = await sb.auth.getSession()
 
       if (!session) {
-        // Pas connecté — rediriger vers login avec retour sur club.html
-        window.location.href = 'client-login.html?redirect=club.html'
+        // Stocker l'intention de paiement pour y revenir après connexion
+        sessionStorage.setItem('sbw_after_login', 'checkout')
+        window.location.href = 'client-login.html?redirect=checkout'
         return
       }
 
-      // Appeler la Edge Function pour créer la session Stripe
+      // Appeler la Edge Function
       const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
         method: 'POST',
         headers: {
@@ -721,7 +734,7 @@
           plan: 'basic',
           email: session.user.email,
           userId: session.user.id,
-          isIntro: true, // offre 1€/mois x 3 mois
+          isIntro: true,
         }),
       })
 
@@ -736,11 +749,19 @@
     } catch (err) {
       console.error(err)
       alert('Une erreur est survenue. Réessaie dans quelques instants.')
-      btn.textContent = 'Rejoindre le Club SBW →'
-      btn.style.opacity = '1'
-      btn.style.pointerEvents = 'auto'
+      setLoading(false)
     }
   }
+
+  // Si l'utilisateur revient après connexion avec intention checkout
+  window.addEventListener('load', async () => {
+    const afterLogin = sessionStorage.getItem('sbw_after_login')
+    const urlParams = new URLSearchParams(window.location.search)
+    if (afterLogin === 'checkout' || urlParams.get('checkout') === '1') {
+      sessionStorage.removeItem('sbw_after_login')
+      handleJoin(new Event('click'))
+    }
+  })
 
   // Intersection Observer pour animations au scroll
   const observer = new IntersectionObserver(entries => {

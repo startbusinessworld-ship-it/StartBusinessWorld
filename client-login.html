@@ -197,12 +197,32 @@ var sb = supabase.createClient(
 // Vérifier session existante
 (async function() {
   var s = await sb.auth.getSession();
-  if (s.data.session) window.location.href = "client-dashboard.html";
+  if (s.data.session) {
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect");
+    if (redirect === "checkout" || sessionStorage.getItem("sbw_after_login") === "checkout") {
+      window.location.href = "club.html?checkout=1";
+    } else {
+      const _params = new URLSearchParams(window.location.search);
+    const _redirect = _params.get("redirect");
+    if (_redirect === "checkout" || sessionStorage.getItem("sbw_after_login") === "checkout") {
+      window.location.href = "club.html?checkout=1";
+    } else {
+      window.location.href = "client-dashboard.html";
+    }
+    }
+  }
 
   // Gérer le retour OAuth (Google/Apple)
   sb.auth.onAuthStateChange(function(event, session) {
     if (event === "SIGNED_IN" && session) {
+      const _params = new URLSearchParams(window.location.search);
+    const _redirect = _params.get("redirect");
+    if (_redirect === "checkout" || sessionStorage.getItem("sbw_after_login") === "checkout") {
+      window.location.href = "club.html?checkout=1";
+    } else {
       window.location.href = "client-dashboard.html";
+    }
     }
   });
 })();
@@ -226,7 +246,7 @@ async function sendMagicLink() {
 
   var res = await sb.auth.signInWithOtp({
     email: email,
-    options: { emailRedirectTo: window.location.origin + "/client-dashboard.html" }
+    options: { emailRedirectTo: window.location.origin + (new URLSearchParams(window.location.search).get("redirect") === "checkout" ? "/club.html?checkout=1" : "/client-dashboard.html") }
   });
 
   if (res.error) {
@@ -257,21 +277,27 @@ async function loginPassword() {
     btn.disabled = false;
     btn.textContent = "Se connecter";
   } else {
-    window.location.href = "client-dashboard.html";
+    const _params = new URLSearchParams(window.location.search);
+    const _redirect = _params.get("redirect");
+    if (_redirect === "checkout" || sessionStorage.getItem("sbw_after_login") === "checkout") {
+      window.location.href = "club.html?checkout=1";
+    } else {
+      window.location.href = "client-dashboard.html";
+    }
   }
 }
 
 async function loginGoogle() {
   await sb.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: window.location.origin + "/client-dashboard.html" }
+    options: { redirectTo: window.location.origin + (new URLSearchParams(window.location.search).get("redirect") === "checkout" ? "/club.html?checkout=1" : "/client-dashboard.html") }
   });
 }
 
 async function loginApple() {
   await sb.auth.signInWithOAuth({
     provider: "apple",
-    options: { redirectTo: window.location.origin + "/client-dashboard.html" }
+    options: { redirectTo: window.location.origin + (new URLSearchParams(window.location.search).get("redirect") === "checkout" ? "/club.html?checkout=1" : "/client-dashboard.html") }
   });
 }
 
