@@ -1173,6 +1173,29 @@
     </div>
   </section>
 
+  <!-- NEWSLETTER -->
+  <section style="background:#111008;border-top:0.5px solid rgba(255,255,255,.06);border-bottom:0.5px solid rgba(255,255,255,.06);padding:4rem 1.5rem;text-align:center">
+    <div style="max-width:520px;margin:0 auto">
+      <div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#A67C3A;margin-bottom:.8rem">Newsletter SBW</div>
+      <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:.8rem;line-height:1.2">Le business international<br><em style="color:#A67C3A;font-style:italic">dans ta boîte mail.</em></h2>
+      <p style="font-size:.88rem;color:rgba(240,237,228,.45);margin-bottom:2rem;line-height:1.6">Chaque semaine — sourcing Chine, fiscalité, création de société, e-commerce et expatriation. Sans filtre.</p>
+      <div style="display:flex;gap:10px;max-width:420px;margin:0 auto" id="newsletterForm">
+        <input type="email" id="newsletterEmail" placeholder="ton@email.com"
+          style="flex:1;padding:12px 16px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.12);border-radius:8px;color:#F0EDE4;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none"
+          onfocus="this.style.borderColor='#A67C3A'" onblur="this.style.borderColor='rgba(255,255,255,.12)'"
+          onkeydown="if(event.key==='Enter')subscribeNewsletter()">
+        <button onclick="subscribeNewsletter()"
+          style="padding:12px 20px;background:#A67C3A;color:#fff;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:opacity .15s"
+          onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
+          S'abonner →
+        </button>
+      </div>
+      <div id="newsletterSuccess" style="display:none;color:#A67C3A;font-size:.85rem;margin-top:1rem">🎉 Tu es inscrit ! Premiers articles dans ta boîte mail sous 24h.</div>
+      <div id="newsletterError" style="display:none;color:#F09595;font-size:.82rem;margin-top:1rem"></div>
+      <div style="font-size:.7rem;color:rgba(240,237,228,.2);margin-top:1rem">Pas de spam · Désinscription en 1 clic</div>
+    </div>
+  </section>
+
   <!-- FOOTER -->
   <footer>
     <div class="f-top">
@@ -1604,6 +1627,53 @@
     loadHeroArticles();
     loadShorts();
     loadArticles();
+  </script>
+
+  <script>
+    var SB_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
+    var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+
+    async function subscribeNewsletter() {
+      var email = document.getElementById('newsletterEmail').value.trim()
+      var errEl = document.getElementById('newsletterError')
+      var successEl = document.getElementById('newsletterSuccess')
+      errEl.style.display = 'none'
+
+      if (!email || !email.includes('@')) {
+        errEl.textContent = 'Entre une adresse email valide.'
+        errEl.style.display = 'block'
+        return
+      }
+
+      var btn = document.querySelector('#newsletterForm button')
+      btn.disabled = true
+      btn.textContent = '...'
+
+      try {
+        var res = await fetch(SB_URL + '/rest/v1/subscribers', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SB_KEY,
+            'Authorization': 'Bearer ' + SB_KEY,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ email: email, source: 'index' })
+        })
+
+        if (res.ok || res.status === 409) { // 409 = déjà inscrit
+          document.getElementById('newsletterForm').style.display = 'none'
+          successEl.style.display = 'block'
+        } else {
+          throw new Error('Erreur serveur')
+        }
+      } catch(e) {
+        errEl.textContent = 'Une erreur est survenue. Réessaie.'
+        errEl.style.display = 'block'
+        btn.disabled = false
+        btn.textContent = "S'abonner →"
+      }
+    }
   </script>
 
 </body>
