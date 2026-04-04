@@ -688,11 +688,58 @@
     if (!isOpen) item.classList.add('open')
   }
 
-  function handleJoin(e) {
+  const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+
+  async function handleJoin(e) {
     e.preventDefault()
-    // Ici on connectera Stripe
-    // window.location.href = 'checkout.html'
-    alert('Paiement Stripe à connecter — prochaine étape !')
+    const btn = document.querySelector('.hero-cta')
+    btn.textContent = 'Chargement...'
+    btn.style.opacity = '0.7'
+    btn.style.pointerEvents = 'none'
+
+    try {
+      // Vérifier si l'utilisateur est connecté
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+      const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      const { data: { session } } = await sb.auth.getSession()
+
+      if (!session) {
+        // Pas connecté — rediriger vers login avec retour sur club.html
+        window.location.href = 'client-login.html?redirect=club.html'
+        return
+      }
+
+      // Appeler la Edge Function pour créer la session Stripe
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          plan: 'basic',
+          email: session.user.email,
+          userId: session.user.id,
+          isIntro: true, // offre 1€/mois x 3 mois
+        }),
+      })
+
+      const data = await res.json()
+
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error(data.error || 'Erreur lors de la création du paiement')
+      }
+
+    } catch (err) {
+      console.error(err)
+      alert('Une erreur est survenue. Réessaie dans quelques instants.')
+      btn.textContent = 'Rejoindre le Club SBW →'
+      btn.style.opacity = '1'
+      btn.style.pointerEvents = 'auto'
+    }
   }
 
   // Intersection Observer pour animations au scroll
