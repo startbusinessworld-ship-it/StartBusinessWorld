@@ -8,8 +8,22 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="sbw-tracker.js"></script>
-  <script src="sbw-admin-check.js"></script>
+  <script>
+    // Chargement non-bloquant des scripts optionnels
+    function loadScript(src) {
+      return new Promise(function(resolve) {
+        var s = document.createElement('script');
+        s.src = src;
+        s.onload = resolve;
+        s.onerror = resolve; // ne bloque pas si 404
+        document.head.appendChild(s);
+      });
+    }
+    window._scriptsReady = Promise.all([
+      loadScript('sbw-tracker.js'),
+      loadScript('sbw-admin-check.js')
+    ]);
+  </script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
@@ -1003,6 +1017,11 @@
             <div style="font-size:0.8rem;color:var(--muted);margin-bottom:1rem" id="compteSubInfo">—</div>
             <button style="font-size:0.78rem;color:var(--red);background:none;border:0.5px solid rgba(192,57,43,0.3);padding:6px 14px;border-radius:5px;cursor:pointer" onclick="cancelSub()">Annuler mon abonnement</button>
           </div>
+          <div style="margin-top:2rem;padding-top:1.5rem;border-top:0.5px solid var(--subtle)">
+            <button onclick="handleLogout()" style="display:flex;align-items:center;gap:8px;font-size:0.82rem;color:rgba(240,237,228,0.5);background:none;border:0.5px solid var(--subtle);padding:9px 18px;border-radius:7px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s" onmouseover="this.style.color='#F0EDE4';this.style.borderColor='rgba(255,255,255,.3)'" onmouseout="this.style.color='rgba(240,237,228,0.5)';this.style.borderColor='var(--subtle)'">
+              <span>⏻</span> Se déconnecter
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1330,7 +1349,12 @@
 
   window.handleLogout = async function() {
     try {
-      await sb.auth.signOut()
+      const { createClient } = supabase
+      const _sb = createClient(
+        'https://grwimhqsthcmfwblwdwg.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+      )
+      await _sb.auth.signOut()
     } catch(e) {}
     window.location.href = 'client-login.html'
   }
