@@ -325,6 +325,8 @@
       nav { grid-template-columns: auto 1fr auto; padding:0 1rem; }
       .nav-back { display: none; }
       .nav-logo { text-align:center; font-size:1rem; }
+      .nav-desktop-link { display:none !important; }
+      .nav-mobile-login { display:flex !important; }
       .hero h1 { font-size: 2.2rem; }
       .hero-stats { gap: 1rem; flex-wrap:wrap; justify-content:center; }
       .hero { padding:4rem 1.2rem 2.5rem; }
@@ -366,10 +368,12 @@
   <div class="hamburger" id="ham" style="color:#F0EDE4"><span></span><span></span><span></span></div>
   <a href="index.html" class="nav-logo" style="text-decoration:none;color:#F0EDE4">Start Business World</a>
   <div class="nav-right" style="display:flex;align-items:center;gap:1.5rem">
-    <a href="index.html" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Accueil</a>
-    <a href="index.html#articles" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Blog</a>
-    <a href="client-login.html?mode=login" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Se connecter</a> <span data-sbw-auth></span>
-    <a href="client-login.html" class="nav-cta">Rejoindre le Club</a>
+    <a href="index.html" class="nav-desktop-link" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Accueil</a>
+    <a href="index.html#articles" class="nav-desktop-link" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Blog</a>
+    <span class="nav-desktop-link" data-sbw-auth></span>
+    <a href="client-login.html" class="nav-cta nav-desktop-link">Rejoindre le Club</a>
+    <!-- Mobile uniquement : bouton Se connecter -->
+    <a href="client-login.html?mode=login" class="nav-mobile-login" style="display:none;padding:6px 12px;font-size:.75rem;background:rgba(166,124,58,.15);color:#A67C3A;border:0.5px solid rgba(166,124,58,.3);border-radius:7px;text-decoration:none;font-family:DM Sans,sans-serif;font-weight:500">Se connecter</a>
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mm-section">
@@ -379,7 +383,6 @@
     <div class="mm-section">
       <a href="index.html" class="mm-link" style="color:#F0EDE4">🏠 Accueil</a>
       <a href="index.html#articles" class="mm-link" style="color:#F0EDE4">📝 Blog</a>
-      <a href="client-login.html?mode=login" class="mm-link" style="color:#F0EDE4">🔐 Se connecter</a>
     </div>
   </div>
 </nav>
