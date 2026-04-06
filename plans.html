@@ -3,102 +3,67 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Choisir mon plan — Club SBW</title>
+  <title>Rejoindre le Club SBW</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
-    body{background:#0C0C0A;color:#F0EDE4;font-family:"DM Sans",sans-serif;min-height:100vh;padding:2rem 1.5rem 4rem}
-    :root{--gold:#A67C3A;--subtle:rgba(255,255,255,.08)}
-    .top{text-align:center;margin-bottom:3rem}
+    body{background:#0C0C0A;color:#F0EDE4;font-family:"DM Sans",sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem 1.5rem}
+    :root{--gold:#A67C3A}
+    .wrap{width:100%;max-width:440px;text-align:center}
     .logo{font-family:"DM Serif Display",serif;font-size:1.3rem;margin-bottom:.3rem}
-    .badge{font-size:.62rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)}
-    .title{font-family:"DM Serif Display",serif;font-size:2rem;margin:2rem 0 .6rem;line-height:1.2}
-    .title em{color:var(--gold);font-style:italic}
-    .sub{font-size:.88rem;color:rgba(240,237,228,.45);max-width:420px;margin:0 auto}
-    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:860px;margin:2.5rem auto 0}
-    .plan{background:#141412;border:0.5px solid rgba(255,255,255,.1);border-radius:16px;padding:2rem 1.6rem;cursor:pointer;transition:all .2s;position:relative}
-    .plan:hover{border-color:var(--gold);transform:translateY(-2px)}
-    .plan.featured{border-color:var(--gold);background:rgba(166,124,58,.06)}
-    .plan-badge{position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.6rem;font-weight:700;letter-spacing:.08em;padding:3px 14px;border-radius:10px;white-space:nowrap}
-    .plan-name{font-size:.68rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(240,237,228,.4);margin-bottom:1.2rem}
-    .plan.featured .plan-name{color:var(--gold)}
-    .plan-price{font-family:"DM Serif Display",serif;font-size:2.8rem;margin-bottom:.2rem;line-height:1}
-    .plan-period{font-size:.75rem;color:rgba(240,237,228,.35);margin-bottom:1.6rem}
-    .plan-features{font-size:.78rem;color:rgba(240,237,228,.55);line-height:2;margin-bottom:1.8rem}
-    .plan-features span{display:block}
-    .plan-btn{width:100%;padding:12px;border-radius:8px;border:none;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;transition:opacity .15s}
-    .plan-btn:hover{opacity:.85}
-    .plan-btn-default{background:rgba(255,255,255,.08);color:#F0EDE4}
-    .plan-btn-gold{background:var(--gold);color:#fff}
-    .note{text-align:center;font-size:.72rem;color:rgba(240,237,228,.2);margin-top:1.5rem}
-    @media(max-width:640px){
-      .plans{grid-template-columns:1fr}
-      .title{font-size:1.6rem}
-    }
+    .badge{font-size:.62rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:2.5rem}
+    .card{background:#141412;border:1px solid rgba(166,124,58,.25);border-radius:16px;padding:2.5rem 2rem;position:relative}
+    .offer-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:4px 16px;border-radius:20px;white-space:nowrap}
+    .plan-name{font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:1.2rem}
+    .price-row{display:flex;align-items:baseline;justify-content:center;gap:10px;margin-bottom:.3rem}
+    .price-main{font-family:"DM Serif Display",serif;font-size:3.5rem;color:#F0EDE4;line-height:1}
+    .price-old{font-size:1.1rem;color:rgba(240,237,228,.3);text-decoration:line-through}
+    .price-period{font-size:.82rem;color:rgba(240,237,228,.4);margin-bottom:.6rem}
+    .price-then{font-size:.78rem;color:rgba(240,237,228,.35);margin-bottom:2rem;padding:8px 16px;background:rgba(255,255,255,.04);border-radius:6px;display:inline-block}
+    .features{text-align:left;margin-bottom:2rem}
+    .feature{display:flex;align-items:center;gap:10px;font-size:.85rem;color:rgba(240,237,228,.7);padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,.05)}
+    .feature:last-child{border-bottom:none}
+    .feature-icon{color:var(--gold);font-size:.9rem;flex-shrink:0}
+    .btn{width:100%;padding:15px;background:var(--gold);color:#fff;border:none;border-radius:9px;font-family:"DM Sans",sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .15s;margin-bottom:1rem}
+    .btn:hover{opacity:.88}
+    .note{font-size:.72rem;color:rgba(240,237,228,.2);line-height:1.6}
+    .back{text-align:center;margin-top:1.5rem;font-size:.75rem}
+    .back a{color:rgba(240,237,228,.3);text-decoration:none}
+    .back a:hover{color:rgba(240,237,228,.6)}
   </style>
 </head>
 <body>
-
-<div class="top">
+<div class="wrap">
   <div class="logo">Start Business World</div>
   <div class="badge">Le Club SBW</div>
-  <h1 class="title">Choisis ton plan,<br><em>commence maintenant.</em></h1>
-  <p class="sub">Accès immédiat après paiement. Sans engagement, annulation en 1 clic.</p>
+
+  <div class="card">
+    <div class="offer-badge">🎯 Offre de lancement</div>
+
+    <div class="plan-name">Club SBW — Accès complet</div>
+
+    <div class="price-row">
+      <div class="price-main">1€</div>
+      <div class="price-old">29€</div>
+    </div>
+    <div class="price-period">/mois pendant 3 mois</div>
+    <div class="price-then">Puis 29€/mois · Sans engagement</div>
+
+    <div class="features">
+      <div class="feature"><span class="feature-icon">✓</span>Formations IA & business complètes</div>
+      <div class="feature"><span class="feature-icon">✓</span>Articles & ressources exclusifs</div>
+      <div class="feature"><span class="feature-icon">✓</span>Agent IA SBW</div>
+      <div class="feature"><span class="feature-icon">✓</span>Mises à jour mensuelles</div>
+      <div class="feature"><span class="feature-icon">✓</span>Accès aux offres Pro & Business depuis le dashboard</div>
+    </div>
+
+    <button class="btn" onclick="selectPlan()">Commencer à 1€ →</button>
+    <div class="note">Annulation en 1 clic · Paiement sécurisé par Stripe</div>
+  </div>
+
+  <div class="back"><a href="club.html">← Retour</a></div>
 </div>
-
-<div class="plans">
-
-  <!-- BASIC avec offre intro -->
-  <div class="plan" style="position:relative" onclick="selectPlan('basic', true)">
-    <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#A67C3A;color:#fff;font-size:.6rem;font-weight:700;padding:3px 12px;border-radius:10px;white-space:nowrap;letter-spacing:.06em">OFFRE DE LANCEMENT</div>
-    <div class="plan-name">Basic</div>
-    <div style="display:flex;align-items:baseline;gap:8px;justify-content:center;margin-bottom:.2rem">
-      <div class="plan-price" style="color:#A67C3A">1€</div>
-      <div style="font-size:.8rem;color:rgba(240,237,228,.4);text-decoration:line-through">29€</div>
-    </div>
-    <div class="plan-period">/mois pendant 3 mois · puis 29€/mois</div>
-    <div class="plan-features">
-      <span>✓ Formations IA complètes</span>
-      <span>✓ Articles & ressources exclusifs</span>
-      <span>✓ Agent IA SBW</span>
-      <span>✓ Mises à jour mensuelles</span>
-    </div>
-    <button class="plan-btn plan-btn-gold">Commencer à 1€ →</button>
-  </div>
-
-  <!-- PRO -->
-  <div class="plan featured" onclick="selectPlan('pro', false)">
-    <div class="plan-badge">LE PLUS POPULAIRE</div>
-    <div class="plan-name">Pro</div>
-    <div class="plan-price">79€</div>
-    <div class="plan-period">/mois · sans engagement</div>
-    <div class="plan-features">
-      <span>✓ Tout le plan Basic</span>
-      <span>✓ Formations vidéo Pro</span>
-      <span>✓ Annuaire fournisseurs Chine</span>
-      <span>✓ Contacts business exclusifs</span>
-    </div>
-    <button class="plan-btn plan-btn-gold">Choisir Pro →</button>
-  </div>
-
-  <!-- BUSINESS -->
-  <div class="plan" onclick="selectPlan('business', false)">
-    <div class="plan-name">Business</div>
-    <div class="plan-price">149€</div>
-    <div class="plan-period">/mois · sans engagement</div>
-    <div class="plan-features">
-      <span>✓ Tout le plan Pro</span>
-      <span>✓ Groupe privé Business</span>
-      <span>✓ Live mensuel en direct</span>
-      <span>✓ Accompagnement prioritaire</span>
-    </div>
-    <button class="plan-btn plan-btn-default">Choisir Business →</button>
-  </div>
-
-</div>
-
-<div class="note">Sans engagement · Résiliable en 1 clic · Paiement sécurisé par Stripe</div>
 
 <script>
   const sb = supabase.createClient(
@@ -106,17 +71,14 @@
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
   )
 
-  // Vérifier session
   ;(async () => {
     const { data: { session } } = await sb.auth.getSession()
-    if (!session) {
-      window.location.href = 'client-login.html'
-    }
+    if (!session) window.location.href = 'client-login.html'
   })()
 
-  function selectPlan(plan, isIntro) {
-    sessionStorage.setItem('sbw_plan', plan)
-    sessionStorage.setItem('sbw_intro', isIntro ? 'true' : 'false')
+  function selectPlan() {
+    sessionStorage.setItem('sbw_plan', 'basic')
+    sessionStorage.setItem('sbw_intro', 'true')
     window.location.href = 'checkout.html'
   }
 </script>
