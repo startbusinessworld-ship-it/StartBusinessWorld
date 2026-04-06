@@ -1241,15 +1241,26 @@
 
     currentMember = member
 
-    // Vérifier si le membre a un plan actif
-    const planActif = member?.plan && member.plan !== 'trial' && member.plan !== null
-    const statusActif = !member?.stripe_subscription_status || 
-                        member?.stripe_subscription_status === 'active' ||
-                        member?.stripe_subscription_status === 'trialing'
+    // Vérifier si admin → bypass la vérification de plan
+    const { data: userData } = await sb
+      .from('users')
+      .select('role')
+      .eq('id', currentUser.id)
+      .single()
 
-    if (!planActif || !statusActif) {
-      window.location.href = 'plans.html'
-      return
+    const isAdmin = userData?.role === 'admin'
+
+    if (!isAdmin) {
+      // Vérifier si le membre a un plan actif
+      const planActif = member?.plan && member.plan !== 'trial' && member.plan !== null
+      const statusActif = !member?.stripe_subscription_status || 
+                          member?.stripe_subscription_status === 'active' ||
+                          member?.stripe_subscription_status === 'trialing'
+
+      if (!planActif || !statusActif) {
+        window.location.href = 'plans.html'
+        return
+      }
     }
 
     renderUser()
@@ -1480,11 +1491,10 @@
     document.getElementById('modalBusiness').style.display = 'none'
   }
 
-  function handleUpgrade(e, plan) {
-    e.preventDefault()
-    const prices = { pro: '79€/mois', business: '149€/mois' }
-    // TODO: Connecter Stripe
-    alert('Upgrade vers le plan ' + plan.charAt(0).toUpperCase() + plan.slice(1) + ' (' + prices[plan] + ') — Stripe à connecter !')
+  window.handleUpgrade = function(e, plan) {
+    if (e) e.preventDefault()
+    sessionStorage.setItem('sbw_plan', plan || 'pro')
+    window.location.href = 'checkout.html'
   }
 
   function formatDate(str) {
