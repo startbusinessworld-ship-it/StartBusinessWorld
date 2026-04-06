@@ -1427,36 +1427,42 @@
     window.location.href = 'client-login.html'
   }
 
+  function getFormationProgress(key, total) {
+    // Lire la progression depuis localStorage (stockée par les formations HTML)
+    try {
+      var data = JSON.parse(localStorage.getItem('sbw_tracker__' + key) || '{}')
+      var done = Object.values(data).filter(function(v){ return v === true }).length
+      var pct = total > 0 ? Math.round((done / total) * 100) : 0
+      return { done: done, total: total, pct: pct }
+    } catch(e) { return { done: 0, total: total, pct: 0 } }
+  }
+
   function renderModuleProgress() {
     try {
-      var allProg = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { byFormation: {} };
-      var by = allProg.byFormation || {};
-
-      // Les clés sont normalisées avec tirets dans byFormation
       var modules = [
         { id: 'mindset',   key: 'formation-mindset',             total: 20 },
         { id: 'fiscalite', key: 'formation-creation-entreprise', total: 16 },
         { id: 'hk',        key: 'formation-hong-kong',           total: 15 },
         { id: 'ecom',      key: 'formation-ecom-module-1',       total: 30 },
-      ];
+      ]
 
       modules.forEach(function(m) {
-        var data = by[m.key] || { done: 0, total: m.total, pct: 0 };
-        var pct = data.pct || 0;
+        var data = getFormationProgress(m.key, m.total)
+        var pct = data.pct
 
-        var barEl = document.getElementById('prog-' + m.id);
-        var pctEl = document.getElementById('pct-' + m.id);
-        var statusEl = document.getElementById('status-' + m.id);
+        var barEl = document.getElementById('prog-' + m.id)
+        var pctEl = document.getElementById('pct-' + m.id)
+        var statusEl = document.getElementById('status-' + m.id)
 
-        if (barEl) setTimeout(function(b,p){ b.style.width = p + '%'; }, 300, barEl, pct);
-        if (pctEl) pctEl.textContent = pct + '%';
+        if (barEl) setTimeout(function(b,p){ b.style.width = p + '%'; }, 300, barEl, pct)
+        if (pctEl) pctEl.textContent = pct + '%'
         if (statusEl) {
           if (pct === 0) { statusEl.textContent = 'À commencer'; statusEl.className = 'module-status'; }
           else if (pct >= 100) { statusEl.textContent = 'Terminé ✓'; statusEl.className = 'module-status status-done'; }
           else { statusEl.textContent = 'En cours'; statusEl.className = 'module-status status-inprogress'; }
         }
-      });
-    } catch(e) { console.log('Module progress error:', e); }
+      })
+    } catch(e) { console.log('Module progress error:', e) }
   }
 
   window.accessFournisseurs = function() {
