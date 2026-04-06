@@ -368,18 +368,18 @@
   <div class="nav-right" style="display:flex;align-items:center;gap:1.5rem">
     <a href="index.html" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Accueil</a>
     <a href="index.html#articles" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Blog</a>
-    <a href="client-login.html" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Se connecter</a>
+    <a href="client-login.html?mode=login" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Se connecter</a>
     <a href="client-login.html" class="nav-cta">Rejoindre le Club</a>
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mm-section">
-      <a href="client-login.html" class="mm-link secondary">Se connecter</a>
+      <a href="client-login.html?mode=login" class="mm-link secondary">Se connecter</a>
       <a href="client-login.html" class="mm-link primary">Rejoindre le Club →</a>
     </div>
     <div class="mm-section">
       <a href="index.html" class="mm-link" style="color:#F0EDE4">🏠 Accueil</a>
       <a href="index.html#articles" class="mm-link" style="color:#F0EDE4">📝 Blog</a>
-      <a href="client-login.html" class="mm-link" style="color:#F0EDE4">🔐 Se connecter</a>
+      <a href="client-login.html?mode=login" class="mm-link" style="color:#F0EDE4">🔐 Se connecter</a>
     </div>
   </div>
 </nav>
@@ -711,7 +711,7 @@
 
       if (!session) {
         sessionStorage.setItem('sbw_plan', plan)
-        window.location.href = 'client-login.html?redirect=checkout'
+        window.location.href = 'plans.html'
         return
       }
 
@@ -763,7 +763,7 @@
 
       if (!session) {
         // Pas de session — retour login
-        window.location.href = 'client-login.html?redirect=checkout'
+        window.location.href = 'plans.html'
         return
       }
 
