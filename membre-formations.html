@@ -248,23 +248,25 @@ async function init() {
 
 // ═══ CHARGEMENT ═══
 async function loadAll() {
-  // Charger toutes les formations publiées avec leurs modules et leçons
   var r = await SB.from('formations')
     .select('*, modules(*, lecons(*))')
     .eq('status', 'published')
     .order('position');
 
   allData = (r.data || []).map(function(f) {
-    // Normaliser le type : si NULL ou inconnu → video
     if (!f.type) f.type = 'video';
-    // Auto-détecter html si un module a html_url
     f.modules = (f.modules || [])
       .sort(function(a,b){return a.position-b.position;})
       .map(function(m) {
+        // Corriger l'ancienne URL Vercel → nouveau domaine
+        if (m.html_url) {
+          m.html_url = m.html_url
+            .replace('https://start-business-world.vercel.app/', 'https://www.startbusinessworld.com/')
+            .replace('http://start-business-world.vercel.app/', 'https://www.startbusinessworld.com/');
+        }
         m.lecons = (m.lecons || []).sort(function(a,b){return a.position-b.position;});
         return m;
       });
-    // Si au moins un module a html_url → type html
     if (f.type === 'video' && f.modules.some(function(m){return !!m.html_url;})) {
       f.type = 'html';
     }
