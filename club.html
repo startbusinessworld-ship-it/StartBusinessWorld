@@ -368,7 +368,7 @@
   <div class="nav-right" style="display:flex;align-items:center;gap:1.5rem">
     <a href="index.html" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Accueil</a>
     <a href="index.html#articles" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Blog</a>
-    <a href="client-login.html?mode=login" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Se connecter</a>
+    <a href="client-login.html?mode=login" style="font-size:.82rem;color:rgba(240,237,228,.5);text-decoration:none;transition:color .15s" onmouseover="this.style.color='#F0EDE4'" onmouseout="this.style.color='rgba(240,237,228,.5)'">Se connecter</a> <span data-sbw-auth></span>
     <a href="client-login.html" class="nav-cta">Rejoindre le Club</a>
   </div>
   <div class="mobile-menu" id="mobileMenu">
@@ -863,5 +863,7 @@
   }
 })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="sbw-nav-auth.js"></script>
 </body>
 </html>
