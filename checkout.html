@@ -51,6 +51,7 @@ async function startCheckout(session) {
   try {
     // Lire le plan AVANT tout — et ne pas le supprimer tout de suite
     const plan = sessionStorage.getItem('sbw_plan') || 'basic'
+    const isIntro = sessionStorage.getItem('sbw_intro') !== 'false' // true par défaut
 
     const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
       method: 'POST',
@@ -62,12 +63,13 @@ async function startCheckout(session) {
         plan: plan,
         email: session.user.email,
         userId: session.user.id,
-        isIntro: false,
+        isIntro: isIntro,
       }),
     })
     const data = await res.json()
     if (data.url) {
-      sessionStorage.removeItem('sbw_plan') // supprimer seulement si succès
+      sessionStorage.removeItem('sbw_plan')
+      sessionStorage.removeItem('sbw_intro')
       window.location.href = data.url
     } else {
       showError('Erreur paiement : ' + (data.error || 'Réessaie dans quelques instants.'))

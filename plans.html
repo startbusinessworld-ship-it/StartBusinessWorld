@@ -49,22 +49,26 @@
 
 <div class="plans">
 
-  <!-- BASIC -->
-  <div class="plan" onclick="selectPlan('basic')">
+  <!-- BASIC avec offre intro -->
+  <div class="plan" style="position:relative" onclick="selectPlan('basic', true)">
+    <div style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#A67C3A;color:#fff;font-size:.6rem;font-weight:700;padding:3px 12px;border-radius:10px;white-space:nowrap;letter-spacing:.06em">OFFRE DE LANCEMENT</div>
     <div class="plan-name">Basic</div>
-    <div class="plan-price">29€</div>
-    <div class="plan-period">/mois · sans engagement</div>
+    <div style="display:flex;align-items:baseline;gap:8px;justify-content:center;margin-bottom:.2rem">
+      <div class="plan-price" style="color:#A67C3A">1€</div>
+      <div style="font-size:.8rem;color:rgba(240,237,228,.4);text-decoration:line-through">29€</div>
+    </div>
+    <div class="plan-period">/mois pendant 3 mois · puis 29€/mois</div>
     <div class="plan-features">
       <span>✓ Formations IA complètes</span>
       <span>✓ Articles & ressources exclusifs</span>
       <span>✓ Agent IA SBW</span>
       <span>✓ Mises à jour mensuelles</span>
     </div>
-    <button class="plan-btn plan-btn-default">Choisir Basic →</button>
+    <button class="plan-btn plan-btn-gold">Commencer à 1€ →</button>
   </div>
 
   <!-- PRO -->
-  <div class="plan featured" onclick="selectPlan('pro')">
+  <div class="plan featured" onclick="selectPlan('pro', false)">
     <div class="plan-badge">LE PLUS POPULAIRE</div>
     <div class="plan-name">Pro</div>
     <div class="plan-price">79€</div>
@@ -79,7 +83,7 @@
   </div>
 
   <!-- BUSINESS -->
-  <div class="plan" onclick="selectPlan('business')">
+  <div class="plan" onclick="selectPlan('business', false)">
     <div class="plan-name">Business</div>
     <div class="plan-price">149€</div>
     <div class="plan-period">/mois · sans engagement</div>
@@ -110,8 +114,9 @@
     }
   })()
 
-  function selectPlan(plan) {
+  function selectPlan(plan, isIntro) {
     sessionStorage.setItem('sbw_plan', plan)
+    sessionStorage.setItem('sbw_intro', isIntro ? 'true' : 'false')
     window.location.href = 'checkout.html'
   }
 </script>
