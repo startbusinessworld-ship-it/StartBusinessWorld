@@ -31,7 +31,7 @@
   <div class="sub">Tu vas être redirigé vers notre page de paiement sécurisé.</div>
   <div class="error-box" id="errorBox">
     <p id="errorMsg">Une erreur est survenue.</p>
-    <a href="club.html" class="btn">Réessayer →</a>
+    <a href="plans.html" class="btn">Réessayer →</a>
   </div>
 </div>
 
@@ -49,7 +49,6 @@ function showError(msg) {
 
 async function startCheckout(session) {
   try {
-    // Lire le plan AVANT tout — et ne pas le supprimer tout de suite
     const plan = sessionStorage.getItem('sbw_plan') || 'basic'
     const isIntro = sessionStorage.getItem('sbw_intro') !== 'false' // true par défaut
 
@@ -66,13 +65,14 @@ async function startCheckout(session) {
         isIntro: isIntro,
       }),
     })
+
     const data = await res.json()
     if (data.url) {
       sessionStorage.removeItem('sbw_plan')
       sessionStorage.removeItem('sbw_intro')
       window.location.href = data.url
     } else {
-      showError('Erreur paiement : ' + (data.error || 'Réessaie dans quelques instants.'))
+      showError('Erreur : ' + (data.error || 'Réessaie dans quelques instants.'))
     }
   } catch(e) {
     showError('Erreur de connexion. Vérifie ta connexion internet.')
@@ -81,23 +81,17 @@ async function startCheckout(session) {
 
 async function init() {
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  let started = false
 
-  let attempts = 0
-  const maxAttempts = 10
-  let started = false // empêcher double appel
-
-  async function tryGetSession() {
-    attempts++
+  async function tryGetSession(attempts) {
     const { data: { session } } = await sb.auth.getSession()
-
     if (session && !started) {
       started = true
       startCheckout(session)
       return
     }
-
-    if (!started && attempts < maxAttempts) {
-      setTimeout(tryGetSession, 500)
+    if (!started && attempts < 10) {
+      setTimeout(() => tryGetSession(attempts + 1), 500)
     } else if (!started) {
       window.location.href = 'client-login.html'
     }
@@ -106,12 +100,11 @@ async function init() {
   sb.auth.onAuthStateChange((event, session) => {
     if (session && !started) {
       started = true
-      attempts = maxAttempts + 1
       startCheckout(session)
     }
   })
 
-  tryGetSession()
+  tryGetSession(0)
 }
 
 init()

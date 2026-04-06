@@ -20,11 +20,11 @@
     .price-main{font-family:"DM Serif Display",serif;font-size:3.5rem;color:#F0EDE4;line-height:1}
     .price-old{font-size:1.1rem;color:rgba(240,237,228,.3);text-decoration:line-through}
     .price-period{font-size:.82rem;color:rgba(240,237,228,.4);margin-bottom:.6rem}
-    .price-then{font-size:.78rem;color:rgba(240,237,228,.35);margin-bottom:2rem;padding:8px 16px;background:rgba(255,255,255,.04);border-radius:6px;display:inline-block}
+    .price-note{font-size:.78rem;color:rgba(240,237,228,.35);margin-bottom:2rem;padding:8px 16px;background:rgba(255,255,255,.04);border-radius:6px;display:inline-block}
     .features{text-align:left;margin-bottom:2rem}
-    .feature{display:flex;align-items:center;gap:10px;font-size:.85rem;color:rgba(240,237,228,.7);padding:7px 0;border-bottom:0.5px solid rgba(255,255,255,.05)}
+    .feature{display:flex;align-items:center;gap:10px;font-size:.84rem;color:rgba(240,237,228,.75);padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,.05)}
     .feature:last-child{border-bottom:none}
-    .feature-icon{color:var(--gold);font-size:.9rem;flex-shrink:0}
+    .fi{font-size:.95rem;flex-shrink:0;width:22px;text-align:center}
     .btn{width:100%;padding:15px;background:var(--gold);color:#fff;border:none;border-radius:9px;font-family:"DM Sans",sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:opacity .15s;margin-bottom:1rem}
     .btn:hover{opacity:.88}
     .note{font-size:.72rem;color:rgba(240,237,228,.2);line-height:1.6}
@@ -48,24 +48,24 @@
       <div class="price-old">29€</div>
     </div>
     <div class="price-period">/mois pendant 3 mois</div>
-    <div class="price-then">Sans engagement</div>
+    <div class="price-note">Sans engagement · Puis 29€/mois</div>
 
     <div class="features">
-      <div class="feature"><span class="feature-icon">✓</span>Formations IA & business complètes</div>
-      <div class="feature"><span class="feature-icon">✓</span>Articles & ressources exclusifs</div>
-      <div class="feature"><span class="feature-icon">✓</span>Agent IA SBW</div>
-      <div class="feature"><span class="feature-icon">✓</span>Mises à jour mensuelles</div>
-      <div class="feature"><span class="feature-icon">🎬</span>Formations vidéo Pro avancées</div>
-      <div class="feature"><span class="feature-icon">🇨🇳</span>Annuaire fournisseurs & contacts Chine</div>
-      <div class="feature"><span class="feature-icon">🚢</span>Import-Export · Incoterms · Douane</div>
-      <div class="feature"><span class="feature-icon">🏛️</span>Création société Hong Kong · Fiscalité</div>
-      <div class="feature"><span class="feature-icon">🛒</span>E-commerce · Shopify · Dropshipping</div>
-      <div class="feature"><span class="feature-icon">✈️</span>Expatriation · Immobilier international</div>
-      <div class="feature"><span class="feature-icon">💬</span>Groupe privé Business</div>
-      <div class="feature"><span class="feature-icon">🎥</span>Live mensuel en direct</div>
+      <div class="feature"><span class="fi">✓</span>Formations IA & business complètes</div>
+      <div class="feature"><span class="fi">✓</span>Articles & ressources exclusifs</div>
+      <div class="feature"><span class="fi">✓</span>Agent IA SBW</div>
+      <div class="feature"><span class="fi">✓</span>Mises à jour mensuelles</div>
+      <div class="feature"><span class="fi">🎬</span>Formations vidéo Pro avancées</div>
+      <div class="feature"><span class="fi">🇨🇳</span>Annuaire fournisseurs & contacts Chine</div>
+      <div class="feature"><span class="fi">🚢</span>Import-Export · Incoterms · Douane</div>
+      <div class="feature"><span class="fi">🏛️</span>Création société Hong Kong · Fiscalité</div>
+      <div class="feature"><span class="fi">🛒</span>E-commerce · Shopify · Dropshipping</div>
+      <div class="feature"><span class="fi">✈️</span>Expatriation · Immobilier international</div>
+      <div class="feature"><span class="fi">💬</span>Groupe privé Business</div>
+      <div class="feature"><span class="fi">🎥</span>Live mensuel en direct</div>
     </div>
 
-    <button class="btn" onclick="selectPlan()">Commencer à 1€ →</button>
+    <button class="btn" onclick="joinNow()">Commencer à 1€ →</button>
     <div class="note">Annulation en 1 clic · Paiement sécurisé par Stripe</div>
   </div>
 
@@ -73,21 +73,21 @@
 </div>
 
 <script>
-  const sb = supabase.createClient(
-    'https://grwimhqsthcmfwblwdwg.supabase.co',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
-  )
+const sb = supabase.createClient(
+  'https://grwimhqsthcmfwblwdwg.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+)
 
-  ;(async () => {
-    const { data: { session } } = await sb.auth.getSession()
-    if (!session) window.location.href = 'client-login.html'
-  })()
+;(async () => {
+  const { data: { session } } = await sb.auth.getSession()
+  if (!session) window.location.href = 'client-login.html'
+})()
 
-  function selectPlan() {
-    sessionStorage.setItem('sbw_plan', 'basic')
-    sessionStorage.setItem('sbw_intro', 'true')
-    window.location.href = 'checkout.html'
-  }
+function joinNow() {
+  sessionStorage.setItem('sbw_plan', 'basic')
+  sessionStorage.setItem('sbw_intro', 'true')
+  window.location.href = 'checkout.html'
+}
 </script>
 </body>
 </html>
