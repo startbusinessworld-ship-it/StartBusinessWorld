@@ -6,7 +6,6 @@
 <title>Mon Prestige — Club SBW</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="sbw-membre-auth.js"></script>
 <script src="sbw-tracker.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -271,22 +270,10 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <div class="levels-list" id="levelsList"></div>
   </div>
 
-  <!-- RÉCOMPENSE LÉGENDE -->
-  <div class="legend-reward">
-    <div class="reward-badge">🌟</div>
-    <div class="reward-title">Récompense Légende — RDV Privé 1-on-1</div>
-    <div class="reward-desc">
-      Atteins le niveau Légende et obtiens un rendez-vous privé de 30 minutes avec Ayoub.
-      Analyse de ton business, conseils personnalisés, questions sans filtre.
-      Réservé uniquement aux membres qui ont tout donné.
-    </div>
-    <button class="reward-btn" id="rewardBtn" disabled onclick="claimReward()">
-      🏆 Réclamer mon RDV
-    </button>
-    <div class="reward-locked" id="rewardLocked">
-      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 016 0v2"/></svg>
-      Débloque le niveau Légende (1500 XP) pour accéder à cette récompense
-    </div>
+  <!-- RÉCOMPENSES PAR NIVEAU -->
+  <div style="margin-bottom:24px">
+    <div class="section-title">🎁 Récompenses à débloquer</div>
+    <div id="rewardsList" style="display:flex;flex-direction:column;gap:12px"></div>
   </div>
 
   <!-- HALL OF FAME -->
@@ -318,8 +305,40 @@ var LEVELS = [
   { num:5, title:"Légende",   badge:"🌟", class:"l5", xp:1500, color:"#A67C3A" }
 ];
 
+// Récompenses débloquables à chaque niveau
 var REWARDS = [
-  { level:5, text:"RDV privé 1-on-1 avec Ayoub (30 min)" }
+  {
+    level: 2,
+    title: "eBook — Go Créer Mon Business",
+    desc: "Le guide complet pour lancer ton business international. Sourcing, fiscalité, création de société — tout ce qu'il faut savoir.",
+    badge: "📖",
+    cta: "Télécharger l'eBook",
+    type: "ebook"
+  },
+  {
+    level: 3,
+    title: "3 jours offerts — Plan Pro",
+    desc: "Accès gratuit pendant 3 jours au plan Pro : formations vidéo avancées, annuaire fournisseurs Chine et contacts exclusifs.",
+    badge: "⭐",
+    cta: "Activer 3 jours Pro",
+    type: "trial_pro"
+  },
+  {
+    level: 4,
+    title: "Pack Business en Chine",
+    desc: "Accès exclusif au pack Business Chine : contacts fournisseurs premium, guide sourcing avancé et templates de contrats import.",
+    badge: "🇨🇳",
+    cta: "Débloquer le Pack",
+    type: "pack_china"
+  },
+  {
+    level: 5,
+    title: "3 jours offerts — Plan Business",
+    desc: "Accès complet au plan Business pendant 3 jours : groupe privé, live mensuel et accompagnement prioritaire.",
+    badge: "🚀",
+    cta: "Activer 3 jours Business",
+    type: "trial_business"
+  }
 ];
 
 async function init() {
@@ -337,6 +356,7 @@ async function init() {
   await loadMyXp();
   renderHero();
   renderLevels();
+  renderRewards();
   await loadHallOfFame();
 }
 
@@ -474,6 +494,85 @@ function renderLevels() {
 
     list.appendChild(row);
   });
+}
+
+function renderRewards() {
+  var container = document.getElementById('rewardsList');
+  if (!container) return;
+  var currentLevel = myXp.level;
+
+  container.innerHTML = REWARDS.map(function(r) {
+    var unlocked = currentLevel >= r.level;
+    var levelInfo = LEVELS[r.level - 1];
+    var xpRequired = levelInfo ? levelInfo.xp : 0;
+    var xpMissing = Math.max(0, xpRequired - myXp.xp);
+
+    return '<div style="background:' + (unlocked ? '#fff' : '#f8f8f6') + ';border:0.5px solid ' + (unlocked ? 'rgba(166,124,58,.3)' : 'var(--subtle)') + ';border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;' + (unlocked ? '' : 'opacity:.6') + '">' +
+      '<div style="font-size:2.2rem;flex-shrink:0;width:52px;text-align:center">' + (unlocked ? r.badge : '🔒') + '</div>' +
+      '<div style="flex:1">' +
+        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
+          '<div style="font-size:.92rem;font-weight:500;color:var(--ink)">' + r.title + '</div>' +
+          (unlocked
+            ? '<span style="font-size:.6rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);padding:2px 8px;border-radius:10px;border:.5px solid rgba(166,124,58,.2)">DÉBLOQUÉ</span>'
+            : '<span style="font-size:.6rem;font-weight:600;background:var(--surface);color:var(--muted);padding:2px 8px;border-radius:10px">Niveau ' + r.level + ' requis</span>') +
+        '</div>' +
+        '<div style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:' + (unlocked ? '12' : '0') + 'px">' + r.desc + '</div>' +
+        (unlocked
+          ? '<button onclick="claimReward(\'' + r.type + '\')" style="background:var(--gold);color:#fff;border:none;padding:7px 18px;border-radius:7px;font-family:inherit;font-size:.8rem;font-weight:500;cursor:pointer">' + r.cta + ' →</button>'
+          : '<div style="font-size:.72rem;color:var(--muted);margin-top:6px">Encore ' + xpMissing.toLocaleString("fr-FR") + ' XP pour débloquer</div>') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+async function claimReward(type) {
+  var btn = event.target;
+  btn.disabled = true;
+  btn.textContent = 'En cours...';
+
+  try {
+    // Enregistrer la réclamation
+    await SB.from('reward_claims').upsert({
+      user_id: user.id,
+      reward_type: type,
+      claimed_at: new Date().toISOString()
+    }, { onConflict: 'user_id,reward_type' });
+
+    if (type === 'trial_pro' || type === 'trial_business') {
+      // Activer 3 jours d'accès
+      var planTrial = type === 'trial_pro' ? 'pro' : 'business';
+      var expires = new Date();
+      expires.setDate(expires.getDate() + 3);
+
+      await SB.from('members').update({
+        trial_plan: planTrial,
+        trial_expires_at: expires.toISOString()
+      }).eq('id', user.id);
+
+      btn.textContent = '✓ Activé !';
+      btn.style.background = '#22c55e';
+      alert('🎉 ' + (type === 'trial_pro' ? '3 jours Pro activés' : '3 jours Business activés') + ' ! Retourne sur le dashboard pour en profiter.');
+
+    } else if (type === 'ebook') {
+      btn.textContent = '✓ Débloqué !';
+      btn.style.background = '#22c55e';
+      // Ouvrir le lien de téléchargement (à configurer)
+      var ebookUrl = 'https://grwimhqsthcmfwblwdwg.supabase.co/storage/v1/object/public/rewards/ebook-go-creer-mon-business.pdf';
+      window.open(ebookUrl, '_blank');
+
+    } else if (type === 'pack_china') {
+      btn.textContent = '✓ Débloqué !';
+      btn.style.background = '#22c55e';
+      // Ouvrir le pack Chine (à configurer)
+      var packUrl = 'https://grwimhqsthcmfwblwdwg.supabase.co/storage/v1/object/public/rewards/pack-business-chine.pdf';
+      window.open(packUrl, '_blank');
+    }
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'Réessayer';
+    alert('Erreur. Réessaie dans quelques instants.');
+  }
 }
 
 async function loadHallOfFame() {

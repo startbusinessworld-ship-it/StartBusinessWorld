@@ -1253,9 +1253,18 @@
                        member?.stripe_subscription_status === 'active' ||
                        member?.stripe_subscription_status === 'trialing'
 
-      if (!aPaye || !statusOk) {
+      // Vérifier trial prestige (3 jours offerts)
+      const trialActif = member?.trial_plan && member?.trial_expires_at &&
+                         new Date(member.trial_expires_at) > new Date()
+
+      if (!aPaye && !trialActif || (!aPaye && !statusOk && !trialActif)) {
         window.location.href = 'plans.html'
         return
+      }
+
+      // Si trial actif, utiliser le plan trial pour les accès
+      if (trialActif && !aPaye) {
+        currentMember = { ...member, plan: member.trial_plan }
       }
     }
 
