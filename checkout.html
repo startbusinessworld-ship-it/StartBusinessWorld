@@ -19,45 +19,50 @@
     .sub{font-size:.82rem;color:rgba(240,237,228,.4);line-height:1.6}
     .error-box{background:rgba(192,57,43,.12);border:0.5px solid rgba(192,57,43,.3);border-radius:10px;padding:1.2rem;margin-top:1.5rem;display:none}
     .error-box p{font-size:.82rem;color:#F09595;margin-bottom:1rem}
-    .btn{display:inline-block;padding:10px 24px;background:var(--gold);color:#fff;border:none;border-radius:7px;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none}
+    .btn{display:inline-block;padding:10px 24px;background:var(--gold);color:#fff;border:none;border-radius:7px;font-family:"DM Sans",sans-serif;font-size:.85rem;font-weight:600;cursor:pointer;text-decoration:none;margin:4px}
+    .btn-out{display:inline-block;padding:10px 24px;background:none;color:rgba(240,237,228,.4);border:0.5px solid rgba(255,255,255,.1);border-radius:7px;font-family:"DM Sans",sans-serif;font-size:.85rem;cursor:pointer;text-decoration:none;margin:4px}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div class="logo">Start Business World</div>
   <div class="badge">Le Club SBW</div>
-  <div class="spinner"></div>
-  <div class="title">Redirection vers le paiement...</div>
-  <div class="sub">Tu vas être redirigé vers notre page de paiement sécurisé.</div>
+  <div class="spinner" id="spinner"></div>
+  <div class="title" id="title">Redirection vers le paiement...</div>
+  <div class="sub" id="sub">Tu vas être redirigé vers notre page de paiement sécurisé.</div>
   <div class="error-box" id="errorBox">
     <p id="errorMsg">Une erreur est survenue.</p>
     <a href="plans.html" class="btn">Réessayer →</a>
+    <a href="client-login.html" class="btn-out" onclick="logout()">Se déconnecter</a>
   </div>
 </div>
-
 <script>
 const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+
+async function logout() {
+  await sb.auth.signOut()
+}
 
 function showError(msg) {
-  document.querySelector('.spinner').style.display = 'none'
-  document.querySelector('.title').textContent = 'Oups...'
-  document.querySelector('.sub').textContent = ''
+  document.getElementById('spinner').style.display = 'none'
+  document.getElementById('title').textContent = 'Oups...'
+  document.getElementById('sub').textContent = ''
   document.getElementById('errorMsg').textContent = msg
   document.getElementById('errorBox').style.display = 'block'
 }
 
 async function startCheckout(session) {
+  if (!session?.user?.id || !session?.user?.email) {
+    showError('Session invalide. Reconnecte-toi.')
+    return
+  }
+
+  const plan = sessionStorage.getItem('sbw_plan') || 'basic'
+  const isIntro = sessionStorage.getItem('sbw_intro') !== 'false'
+
   try {
-    const plan = sessionStorage.getItem('sbw_plan') || 'basic'
-    const isIntro = sessionStorage.getItem('sbw_intro') !== 'false'
-
-    // Vérifier que les données de session sont bien là
-    if (!session?.user?.id || !session?.user?.email) {
-      showError('Session invalide. Reconnecte-toi.')
-      return
-    }
-
     const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
       method: 'POST',
       headers: {
@@ -71,7 +76,6 @@ async function startCheckout(session) {
         isIntro: isIntro,
       }),
     })
-
     const data = await res.json()
     if (data.url) {
       sessionStorage.removeItem('sbw_plan')
@@ -85,35 +89,14 @@ async function startCheckout(session) {
   }
 }
 
-async function init() {
-  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  let started = false
-
-  async function tryGetSession(attempts) {
-    const { data: { session } } = await sb.auth.getSession()
-    if (session && !started) {
-      started = true
-      startCheckout(session)
-      return
-    }
-    if (!started && attempts < 10) {
-      setTimeout(() => tryGetSession(attempts + 1), 500)
-    } else if (!started) {
-      window.location.href = 'client-login.html'
-    }
+;(async function init() {
+  const { data: { session } } = await sb.auth.getSession()
+  if (!session) {
+    window.location.href = 'client-login.html'
+    return
   }
-
-  sb.auth.onAuthStateChange((event, session) => {
-    if (session && !started) {
-      started = true
-      startCheckout(session)
-    }
-  })
-
-  tryGetSession(0)
-}
-
-init()
+  startCheckout(session)
+})()
 </script>
 </body>
 </html>
