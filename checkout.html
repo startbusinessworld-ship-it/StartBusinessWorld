@@ -50,7 +50,13 @@ function showError(msg) {
 async function startCheckout(session) {
   try {
     const plan = sessionStorage.getItem('sbw_plan') || 'basic'
-    const isIntro = sessionStorage.getItem('sbw_intro') !== 'false' // true par défaut
+    const isIntro = sessionStorage.getItem('sbw_intro') !== 'false'
+
+    // Vérifier que les données de session sont bien là
+    if (!session?.user?.id || !session?.user?.email) {
+      showError('Session invalide. Reconnecte-toi.')
+      return
+    }
 
     const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
       method: 'POST',
