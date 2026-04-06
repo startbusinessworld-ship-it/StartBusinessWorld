@@ -258,7 +258,7 @@ async function handleSubmit() {
 async function loginGoogle() {
   var { error } = await sb.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: window.location.origin + '/client-login.html' }
+    options: { redirectTo: window.location.origin + '/auth-callback.html' }
   })
   if (error) showError(error.message)
 }
