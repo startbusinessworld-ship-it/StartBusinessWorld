@@ -151,9 +151,17 @@ var isLoginMode = new URLSearchParams(window.location.search).get('mode') === 'l
 
 // Si session active → rediriger selon plan
 ;(async function() {
+  // Écouter onAuthStateChange pour attraper le token Google OAuth
+  sb.auth.onAuthStateChange(async function(event, session) {
+    if ((event === 'SIGNED_IN' || event === 'USER_UPDATED') && session) {
+      await redirectUser(session.user.id)
+    }
+  })
+
   const { data: { session } } = await sb.auth.getSession()
   if (session) {
     await redirectUser(session.user.id)
+    return
   }
   if (isLoginMode) toggleMode()
 })()
