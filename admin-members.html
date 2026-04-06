@@ -79,8 +79,11 @@
       <div class="topbar-actions">
         <select class="btn-ghost" id="filterPlan" onchange="filterMembers()" style="cursor:pointer">
           <option value="all">Tous les plans</option>
-          <option value="trial">1€/mois (essai)</option>
-          <option value="active">29€/mois</option>
+          <option value="inscrit">Inscrit (sans plan)</option>
+          <option value="intro">1€/mois — Offre lancement</option>
+          <option value="basic">Basic — 29€/mois</option>
+          <option value="pro">Pro — 79€/mois</option>
+          <option value="business">Business — 149€/mois</option>
           <option value="cancelled">Annulé</option>
         </select>
         <button class="btn-ghost" onclick="exportMembers()">↓ Exporter CSV</button>
@@ -151,17 +154,21 @@
     const { data } = await sb.from('members').select('*').order('created_at', { ascending: false })
     allMembers = data || []
 
-    const active = allMembers.filter(m => m.plan === 'active').length
-    const trial = allMembers.filter(m => m.plan === 'trial').length
+    const inscrit = allMembers.filter(m => m.plan === 'inscrit').length
+    const intro = allMembers.filter(m => m.plan === 'intro').length
+    const basic = allMembers.filter(m => m.plan === 'basic').length
+    const pro = allMembers.filter(m => m.plan === 'pro').length
+    const business = allMembers.filter(m => m.plan === 'business').length
     const cancelled = allMembers.filter(m => m.plan === 'cancelled').length
-    const mrr = (active * 29) + (trial * 1)
+    const totalPayants = intro + basic + pro + business
+    const mrr = (intro * 1) + (basic * 29) + (pro * 79) + (business * 149)
 
-    document.getElementById('memberCount').textContent = active + ' membres actifs'
-    document.getElementById('mActive').textContent = active
-    document.getElementById('mActiveDelta').textContent = '+7 ce mois'
-    document.getElementById('mTrial').textContent = trial
+    document.getElementById('memberCount').textContent = totalPayants + ' membres actifs'
+    document.getElementById('mActive').textContent = totalPayants
+    document.getElementById('mActiveDelta').textContent = inscrit + ' inscrits sans plan'
+    document.getElementById('mTrial').textContent = intro
     document.getElementById('mCancelled').textContent = cancelled
-    document.getElementById('mCancelledDelta').textContent = '-2 ce mois'
+    document.getElementById('mCancelledDelta').textContent = basic + ' Basic · ' + pro + ' Pro · ' + business + ' Business'
     document.getElementById('mMRR').textContent = mrr.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 
     renderMembers(allMembers)
@@ -188,6 +195,23 @@
     tbody.innerHTML = members.map(m => {
       const name = m.full_name || m.email
       const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+      const planLabels = {
+        inscrit: 'Inscrit',
+        intro: '1€/mois',
+        basic: 'Basic 29€',
+        pro: 'Pro 79€',
+        business: 'Business 149€',
+        cancelled: 'Annulé'
+      }
+      const planLabel = planLabels[m.plan] || m.plan || '—'
+      const planClass = m.plan === 'inscrit' ? 'draft' :
+                        m.plan === 'intro' ? 'trial' :
+                        m.plan === 'cancelled' ? 'draft' : ''
+      const statusLabel = m.stripe_subscription_status === 'active' ? 'Actif' :
+                          m.stripe_subscription_status === 'past_due' ? 'Impayé' :
+                          m.stripe_subscription_status === 'canceled' ? 'Annulé' :
+                          m.plan === 'inscrit' ? 'Sans plan' : '—'
+      const statusClass = m.stripe_subscription_status === 'active' ? 'sent' : 'draft'
       return `
         <tr>
           <td>
@@ -197,15 +221,13 @@
             </div>
           </td>
           <td style="color:var(--muted)">${m.email}</td>
-          <td><span class="plan-badge ${m.plan === 'trial' ? 'trial' : m.plan === 'cancelled' ? 'draft' : ''}">
-            ${m.plan === 'trial' ? '1€/mois' : m.plan === 'active' ? '29€/mois' : 'Annulé'}
-          </span></td>
-          <td><span class="status-pill ${m.status === 'active' ? 'sent' : 'draft'}">${m.status === 'active' ? 'Actif' : 'Inactif'}</span></td>
+          <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
+          <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
           <td style="color:var(--muted)">${formatDate(m.created_at)}</td>
           <td>
             <div style="display:flex;gap:6px">
-              ${m.plan === 'trial' ? `<button class="row-action" onclick="upgradeMember('${m.id}')">Passer 29€</button>` : ''}
-              <button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="cancelMember('${m.id}')">Annuler</button>
+              ${m.plan === 'inscrit' ? `<button class="row-action" onclick="upgradeMember('${m.id}')">Activer</button>` : ''}
+              ${m.plan !== 'cancelled' && m.plan !== 'inscrit' ? `<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="cancelMember('${m.id}')">Annuler</button>` : ''}
             </div>
           </td>
         </tr>
@@ -214,8 +236,8 @@
   }
 
   async function upgradeMember(id) {
-    await sb.from('members').update({ plan: 'active' }).eq('id', id)
-    showToast('Membre mis à jour.', 'success')
+    await sb.from('members').update({ plan: 'intro' }).eq('id', id)
+    showToast('Membre activé.', 'success')
     loadMembers()
   }
 
