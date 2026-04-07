@@ -49,22 +49,22 @@ const LINKS: Record<string, string> = {
 
 // ─── CTA FORMAT [OUTIL:Nom|Description|URL] ──────────────────────────────────
 const CTA: Record<string, string> = {
-  luminos:   `[OUTIL:Luminos Corp — Société Hong Kong|Création 7 jours, 100% en ligne, depuis n'importe où|${LINKS.luminos}]`,
-  airwallex: `[OUTIL:Airwallex — Compte bancaire international|Multi-devises, Stripe compatible, zéro frais cachés|${LINKS.airwallex}]`,
-  legalplace:`[OUTIL:LegalPlace — Créer sa société en France|SASU EURL SAS en ligne. Code SBW15 pour -15%|${LINKS.legalplace}]`,
-  shopify:   `[OUTIL:Shopify — Lance ta boutique e-commerce|Plateforme n°1 mondial. Essai gratuit 3 mois|${LINKS.shopify}]`,
-  wix:       `[OUTIL:Wix — Crée ton site professionnel|Éditeur no-code simple et puissant. Offre SBW|${LINKS.wix}]`,
-  wise:      `[OUTIL:Wise Business — Paiements internationaux|Frais transparents, multi-devises, idéal entrepreneurs|${LINKS.wise}]`,
-  xtransfer: `[OUTIL:XTransfer — Paiements Chine et Asie|Solution de référence pour importer depuis la Chine|${LINKS.xtransfer}]`,
-  pingpong:  `[OUTIL:PingPong — Encaisser depuis l'étranger|Idéal pour Amazon FBA et e-commerçants internationaux|${LINKS.pingpong}]`,
-  airalo:    `[OUTIL:Airalo — eSIM internationale|Reste connecté à l'étranger sans frais excessifs|${LINKS.airalo}]`,
-  capcut:    `[OUTIL:CapCut — Montage vidéo pro|Crée des Reels, Shorts et TikTok facilement|${LINKS.capcut}]`,
-  udemy:     `[OUTIL:Udemy — Formations en ligne|Des milliers de cours pour développer tes compétences|${LINKS.udemy}]`,
-  kiwi:      `[OUTIL:Kiwi.com — Vols pas chers|Trouve les meilleurs prix pour tes voyages internationaux|${LINKS.kiwi}]`,
-  club:      `[OUTIL:Club Start Business World|Formations, outils exclusifs et communauté d'entrepreneurs|${LINKS.club}]`,
+  luminos:   `[OUTIL:Luminos Corp — Société Hong Kong|Création en 7 jours, 100% en ligne|${LINKS.luminos}]`,
+  airwallex: `[OUTIL:Airwallex — Compte multi-devises|Compatible Stripe, PayPal, zéro frais cachés|${LINKS.airwallex}]`,
+  legalplace:`[OUTIL:LegalPlace — Créer sa société|SASU EURL SAS. Code SBW15 pour -15%|${LINKS.legalplace}]`,
+  shopify:   `[OUTIL:Shopify — Boutique e-commerce|Plateforme n°1. Essai gratuit 3 mois|${LINKS.shopify}]`,
+  wix:       `[OUTIL:Wix — Site professionnel no-code|Simple, rapide, efficace|${LINKS.wix}]`,
+  wise:      `[OUTIL:Wise Business — Virements internationaux|Frais bas, multi-devises, transparent|${LINKS.wise}]`,
+  xtransfer: `[OUTIL:XTransfer — Paiements Chine|La référence pour payer tes fournisseurs chinois|${LINKS.xtransfer}]`,
+  pingpong:  `[OUTIL:PingPong — Encaisser à l'international|Idéal Amazon FBA et ventes en ligne|${LINKS.pingpong}]`,
+  airalo:    `[OUTIL:Airalo — eSIM de voyage|Reste connecté partout dans le monde|${LINKS.airalo}]`,
+  capcut:    `[OUTIL:CapCut — Montage vidéo|Reels, Shorts, TikTok — simple et pro|${LINKS.capcut}]`,
+  udemy:     `[OUTIL:Udemy — Formations en ligne|Des milliers de cours pour monter en compétences|${LINKS.udemy}]`,
+  kiwi:      `[OUTIL:Kiwi.com — Vols pas chers|Les meilleurs prix pour voyager partout|${LINKS.kiwi}]`,
+  club:      `[OUTIL:Club Start Business World|Formations + outils + communauté d'entrepreneurs|${LINKS.club}]`,
 };
 
-const CLUB_BLOCK = `> Rejoins le Club Start Business World — Formations complètes, outils exclusifs, communauté d'entrepreneurs francophones. Tout ce qu'il faut pour lancer et scaler ton business international.
+const CLUB_BLOCK = `> T'as aimé cet article ? Dans le Club SBW tu vas encore plus loin — formations complètes, outils exclusifs, et une communauté d'entrepreneurs qui bougent vraiment.
 
 ${CTA.club}`;
 
@@ -72,9 +72,7 @@ ${CTA.club}`;
 function getCTAs(cat: string): string {
   const map: Record<string, string[]> = {
     "Hong Kong":        [CTA.luminos, CTA.airwallex],
-    "Fiscalite":        [CTA.luminos, CTA.legalplace],
     "Fiscalité":        [CTA.luminos, CTA.legalplace],
-    "Creation societe": [CTA.legalplace, CTA.airwallex],
     "Création société": [CTA.legalplace, CTA.airwallex],
     "E-commerce":       [CTA.shopify, CTA.airwallex, CTA.pingpong],
     "Import-Export":    [CTA.xtransfer, CTA.airwallex, CTA.luminos],
@@ -83,7 +81,6 @@ function getCTAs(cat: string): string {
     "Business Chine":   [CTA.xtransfer, CTA.airwallex, CTA.shopify],
     "Mindset":          [CTA.capcut, CTA.udemy],
     "Outils":           [CTA.capcut, CTA.shopify, CTA.wix],
-    "Actualite":        [CTA.airwallex, CTA.wise],
     "Actualité":        [CTA.airwallex, CTA.wise],
   };
   return (map[cat] || [CTA.legalplace]).join("\n\n");
@@ -97,11 +94,11 @@ async function getLastScores(): Promise<string> {
       .eq("generated_by_ai", true)
       .order("created_at", { ascending: false })
       .limit(5);
-    if (!data || data.length === 0) return "Premier article — pas d'historique.";
+    if (!data || data.length === 0) return "Premier article.";
     return data.map((a, i) =>
-      `#${i+1} "${a.title}" SEO:${a.seo_score}/100 Copy:${a.copy_score}/100 Eng:${a.engagement_score}/100 — Améliorer: ${a.seo_recommendations || "rien"}`
+      `#${i+1} "${a.title}" SEO:${a.seo_score} Copy:${a.copy_score} Eng:${a.engagement_score} — Améliorer: ${a.seo_recommendations || "rien"}`
     ).join(" || ");
-  } catch { return "Impossible de charger l'historique."; }
+  } catch { return "Pas d'historique."; }
 }
 
 // ─── APPEL CLAUDE ─────────────────────────────────────────────────────────────
@@ -113,19 +110,14 @@ async function callClaude(messages: object[], system: string, maxTokens: number)
       "x-api-key": ANTHROPIC_KEY,
       "anthropic-version": "2023-06-01"
     },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: maxTokens,
-      system,
-      messages
-    })
+    body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: maxTokens, system, messages })
   });
   const data = await res.json();
-  if (!data.content || !data.content[0]) throw new Error("Claude API error: " + JSON.stringify(data));
+  if (!data.content?.[0]) throw new Error("Claude API error: " + JSON.stringify(data));
   return data.content[0].text.trim();
 }
 
-// ─── HANDLER PRINCIPAL ────────────────────────────────────────────────────────
+// ─── HANDLER ─────────────────────────────────────────────────────────────────
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -133,88 +125,96 @@ serve(async (req) => {
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const manualTopic: string | null = body.topic || null;
 
-    // 1. Scores des derniers articles
     const lastScores = await getLastScores();
 
-    // 2. Générer un sujet varié si pas de sujet manuel
+    // Sujet varié si pas de sujet manuel
     let topic = manualTopic;
     if (!topic) {
       const date = new Date().toLocaleDateString("fr-FR");
-      const rand = Math.floor(Math.random() * 11);
       const themes = [
-        "Hong Kong fiscalité société offshore",
-        "e-commerce Shopify Amazon FBA dropshipping",
-        "import export Chine fournisseurs",
-        "expatriation Dubaï fiscalité nomade digital",
-        "finance entrepreneur trésorerie banque",
-        "actualité business entrepreneur succès réforme",
-        "création société France SASU EURL",
-        "mindset entrepreneur productivité succès",
-        "outils IA automatisation business",
-        "Airwallex Wise paiements internationaux",
-        "immobilier investissement international"
+        "actualité réforme entrepreneur France loi fiscale nouveauté 2026",
+        "Hong Kong société offshore fiscalité territoriale avantages concrets",
+        "e-commerce Amazon FBA Shopify dropshipping stratégie rentabilité",
+        "import export Chine fournisseurs Alibaba containers logistique",
+        "expatriation Dubaï Portugal Thaïlande résidence fiscale nomade",
+        "finance entrepreneur trésorerie gestion argent investissement",
+        "création société France SASU EURL SAS choix statut juridique",
+        "mindset entrepreneur discipline habitudes succès développement personnel",
+        "business physique franchise boutique commerce local international",
+        "voyage digital nomad eSIM connexion productivité déplacement",
+        "intelligence artificielle Claude ChatGPT outils IA productivité entrepreneur",
+        "nouveaux outils tech tendances business automatisation 2026",
+        "business Chine sourcing négociation fournisseurs qualité",
+        "fiscalité optimisation légale holding dividendes structure",
+        "banque néobanque Airwallex Wise paiements internationaux frais",
+        "immobilier investissement étranger patrimoine international",
+        "développement personnel croissance entrepreneur motivation",
+        "tendances business digital 2026 opportunités marché",
+        "réseaux sociaux LinkedIn TikTok Instagram stratégie entrepreneur",
+        "actualité grands entrepreneurs succès leçons business",
+        "nouvelles réformes sociales fiscales impact entrepreneur France",
+        "startup levée de fonds investisseur business model scalable",
+        "freelance indépendant revenus multiples liberté financière"
       ];
+      const rand = Math.floor(Math.random() * themes.length);
       topic = await callClaude(
-        [{ role: "user", content: `Date: ${date}. Thème imposé: "${themes[rand]}". Propose UN seul sujet d'article de blog ORIGINAL et CONCRET pour Start Business World, différent de ces sujets déjà traités: ${lastScores}. Réponds UNIQUEMENT avec le titre du sujet, rien d'autre.` }],
-        "Tu es rédacteur en chef de Start Business World, média francophone d'entrepreneuriat international. Tu dois proposer des sujets variés, jamais répétitifs.",
-        100
+        [{ role: "user", content: `Date: ${date}. Thème: "${themes[rand]}". Propose UN sujet d'article ORIGINAL et CONCRET pour Start Business World. Ces sujets ont déjà été traités — évite-les absolument: ${lastScores}. Réponds UNIQUEMENT avec le titre du sujet.` }],
+        "Tu es rédacteur en chef de Start Business World. Tu proposes des sujets originaux, jamais répétitifs, toujours concrets et utiles pour des entrepreneurs francophones.",
+        120
       );
     }
 
-    // 3. Générer l'article complet en markdown
+    // Générer l'article
     const raw = await callClaude(
-      [{ role: "user", content: `Rédige un article complet sur: "${topic}"\n\nAnalyse les scores précédents et fais MIEUX:\n${lastScores}\n\nNote-toi honnêtement et donne 3 recommandations précises.` }],
-      `Tu es le meilleur rédacteur web francophone. Style Eugène Schwartz. Tu écris pour Start Business World (SBW).
+      [{ role: "user", content: `Sujet: "${topic}"\n\nScores précédents — fais MIEUX:\n${lastScores}` }],
+      `Tu es le meilleur rédacteur web francophone pour des entrepreneurs. Tu écris pour Start Business World (SBW).
 
-ANALYSE: Lis les scores et recommandations des articles précédents. Fais MIEUX sur cet article.
+TON OBLIGATOIRE:
+Parle comme un pote qui s'y connaît — direct, cash, sans blabla. Pas de langage corporatif, pas de "il convient de noter que". Comme si tu expliquais ça à un ami autour d'un café. Naturel, familier mais pro. Tu dis "t'as", "c'est", "tu vas", "ça marche", "honnêtement", "concrètement". Tu utilises des exemples de la vraie vie.
 
-RÈGLES ABSOLUES:
-- TON: Direct, punchy, entrepreneur à entrepreneur. Phrases courtes. Impact immédiat.
-- ACCROCHE: 2-3 phrases percutantes SANS titre en début
-- STRUCTURE: 4-5 sections avec ## Titre section
-- DONNÉES: Chiffres concrets, année 2026
-- LONGUEUR: 900-1100 mots
-- COPYWRITING SCHWARTZ: Douleur → Amplification → Solution → Preuve → Action
+STRUCTURE OBLIGATOIRE:
+- 2-3 phrases d'accroche SANS titre (commence par une douleur ou une opportunité concrète)
+- 4 à 5 sections ## bien espacées
+- Des listes - pour les points clés
+- Des callouts > pour les conseils importants
+- Données chiffrées avec l'année 2026
+- 900-1100 mots
+- Termine par un appel à l'action naturel
 
-FORMAT MARKDOWN UNIQUEMENT (pas de HTML):
+FORMAT MARKDOWN STRICT (JAMAIS de HTML):
 ## Titre section
-### Sous-section (si besoin)
-- élément de liste
-> conseil important ou information clé
-Paragraphes séparés par UNE ligne vide
+### Sous-section
+- élément liste
+> conseil clé
+Paragraphes séparés par ligne vide
 
-JAMAIS de balises HTML, JAMAIS de <div>, JAMAIS de <p>
+AMÉLIORATION: Analyse les scores précédents et fais mieux sur SEO, copywriting et engagement.
 
 CATÉGORIES: Hong Kong | Fiscalité | Création société | E-commerce | Import-Export | Finance | Expatriation | Business Chine | Mindset | Outils | Actualité
 
-RÉPONDS UNIQUEMENT EN JSON VALIDE sur une seule ligne (escape les sauts de ligne avec \\n):
-{"title":"...","deck":"résumé 150 chars","slug":"url-seo-tirets","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"titre SEO 55-60 chars","meta_description":"description 150-155 chars avec CTA","content":"accroche\\n\\n## Section 1\\n\\nparagraphe...\\n\\n## Section 2\\n\\nparagraphe...","tools":["outil1"],"seo_score":0,"copy_score":0,"engagement_score":0,"seo_recommendations":"3 points précis"}`,
+RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
+{"title":"Titre accrocheur SEO","deck":"Résumé 150 chars","slug":"url-tirets-seo","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"Meta 55-60 chars","meta_description":"Meta 150-155 chars avec CTA","content":"accroche\\n\\n## Titre\\n\\ncontenu...","tools":["outil1"],"seo_score":85,"copy_score":80,"engagement_score":78,"seo_recommendations":"3 points précis pour le prochain article"}`,
       3000
     );
 
-    // 4. Parser le JSON
-    const clean = raw
-      .replace(/^```json\s*/i, "")
-      .replace(/^```\s*/i, "")
-      .replace(/```\s*$/i, "")
-      .trim();
+    const clean = raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
     const article = JSON.parse(clean);
 
-    // 5. Nettoyer le markdown
+    // Nettoyer markdown
     let content: string = article.content || "";
     content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
     content = content.replace(/([^\n])\n(#{2,3} )/g, "$1\n\n$2");
-    content = content.replace(/(#{2,3} [^\n]+)\n([^\n#\->-])/g, "$1\n\n$2");
+    content = content.replace(/(#{2,3} [^\n]+)\n([^\n#>-])/g, "$1\n\n$2");
 
-    // 6. Images Unsplash en parallèle
-    const keyword1 = (article.tags?.[0] || topic || "business").substring(0, 30);
-    const keyword2 = (article.category || "entrepreneur").substring(0, 30);
+    // Images Unsplash
+    const kw1 = (article.tags?.[0] || topic || "business").slice(0, 40);
+    const kw2 = (article.category || "entrepreneur").slice(0, 30);
     const [imgCover, imgMid] = await Promise.all([
-      fetchImage(keyword1),
-      fetchImage(keyword2 + " business")
+      fetchImage(kw1),
+      fetchImage(kw2 + " business professional")
     ]);
 
-    // 7. Assembler le contenu final
+    // Assembler contenu final
     const paragraphs = content.split("\n\n").filter((p: string) => p.trim());
     const mid = Math.floor(paragraphs.length / 2);
     const ctaBlock = getCTAs(article.category);
@@ -222,7 +222,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE sur une seule ligne (escape les sauts de lign
     const parts: string[] = [];
     if (imgCover) parts.push(`[IMAGE:${imgCover}|${article.title}]`);
     parts.push(...paragraphs.slice(0, mid));
-    if (imgMid) parts.push(`[IMAGE:${imgMid}|${article.category} — Start Business World]`);
+    if (imgMid) parts.push(`[IMAGE:${imgMid}|${article.category}]`);
     parts.push(ctaBlock);
     parts.push(...paragraphs.slice(mid));
     parts.push("");
@@ -230,11 +230,11 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE sur une seule ligne (escape les sauts de lign
 
     const contentFinal = parts.join("\n\n");
 
-    // 8. Publier dans Supabase
+    // Publier
     const { data, error } = await sb.from("articles").insert({
       title: article.title,
       deck: article.deck,
-      slug: article.slug || article.title.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      slug: article.slug || article.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 80),
       category: article.category,
       tags: article.tags || [],
       content: contentFinal,
@@ -252,7 +252,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE sur une seule ligne (escape les sauts de lign
       updated_at: new Date().toISOString(),
     }).select().single();
 
-    if (error) throw new Error("Supabase error: " + error.message);
+    if (error) throw new Error("Supabase: " + error.message);
 
     return new Response(
       JSON.stringify({ success: true, article: data, topic }),
@@ -260,7 +260,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE sur une seule ligne (escape les sauts de lign
     );
 
   } catch (err) {
-    console.error("generate-article error:", String(err));
+    console.error("Error:", String(err));
     return new Response(
       JSON.stringify({ success: false, error: String(err) }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
