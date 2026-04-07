@@ -12,196 +12,118 @@ const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// ─── CTA par catégorie ───────────────────────────────────────────────────────
-const CTA_MAP: Record<string, string> = {
-  "Hong Kong": `
-<div class="article-cta cta-hk">
-  <div class="cta-label">Partenaire recommandé</div>
-  <h3>Créer ta société à Hong Kong</h3>
-  <p>Luminos Corp accompagne les entrepreneurs francophones dans la création et la gestion de sociétés à Hong Kong. Création en 7 jours, 100% en ligne.</p>
-  <a href="https://www.startbusinessworld.com/hong-kong" class="cta-btn">Démarrer ma création →</a>
-</div>
-<div class="article-cta cta-airwallex">
-  <div class="cta-label">Banking recommandé</div>
-  <h3>Ouvre ton compte Airwallex</h3>
-  <p>La meilleure solution bancaire pour ta société Hong Kong — multi-devises, Stripe compatible, zéro frais cachés.</p>
-  <a href="https://www.airwallex.com/fr" class="cta-btn">Ouvrir mon compte →</a>
-</div>`,
-  "Création société": `
-<div class="article-cta cta-legalplace">
-  <div class="cta-label">Partenaire recommandé</div>
-  <h3>Créer ta société avec LegalPlace</h3>
-  <p>Création de SASU, EURL ou SAS en ligne — rapide, simple, garanti sans rejet du greffe.</p>
-  <a href="https://www.legalplace.fr" class="cta-btn">Utiliser le code SBW15 (-15%) →</a>
-</div>`,
-  "E-commerce": `
-<div class="article-cta cta-shopify">
-  <div class="cta-label">Outil recommandé</div>
-  <h3>Lance ta boutique Shopify</h3>
-  <p>La plateforme e-commerce la plus utilisée au monde. Essai gratuit 3 mois avec notre lien affilié.</p>
-  <a href="https://shopify.pxf.io/gOP9jv" class="cta-btn">Essayer Shopify gratuitement →</a>
-</div>`,
-  "Finance": `
-<div class="article-cta cta-airwallex">
-  <div class="cta-label">Outil recommandé</div>
-  <h3>Gère tes finances avec Airwallex</h3>
-  <p>Multi-devises, cartes équipe, virements internationaux à frais réduits. La solution des entrepreneurs globaux.</p>
-  <a href="https://www.airwallex.com/fr" class="cta-btn">Découvrir Airwallex →</a>
-</div>`,
-  "Import-Export": `
-<div class="article-cta cta-hk">
-  <div class="cta-label">Structurer ton activité</div>
-  <h3>Société Hong Kong pour l'import-export</h3>
-  <p>Une structure à Hong Kong te donne un accès privilégié aux fournisseurs asiatiques et une fiscalité optimisée sur tes marges.</p>
-  <a href="https://www.startbusinessworld.com/hong-kong" class="cta-btn">En savoir plus →</a>
-</div>`,
-};
+const CTA_LEGALPLACE = `<div style="margin:32px 0;padding:24px;background:#FAFAF8;border-left:4px solid #A67C3A;border-radius:0 8px 8px 0"><p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#A67C3A;margin:0 0 8px">Partenaire recommandé</p><p style="font-size:17px;font-weight:600;color:#111;margin:0 0 8px">Créer ta société avec LegalPlace</p><p style="font-size:14px;color:#555;margin:0 0 16px">SASU, EURL, SAS en ligne — garanti sans rejet. Code <strong>SBW15</strong> pour -15%.</p><a href="https://www.legalplace.fr" target="_blank" style="display:inline-block;background:#111;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">Créer ma société →</a></div>`;
 
-const CTA_CLUB = `
-<div class="article-cta cta-club">
-  <div class="cta-label">Rejoins la communauté</div>
-  <h3>Club Start Business World</h3>
-  <p>Formations complètes, outils exclusifs, communauté d'entrepreneurs et accompagnement — tout ce qu'il te faut pour lancer et scaler ton business international.</p>
-  <a href="https://www.startbusinessworld.com/club" class="cta-btn cta-btn-gold">Rejoindre le Club SBW →</a>
-</div>`;
+const CTA_AIRWALLEX = `<div style="margin:32px 0;padding:24px;background:#FAFAF8;border-left:4px solid #A67C3A;border-radius:0 8px 8px 0"><p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#A67C3A;margin:0 0 8px">Banking recommandé</p><p style="font-size:17px;font-weight:600;color:#111;margin:0 0 8px">Ouvre ton compte Airwallex</p><p style="font-size:14px;color:#555;margin:0 0 16px">Multi-devises, cartes équipe, virements internationaux. Compatible Stripe et PayPal.</p><a href="https://www.airwallex.com/fr" target="_blank" style="display:inline-block;background:#111;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">Ouvrir mon compte →</a></div>`;
 
-// ─── Récupérer les scores des derniers articles ───────────────────────────────
-async function getLastArticlesScores(): Promise<string> {
-  const { data } = await sb
-    .from("articles")
-    .select("title, seo_score, copy_score, engagement_score, seo_recommendations")
-    .eq("generated_by_ai", true)
-    .order("created_at", { ascending: false })
-    .limit(5);
+const CTA_SHOPIFY = `<div style="margin:32px 0;padding:24px;background:#FAFAF8;border-left:4px solid #A67C3A;border-radius:0 8px 8px 0"><p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#A67C3A;margin:0 0 8px">Outil recommandé</p><p style="font-size:17px;font-weight:600;color:#111;margin:0 0 8px">Lance ta boutique Shopify</p><p style="font-size:14px;color:#555;margin:0 0 16px">La plateforme e-commerce la plus utilisée au monde. Essai gratuit 3 mois.</p><a href="https://shopify.pxf.io/gOP9jv" target="_blank" style="display:inline-block;background:#111;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">Essayer Shopify →</a></div>`;
 
-  if (!data || data.length === 0) return "Aucun article précédent. C'est le premier.";
+const CTA_LUMINOS = `<div style="margin:32px 0;padding:24px;background:#FAFAF8;border-left:4px solid #A67C3A;border-radius:0 8px 8px 0"><p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#A67C3A;margin:0 0 8px">Partenaire recommandé</p><p style="font-size:17px;font-weight:600;color:#111;margin:0 0 8px">Créer ta société à Hong Kong</p><p style="font-size:14px;color:#555;margin:0 0 16px">Luminos Corp — création en 7 jours, 100% en ligne, depuis n'importe où dans le monde.</p><a href="https://www.startbusinessworld.com/hong-kong" target="_blank" style="display:inline-block;background:#111;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">Démarrer ma création →</a></div>`;
 
-  return data.map((a, i) =>
-    `Article ${i + 1}: "${a.title}" — SEO: ${a.seo_score}/100, Copy: ${a.copy_score}/100, Engagement: ${a.engagement_score}/100. Points à améliorer: ${a.seo_recommendations || "aucun"}`
-  ).join("\n");
+const CTA_WISE = `<div style="margin:32px 0;padding:24px;background:#FAFAF8;border-left:4px solid #A67C3A;border-radius:0 8px 8px 0"><p style="font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#A67C3A;margin:0 0 8px">Outil recommandé</p><p style="font-size:17px;font-weight:600;color:#111;margin:0 0 8px">Wise Business</p><p style="font-size:14px;color:#555;margin:0 0 16px">Paiements internationaux transparents et pas chers. Idéal pour freelances et solopreneurs.</p><a href="https://wise.com/fr/business" target="_blank" style="display:inline-block;background:#111;color:#fff;padding:10px 20px;border-radius:6px;font-size:13px;font-weight:500;text-decoration:none">Ouvrir mon compte Wise →</a></div>`;
+
+const CTA_CLUB = `<div style="margin:40px 0;padding:32px;background:#111110;border-radius:12px;text-align:center"><p style="font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:#A67C3A;margin:0 0 12px">Rejoins la communauté</p><p style="font-size:22px;font-weight:600;color:#F0ECE4;margin:0 0 12px">Club Start Business World</p><p style="font-size:14px;color:rgba(240,236,228,0.65);line-height:1.7;margin:0 0 24px">Formations complètes, outils exclusifs, communauté d'entrepreneurs — tout ce qu'il te faut pour lancer et scaler ton business international.</p><a href="https://www.startbusinessworld.com/club.html" target="_blank" style="display:inline-block;background:#A67C3A;color:#fff;padding:12px 28px;border-radius:6px;font-size:14px;font-weight:500;text-decoration:none">Rejoindre le Club SBW →</a></div>`;
+
+function getCTAs(category: string): string {
+  const map: Record<string, string> = {
+    "Hong Kong": CTA_LUMINOS + CTA_AIRWALLEX,
+    "Fiscalité": CTA_LUMINOS,
+    "Création société": CTA_LEGALPLACE,
+    "E-commerce": CTA_SHOPIFY + CTA_AIRWALLEX,
+    "Import-Export": CTA_LUMINOS + CTA_AIRWALLEX,
+    "Expatriation": CTA_LUMINOS + CTA_AIRWALLEX,
+    "Finance": CTA_AIRWALLEX + CTA_WISE,
+    "Mindset": "",
+    "Business Chine": CTA_AIRWALLEX + CTA_SHOPIFY,
+  };
+  return map[category] || CTA_LEGALPLACE;
 }
 
-// ─── Générer un sujet si non fourni ──────────────────────────────────────────
-async function generateTopic(): Promise<string> {
+async function getLastScores(): Promise<string> {
+  const { data } = await sb.from("articles")
+    .select("title,seo_score,copy_score,engagement_score,seo_recommendations")
+    .eq("generated_by_ai", true)
+    .order("created_at", { ascending: false })
+    .limit(3);
+  if (!data || data.length === 0) return "Premier article.";
+  return data.map((a, i) =>
+    `#${i+1} "${a.title}" SEO:${a.seo_score} Copy:${a.copy_score} Eng:${a.engagement_score} — A ameliorer: ${a.seo_recommendations||"rien"}`
+  ).join(" | ");
+}
+
+async function callClaude(messages: object[], systemPrompt: string, maxTokens: number) {
   const res = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": ANTHROPIC_KEY,
+      "anthropic-version": "2023-06-01"
+    },
     body: JSON.stringify({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 300,
-      messages: [{
-        role: "user",
-        content: `Tu es le rédacteur en chef de Start Business World (SBW), un média francophone sur l'entrepreneuriat international.
-
-Propose UN sujet d'article de blog pertinent pour aujourd'hui (${new Date().toLocaleDateString("fr-FR")}) parmi ces thématiques : Hong Kong, fiscalité internationale, création de société, e-commerce, import-export depuis la Chine, expatriation, finance d'entrepreneur, mindset.
-
-Critères :
-- Sujet concret, actionnable, recherché sur Google en 2026
-- Angle original — pas un sujet déjà 100 fois traité
-- Pertinent pour un entrepreneur francophone
-
-Réponds UNIQUEMENT avec le sujet, sans explication. Ex: "Comment ouvrir un compte bancaire pro à Hong Kong depuis la France en 2026"`
-      }]
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages
     })
   });
   const data = await res.json();
   return data.content[0].text.trim();
 }
 
-// ─── Générer l'article complet ────────────────────────────────────────────────
-async function generateArticleContent(topic: string, lastScores: string): Promise<{
-  title: string; deck: string; slug: string; category: string; tags: string[];
-  content: string; meta_title: string; meta_description: string;
-  seo_score: number; copy_score: number; engagement_score: number;
-  seo_recommendations: string; tools: string[];
-}> {
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-api-key": ANTHROPIC_KEY, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 4000,
-      system: `Tu es le meilleur rédacteur de contenu web francophone. Tu maîtrises le copywriting comme Eugène Schwartz — tu accroches, tu maintiens l'attention, tu pousses à l'action. Tu écris pour Start Business World (SBW), un média d'entrepreneuriat international pour francophones.
-
-SCORES DES DERNIERS ARTICLES (apprends-en et fais mieux) :
-${lastScores}
-
-RÈGLES ABSOLUES :
-1. TON : Direct, sans bullshit, entre entrepreneurs. Phrases courtes. Impact immédiat. Données chiffrées avec l'année 2026.
-2. STRUCTURE : Accroche sans titre (2-3 phrases qui accrochent), minimum 4 sections ##, callouts > pour les conseils clés, conclusion avec appel à l'action.
-3. SEO : Mot-clé principal dans le titre H1, dans les 100 premiers mots, dans 2-3 sous-titres H2, densité 1-2%.
-4. COPYWRITING EUGÈNE SCHWARTZ : Commence par la douleur ou le désir du lecteur. Amplifie. Présente la solution. Preuve. Action.
-5. LONGUEUR : 1000-1500 mots.
-6. PRÉCISIONS FACTUELLES : Hong Kong = fiscalité territoriale, 0% sur revenus étrangers, 8.25%/16.5% local. Société HK ≠ résidence fiscale. Exportateur ≠ usine.
-
-RÉPONDS UNIQUEMENT EN JSON VALIDE (pas de markdown autour) :
-{
-  "title": "titre SEO optimisé",
-  "deck": "résumé 150 chars max pour Google",
-  "slug": "url-optimisee-seo",
-  "category": "une seule parmi: Hong Kong|Fiscalité|Création société|E-commerce|Import-Export|Expatriation|Finance|Mindset|Business Chine",
-  "tags": ["tag1", "tag2", "tag3"],
-  "meta_title": "Meta titre 60 chars max",
-  "meta_description": "Meta description 155 chars max avec mot-clé",
-  "content": "HTML complet de l'article avec h2, h3, p, ul, blockquote pour les callouts",
-  "tools": ["outil mentionné parmi: Airwallex|Wise|LegalPlace|Shopify|Amazon FBA"],
-  "seo_score": 0,
-  "copy_score": 0,
-  "engagement_score": 0,
-  "seo_recommendations": "ce qui pourrait être amélioré SEO"
-}`,
-      messages: [{
-        role: "user",
-        content: `Rédige un article complet sur : "${topic}"\n\nNote toi-même honnêtement après rédaction (SEO /100, Copy /100, Engagement /100) et donne des recommandations pour faire mieux au prochain article.`
-      }]
-    })
-  });
-
-  const data = await res.json();
-  const text = data.content[0].text.trim();
-  const clean = text.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
-  return JSON.parse(clean);
-}
-
-// ─── Injecter les CTA dans le contenu HTML ───────────────────────────────────
-function injectCTAs(content: string, category: string, tools: string[]): string {
-  const ctaCategory = CTA_MAP[category] || "";
-
-  // Insérer CTA catégorie au 2/3 de l'article
-  const paragraphs = content.split("</p>");
-  const insertAt = Math.floor(paragraphs.length * 0.65);
-  if (insertAt > 0 && ctaCategory) {
-    paragraphs.splice(insertAt, 0, ctaCategory);
-  }
-  let result = paragraphs.join("</p>");
-
-  // CTA Club toujours en fin
-  result += CTA_CLUB;
-
-  return result;
-}
-
-// ─── Handler principal ────────────────────────────────────────────────────────
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
   try {
-    const body = req.method === "POST" ? await req.json() : {};
+    const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const manualTopic: string | null = body.topic || null;
 
-    // 1. Récupérer les scores passés
-    const lastScores = await getLastArticlesScores();
+    // 1. Scores des derniers articles
+    const lastScores = await getLastScores();
 
-    // 2. Sujet : manuel ou auto-généré
-    const topic = manualTopic || await generateTopic();
+    // 2. Sujet
+    let topic = manualTopic;
+    if (!topic) {
+      topic = await callClaude(
+        [{ role: "user", content: `Date: ${new Date().toLocaleDateString("fr-FR")}. Propose UN sujet d'article pour Start Business World (entrepreneuriat international francophone: Hong Kong, fiscalité, e-commerce, import-export, expatriation, finance, mindset). Concret, recherché sur Google 2026, angle original. Réponds UNIQUEMENT avec le sujet.` }],
+        "Tu es rédacteur en chef SBW.",
+        150
+      );
+    }
 
     // 3. Générer l'article
-    const article = await generateArticleContent(topic, lastScores);
+    const raw = await callClaude(
+      [{ role: "user", content: `Rédige un article complet sur: "${topic}". Scores précédents: ${lastScores}. Note-toi après rédaction.` }],
+      `Tu es le meilleur rédacteur web francophone. Style Eugène Schwartz. Tu écris pour Start Business World.
 
-    // 4. Injecter les CTA
-    const contentWithCTA = injectCTAs(article.content, article.category, article.tools);
+RÈGLES:
+- HTML UNIQUEMENT. JAMAIS de markdown (pas ##, pas **, pas -)
+- Utilise <h2><h3><p><ul><li><blockquote>
+- Accroche <p> sans titre, min 4 <h2>, callouts <blockquote>, conclusion
+- Direct, punchy, données 2026, 800-1000 mots
+- Mot-clé dans premier <h2> et premiers 100 mots
 
-    // 5. Insérer dans Supabase
+RÉPONDS UNIQUEMENT EN JSON:
+{"title":"...","deck":"résumé 150 chars","slug":"url-seo","category":"Hong Kong|Fiscalité|Création société|E-commerce|Import-Export|Expatriation|Finance|Mindset|Business Chine","tags":["..."],"meta_title":"60 chars","meta_description":"155 chars","content":"HTML ici","tools":["Airwallex","Wise","LegalPlace","Shopify"],"seo_score":0,"copy_score":0,"engagement_score":0,"seo_recommendations":"..."}`,
+      2500
+    );
+
+    const clean = raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
+    const article = JSON.parse(clean);
+
+    // 4. Injecter CTA
+    const ctaCategory = getCTAs(article.category);
+    const parts = article.content.split("</h2>");
+    let contentWithCTA = article.content;
+    if (parts.length >= 3) {
+      const mid = Math.floor(parts.length / 2);
+      parts.splice(mid, 0, ctaCategory);
+      contentWithCTA = parts.join("</h2>");
+    } else {
+      contentWithCTA = article.content + ctaCategory;
+    }
+    contentWithCTA += CTA_CLUB;
+
+    // 5. Publier dans Supabase
     const { data, error } = await sb.from("articles").insert({
       title: article.title,
       deck: article.deck,
@@ -211,7 +133,7 @@ serve(async (req) => {
       content: contentWithCTA,
       meta_title: article.meta_title,
       meta_description: article.meta_description,
-      tools: article.tools,
+      tools: article.tools || [],
       status: "published",
       generated_by_ai: true,
       seo_score: article.seo_score,
@@ -225,14 +147,15 @@ serve(async (req) => {
 
     if (error) throw error;
 
-    return new Response(JSON.stringify({ success: true, article: data, topic }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ success: true, article: data, topic }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: String(err) }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: String(err) }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
   }
 });
