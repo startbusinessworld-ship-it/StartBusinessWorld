@@ -9,8 +9,25 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
+const UNSPLASH_KEY = "DN6WRgVvzG_ZivB2m1HabRpSaUZXv2PpXUwAnNlMjC0";
 
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+// ─── UNSPLASH ─────────────────────────────────────────────────────────────────
+async function fetchImage(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=3&orientation=landscape`,
+      { headers: { "Authorization": `Client-ID ${UNSPLASH_KEY}` } }
+    );
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      const idx = Math.floor(Math.random() * Math.min(3, data.results.length));
+      return data.results[idx].urls.regular;
+    }
+    return null;
+  } catch { return null; }
+}
 
 // ─── LIENS AFFILIÉS ───────────────────────────────────────────────────────────
 const LINKS = {
@@ -169,13 +186,26 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (pas de markdown autour):
     content = content.replace(/(#{2,3} [^\n]+)\n([^\n#\->])/g, "$1\n\n$2");
     article.content = content;
 
+    // Récupérer images Unsplash
+    const imgKeyword = article.tags?.[0] || topic || "business entrepreneur";
+    const [imgCover, imgMiddle] = await Promise.all([
+      fetchImage(imgKeyword + " business"),
+      fetchImage(article.category + " entrepreneur")
+    ]);
+
     // Injecter CTA au milieu de l'article
     const ctaCategory = getCTAs(article.category);
     const paragraphs = article.content.split("\n\n");
     const midPoint = Math.floor(paragraphs.length / 2);
 
+    // Image de couverture en début, image au milieu
+    const imgCoverBlock = imgCover ? `[IMAGE:${imgCover}|${article.title}]` : "";
+    const imgMiddleBlock = imgMiddle ? `[IMAGE:${imgMiddle}|${article.category} — Start Business World]` : "";
+
     const contentFinal = [
+      ...(imgCoverBlock ? [imgCoverBlock] : []),
       ...paragraphs.slice(0, midPoint),
+      ...(imgMiddleBlock ? [imgMiddleBlock] : []),
       ctaCategory,
       ...paragraphs.slice(midPoint),
       "",
