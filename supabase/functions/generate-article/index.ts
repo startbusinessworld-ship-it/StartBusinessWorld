@@ -160,6 +160,15 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (pas de markdown autour):
     const clean = raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
     const article = JSON.parse(clean);
 
+    // Nettoyer le contenu markdown
+    let content = article.content;
+    // S'assurer que ## et ### ont bien un espace après
+    content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
+    // S'assurer que les titres sont séparés par des lignes vides
+    content = content.replace(/([^\n])\n(#{2,3} )/g, "$1\n\n$2");
+    content = content.replace(/(#{2,3} [^\n]+)\n([^\n#\->])/g, "$1\n\n$2");
+    article.content = content;
+
     // Injecter CTA au milieu de l'article
     const ctaCategory = getCTAs(article.category);
     const paragraphs = article.content.split("\n\n");
