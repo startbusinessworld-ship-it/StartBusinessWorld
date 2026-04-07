@@ -1228,8 +1228,21 @@
         dateEl.textContent = d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
       }
 
-      // Meta title
-      document.title = a.title + " — Start Business World";
+      // Meta title + SEO dynamique
+      var metaTitle = (a.meta_title || a.title) + " — Start Business World";
+      document.title = metaTitle;
+      var metaDesc = document.querySelector("meta[name='description']");
+      if (metaDesc) metaDesc.setAttribute("content", a.meta_description || a.deck || "");
+      // Open Graph
+      var ogTitle = document.querySelector("meta[property='og:title']");
+      if (!ogTitle) { ogTitle = document.createElement("meta"); ogTitle.setAttribute("property","og:title"); document.head.appendChild(ogTitle); }
+      ogTitle.setAttribute("content", metaTitle);
+      var ogDesc = document.querySelector("meta[property='og:description']");
+      if (!ogDesc) { ogDesc = document.createElement("meta"); ogDesc.setAttribute("property","og:description"); document.head.appendChild(ogDesc); }
+      ogDesc.setAttribute("content", a.meta_description || a.deck || "");
+      var ogUrl = document.querySelector("meta[property='og:url']");
+      if (!ogUrl) { ogUrl = document.createElement("meta"); ogUrl.setAttribute("property","og:url"); document.head.appendChild(ogUrl); }
+      ogUrl.setAttribute("content", window.location.href);
 
       // Boutons de partage
       var pageUrl = encodeURIComponent(window.location.href);
