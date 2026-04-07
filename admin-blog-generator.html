@@ -310,33 +310,54 @@
       'Analyse des articles précédents...',
       auto ? 'Recherche du meilleur sujet du moment...' : 'Préparation du sujet...',
       'Rédaction de l\'article (style Eugène Schwartz)...',
-      'Optimisation SEO et injection des CTA...',
+      'Recherche d\'images Unsplash...',
+      'Injection des CTA affiliés...',
       'Publication en cours...'
     ]
     let i = 0
     const interval = setInterval(() => {
       if (i < steps.length) document.getElementById('statusText').textContent = steps[i++]
-    }, 3500)
+    }, 4000)
 
     try {
       const res = await fetch(`${SBW_FUNCTIONS_URL}/functions/v1/generate-article`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${SUPABASE_ANON_KEY}` },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'apikey': SUPABASE_ANON_KEY
+        },
         body: JSON.stringify(topic ? { topic } : {})
       })
+
+      if (!res.ok) {
+        const errText = await res.text()
+        throw new Error(`Erreur serveur ${res.status}: ${errText}`)
+      }
+
       const data = await res.json()
       clearInterval(interval)
 
       if (data.error) throw new Error(data.error)
 
       bar.classList.remove('visible')
-      showToast(`Article publié : "${data.article.title}"`, 'success')
+      document.getElementById('statusBar').classList.remove('visible')
+
+      // Afficher confirmation avec lien
+      showToast(`✓ Article publié : "${data.article?.title || 'Article généré'}"`, 'success')
       document.getElementById('topicInput').value = ''
       await loadStats()
       await loadArticles()
+
+      // Scroll vers le tableau
+      setTimeout(() => {
+        document.getElementById('tab-articles').scrollIntoView({ behavior: 'smooth' })
+      }, 500)
+
     } catch (err) {
       clearInterval(interval)
       bar.classList.remove('visible')
+      console.error('Erreur génération:', err)
       showToast('Erreur : ' + err.message, 'error')
     }
 
