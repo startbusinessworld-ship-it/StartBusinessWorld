@@ -86,19 +86,22 @@ function getCTAs(cat: string): string {
   return (map[cat] || [CTA.legalplace]).join("\n\n");
 }
 
-// ─── SCORES DES DERNIERS ARTICLES ────────────────────────────────────────────
-async function getLastScores(): Promise<string> {
+// ─── HISTORIQUE DES DERNIERS ARTICLES ────────────────────────────────────────
+async function getRecentArticles(): Promise<{ scores: string; categories: string[]; titles: string[] }> {
   try {
     const { data } = await sb.from("articles")
-      .select("title,seo_score,copy_score,engagement_score,seo_recommendations")
+      .select("title,category,seo_score,copy_score,engagement_score,seo_recommendations")
       .eq("generated_by_ai", true)
       .order("created_at", { ascending: false })
-      .limit(5);
-    if (!data || data.length === 0) return "Premier article.";
-    return data.map((a, i) =>
+      .limit(15);
+    if (!data || data.length === 0) return { scores: "Premier article.", categories: [], titles: [] };
+    const scores = data.slice(0, 5).map((a, i) =>
       `#${i+1} "${a.title}" SEO:${a.seo_score} Copy:${a.copy_score} Eng:${a.engagement_score} — Améliorer: ${a.seo_recommendations || "rien"}`
     ).join(" || ");
-  } catch { return "Pas d'historique."; }
+    const categories = data.map(a => a.category).filter(Boolean);
+    const titles = data.map(a => a.title).filter(Boolean);
+    return { scores, categories, titles };
+  } catch { return { scores: "Pas d'historique.", categories: [], titles: [] }; }
 }
 
 // ─── APPEL CLAUDE ─────────────────────────────────────────────────────────────
@@ -125,41 +128,47 @@ serve(async (req) => {
     const body = req.method === "POST" ? await req.json().catch(() => ({})) : {};
     const manualTopic: string | null = body.topic || null;
 
-    const lastScores = await getLastScores();
+    const { scores: lastScores, categories: recentCats, titles: recentTitles } = await getRecentArticles();
 
     // Sujet varié si pas de sujet manuel
     let topic = manualTopic;
     if (!topic) {
       const date = new Date().toLocaleDateString("fr-FR");
-      const themes = [
-        "actualité réforme entrepreneur France loi fiscale nouveauté 2026",
-        "Hong Kong société offshore fiscalité territoriale avantages concrets",
-        "e-commerce Amazon FBA Shopify dropshipping stratégie rentabilité",
-        "import export Chine fournisseurs Alibaba containers logistique",
-        "expatriation Dubaï Portugal Thaïlande résidence fiscale nomade",
-        "finance entrepreneur trésorerie gestion argent investissement",
-        "création société France SASU EURL SAS choix statut juridique",
-        "mindset entrepreneur discipline habitudes succès développement personnel",
-        "business physique franchise boutique commerce local international",
-        "voyage digital nomad eSIM connexion productivité déplacement",
-        "intelligence artificielle Claude ChatGPT outils IA productivité entrepreneur",
-        "nouveaux outils tech tendances business automatisation 2026",
-        "business Chine sourcing négociation fournisseurs qualité",
-        "fiscalité optimisation légale holding dividendes structure",
-        "banque néobanque Airwallex Wise paiements internationaux frais",
-        "immobilier investissement étranger patrimoine international",
-        "développement personnel croissance entrepreneur motivation",
-        "tendances business digital 2026 opportunités marché",
-        "réseaux sociaux LinkedIn TikTok Instagram stratégie entrepreneur",
-        "actualité grands entrepreneurs succès leçons business",
-        "nouvelles réformes sociales fiscales impact entrepreneur France",
-        "startup levée de fonds investisseur business model scalable",
-        "freelance indépendant revenus multiples liberté financière"
-      ];
-      const rand = Math.floor(Math.random() * themes.length);
+      const allThemes: Record<string, string[]> = {
+        "Hong Kong":        ["société Hong Kong avantages fiscalité territoriale", "ouvrir un compte bancaire business Hong Kong", "Hong Kong vs Singapour pour entrepreneur"],
+        "Fiscalité":        ["optimisation fiscale légale holding France", "réforme fiscale 2026 impact entrepreneur", "TVA intracommunautaire e-commerce"],
+        "Création société": ["SASU vs EURL choix statut 2026", "créer société en ligne étapes", "capital social minimum comment choisir"],
+        "E-commerce":       ["Amazon FBA lancer en 2026 stratégie", "Shopify vs WooCommerce comparatif", "dropshipping mort ou opportunité 2026"],
+        "Import-Export":    ["importer de Chine étapes fournisseurs", "négocier fournisseurs Alibaba erreurs", "logistique maritime container prix 2026"],
+        "Finance":          ["trésorerie entrepreneur gestion cash flow", "paiements internationaux comparatif banques", "investir en tant qu'entrepreneur où placer"],
+        "Expatriation":     ["s'expatrier à Dubaï entrepreneur guide", "résidence fiscale Portugal NHR 2026", "digital nomad visa pays comparatif"],
+        "Business Chine":   ["foire de Canton guide pratique", "sourcing Chine qualité contrôle", "payer fournisseurs chinois méthodes sûres"],
+        "Mindset":          ["discipline entrepreneur routine succès", "syndrome imposteur entrepreneur surmonter", "productivité deep work entrepreneur"],
+        "Outils":           ["meilleurs outils IA entrepreneur 2026", "automatiser son business outils no-code", "CapCut montage vidéo réseaux sociaux"],
+        "Actualité":        ["tendances business 2026 opportunités", "nouvelles lois entrepreneur France 2026", "success story entrepreneur francophone"],
+        "Immobilier":       ["investir immobilier étranger entrepreneur", "SCI ou nom propre investissement", "immobilier Bali investissement rentable"],
+        "Réseaux sociaux":  ["LinkedIn personal branding entrepreneur", "TikTok business stratégie contenu", "Instagram Reels croissance audience"],
+        "Startup":          ["lever des fonds étapes concrètes", "business model scalable exemples", "bootstrapper vs lever différences"],
+        "Freelance":        ["freelance revenus multiples stratégie", "passer de freelance à agence", "tarifs freelance comment fixer prix"]
+      };
+
+      // Exclure les catégories des 5 derniers articles pour forcer la variété
+      const recentCatSet = new Set(recentCats.slice(0, 5));
+      const availableCats = Object.keys(allThemes).filter(c => !recentCatSet.has(c));
+      const catPool = availableCats.length > 0 ? availableCats : Object.keys(allThemes);
+
+      // Choisir une catégorie au hasard parmi celles non utilisées récemment
+      const chosenCat = catPool[Math.floor(Math.random() * catPool.length)];
+      const catThemes = allThemes[chosenCat];
+      const chosenTheme = catThemes[Math.floor(Math.random() * catThemes.length)];
+
+      const titlesStr = recentTitles.length > 0
+        ? `\n\nATTENTION — ces articles EXISTENT DÉJÀ, ne répète AUCUN de ces sujets:\n${recentTitles.map(t => `- "${t}"`).join("\n")}`
+        : "";
+
       topic = await callClaude(
-        [{ role: "user", content: `Date: ${date}. Thème: "${themes[rand]}". Propose UN sujet d'article ORIGINAL et CONCRET pour Start Business World. Ces sujets ont déjà été traités — évite-les absolument: ${lastScores}. Réponds UNIQUEMENT avec le titre du sujet.` }],
-        "Tu es rédacteur en chef de Start Business World. Tu proposes des sujets originaux, jamais répétitifs, toujours concrets et utiles pour des entrepreneurs francophones.",
+        [{ role: "user", content: `Date: ${date}. Catégorie imposée: "${chosenCat}". Angle: "${chosenTheme}".\n\nPropose UN sujet d'article ORIGINAL et CONCRET pour Start Business World. Le sujet doit être DIFFÉRENT de tout ce qui a déjà été publié.${titlesStr}\n\nRéponds UNIQUEMENT avec le titre du sujet, rien d'autre.` }],
+        "Tu es rédacteur en chef de Start Business World. Tu proposes des sujets originaux, jamais répétitifs, toujours concrets et utiles pour des entrepreneurs francophones. Tu dois OBLIGATOIREMENT respecter la catégorie imposée.",
         120
       );
     }
