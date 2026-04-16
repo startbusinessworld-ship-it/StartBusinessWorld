@@ -1001,7 +1001,9 @@
 
       // Catégorie
       var cat = document.querySelector(".article-cat");
-      if (cat) cat.textContent = (a.category || "").split(",")[0].trim();
+      var CAT_EMOJI = {'Création de société':'🏢','Business Chine':'🇨🇳','Fiscalité':'🏛️','Outils':'🛠️','E-commerce':'📦','Expatriation':'✈️','Finance':'💰','Import-Export':'🔗','Mindset':'🧠','Actualité':'📰'};
+      var catName = (a.category || "").split(",")[0].trim();
+      if (cat) cat.textContent = (CAT_EMOJI[catName] || '') + ' ' + catName;
 
       // Deck
       var deck = document.querySelector(".article-deck");

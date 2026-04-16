@@ -87,17 +87,16 @@ ${CTA.club}`;
 // ─── CTA PAR CATÉGORIE ────────────────────────────────────────────────────────
 function getCTAs(cat: string): string {
   const map: Record<string, string[]> = {
-    "Hong Kong":        [CTA.luminos, CTA.airwallex],
-    "Fiscalité":        [CTA.luminos, CTA.legalplace],
-    "Création société": [CTA.legalplace, CTA.airwallex],
-    "E-commerce":       [CTA.shopify, CTA.airwallex, CTA.pingpong],
-    "Import-Export":    [CTA.xtransfer, CTA.airwallex, CTA.luminos],
-    "Finance":          [CTA.airwallex, CTA.wise, CTA.xtransfer],
-    "Expatriation":     [CTA.luminos, CTA.airwallex, CTA.airalo, CTA.kiwi],
-    "Business Chine":   [CTA.xtransfer, CTA.airwallex, CTA.shopify],
-    "Mindset":          [CTA.capcut, CTA.udemy],
-    "Outils":           [CTA.capcut, CTA.shopify, CTA.wix],
-    "Actualité":        [CTA.airwallex, CTA.wise],
+    "Création de société": [CTA.legalplace, CTA.airwallex],
+    "Business Chine":      [CTA.xtransfer, CTA.airwallex, CTA.luminos],
+    "Fiscalité":           [CTA.luminos, CTA.legalplace],
+    "Outils":              [CTA.capcut, CTA.shopify, CTA.wix],
+    "E-commerce":          [CTA.shopify, CTA.airwallex, CTA.pingpong],
+    "Expatriation":        [CTA.luminos, CTA.airwallex, CTA.airalo, CTA.kiwi],
+    "Finance":             [CTA.airwallex, CTA.wise, CTA.xtransfer],
+    "Import-Export":       [CTA.xtransfer, CTA.airwallex, CTA.luminos],
+    "Mindset":             [CTA.capcut, CTA.udemy],
+    "Actualité":           [CTA.airwallex, CTA.wise, CTA.legalplace],
   };
   return (map[cat] || [CTA.legalplace]).join("\n\n");
 }
@@ -191,21 +190,16 @@ serve(async (req) => {
     if (!topic) {
       const date = new Date().toLocaleDateString("fr-FR");
       const allThemes: Record<string, string[]> = {
-        "Hong Kong":        ["société Hong Kong avantages fiscalité territoriale", "ouvrir un compte bancaire business Hong Kong", "Hong Kong vs Singapour pour entrepreneur"],
-        "Fiscalité":        ["optimisation fiscale légale holding France", "réforme fiscale 2026 impact entrepreneur", "TVA intracommunautaire e-commerce"],
-        "Création société": ["SASU vs EURL choix statut 2026", "créer société en ligne étapes", "capital social minimum comment choisir"],
-        "E-commerce":       ["Amazon FBA lancer en 2026 stratégie", "Shopify vs WooCommerce comparatif", "dropshipping mort ou opportunité 2026"],
-        "Import-Export":    ["importer de Chine étapes fournisseurs", "négocier fournisseurs Alibaba erreurs", "logistique maritime container prix 2026"],
-        "Finance":          ["trésorerie entrepreneur gestion cash flow", "paiements internationaux comparatif banques", "investir en tant qu'entrepreneur où placer"],
-        "Expatriation":     ["s'expatrier à Dubaï entrepreneur guide", "résidence fiscale Portugal NHR 2026", "digital nomad visa pays comparatif"],
-        "Business Chine":   ["foire de Canton guide pratique", "sourcing Chine qualité contrôle", "payer fournisseurs chinois méthodes sûres"],
-        "Mindset":          ["discipline entrepreneur routine succès", "syndrome imposteur entrepreneur surmonter", "productivité deep work entrepreneur"],
-        "Outils":           ["meilleurs outils IA entrepreneur 2026", "automatiser son business outils no-code", "CapCut montage vidéo réseaux sociaux"],
-        "Actualité":        ["tendances business 2026 opportunités", "nouvelles lois entrepreneur France 2026", "success story entrepreneur francophone"],
-        "Immobilier":       ["investir immobilier étranger entrepreneur", "SCI ou nom propre investissement", "immobilier Bali investissement rentable"],
-        "Réseaux sociaux":  ["LinkedIn personal branding entrepreneur", "TikTok business stratégie contenu", "Instagram Reels croissance audience"],
-        "Startup":          ["lever des fonds étapes concrètes", "business model scalable exemples", "bootstrapper vs lever différences"],
-        "Freelance":        ["freelance revenus multiples stratégie", "passer de freelance à agence", "tarifs freelance comment fixer prix"]
+        "Création de société":["SASU vs EURL choix statut 2026", "créer société en ligne étapes concrètes", "capital social minimum comment choisir", "auto-entrepreneur ou société avantages"],
+        "Business Chine":    ["foire de Canton guide pratique", "sourcing Chine qualité contrôle", "importer de Chine étapes fournisseurs", "négocier fournisseurs Alibaba astuces"],
+        "Fiscalité":         ["optimisation fiscale légale holding France", "réforme fiscale 2026 impact entrepreneur", "TVA intracommunautaire e-commerce", "impôts micro-entreprise simulation"],
+        "Outils":            ["meilleurs outils IA entrepreneur 2026", "automatiser son business no-code", "CapCut montage vidéo réseaux sociaux", "outils gratuits lancer business"],
+        "E-commerce":        ["Amazon FBA lancer en 2026 stratégie", "Shopify créer boutique guide débutant", "dropshipping opportunité 2026", "vendre en ligne sans stock"],
+        "Expatriation":      ["s'expatrier à Dubaï entrepreneur guide", "résidence fiscale Portugal NHR 2026", "digital nomad visa pays comparatif", "vivre à Bali entrepreneur"],
+        "Finance":           ["trésorerie entrepreneur gestion cash flow", "paiements internationaux comparatif", "ouvrir compte pro en ligne", "investir premiers revenus entrepreneur"],
+        "Import-Export":     ["logistique maritime container prix 2026", "payer fournisseurs chinois méthodes sûres", "douane import France procédure", "trouver fournisseur fiable étranger"],
+        "Mindset":           ["routine entrepreneur productivité", "syndrome imposteur surmonter entrepreneur", "habitudes succès entrepreneurs", "gérer le stress quand on entreprend"],
+        "Actualité":         ["tendances business 2026 opportunités", "nouvelles lois entrepreneur France 2026", "success story entrepreneur francophone", "IA impact business 2026 opportunités"],
       };
 
       // Exclure les catégories des 5 derniers articles pour forcer la variété
@@ -287,7 +281,8 @@ FORMAT MARKDOWN STRICT:
 > conseil d'ami
 Paragraphes séparés par ligne vide
 
-CATÉGORIES: Hong Kong | Fiscalité | Création société | E-commerce | Import-Export | Finance | Expatriation | Business Chine | Mindset | Outils | Actualité | Immobilier | Réseaux sociaux | Startup | Freelance
+CATÉGORIES (utilise EXACTEMENT un de ces noms, sans emoji):
+Création de société | Business Chine | Fiscalité | Outils | E-commerce | Expatriation | Finance | Import-Export | Mindset | Actualité
 
 RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
 {"title":"Titre accrocheur et simple","deck":"Résumé 150 chars en langage simple","slug":"url-en-tirets","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"Meta 55-60 chars","meta_description":"Meta 150-155 chars","content":"accroche\\n\\n## Titre\\n\\ncontenu...","tools":["outil1"],"seo_score":85,"copy_score":80,"engagement_score":78,"seo_recommendations":"3 points précis pour le prochain article"}`,
