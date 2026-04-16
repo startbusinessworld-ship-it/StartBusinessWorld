@@ -438,7 +438,7 @@ function renderAffiliation() {
   if (!affData) return;
 
   var baseUrl = window.location.origin;
-  var link = baseUrl + "/club.html?ref=" + affData.ref_code;
+  var link = baseUrl + "/client-login.html?ref=" + affData.ref_code;
   document.getElementById("refLink").value = link;
 
   document.getElementById("statClicks").textContent = affData.clicks || 0;

@@ -99,7 +99,7 @@ serve(async (req) => {
     const baseParams: Record<string, string> = {
       mode: "subscription",
       success_url: "https://www.startbusinessworld.com/client-dashboard.html?payment=success",
-      cancel_url: "https://www.startbusinessworld.com/club.html",
+      cancel_url: "https://www.startbusinessworld.com/client-login.html",
       "metadata[supabase_id]": userId,
       "metadata[plan]": plan,
       "metadata[is_intro]": isIntro ? "true" : "false",
