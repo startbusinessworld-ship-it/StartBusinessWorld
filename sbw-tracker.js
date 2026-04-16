@@ -31,7 +31,7 @@
       },
       body: JSON.stringify({
         page: getPage(),
-        referrer: document.referrer ? new URL(document.referrer).hostname : null,
+        referrer: document.referrer ? (function() { try { return new URL(document.referrer).hostname } catch(e) { return null } })() : null,
         device: getDevice()
       })
     }).catch(function() {})
