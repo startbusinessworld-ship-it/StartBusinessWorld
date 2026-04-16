@@ -10,24 +10,78 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
-const UNSPLASH_KEY = "DN6WRgVvzG_ZivB2m1HabRpSaUZXv2PpXUwAnNlMjC0";
-
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// ─── UNSPLASH ─────────────────────────────────────────────────────────────────
-async function fetchImage(query: string): Promise<string | null> {
-  try {
-    const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,
-      { headers: { "Authorization": `Client-ID ${UNSPLASH_KEY}` } }
-    );
-    const data = await res.json();
-    if (data.results && data.results.length > 0) {
-      const idx = Math.floor(Math.random() * Math.min(5, data.results.length));
-      return data.results[idx].urls.regular;
-    }
-    return null;
-  } catch { return null; }
+// ─── COVER SVG GENERATOR ─────────────────────────────────────────────────────
+const CAT_EMOJI: Record<string, string> = {
+  "Création de société": "🏢",
+  "Business Chine": "🇨🇳",
+  "Fiscalité": "🏛️",
+  "Outils": "🛠️",
+  "E-commerce": "📦",
+  "Expatriation": "✈️",
+  "Finance": "💰",
+  "Import-Export": "🔗",
+  "Mindset": "🧠",
+  "Actualité": "📰",
+};
+
+const CAT_COLORS: Record<string, string> = {
+  "Création de société": "#4A7FD4",
+  "Business Chine": "#D4534A",
+  "Fiscalité": "#A67C3A",
+  "Outils": "#5B8C3E",
+  "E-commerce": "#D49A4A",
+  "Expatriation": "#4ABCD4",
+  "Finance": "#A67C3A",
+  "Import-Export": "#7A4AD4",
+  "Mindset": "#D44A8C",
+  "Actualité": "#4A7FD4",
+};
+
+function generateCoverSVG(title: string, category: string, deck: string): string {
+  const emoji = CAT_EMOJI[category] || "📄";
+  const accent = CAT_COLORS[category] || "#A67C3A";
+
+  // Couper le titre en 2 lignes si trop long
+  const words = title.split(" ");
+  let line1 = title;
+  let line2 = "";
+  if (title.length > 30) {
+    const mid = Math.ceil(words.length / 2);
+    line1 = words.slice(0, mid).join(" ");
+    line2 = words.slice(mid).join(" ");
+  }
+
+  // Adapter la taille de police selon la longueur
+  const fontSize1 = line1.length > 25 ? 72 : line1.length > 18 ? 85 : 100;
+  const fontSize2 = line2.length > 25 ? 72 : line2.length > 18 ? 85 : 100;
+
+  // Tronquer le deck
+  const shortDeck = deck.length > 90 ? deck.substring(0, 87) + "..." : deck;
+
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 788" width="1400" height="788">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#0e1630"/>
+      <stop offset="100%" stop-color="#080c18"/>
+    </radialGradient>
+  </defs>
+  <rect width="1400" height="788" fill="url(#bg)"/>
+  <rect width="1400" height="788" fill="black" opacity="0.2"/>
+  <text x="700" y="80" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="400" letter-spacing="10" fill="rgba(255,255,255,0.45)">START BUSINESS WORLD</text>
+  <text x="700" y="210" text-anchor="middle" font-size="80">${emoji}</text>
+  <text x="700" y="${line2 ? 360 : 400}" text-anchor="middle" font-family="Georgia, serif" font-size="${fontSize1}" font-weight="700" fill="white">${escXml(line1)}</text>
+  ${line2 ? `<text x="700" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="${fontSize2}" font-weight="700" fill="${accent}">${escXml(line2)}</text>` : ""}
+  <text x="700" y="${line2 ? 580 : 520}" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="300" fill="rgba(255,255,255,0.5)">${escXml(shortDeck)}</text>
+  <rect x="650" y="${line2 ? 620 : 560}" width="100" height="3" rx="1.5" fill="${accent}" opacity="0.6"/>
+</svg>`;
+
+  return svg;
+}
+
+function escXml(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 // ─── LIENS AFFILIÉS ───────────────────────────────────────────────────────────
@@ -367,13 +421,9 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     content = content.replace(/([^\n])\n(#{2,3} )/g, "$1\n\n$2");
     content = content.replace(/(#{2,3} [^\n]+)\n([^\n#>-])/g, "$1\n\n$2");
 
-    // Images Unsplash
-    const kw1 = (article.tags?.[0] || topic || "business").slice(0, 40);
-    const kw2 = (article.category || "entrepreneur").slice(0, 30);
-    const [imgCover, imgMid] = await Promise.all([
-      fetchImage(kw1),
-      fetchImage(kw2 + " business professional")
-    ]);
+    // Générer cover SVG
+    const coverSVG = generateCoverSVG(article.title, article.category, article.deck || "");
+    const coverDataUri = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(coverSVG)));
 
     // Assembler contenu final
     const paragraphs = content.split("\n\n").filter((p: string) => p.trim());
@@ -381,9 +431,8 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     const ctaBlock = getCTAs(article.category);
 
     const parts: string[] = [];
-    if (imgCover) parts.push(`[IMAGE:${imgCover}|${article.title}]`);
+    parts.push(`[IMAGE:${coverDataUri}|${article.title}]`);
     parts.push(...paragraphs.slice(0, mid));
-    if (imgMid) parts.push(`[IMAGE:${imgMid}|${article.category}]`);
     parts.push(ctaBlock);
     parts.push(...paragraphs.slice(mid));
     parts.push("");
@@ -399,6 +448,7 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
       category: article.category,
       tags: article.tags || [],
       content: contentFinal,
+      cover_url: coverDataUri,
       meta_title: article.meta_title || article.title,
       meta_description: article.meta_description || article.deck,
       tools: article.tools || [],
