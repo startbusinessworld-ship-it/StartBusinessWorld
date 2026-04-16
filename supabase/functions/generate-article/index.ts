@@ -362,7 +362,8 @@ STRUCTURE OBLIGATOIRE:
 - Termine par un appel à l'action naturel et encourageant
 
 INTERDICTIONS ABSOLUES:
-- JAMAIS de hashtags (#entrepreneur, #business, etc.)
+- JAMAIS de hashtags (#entrepreneur, #business, #ecommerce, etc.) — NI dans le titre, NI dans le contenu, NI à la fin
+- JAMAIS de titre avec un seul # (utilise ## pour les sections et ### pour les sous-sections)
 - JAMAIS de emojis dans le texte
 - JAMAIS de HTML, uniquement du Markdown
 - JAMAIS de phrases creuses ou de remplissage
@@ -414,9 +415,18 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
 
     // Nettoyer markdown du contenu
     let content: string = article.content || "";
-    // Supprimer les hashtags type #entrepreneur #business (pas les ## markdown headers)
-    content = content.replace(/ #[A-Za-zÀ-ÿ0-9]\S*/g, "");
-    content = content.replace(/^#([^#\s])/gm, "$1");
+
+    // Convertir # Titre (h1) en ## Titre (h2) — on ne veut pas de h1 dans le contenu
+    content = content.replace(/^# ([^\n#])/gm, "## $1");
+
+    // Supprimer les hashtags type #entrepreneur #business (milieu/fin de ligne)
+    content = content.replace(/ #[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9_]*/g, "");
+    // Supprimer les hashtags en début de ligne (pas suivis d'un espace = pas un header markdown)
+    content = content.replace(/^#([^#\s ])/gm, "$1");
+    // Supprimer les lignes qui ne contiennent que des hashtags
+    content = content.replace(/^(#[A-Za-zÀ-ÿ0-9]\S*\s*)+$/gm, "");
+
+    // Fixer le formatage markdown
     content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
     content = content.replace(/([^\n])\n(#{2,3} )/g, "$1\n\n$2");
     content = content.replace(/(#{2,3} [^\n]+)\n([^\n#>-])/g, "$1\n\n$2");
