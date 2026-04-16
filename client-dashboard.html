@@ -1254,12 +1254,25 @@
     const { data: userData } = await sb.from('users').select('role').eq('id', currentUser.id).single()
     const isAdmin = userData?.role === 'admin'
 
-    // Récupère le profil membre
+    // Récupère le profil membre (par ID, sinon par email)
     let { data: member } = await sb
       .from('members')
       .select('*')
       .eq('id', currentUser.id)
       .single()
+
+    if (!member) {
+      const { data: memberByEmail } = await sb
+        .from('members')
+        .select('*')
+        .eq('email', currentUser.email)
+        .maybeSingle()
+      if (memberByEmail) {
+        // Lier le membre au user auth
+        await sb.from('members').update({ id: currentUser.id, email: currentUser.email }).eq('id', memberByEmail.id)
+        member = { ...memberByEmail, id: currentUser.id }
+      }
+    }
 
     // Si le plan n'est pas payant, tenter une sync Stripe directe
     const plansPayants = ['intro', 'basic', 'pro', 'business']

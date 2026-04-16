@@ -48,9 +48,21 @@ serve(async (req) => {
       .single()
 
     if (!member) {
-      return new Response(JSON.stringify({ error: "Membre non trouvé" }), {
-        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
+      // Fallback: chercher par email dans members
+      const { data: memberByEmail } = await sb.from("members")
+        .select("id, email, plan, stripe_customer_id")
+        .eq("email", user.email)
+        .maybeSingle()
+
+      if (memberByEmail) {
+        // Lier le membre à l'auth user
+        await sb.from("members").update({ id: user.id }).eq("id", memberByEmail.id)
+        member = { ...memberByEmail, id: user.id }
+      } else {
+        return new Response(JSON.stringify({ synced: false, reason: "Membre non trouvé" }), {
+          status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" }
+        })
+      }
     }
 
     // Si pas de customer Stripe, chercher par email
