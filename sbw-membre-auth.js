@@ -7,8 +7,8 @@
 ;(function() {
   var SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
-  var PLANS_PAYANTS = ['intro', 'basic', 'pro', 'business']
-  var PLAN_LEVELS = { 'intro': 2, 'basic': 2, 'pro': 3, 'business': 4 }
+  var PLANS_PAYANTS = ['inscrit', 'intro', 'basic', 'pro', 'business']
+  var PLAN_LEVELS = { 'inscrit': 2, 'intro': 2, 'basic': 2, 'pro': 3, 'business': 4 }
   var PLAN_PRICES = { 'basic': '29', 'pro': '79', 'business': '149' }
 
   function getPlanLevel(plan) {

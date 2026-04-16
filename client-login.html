@@ -168,7 +168,7 @@ var isLoginMode = new URLSearchParams(window.location.search).get('mode') === 'l
 })()
 
 async function redirectUser(userId) {
-  const plansPayants = ['intro', 'basic', 'pro', 'business']
+  const plansPayants = ['inscrit', 'intro', 'basic', 'pro', 'business']
 
   // Vérifier si admin
   const { data: userData } = await sb.from('users').select('role').eq('id', userId).single()
@@ -221,7 +221,7 @@ function toggleMode() {
   isLoginMode = !isLoginMode
   document.getElementById('prenomField').style.display = isLoginMode ? 'none' : 'block'
   document.getElementById('cardTitle').textContent = isLoginMode ? 'Se connecter' : 'Créer mon compte'
-  document.getElementById('cardSub').textContent = isLoginMode ? 'Accède à ton espace Club SBW.' : 'Rejoins le Club SBW — accès immédiat après paiement.'
+  document.getElementById('cardSub').textContent = isLoginMode ? 'Accède à ton espace Club SBW.' : 'Rejoins le Club SBW — accès immédiat et gratuit.'
   document.getElementById('mainBtn').textContent = isLoginMode ? 'Se connecter →' : 'Créer mon compte →'
   document.getElementById('pwLabel').textContent = isLoginMode ? 'Mot de passe' : 'Choisis un mot de passe'
   document.getElementById('inputPassword').placeholder = isLoginMode ? 'Ton mot de passe' : '8 caractères minimum'
@@ -267,16 +267,16 @@ async function handleSubmit() {
       })
       if (error) { showError(error.message); return }
       if (data.user) {
-        // Créer profil members
+        // Créer profil members avec accès direct
         await sb.from('members').upsert({
           id: data.user.id,
           email: email,
           full_name: prenom,
-          plan: 'inscrit',
+          plan: 'basic',
           created_at: new Date().toISOString()
         }, { onConflict: 'id' })
-        // Toujours vers plans.html après inscription
-        window.location.href = 'plans.html'
+        // Accès direct au dashboard
+        window.location.href = 'client-dashboard.html'
       }
     }
   } catch(e) {

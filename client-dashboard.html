@@ -1275,7 +1275,7 @@
     }
 
     // Si le plan n'est pas payant, tenter une sync Stripe directe
-    const plansPayants = ['intro', 'basic', 'pro', 'business']
+    const plansPayants = ['inscrit', 'intro', 'basic', 'pro', 'business']
     if (member && !plansPayants.includes(member.plan)) {
       const sync = await syncFromStripe(session.access_token)
       if (sync.synced) {
