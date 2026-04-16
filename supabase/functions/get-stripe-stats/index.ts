@@ -19,24 +19,22 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 }
 
-async function stripeGet(endpoint: string) {
+async function stripePost(endpoint: string, params: Record<string, string>) {
+  const body = new URLSearchParams(params)
   const res = await fetch(`https://api.stripe.com/v1${endpoint}`, {
+    method: 'GET',
     headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` }
   })
   return res.json()
 }
 
-function sumSbwInvoices(invoices: any[]) {
-  let total = 0
-  for (const inv of invoices) {
-    if (inv.status !== 'paid') continue
-    for (const line of (inv.lines?.data || [])) {
-      if (SBW_PRICE_IDS.has(line.price?.id)) {
-        total += (line.amount - (line.amount_refunded || 0))
-      }
-    }
-  }
-  return total / 100
+async function stripeList(endpoint: string, params: Record<string, string> = {}) {
+  const qs = new URLSearchParams(params).toString()
+  const url = `https://api.stripe.com/v1${endpoint}${qs ? '?' + qs : ''}`
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` }
+  })
+  return res.json()
 }
 
 serve(async (req) => {
@@ -71,28 +69,37 @@ serve(async (req) => {
     const now = new Date()
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1)
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+    const startTs = Math.floor(startOfMonth.getTime() / 1000).toString()
+    const lastMonthTs = Math.floor(startOfLastMonth.getTime() / 1000).toString()
 
-    // Invoices du mois en cours (avec line items pour filtrer par price)
-    const invoices = await stripeGet(
-      `/invoices?created[gte]=${Math.floor(startOfMonth.getTime()/1000)}&limit=100&expand[]=data.lines.data&status=paid`
-    )
+    // Récupérer abonnements actifs + charges en parallèle
+    const [subs, chargesThis, chargesLast] = await Promise.all([
+      stripeList('/subscriptions', { status: 'active', limit: '100' }),
+      stripeList('/charges', { 'created[gte]': startTs, limit: '100', status: 'succeeded' }),
+      stripeList('/charges', { 'created[gte]': lastMonthTs, 'created[lt]': startTs, limit: '100', status: 'succeeded' })
+    ])
 
-    // Invoices du mois dernier
-    const lastMonthInvoices = await stripeGet(
-      `/invoices?created[gte]=${Math.floor(startOfLastMonth.getTime()/1000)}&created[lt]=${Math.floor(startOfMonth.getTime()/1000)}&limit=100&expand[]=data.lines.data&status=paid`
-    )
-
-    const revenueThisMonth = sumSbwInvoices(invoices.data || [])
-    const revenueLastMonth = sumSbwInvoices(lastMonthInvoices.data || [])
-    const revenueDelta = revenueLastMonth > 0
-      ? Math.round(((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100)
-      : 0
-
-    // Abonnements actifs SBW uniquement
-    const subs = await stripeGet(`/subscriptions?status=active&limit=100`)
+    // Identifier les customers SBW via leurs abonnements
     const sbwSubs = (subs.data || []).filter((s: any) =>
       s.items?.data?.some((item: any) => SBW_PRICE_IDS.has(item.price?.id))
     )
+    const sbwCustomerIds = new Set(sbwSubs.map((s: any) => s.customer))
+
+    // Filtrer les charges par customers SBW
+    const filterSbwCharges = (charges: any[]) =>
+      charges.filter((c: any) => sbwCustomerIds.has(c.customer))
+
+    const sbwChargesThis = filterSbwCharges(chargesThis.data || [])
+    const sbwChargesLast = filterSbwCharges(chargesLast.data || [])
+
+    const revenueThisMonth = sbwChargesThis.reduce((sum: number, c: any) =>
+      sum + (c.amount - (c.amount_refunded || 0)), 0) / 100
+    const revenueLastMonth = sbwChargesLast.reduce((sum: number, c: any) =>
+      sum + (c.amount - (c.amount_refunded || 0)), 0) / 100
+
+    const revenueDelta = revenueLastMonth > 0
+      ? Math.round(((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100)
+      : 0
 
     const mrr = sbwSubs.reduce((sum: number, s: any) => {
       const item = s.items?.data?.find((i: any) => SBW_PRICE_IDS.has(i.price?.id))
@@ -100,20 +107,13 @@ serve(async (req) => {
     }, 0)
 
     // Derniers paiements SBW
-    const recentPayments: any[] = []
-    for (const inv of (invoices.data || [])) {
-      if (inv.status !== 'paid') continue
-      const hasSbw = inv.lines?.data?.some((l: any) => SBW_PRICE_IDS.has(l.price?.id))
-      if (hasSbw && recentPayments.length < 5) {
-        recentPayments.push({
-          id: inv.id,
-          amount: inv.amount_paid / 100,
-          email: inv.customer_email || '—',
-          date: new Date(inv.created * 1000).toISOString(),
-          status: inv.status
-        })
-      }
-    }
+    const recentPayments = sbwChargesThis.slice(0, 5).map((c: any) => ({
+      id: c.id,
+      amount: (c.amount - (c.amount_refunded || 0)) / 100,
+      email: c.billing_details?.email || c.receipt_email || '—',
+      date: new Date(c.created * 1000).toISOString(),
+      status: c.status
+    }))
 
     return new Response(JSON.stringify({
       revenueThisMonth,
