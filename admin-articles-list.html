@@ -10,6 +10,7 @@
 <script>const PAGE_ID = 'articles'</script>
 <link rel="stylesheet" href="admin.css">
 <style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 /* MODAL */
 .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
 .overlay.on { display: flex; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
@@ -144,6 +145,25 @@
   </div>
 
   <div class="content-area">
+
+    <!-- GÉNÉRATEUR IA -->
+    <div style="background:var(--bg);border:0.5px solid var(--subtle);border-radius:10px;padding:20px 24px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <h2 style="font-family:'DM Serif Display',serif;font-size:1.1rem;font-weight:400">Générer un article avec l'IA</h2>
+        <span style="font-size:0.65rem;padding:3px 8px;border-radius:10px;background:rgba(166,124,58,0.1);color:var(--gold);border:0.5px solid rgba(166,124,58,0.2)">IA</span>
+      </div>
+      <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px">Donne un sujet ou laisse l'IA choisir. L'article est publié automatiquement.</p>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="aiTopicInput" placeholder="Ex: Comment créer sa société à Hong Kong en 2026" style="flex:1;padding:9px 12px;border:0.5px solid var(--subtle);border-radius:6px;font-size:0.85rem;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);outline:none">
+        <button id="btnGenerate" onclick="generateArticle(false)" class="btn-primary" style="white-space:nowrap">Générer</button>
+        <button id="btnAuto" onclick="generateArticle(true)" class="btn-ghost" style="white-space:nowrap">IA choisit</button>
+      </div>
+      <div id="aiStatus" style="display:none;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;background:rgba(166,124,58,0.06);border:0.5px solid rgba(166,124,58,0.2);border-radius:6px;font-size:0.78rem;color:var(--gold)">
+        <div style="width:7px;height:7px;border-radius:50%;background:var(--gold);animation:pulse 1s ease-in-out infinite;flex-shrink:0"></div>
+        <span id="aiStatusText">Génération en cours...</span>
+      </div>
+    </div>
+
     <div class="card">
       <table class="data-table">
         <thead>
@@ -731,6 +751,61 @@ function showToast(msg, type) {
   t.textContent = msg;
   t.className = 'toast ' + (type || 'success') + ' show';
   setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+// ─── GÉNÉRATEUR IA ──────────────────────────────────────────────────────────
+async function generateArticle(auto) {
+  var topic = auto ? null : document.getElementById('aiTopicInput').value.trim();
+  if (!auto && !topic) { showToast('Entre un sujet ou clique sur "IA choisit"', 'error'); return; }
+
+  document.getElementById('btnGenerate').disabled = true;
+  document.getElementById('btnAuto').disabled = true;
+  var bar = document.getElementById('aiStatus');
+  bar.style.display = 'flex';
+
+  var steps = [
+    'Analyse des articles précédents...',
+    auto ? 'Recherche du meilleur sujet...' : 'Préparation du sujet...',
+    'Recherche de sources web...',
+    'Rédaction de l\'article...',
+    'Création des visuels...',
+    'Publication en cours...'
+  ];
+  var i = 0;
+  var interval = setInterval(function() {
+    if (i < steps.length) document.getElementById('aiStatusText').textContent = steps[i++];
+  }, 4000);
+
+  try {
+    var res = await fetch(SUPABASE_URL + '/functions/v1/generate-article', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'apikey': SUPABASE_ANON_KEY
+      },
+      body: JSON.stringify(topic ? { topic: topic } : {})
+    });
+
+    if (!res.ok) throw new Error('Erreur serveur ' + res.status);
+
+    var data = await res.json();
+    clearInterval(interval);
+
+    if (data.error) throw new Error(data.error);
+
+    bar.style.display = 'none';
+    document.getElementById('aiTopicInput').value = '';
+    showToast('Article publié : ' + (data.article?.title || 'OK'), 'success');
+    loadArticles();
+  } catch (err) {
+    clearInterval(interval);
+    bar.style.display = 'none';
+    showToast('Erreur : ' + err.message, 'error');
+  }
+
+  document.getElementById('btnGenerate').disabled = false;
+  document.getElementById('btnAuto').disabled = false;
 }
 </script>
 </body>

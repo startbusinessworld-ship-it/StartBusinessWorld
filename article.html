@@ -1066,11 +1066,17 @@
           var para = paragraphs[i].trim();
           if (!para) continue;
 
+          // Convertir # Titre en ## Titre (h1 → h2)
+          if (para.startsWith("# ") && !para.startsWith("## ")) {
+            para = "#" + para;
+          }
+
           if (para.startsWith("## ")) {
             var h2 = document.createElement("h2");
-            var slug = para.slice(3).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+            var hText = para.slice(para.startsWith("### ") ? 4 : para.startsWith("## ") ? 3 : 2);
+            var slug = hText.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
             h2.id = slug;
-            h2.textContent = para.slice(3);
+            h2.textContent = hText;
             body.appendChild(h2);
 
           } else if (para.startsWith("### ")) {
