@@ -1086,7 +1086,7 @@
       </div>
       <div style="font-size:0.72rem;color:rgba(240,237,228,0.3);margin-top:0.3rem">Groupe privé · Live mensuel · Avant-première contenu · Sans engagement</div>
     </div>
-    <button onclick="handleUpgrade(event,'business')" style="width:100%;background:var(--gold);color:#fff;border:none;padding:1rem;border-radius:7px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">Passer au plan Business →</button>
+    <button id="modalUpgradeBtn" onclick="handleUpgrade(event,'business')" style="width:100%;background:var(--gold);color:#fff;border:none;padding:1rem;border-radius:7px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">Passer au plan Business →</button>
     <div style="font-size:0.65rem;color:rgba(240,237,228,0.2);text-align:center;margin-top:0.7rem">Sans engagement · Annulation en 1 clic</div>
   </div>
 </div>
@@ -1530,8 +1530,8 @@
       document.getElementById('modalIcon').textContent = '📂'
       document.getElementById('modalTitle').textContent = 'Accède aux fournisseurs vérifiés'
       document.getElementById('modalDesc').textContent = 'L\'annuaire fournisseurs est réservé aux membres Pro et Business. Des contacts vérifiés, des prix négociés, zéro arnaque.'
-      document.getElementById('modalBusiness').querySelector('button[onclick*="handleUpgrade"]').setAttribute('onclick', "handleUpgrade(event,'pro')")
-      document.getElementById('modalBusiness').querySelector('button[onclick*="handleUpgrade"]').textContent = 'Passer au plan Pro — 79€/mois →'
+      document.getElementById('modalUpgradeBtn').setAttribute('onclick', "handleUpgrade(event,'pro')")
+      document.getElementById('modalUpgradeBtn').textContent = 'Passer au plan Pro — 79€/mois →'
       document.getElementById('modalBusiness').style.display = 'flex'
     }
   }
@@ -1543,6 +1543,8 @@
       document.getElementById('modalIcon').textContent = '💬'
       document.getElementById('modalTitle').textContent = 'Accède au groupe privé'
       document.getElementById('modalDesc').textContent = 'Le groupe privé est réservé aux membres Business. Des entrepreneurs sérieux, des questions de fond, zéro bruit de fond.'
+      document.getElementById('modalUpgradeBtn').setAttribute('onclick', "handleUpgrade(event,'business')")
+      document.getElementById('modalUpgradeBtn').textContent = 'Passer au plan Business — 149€/mois →'
       document.getElementById('modalBusiness').style.display = 'flex'
     }
   }
@@ -1554,6 +1556,8 @@
       document.getElementById('modalIcon').textContent = '🎥'
       document.getElementById('modalTitle').textContent = 'Accède au live mensuel'
       document.getElementById('modalDesc').textContent = 'Chaque mois, pose tes questions en avance et retrouve les réponses en live. Réservé aux membres Business uniquement.'
+      document.getElementById('modalUpgradeBtn').setAttribute('onclick', "handleUpgrade(event,'business')")
+      document.getElementById('modalUpgradeBtn').textContent = 'Passer au plan Business — 149€/mois →'
       document.getElementById('modalBusiness').style.display = 'flex'
     }
   }

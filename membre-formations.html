@@ -297,6 +297,23 @@ async function loadAll() {
   renderAll();
 }
 
+// ═══ UPGRADE ═══
+async function doUpgrade(plan) {
+  try {
+    var s = await SB.auth.getSession();
+    if (!s.data.session) { window.location.href = 'client-login.html'; return; }
+    var res = await fetch('https://grwimhqsthcmfwblwdwg.supabase.co/functions/v1/upgrade-plan', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.data.session.access_token },
+      body: JSON.stringify({ plan: plan })
+    });
+    var data = await res.json();
+    if (data.url) { window.location.href = data.url; }
+    else if (data.success) { window.location.reload(); }
+    else { alert('Erreur: ' + (data.error || 'Réessaie')); }
+  } catch(e) { alert('Erreur: ' + e.message); }
+}
+
 // ═══ LOCK CARD ═══
 function applyLock(card, reqPlan) {
   var planName = reqPlan.charAt(0).toUpperCase() + reqPlan.slice(1);
@@ -306,30 +323,23 @@ function applyLock(card, reqPlan) {
   card.style.position = 'relative';
   card.style.overflow = 'hidden';
 
-  // Overlay cadenas
   var lock = document.createElement('div');
   lock.style.cssText = 'position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer';
   lock.innerHTML = '<div style="font-size:2rem;margin-bottom:8px">🔒</div>'
     + '<div style="color:#fff;font-size:0.85rem;font-weight:600;margin-bottom:4px">Plan ' + planName + '</div>'
     + '<div style="color:rgba(255,255,255,0.6);font-size:0.72rem;margin-bottom:12px">' + price + '€/mois</div>'
-    + '<div style="background:#A67C3A;color:#fff;padding:8px 18px;border-radius:6px;font-size:0.78rem;font-weight:500">Upgrade →</div>';
+    + '<div style="background:#A67C3A;color:#fff;padding:10px 24px;border-radius:6px;font-size:0.82rem;font-weight:500">Passer au plan ' + planName + ' →</div>';
 
   lock.onclick = function(e) {
     e.stopPropagation();
-    if (window.SBW_showUpgradeModal) {
-      SBW_showUpgradeModal(reqPlan);
-    } else {
-      window.location.href = 'client-dashboard.html';
-    }
+    lock.querySelector('div:last-child').textContent = 'Chargement...';
+    doUpgrade(reqPlan);
   };
 
   card.appendChild(lock);
 
-  // Désactiver les boutons en dessous
   var btns = card.querySelectorAll('button, a');
-  for (var i = 0; i < btns.length; i++) {
-    btns[i].style.pointerEvents = 'none';
-  }
+  for (var i = 0; i < btns.length; i++) { btns[i].style.pointerEvents = 'none'; }
 }
 
 // ═══ RENDER PRINCIPAL ═══
@@ -370,46 +380,6 @@ function renderAll() {
 
   container.appendChild(grid);
 
-  // Section formations vidéo Pro — bientôt disponible
-  var proSection = document.createElement('div');
-  proSection.className = 'f-group';
-  proSection.style.marginTop = '3rem';
-  proSection.innerHTML =
-    '<div class="f-group-head">' +
-      '<div class="f-group-title">Formations vidéo</div>' +
-      '<span class="f-group-badge badge-video">Plan Pro</span>' +
-      '<div class="f-group-count">En production</div>' +
-    '</div>' +
-    '<div style="background:#fff;border:0.5px solid var(--subtle);border-radius:12px;padding:2.5rem;text-align:center">' +
-      '<div style="font-size:2.5rem;margin-bottom:1rem">🎬</div>' +
-      '<div style="font-family:\'DM Serif Display\',serif;font-size:1.3rem;margin-bottom:0.5rem">Les formations vidéo arrivent bientôt</div>' +
-      '<div style="font-size:0.85rem;color:var(--muted);line-height:1.7;max-width:480px;margin:0 auto 1.5rem">' +
-        'Business Chine, B2B, Fiscalité avancée, Expatriation — filmées en ce moment. ' +
-        'Les membres Pro y auront accès en avant-première dès leur sortie.' +
-      '</div>' +
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:600px;margin:0 auto 1.5rem">' +
-        '<div style="background:var(--surface);border-radius:8px;padding:14px;opacity:0.6">' +
-          '<div style="font-size:1.5rem;margin-bottom:6px">🇨🇳</div>' +
-          '<div style="font-size:0.8rem;font-weight:600">Business Chine</div>' +
-          '<div style="font-size:0.68rem;color:var(--muted);margin-top:2px">En cours de tournage</div>' +
-        '</div>' +
-        '<div style="background:var(--surface);border-radius:8px;padding:14px;opacity:0.6">' +
-          '<div style="font-size:1.5rem;margin-bottom:6px">🏛️</div>' +
-          '<div style="font-size:0.8rem;font-weight:600">Fiscalité avancée</div>' +
-          '<div style="font-size:0.68rem;color:var(--muted);margin-top:2px">En cours de tournage</div>' +
-        '</div>' +
-        '<div style="background:var(--surface);border-radius:8px;padding:14px;opacity:0.6">' +
-          '<div style="font-size:1.5rem;margin-bottom:6px">✈️</div>' +
-          '<div style="font-size:0.8rem;font-weight:600">Expatriation</div>' +
-          '<div style="font-size:0.68rem;color:var(--muted);margin-top:2px">En cours de tournage</div>' +
-        '</div>' +
-      '</div>' +
-      '<a href="#" onclick="SBW_showUpgradeModal(\'pro\');return false" style="display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:#fff;padding:10px 24px;border-radius:7px;font-size:0.85rem;font-weight:500">' +
-        'Passer au plan Pro — 79€/mois →' +
-      '</a>' +
-      '<div style="font-size:0.68rem;color:var(--muted);margin-top:10px">Sans engagement · Accès immédiat dès la sortie</div>' +
-    '</div>';
-  container.appendChild(proSection);
   var globalProg = window.SBW_getAllFormationsProgress ? SBW_getAllFormationsProgress() : { totalDone: totalDone, totalLessons: totalAll, pct: totalAll > 0 ? Math.round(totalDone/totalAll*100) : 0 };
   var pct = globalProg.pct;
   setTimeout(function() { document.getElementById('gbarFill').style.width = pct + '%'; }, 200);
