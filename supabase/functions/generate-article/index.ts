@@ -86,6 +86,46 @@ function getCTAs(cat: string): string {
   return (map[cat] || [CTA.legalplace]).join("\n\n");
 }
 
+// ─── SOURCES WEB ─────────────────────────────────────────────────────────────
+async function fetchSourceContent(topic: string): Promise<string> {
+  const sites = [
+    { name: "Le Coin des Entrepreneurs", url: `https://www.lecoindesentrepreneurs.fr/?s=${encodeURIComponent(topic)}` },
+    { name: "Shopify Blog FR", url: `https://www.shopify.com/fr/blog/search?q=${encodeURIComponent(topic)}` },
+  ];
+
+  try {
+    const results = await Promise.allSettled(
+      sites.map(site =>
+        fetch(site.url, {
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; SBWBot/1.0)" },
+          redirect: "follow",
+          signal: AbortSignal.timeout(8000),
+        }).then(async (res) => {
+          if (!res.ok) return "";
+          const html = await res.text();
+          const text = html
+            .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+            .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/&[a-z]+;/gi, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+          return `[Source: ${site.name}]\n${text.substring(0, 2000)}`;
+        })
+      )
+    );
+
+    return results
+      .filter((r): r is PromiseFulfilledResult<string> => r.status === "fulfilled" && r.value.length > 100)
+      .map(r => r.value)
+      .join("\n\n---\n\n")
+      .substring(0, 4000);
+  } catch (e) {
+    console.log("Erreur fetch sources:", e);
+    return "";
+  }
+}
+
 // ─── HISTORIQUE DES DERNIERS ARTICLES ────────────────────────────────────────
 async function getRecentArticles(): Promise<{ scores: string; categories: string[]; titles: string[] }> {
   try {
@@ -173,9 +213,15 @@ serve(async (req) => {
       );
     }
 
+    // Récupérer du contenu source pour enrichir l'article
+    const sourceContent = await fetchSourceContent(topic);
+    const sourceContext = sourceContent
+      ? `\n\nINFORMATIONS SOURCES (utilise ces données factuelles pour enrichir l'article, reformule avec tes propres mots):\n${sourceContent}`
+      : "";
+
     // Générer l'article
     const raw = await callClaude(
-      [{ role: "user", content: `Sujet: "${topic}"\n\nScores précédents — fais MIEUX:\n${lastScores}` }],
+      [{ role: "user", content: `Sujet: "${topic}"\n\nScores précédents — fais MIEUX:\n${lastScores}${sourceContext}` }],
       `Tu es rédacteur pour Start Business World (SBW). Tu écris pour des gens qui se lancent dans le business — souvent sans diplôme ni formation. Ton but: qu'ils comprennent TOUT du premier coup.
 
 INSPIRATION (adapte ce style):
