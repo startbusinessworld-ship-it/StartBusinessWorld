@@ -213,6 +213,20 @@
   // Date actuelle
   document.getElementById('currentDate').textContent = new Date().toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'})
 
+  // Protection XSS
+  function esc(str) {
+    const d = document.createElement('div')
+    d.textContent = str || ''
+    return d.innerHTML
+  }
+
+  // Classe delta dynamique (up ou down)
+  function setDelta(id, value, label) {
+    const el = document.getElementById(id)
+    el.textContent = (value >= 0 ? '+' : '') + value + label
+    el.className = 'metric-delta ' + (value >= 0 ? 'up' : 'down')
+  }
+
   async function loadDashboard() {
     const profile = await initAuth()
     if (!profile) return
@@ -229,57 +243,74 @@
   async function loadMetrics() {
     const startOfMonth = new Date(); startOfMonth.setDate(1); startOfMonth.setHours(0,0,0,0)
     const lastMonth = new Date(startOfMonth); lastMonth.setMonth(lastMonth.getMonth() - 1)
+    const startOfWeek = new Date(); startOfWeek.setDate(startOfWeek.getDate() - 7); startOfWeek.setHours(0,0,0,0)
 
-    // Abonnés newsletter
-    const { count: subCount } = await sb.from('subscribers').select('*', {count:'exact',head:true})
-    document.getElementById('metricSubscribers').textContent = (subCount || 0).toLocaleString('fr-FR')
-    document.getElementById('metricSubDelta').textContent = '+64 cette semaine'
+    // Lancer toutes les requêtes en parallèle
+    const [subRes, subWeekRes, memberRes, memberLastRes, visitsRes, visitsLastRes, draftsRes, sessionRes] = await Promise.all([
+      sb.from('subscribers').select('*', {count:'exact',head:true}),
+      sb.from('subscribers').select('*', {count:'exact',head:true}).gte('created_at', startOfWeek.toISOString()),
+      sb.from('members').select('*', {count:'exact',head:true}).not('plan','eq','trial').not('plan','is',null),
+      sb.from('members').select('*', {count:'exact',head:true}).not('plan','eq','trial').not('plan','is',null).lt('plan_updated_at', startOfMonth.toISOString()),
+      sb.from('page_views').select('*', {count:'exact',head:true}).gte('created_at', startOfMonth.toISOString()),
+      sb.from('page_views').select('*', {count:'exact',head:true}).gte('created_at', lastMonth.toISOString()).lt('created_at', startOfMonth.toISOString()),
+      sb.from('articles').select('*', {count:'exact',head:true}).eq('status','draft'),
+      sb.auth.getSession()
+    ])
+
+    // Abonnés newsletter (delta réel cette semaine)
+    const subCount = subRes.count || 0
+    const subWeekCount = subWeekRes.count || 0
+    document.getElementById('metricSubscribers').textContent = subCount.toLocaleString('fr-FR')
+    document.getElementById('metricSubDelta').textContent = '+' + subWeekCount + ' cette semaine'
+    document.getElementById('metricSubDelta').className = 'metric-delta up'
 
     // Membres Club actifs
-    const { count: memberCount } = await sb.from('members')
-      .select('*', { count: 'exact', head: true })
-      .not('plan', 'eq', 'trial')
-      .not('plan', 'is', null)
+    const memberCount = memberRes.count || 0
+    const memberCountLast = memberLastRes.count || 0
+    const newMembers = memberCount - memberCountLast
+    document.getElementById('metricMembers').textContent = memberCount.toLocaleString('fr-FR')
+    setDelta('metricMembersDelta', newMembers, ' ce mois')
 
-    const { count: memberCountLastMonth } = await sb.from('members')
-      .select('*', { count: 'exact', head: true })
-      .not('plan', 'eq', 'trial')
-      .not('plan', 'is', null)
-      .lt('plan_updated_at', startOfMonth.toISOString())
+    // Visites
+    const visitsThisMonth = visitsRes.count || 0
+    const visitsLastMonth = visitsLastRes.count || 0
+    const visitsDelta = visitsLastMonth > 0
+      ? Math.round(((visitsThisMonth - visitsLastMonth) / visitsLastMonth) * 100)
+      : 0
+    document.getElementById('metricVisits').textContent = visitsThisMonth.toLocaleString('fr-FR')
+    setDelta('metricVisitsDelta', visitsDelta, '% vs mois dernier')
 
-    document.getElementById('metricMembers').textContent = (memberCount || 0).toLocaleString('fr-FR')
-    const newMembers = (memberCount || 0) - (memberCountLastMonth || 0)
-    document.getElementById('metricMembersDelta').textContent = (newMembers > 0 ? '+' : '') + newMembers + ' ce mois'
+    // Brouillons pour badge sidebar
+    const drafts = draftsRes.count || 0
+    const badge = document.getElementById('draftCount')
+    if (drafts > 0) { badge.textContent = drafts } else { badge.style.display = 'none' }
 
-    // Revenus réels depuis Stripe via Edge Function
+    // Revenus depuis Stripe (en parallèle mais après session)
     try {
-      const { data: { session } } = await sb.auth.getSession()
+      const session = sessionRes.data?.session
       if (session) {
-        const statsRes = await fetch(`${SUPABASE_URL}/functions/v1/get-stripe-stats`, {
+        const statsRes = await fetch(SUPABASE_URL + '/functions/v1/get-stripe-stats', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`
+            'Authorization': 'Bearer ' + session.access_token
           }
         })
         const stats = await statsRes.json()
         if (!stats.error) {
           document.getElementById('metricRevenue').textContent =
             stats.revenueThisMonth.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-          document.getElementById('metricRevenueDelta').textContent =
-            (stats.revenueDelta >= 0 ? '+' : '') + stats.revenueDelta + '% vs mois dernier'
+          setDelta('metricRevenueDelta', stats.revenueDelta, '% vs mois dernier')
 
-          // Afficher MRR si l'élément existe
           const mrrEl = document.getElementById('metricMRR')
           if (mrrEl) mrrEl.textContent = stats.mrr.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 
-          // Afficher les derniers paiements
           const paymentsEl = document.getElementById('recentPayments')
           if (paymentsEl && stats.recentPayments?.length) {
             paymentsEl.innerHTML = stats.recentPayments.map(p => `
               <div class="list-row">
                 <div class="row-info">
-                  <div class="row-title">${p.email}</div>
+                  <div class="row-title">${esc(p.email)}</div>
                   <div class="row-meta">${formatDate(p.date)}</div>
                 </div>
                 <span class="plan-badge">${p.amount.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })}</span>
@@ -290,29 +321,8 @@
       }
     } catch(e) {
       console.log('Stripe stats non disponibles:', e.message)
+      document.getElementById('metricRevenue').textContent = '—'
     }
-
-    // Visites réelles depuis page_views
-    const { count: visitsThisMonth } = await sb.from('page_views')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', startOfMonth.toISOString())
-
-    const { count: visitsLastMonth } = await sb.from('page_views')
-      .select('*', { count: 'exact', head: true })
-      .gte('created_at', lastMonth.toISOString())
-      .lt('created_at', startOfMonth.toISOString())
-
-    const visitsDelta = visitsLastMonth > 0
-      ? Math.round(((visitsThisMonth - visitsLastMonth) / visitsLastMonth) * 100)
-      : 0
-
-    document.getElementById('metricVisits').textContent = (visitsThisMonth || 0).toLocaleString('fr-FR')
-    document.getElementById('metricVisitsDelta').textContent = (visitsDelta >= 0 ? '+' : '') + visitsDelta + '% vs mois dernier'
-
-    // Brouillons pour badge sidebar
-    const { count: drafts } = await sb.from('articles').select('*', {count:'exact',head:true}).eq('status','draft')
-    const badge = document.getElementById('draftCount')
-    if (drafts > 0) { badge.textContent = drafts } else { badge.style.display = 'none' }
   }
 
   async function loadArticles() {
@@ -328,8 +338,8 @@
       <div class="list-row">
         <div class="row-status ${a.status === 'published' ? 'pub' : 'draft'}"></div>
         <div class="row-info">
-          <div class="row-title">${a.title}</div>
-          <div class="row-meta">${a.category} · ${formatDate(a.created_at)}</div>
+          <div class="row-title">${esc(a.title)}</div>
+          <div class="row-meta">${esc(a.category)} · ${formatDate(a.created_at)}</div>
         </div>
         <div class="row-right">
           <span class="row-views">${(a.views||0).toLocaleString('fr-FR')}</span>
@@ -350,7 +360,7 @@
 
     el.innerHTML = data.map(m => {
       const name = m.full_name || m.email
-      const initials = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2)
+      const initials = esc(name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2))
       const planLabels = { basic: 'Basic 29€', pro: 'Pro 79€', business: 'Business 149€', trial: 'Essai', active: 'Actif', cancelled: 'Annulé' }
       const planLabel = planLabels[m.plan] || m.plan || '—'
       const isTrial = m.plan === 'trial'
@@ -358,10 +368,10 @@
         <div class="list-row">
           <div class="member-avatar">${initials}</div>
           <div class="row-info">
-            <div class="row-title">${name}</div>
+            <div class="row-title">${esc(name)}</div>
             <div class="row-meta">Depuis ${formatDate(m.created_at)}</div>
           </div>
-          <span class="plan-badge ${isTrial ? 'trial' : ''}">${planLabel}</span>
+          <span class="plan-badge ${isTrial ? 'trial' : ''}">${esc(planLabel)}</span>
         </div>
       `
     }).join('')
@@ -379,12 +389,12 @@
     el.innerHTML = data.map(c => `
       <div class="list-row">
         <div class="row-info">
-          <div class="row-title">${c.subject}</div>
+          <div class="row-title">${esc(c.subject)}</div>
           <div class="row-meta">${c.sent_count ? c.sent_count.toLocaleString('fr-FR') + ' envoyés · ' + Math.round(c.open_rate||0) + '% ouverts' : 'Brouillon'}</div>
         </div>
         <div class="row-right">
           <span class="status-pill ${c.status === 'sent' ? 'sent' : 'draft'}">${c.status === 'sent' ? 'Envoyée' : 'Brouillon'}</span>
-          <a href="admin-newsletter-edit.html?id=${c.id}" class="row-action">Voir</a>
+          <a href="admin-newsletter.html" class="row-action">Voir</a>
         </div>
       </div>
     `).join('')
@@ -403,7 +413,7 @@
     el.innerHTML = data.map(l => `
       <div class="list-row">
         <div class="row-info">
-          <div class="row-title">${l.name}</div>
+          <div class="row-title">${esc(l.name)}</div>
         </div>
         <div class="aff-right">
           <span class="row-views">${(l.clicks||0).toLocaleString('fr-FR')} clics</span>
