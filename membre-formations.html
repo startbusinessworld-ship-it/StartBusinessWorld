@@ -250,11 +250,39 @@ async function init() {
   document.getElementById('logoutBtn').onclick = async function() {
     await SB.auth.signOut(); window.location.href = 'client-login.html';
   };
-  // Récupérer le plan du membre
-  var { data: memberData } = await SB.from('members').select('plan').eq('id', user.id).single();
-  if (memberData?.plan) {
-    userPlan = memberData.plan;
-    userPlanLevel = PLAN_LEVELS[userPlan] || 0;
+  // Récupérer le plan du membre (par ID, puis fallback email)
+  var { data: memberData } = await SB.from('members').select('plan, trial_plan, trial_expires_at').eq('id', user.id).single();
+  if (!memberData && user.email) {
+    var { data: memberByEmail } = await SB.from('members').select('plan, trial_plan, trial_expires_at').eq('email', user.email).maybeSingle();
+    if (memberByEmail) {
+      await SB.from('members').update({ id: user.id }).eq('email', user.email);
+      memberData = memberByEmail;
+    }
+  }
+  // Si pas de membre, créer avec basic
+  if (!memberData) {
+    await SB.from('members').upsert({
+      id: user.id,
+      email: user.email,
+      full_name: fullName,
+      plan: 'basic',
+      created_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+    memberData = { plan: 'basic' };
+  }
+  // Déterminer le plan effectif
+  var effectivePlan = memberData.plan;
+  // Trial prestige actif → utiliser le plan trial
+  var trialActif = memberData.trial_plan && memberData.trial_expires_at &&
+                   new Date(memberData.trial_expires_at) > new Date();
+  if (trialActif) effectivePlan = memberData.trial_plan;
+  // Plans inconnus (cancelled, trial, etc.) → fallback basic
+  if (effectivePlan && PLAN_LEVELS[effectivePlan]) {
+    userPlan = effectivePlan;
+    userPlanLevel = PLAN_LEVELS[effectivePlan];
+  } else {
+    userPlan = 'basic';
+    userPlanLevel = 2;
   }
   // Admin → accès total
   var { data: userData } = await SB.from('users').select('role').eq('id', user.id).single();
