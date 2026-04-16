@@ -58,29 +58,55 @@ serve(async (req) => {
 
         console.log(`Membre mis à jour: ${supabaseId} → ${plan}`)
 
-        // Offre intro: créer Subscription Schedule 1€×3 → 29€
+        // Offre intro: créer Subscription Schedule 1€×3 puis bascule 29€
         if (isIntro && subscriptionId) {
-          const scheduleRes = await fetch("https://api.stripe.com/v1/subscription_schedules", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-              from_subscription: subscriptionId,
-              end_behavior: "release",
-              "phases[0][items][0][price]": INTRO_PRICE_ID,
-              "phases[0][items][0][quantity]": "1",
-              "phases[0][iterations]": "3",
-              "phases[1][items][0][price]": BASIC_PRICE_ID,
-              "phases[1][items][0][quantity]": "1",
-            }),
-          })
-          const schedule = await scheduleRes.json()
-          if (schedule.error) {
-            console.error("Erreur Schedule:", schedule.error.message)
-          } else {
-            console.log("Schedule créée:", schedule.id, "— bascule 29€ après 3 mois")
+          try {
+            // Étape 1 : Créer le schedule depuis l'abonnement existant
+            const createRes = await fetch("https://api.stripe.com/v1/subscription_schedules", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+                "Content-Type": "application/x-www-form-urlencoded",
+              },
+              body: new URLSearchParams({
+                from_subscription: subscriptionId,
+              }),
+            })
+            const schedule = await createRes.json()
+
+            if (schedule.error) {
+              console.error("Erreur création schedule:", schedule.error.message)
+            } else {
+              // Étape 2 : Mettre à jour avec les 2 phases (1€ x 3 mois → 29€)
+              const now = Math.floor(Date.now() / 1000)
+              const in3Months = now + (90 * 24 * 60 * 60) // ~3 mois
+
+              const updateRes = await fetch(`https://api.stripe.com/v1/subscription_schedules/${schedule.id}`, {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
+                  "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                  end_behavior: "release",
+                  "phases[0][items][0][price]": INTRO_PRICE_ID,
+                  "phases[0][items][0][quantity]": "1",
+                  "phases[0][start_date]": String(now),
+                  "phases[0][end_date]": String(in3Months),
+                  "phases[1][items][0][price]": BASIC_PRICE_ID,
+                  "phases[1][items][0][quantity]": "1",
+                  "phases[1][start_date]": String(in3Months),
+                }),
+              })
+              const updated = await updateRes.json()
+              if (updated.error) {
+                console.error("Erreur update schedule:", updated.error.message)
+              } else {
+                console.log("Schedule OK:", schedule.id, "— 1€ x 3 mois puis 29€/mois")
+              }
+            }
+          } catch (schedErr) {
+            console.error("Schedule exception:", schedErr)
           }
         }
         break
