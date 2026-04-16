@@ -334,17 +334,35 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     const clean = raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
     const article = JSON.parse(clean);
 
-    // Nettoyer le titre (enlever # markdown, hashtags, guillemets)
+    // Fonction pour supprimer les hashtags partout
+    function stripHashtags(str: string): string {
+      return str
+        .replace(/\s*#[A-Za-zÀ-ÿ0-9]\S*/g, "")  // #mot (avec accents, chiffres)
+        .replace(/^#+\s*/gm, (m, offset) => {      // ## markdown headers → garder seulement dans content
+          return m;
+        })
+        .trim();
+    }
+
+    // Nettoyer le titre (enlever # markdown, hashtags, guillemets, **)
     article.title = (article.title || "")
       .replace(/^#+\s*/, "")
-      .replace(/#\w+/g, "")
-      .replace(/^["']+|["']+$/g, "")
+      .replace(/\*\*/g, "")
+      .replace(/\s*#[A-Za-zÀ-ÿ0-9]\S*/g, "")
+      .replace(/^["'«»]+|["'«»]+$/g, "")
+      .trim();
+
+    // Nettoyer le deck aussi
+    article.deck = (article.deck || "")
+      .replace(/\s*#[A-Za-zÀ-ÿ0-9]\S*/g, "")
+      .replace(/\*\*/g, "")
       .trim();
 
     // Nettoyer markdown du contenu
     let content: string = article.content || "";
-    // Supprimer les hashtags type #entrepreneur #business
-    content = content.replace(/#[A-Za-zÀ-ÿ]\w+/g, "");
+    // Supprimer les hashtags type #entrepreneur #business (pas les ## markdown headers)
+    content = content.replace(/ #[A-Za-zÀ-ÿ0-9]\S*/g, "");
+    content = content.replace(/^#([^#\s])/gm, "$1");
     content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
     content = content.replace(/([^\n])\n(#{2,3} )/g, "$1\n\n$2");
     content = content.replace(/(#{2,3} [^\n]+)\n([^\n#>-])/g, "$1\n\n$2");
