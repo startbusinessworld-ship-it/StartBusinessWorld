@@ -41,20 +41,52 @@ serve(async (req) => {
         const plan = isIntro ? "intro" : (session.metadata?.plan || "basic")
         const customerId = session.customer
         const subscriptionId = session.subscription
+        const customerEmail = session.customer_details?.email || session.customer_email || ""
 
         if (!supabaseId) {
           console.error("Pas de supabase_id dans metadata")
+          // Tenter de trouver le membre par email
+          if (customerEmail) {
+            const { data: memberByEmail } = await sb.from("members")
+              .select("id").eq("email", customerEmail).maybeSingle()
+            if (memberByEmail) {
+              await sb.from("members").update({
+                plan,
+                stripe_customer_id: customerId,
+                stripe_subscription_id: subscriptionId,
+                stripe_subscription_status: "active",
+                plan_updated_at: new Date().toISOString(),
+              }).eq("id", memberByEmail.id)
+              console.log(`Membre trouvé par email: ${customerEmail} → ${plan}`)
+            }
+          }
           break
         }
 
-        // Mettre à jour le membre
-        await sb.from("members").update({
+        // Upsert le membre (créer si n'existe pas, mettre à jour sinon)
+        const memberData = {
+          id: supabaseId,
           plan,
           stripe_customer_id: customerId,
           stripe_subscription_id: subscriptionId,
           stripe_subscription_status: "active",
           plan_updated_at: new Date().toISOString(),
-        }).eq("id", supabaseId)
+          ...(customerEmail ? { email: customerEmail } : {}),
+        }
+
+        const { error: upsertError } = await sb.from("members").upsert(memberData, { onConflict: "id" })
+
+        if (upsertError) {
+          console.error("Erreur upsert membre:", upsertError.message)
+          // Fallback: tenter un update simple
+          await sb.from("members").update({
+            plan,
+            stripe_customer_id: customerId,
+            stripe_subscription_id: subscriptionId,
+            stripe_subscription_status: "active",
+            plan_updated_at: new Date().toISOString(),
+          }).eq("id", supabaseId)
+        }
 
         console.log(`Membre mis à jour: ${supabaseId} → ${plan}`)
 
@@ -114,31 +146,42 @@ serve(async (req) => {
 
       case "customer.subscription.updated": {
         const sub = event.data.object
-        const supabaseId = sub.metadata?.supabase_id
-        if (!supabaseId) break
+        let subMemberId = sub.metadata?.supabase_id
         const priceId = sub.items?.data?.[0]?.price?.id
         const plan = PRICE_TO_PLAN[priceId] || "basic"
         const status = sub.status
+        // Fallback: chercher par stripe_customer_id
+        if (!subMemberId) {
+          const { data: m } = await sb.from("members")
+            .select("id").eq("stripe_customer_id", sub.customer).maybeSingle()
+          if (m) subMemberId = m.id
+        }
+        if (!subMemberId) break
         await sb.from("members").update({
           plan: status === "canceled" || status === "unpaid" ? "cancelled" : plan,
           stripe_subscription_status: status,
           plan_updated_at: new Date().toISOString(),
-        }).eq("id", supabaseId)
-        console.log(`Abonnement mis à jour: ${supabaseId} → ${plan} (${status})`)
+        }).eq("id", subMemberId)
+        console.log(`Abonnement mis à jour: ${subMemberId} → ${plan} (${status})`)
         break
       }
 
       case "customer.subscription.deleted": {
         const sub = event.data.object
-        const supabaseId = sub.metadata?.supabase_id
-        if (!supabaseId) break
+        let delMemberId = sub.metadata?.supabase_id
+        if (!delMemberId) {
+          const { data: m } = await sb.from("members")
+            .select("id").eq("stripe_customer_id", sub.customer).maybeSingle()
+          if (m) delMemberId = m.id
+        }
+        if (!delMemberId) break
         await sb.from("members").update({
           plan: "cancelled",
           stripe_subscription_status: "canceled",
           stripe_subscription_id: null,
           plan_updated_at: new Date().toISOString(),
-        }).eq("id", supabaseId)
-        console.log(`Abonnement annulé: ${supabaseId}`)
+        }).eq("id", delMemberId)
+        console.log(`Abonnement annulé: ${delMemberId}`)
         break
       }
 
