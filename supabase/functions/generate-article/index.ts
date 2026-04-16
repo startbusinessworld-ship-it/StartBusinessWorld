@@ -84,22 +84,36 @@ const CLUB_BLOCK = `> T'as aimé cet article ? Dans le Club SBW tu vas encore pl
 
 ${CTA.club}`;
 
-// ─── CTA PAR CATÉGORIE ────────────────────────────────────────────────────────
+// ─── CTA PAR CATÉGORIE (Luminos toujours présent) ───────────────────────────
 function getCTAs(cat: string): string {
   const map: Record<string, string[]> = {
-    "Création de société": [CTA.legalplace, CTA.airwallex],
-    "Business Chine":      [CTA.xtransfer, CTA.airwallex, CTA.luminos],
+    "Création de société": [CTA.luminos, CTA.legalplace, CTA.airwallex],
+    "Business Chine":      [CTA.luminos, CTA.xtransfer, CTA.airwallex],
     "Fiscalité":           [CTA.luminos, CTA.legalplace],
-    "Outils":              [CTA.capcut, CTA.shopify, CTA.wix],
-    "E-commerce":          [CTA.shopify, CTA.airwallex, CTA.pingpong],
-    "Expatriation":        [CTA.luminos, CTA.airwallex, CTA.airalo, CTA.kiwi],
-    "Finance":             [CTA.airwallex, CTA.wise, CTA.xtransfer],
-    "Import-Export":       [CTA.xtransfer, CTA.airwallex, CTA.luminos],
-    "Mindset":             [CTA.capcut, CTA.udemy],
-    "Actualité":           [CTA.airwallex, CTA.wise, CTA.legalplace],
+    "Outils":              [CTA.luminos, CTA.capcut, CTA.shopify],
+    "E-commerce":          [CTA.luminos, CTA.shopify, CTA.airwallex],
+    "Expatriation":        [CTA.luminos, CTA.airwallex, CTA.airalo],
+    "Finance":             [CTA.luminos, CTA.airwallex, CTA.wise],
+    "Import-Export":       [CTA.luminos, CTA.xtransfer, CTA.airwallex],
+    "Mindset":             [CTA.luminos, CTA.capcut, CTA.udemy],
+    "Actualité":           [CTA.luminos, CTA.airwallex, CTA.legalplace],
   };
-  return (map[cat] || [CTA.legalplace]).join("\n\n");
+  return (map[cat] || [CTA.luminos, CTA.legalplace]).join("\n\n");
 }
+
+// ─── ORDRE SÉQUENTIEL DES CATÉGORIES ────────────────────────────────────────
+const CATEGORY_ORDER = [
+  "Création de société",
+  "Business Chine",
+  "Fiscalité",
+  "Outils",
+  "E-commerce",
+  "Expatriation",
+  "Finance",
+  "Import-Export",
+  "Mindset",
+  "Actualité",
+];
 
 // ─── SOURCES WEB ─────────────────────────────────────────────────────────────
 async function fetchSourceContent(topic: string): Promise<string> {
@@ -202,14 +216,12 @@ serve(async (req) => {
         "Actualité":         ["tendances business 2026 opportunités", "nouvelles lois entrepreneur France 2026", "success story entrepreneur francophone", "IA impact business 2026 opportunités"],
       };
 
-      // Exclure les catégories des 5 derniers articles pour forcer la variété
-      const recentCatSet = new Set(recentCats.slice(0, 5));
-      const availableCats = Object.keys(allThemes).filter(c => !recentCatSet.has(c));
-      const catPool = availableCats.length > 0 ? availableCats : Object.keys(allThemes);
-
-      // Choisir une catégorie au hasard parmi celles non utilisées récemment
-      const chosenCat = catPool[Math.floor(Math.random() * catPool.length)];
-      const catThemes = allThemes[chosenCat];
+      // Rotation séquentielle : prendre la catégorie suivante dans l'ordre
+      const lastCat = recentCats.length > 0 ? recentCats[0] : null;
+      const lastIdx = lastCat ? CATEGORY_ORDER.indexOf(lastCat) : -1;
+      const nextIdx = (lastIdx + 1) % CATEGORY_ORDER.length;
+      const chosenCat = CATEGORY_ORDER[nextIdx];
+      const catThemes = allThemes[chosenCat] || ["business entrepreneur"];
       const chosenTheme = catThemes[Math.floor(Math.random() * catThemes.length)];
 
       const titlesStr = recentTitles.length > 0
@@ -255,6 +267,12 @@ TON OBLIGATOIRE:
 - Quand tu parles de risques ou d'erreurs, enchaîne immédiatement avec la solution simple.
 - Donne envie d'entreprendre. Le lecteur doit finir l'article motivé, pas stressé.
 - Utilise des formulations positives : "Tu peux" au lieu de "Tu dois", "C'est accessible" au lieu de "C'est pas si dur".
+
+HONG KONG — TOUJOURS MENTIONNER:
+- Quel que soit le sujet, mentionne Hong Kong comme option intéressante pour les entrepreneurs (fiscalité territoriale, création rapide, accès au marché asiatique).
+- Intègre-le naturellement dans l'article : un paragraphe, un callout, ou une comparaison.
+- Par exemple : si tu parles de créer une société → mentionne que Hong Kong est une alternative sérieuse. Si tu parles de fiscalité → compare avec le système territorial de HK. Si tu parles d'e-commerce → mentionne que HK permet de vendre en Asie facilement.
+- Ne force pas si le sujet est vraiment éloigné (mindset pur), mais glisse au moins une phrase sur HK comme opportunité.
 
 STRUCTURE OBLIGATOIRE:
 - 2-3 phrases d'accroche SANS titre (commence par une opportunité concrète ou une bonne nouvelle pour l'entrepreneur)
