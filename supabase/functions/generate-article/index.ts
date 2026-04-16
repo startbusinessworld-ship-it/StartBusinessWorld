@@ -116,11 +116,19 @@ const CATEGORY_ORDER = [
 ];
 
 // ─── SOURCES WEB ─────────────────────────────────────────────────────────────
-async function fetchSourceContent(topic: string): Promise<string> {
+async function fetchSourceContent(topic: string, category?: string): Promise<string> {
   const sites = [
     { name: "Le Coin des Entrepreneurs", url: `https://www.lecoindesentrepreneurs.fr/?s=${encodeURIComponent(topic)}` },
     { name: "Shopify Blog FR", url: `https://www.shopify.com/fr/blog/search?q=${encodeURIComponent(topic)}` },
   ];
+
+  // Pour la catégorie Actualité, ajouter BFM Business comme source principale
+  if (category === "Actualité") {
+    sites.unshift(
+      { name: "BFM Business", url: `https://www.bfmtv.com/economie/` },
+      { name: "BFM Entreprises", url: `https://www.bfmtv.com/economie/entreprises/` },
+    );
+  }
 
   try {
     const results = await Promise.allSettled(
@@ -201,6 +209,7 @@ serve(async (req) => {
 
     // Sujet varié si pas de sujet manuel
     let topic = manualTopic;
+    let chosenCat = "";
     if (!topic) {
       const date = new Date().toLocaleDateString("fr-FR");
       const allThemes: Record<string, string[]> = {
@@ -220,7 +229,7 @@ serve(async (req) => {
       const lastCat = recentCats.length > 0 ? recentCats[0] : null;
       const lastIdx = lastCat ? CATEGORY_ORDER.indexOf(lastCat) : -1;
       const nextIdx = (lastIdx + 1) % CATEGORY_ORDER.length;
-      const chosenCat = CATEGORY_ORDER[nextIdx];
+      chosenCat = CATEGORY_ORDER[nextIdx];
       const catThemes = allThemes[chosenCat] || ["business entrepreneur"];
       const chosenTheme = catThemes[Math.floor(Math.random() * catThemes.length)];
 
@@ -236,9 +245,12 @@ serve(async (req) => {
     }
 
     // Récupérer du contenu source pour enrichir l'article
-    const sourceContent = await fetchSourceContent(topic);
+    const sourceContent = await fetchSourceContent(topic, chosenCat);
+    const actuNote = chosenCat === "Actualité"
+      ? "\n\nCATÉGORIE ACTUALITÉ: Les sources ci-dessous viennent de BFM Business. Choisis une actualité économique récente et pertinente pour les entrepreneurs, puis rédige un article qui explique simplement cette actu et son impact concret pour quelqu'un qui lance son business. N'oublie pas de mentionner Hong Kong comme opportunité."
+      : "";
     const sourceContext = sourceContent
-      ? `\n\nINFORMATIONS SOURCES (utilise ces données factuelles pour enrichir l'article, reformule avec tes propres mots):\n${sourceContent}`
+      ? `\n\nINFORMATIONS SOURCES (utilise ces données factuelles pour enrichir l'article, reformule avec tes propres mots):${actuNote}\n${sourceContent}`
       : "";
 
     // Générer l'article
