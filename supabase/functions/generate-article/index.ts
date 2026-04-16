@@ -10,22 +10,26 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
-const UNSPLASH_KEY = "DN6WRgVvzG_ZivB2m1HabRpSaUZXv2PpXUwAnNlMjC0";
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// ─── UNSPLASH — RECHERCHE CIBLÉE ────────────────────────────────────────────
-async function searchImage(query: string): Promise<string | null> {
-  try {
-    const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,
-      { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` }, signal: AbortSignal.timeout(6000) }
-    );
-    const data = await res.json();
-    if (data.results?.length > 0) {
-      return data.results[Math.floor(Math.random() * Math.min(3, data.results.length))].urls.regular;
-    }
-    return null;
-  } catch { return null; }
+// ─── SECTION BANNERS SVG ────────────────────────────────────────────────────
+function generateSectionBanner(text: string, emoji: string, color: string): string {
+  const shortText = text.length > 50 ? text.substring(0, 47) + "..." : text;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
+  <defs>
+    <linearGradient id="sb" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="${color}" stop-opacity="0.15"/>
+      <stop offset="100%" stop-color="${color}" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="200" rx="12" fill="#0e0d0b"/>
+  <rect width="800" height="200" rx="12" fill="url(#sb)"/>
+  <rect x="0" y="0" width="4" height="200" rx="2" fill="${color}"/>
+  <text x="80" y="110" font-family="sans-serif" font-size="48">${emoji}</text>
+  <text x="150" y="105" font-family="Georgia, serif" font-size="28" font-weight="700" fill="white">${escXml(shortText)}</text>
+  <text x="150" y="140" font-family="sans-serif" font-size="14" fill="rgba(255,255,255,0.35)" letter-spacing="4">START BUSINESS WORLD</text>
+</svg>`;
+  return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
 }
 
 // ─── COVER SVG GENERATOR ─────────────────────────────────────────────────────
@@ -417,10 +421,8 @@ Paragraphes séparés par ligne vide
 CATÉGORIES (utilise EXACTEMENT un de ces noms, sans emoji):
 Création de société | Business Chine | Fiscalité | Outils | E-commerce | Expatriation | Finance | Import-Export | Mindset | Actualité
 
-IMAGES: Ajoute un champ "images" avec 3 termes de recherche EN ANGLAIS pour trouver des photos pertinentes sur Unsplash. Sois TRÈS SPÉCIFIQUE (ex: "entrepreneur signing contract office" et pas juste "business"). Chaque terme doit correspondre à une section différente de l'article.
-
 RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
-{"title":"Titre accrocheur et simple","deck":"Résumé 150 chars en langage simple","slug":"url-en-tirets","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"Meta 55-60 chars","meta_description":"Meta 150-155 chars","content":"accroche\\n\\n## Titre\\n\\ncontenu...","tools":["outil1"],"images":["specific search term 1","specific search term 2","specific search term 3"],"seo_score":85,"copy_score":80,"engagement_score":78,"seo_recommendations":"3 points précis pour le prochain article"}`,
+{"title":"Titre accrocheur et simple","deck":"Résumé 150 chars en langage simple","slug":"url-en-tirets","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"Meta 55-60 chars","meta_description":"Meta 150-155 chars","content":"accroche\\n\\n## Titre\\n\\ncontenu...","tools":["outil1"],"seo_score":85,"copy_score":80,"engagement_score":78,"seo_recommendations":"3 points précis pour le prochain article"}`,
       3000
     );
 
@@ -478,40 +480,37 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     const coverSVG = generateCoverSVG(article.title, article.category, article.deck || "");
     const coverDataUri = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(coverSVG)));
 
-    // Chercher des images pertinentes sur Unsplash
-    const imageQueries = article.images || [];
-    const imageResults = await Promise.all(
-      imageQueries.slice(0, 3).map((q: string) => searchImage(q))
-    );
-    const images = imageResults.filter(Boolean) as string[];
+    // Générer des banners SVG pour les sections (basés sur les ## titres)
+    const sectionTitles: string[] = [];
+    content.split("\n").forEach((line: string) => {
+      const m = line.match(/^## (.+)/);
+      if (m) sectionTitles.push(m[1].trim());
+    });
 
-    // Assembler contenu final avec images réparties
+    const catEmoji = CAT_EMOJI[article.category] || "📄";
+    const catColor = CAT_COLORS[article.category] || "#A67C3A";
+    const sectionEmojis = ["💡", "📋", "🎯", "✅", "🚀"];
+
+    // Assembler contenu final avec banners avant chaque section
     const paragraphs = content.split("\n\n").filter((p: string) => p.trim());
     const ctaBlock = getCTAs(article.category);
+    const ctaPosition = Math.floor(paragraphs.length * 0.6);
 
     const parts: string[] = [];
-    // Cover SVG en premier
     parts.push(`[IMAGE:${coverDataUri}|${article.title}]`);
 
-    // Répartir les images et CTA dans le contenu
-    const totalP = paragraphs.length;
-    const imgPositions = images.length >= 3
-      ? [Math.floor(totalP * 0.25), Math.floor(totalP * 0.5), Math.floor(totalP * 0.75)]
-      : images.length === 2
-      ? [Math.floor(totalP * 0.33), Math.floor(totalP * 0.66)]
-      : images.length === 1
-      ? [Math.floor(totalP * 0.5)]
-      : [];
-    const ctaPosition = Math.floor(totalP * 0.6);
-
-    for (let i = 0; i < totalP; i++) {
-      parts.push(paragraphs[i]);
-      // Insérer image si c'est la bonne position
-      const imgIdx = imgPositions.indexOf(i);
-      if (imgIdx !== -1 && images[imgIdx]) {
-        parts.push(`[IMAGE:${images[imgIdx]}|${escXml(imageQueries[imgIdx] || article.category)}]`);
+    let sectionIdx = 0;
+    for (let i = 0; i < paragraphs.length; i++) {
+      const p = paragraphs[i];
+      // Si c'est un titre de section ##, ajouter un banner SVG avant
+      if (p.trim().startsWith("## ") && sectionIdx < 3) {
+        const sTitle = p.trim().replace(/^## /, "");
+        const sEmoji = sectionEmojis[sectionIdx % sectionEmojis.length];
+        const banner = generateSectionBanner(sTitle, sEmoji, catColor);
+        parts.push(`[IMAGE:${banner}|${sTitle}]`);
+        sectionIdx++;
       }
-      // Insérer CTA
+      parts.push(p);
       if (i === ctaPosition) {
         parts.push(ctaBlock);
       }
