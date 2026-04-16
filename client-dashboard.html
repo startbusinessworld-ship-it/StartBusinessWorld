@@ -1284,7 +1284,7 @@
       const trialActif = member?.trial_plan && member?.trial_expires_at &&
                          new Date(member.trial_expires_at) > new Date()
 
-      if (!aPaye && !trialActif || (!aPaye && !statusOk && !trialActif)) {
+      if (!aPaye && !trialActif) {
         window.location.href = 'plans.html'
         return
       }
@@ -1439,27 +1439,35 @@
   window.saveProfile = async function() {
     const name = document.getElementById('profileName').value.trim()
     if (!name) return
-    await sb.from('members').update({ full_name: name }).eq('email', currentUser.email)
+    await sb.from('members').update({ full_name: name }).eq('id', currentUser.id)
     showToast('Profil mis à jour !', 'success')
     renderUser()
   }
 
   window.cancelSub = async function() {
-    if (!confirm('Annuler ton abonnement ? Tu perdras l\'accès à la fin du mois.')) return
-    await sb.from('members').update({ plan: 'cancelled', status: 'inactive' }).eq('email', currentUser.email)
+    if (!confirm('Annuler ton abonnement ? Tu perdras l\'accès à la fin de la période en cours.')) return
+    // Annuler dans Stripe via la Edge Function
+    try {
+      const { data: { session } } = await sb.auth.getSession()
+      if (session && currentMember?.stripe_subscription_id) {
+        await fetch(SUPABASE_URL + '/functions/v1/sync-subscription', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ action: 'cancel' })
+        })
+      }
+    } catch(e) { console.log('Erreur annulation Stripe:', e) }
+    // Mettre à jour dans Supabase
+    await sb.from('members').update({ plan: 'cancelled', stripe_subscription_status: 'canceled' }).eq('id', currentUser.id)
     showToast('Abonnement annulé.')
     setTimeout(() => window.location.href = 'club.html', 2000)
   }
 
   window.handleLogout = async function() {
-    try {
-      const { createClient } = supabase
-      const _sb = createClient(
-        'https://grwimhqsthcmfwblwdwg.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
-      )
-      await _sb.auth.signOut()
-    } catch(e) {}
+    try { await sb.auth.signOut() } catch(e) {}
     window.location.href = 'client-login.html'
   }
 
@@ -1531,11 +1539,25 @@
     document.getElementById('modalBusiness').style.display = 'none'
   }
 
-  function handleUpgrade(e, plan) {
+  async function handleUpgrade(e, plan) {
     e.preventDefault()
-    const prices = { pro: '79€/mois', business: '149€/mois' }
-    // TODO: Connecter Stripe
-    alert('Upgrade vers le plan ' + plan.charAt(0).toUpperCase() + plan.slice(1) + ' (' + prices[plan] + ') — Stripe à connecter !')
+    try {
+      const { data: { session } } = await sb.auth.getSession()
+      if (!session) { window.location.href = 'client-login.html'; return }
+      const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        },
+        body: JSON.stringify({ plan: plan, isIntro: false, userId: currentUser.id, email: currentUser.email })
+      })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+      else showToast('Erreur: ' + (data.error || 'Impossible de créer le checkout'), 'error')
+    } catch(err) {
+      showToast('Erreur: ' + err.message, 'error')
+    }
   }
 
   function formatDate(str) {
