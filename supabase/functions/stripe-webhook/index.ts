@@ -120,7 +120,7 @@ serve(async (req) => {
         const plan = PRICE_TO_PLAN[priceId] || "basic"
         const status = sub.status
         await sb.from("members").update({
-          plan: status === "canceled" || status === "unpaid" ? "basic" : plan,
+          plan: status === "canceled" || status === "unpaid" ? "cancelled" : plan,
           stripe_subscription_status: status,
           plan_updated_at: new Date().toISOString(),
         }).eq("id", supabaseId)
@@ -133,7 +133,7 @@ serve(async (req) => {
         const supabaseId = sub.metadata?.supabase_id
         if (!supabaseId) break
         await sb.from("members").update({
-          plan: "basic",
+          plan: "cancelled",
           stripe_subscription_status: "canceled",
           stripe_subscription_id: null,
           plan_updated_at: new Date().toISOString(),

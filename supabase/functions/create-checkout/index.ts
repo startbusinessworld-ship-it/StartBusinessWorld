@@ -90,7 +90,7 @@ serve(async (req) => {
         id: userId,
         email: email,
         stripe_customer_id: customerId,
-        plan: "trial",
+        plan: "inscrit",
         created_at: new Date().toISOString()
       }, { onConflict: "id" })
     }
