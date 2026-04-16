@@ -232,6 +232,11 @@ var user = null, prog = {}, allData = [];
 var curModule = null, curLecon = null, curModLecons = [];
 var EMOJIS = ['📚','🎯','⚡','🚀','💡','🌍','💼','🔥','📈','🎓'];
 
+// ═══ PLAN LEVELS ═══
+var PLAN_LEVELS = { 'intro': 1, 'basic': 2, 'pro': 3, 'business': 4 };
+var userPlan = 'basic';
+var userPlanLevel = 2;
+
 // ═══ INIT ═══
 async function init() {
   var s = await SB.auth.getSession();
@@ -243,6 +248,16 @@ async function init() {
   document.getElementById('logoutBtn').onclick = async function() {
     await SB.auth.signOut(); window.location.href = 'client-login.html';
   };
+  // Récupérer le plan du membre
+  var { data: memberData } = await SB.from('members').select('plan').eq('id', user.id).single();
+  if (memberData?.plan) {
+    userPlan = memberData.plan;
+    userPlanLevel = PLAN_LEVELS[userPlan] || 0;
+  }
+  // Admin → accès total
+  var { data: userData } = await SB.from('users').select('role').eq('id', user.id).single();
+  if (userData?.role === 'admin') userPlanLevel = 99;
+
   try { prog = JSON.parse(localStorage.getItem('sbw_p_' + user.id) || '{}'); } catch(e) { prog = {}; }
   await loadAll();
 }
@@ -280,6 +295,41 @@ async function loadAll() {
   renderAll();
 }
 
+// ═══ LOCK CARD ═══
+function applyLock(card, reqPlan) {
+  var planName = reqPlan.charAt(0).toUpperCase() + reqPlan.slice(1);
+  var prices = { 'pro': '79', 'business': '149' };
+  var price = prices[reqPlan] || '79';
+
+  card.style.position = 'relative';
+  card.style.overflow = 'hidden';
+
+  // Overlay cadenas
+  var lock = document.createElement('div');
+  lock.style.cssText = 'position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer';
+  lock.innerHTML = '<div style="font-size:2rem;margin-bottom:8px">🔒</div>'
+    + '<div style="color:#fff;font-size:0.85rem;font-weight:600;margin-bottom:4px">Plan ' + planName + '</div>'
+    + '<div style="color:rgba(255,255,255,0.6);font-size:0.72rem;margin-bottom:12px">' + price + '€/mois</div>'
+    + '<div style="background:#A67C3A;color:#fff;padding:8px 18px;border-radius:6px;font-size:0.78rem;font-weight:500">Upgrade →</div>';
+
+  lock.onclick = function(e) {
+    e.stopPropagation();
+    if (window.SBW_showUpgradeModal) {
+      SBW_showUpgradeModal(reqPlan);
+    } else {
+      window.location.href = 'client-dashboard.html';
+    }
+  };
+
+  card.appendChild(lock);
+
+  // Désactiver les boutons en dessous
+  var btns = card.querySelectorAll('button, a');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].style.pointerEvents = 'none';
+  }
+}
+
 // ═══ RENDER PRINCIPAL ═══
 function renderAll() {
   var container = document.getElementById('formationsContainer');
@@ -296,15 +346,21 @@ function renderAll() {
   grid.className = 'm-grid';
 
   allData.forEach(function(f, fi) {
+    // Vérifier si la formation nécessite un plan supérieur
+    var reqPlan = f.required_plan || 'basic';
+    var reqLevel = PLAN_LEVELS[reqPlan] || 2;
+    var isLocked = userPlanLevel < reqLevel;
+
     if (f.type === 'external') {
       var card = makeExtCard(f, fi);
+      if (isLocked) applyLock(card, reqPlan);
       grid.appendChild(card);
     } else {
       f.modules.forEach(function(m, mi) {
         var prog_data = getModuleProgress(f, m);
-        totalDone += prog_data.done;
-        totalAll += prog_data.total;
+        if (!isLocked) { totalDone += prog_data.done; totalAll += prog_data.total; }
         var card = makeModuleCard(f, m, mi + fi * 10, prog_data);
+        if (isLocked) applyLock(card, reqPlan);
         grid.appendChild(card);
       });
     }
