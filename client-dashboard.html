@@ -1285,21 +1285,49 @@
       }
     }
 
+    // Si aucun membre trouvé, tenter sync Stripe puis créer avec basic
+    if (!member) {
+      const sync = await syncFromStripe(session.access_token)
+      if (sync.synced) {
+        const { data: refreshed } = await sb.from('members').select('*').eq('id', currentUser.id).single()
+        if (refreshed) member = refreshed
+      }
+      if (!member) {
+        await sb.from('members').upsert({
+          id: currentUser.id,
+          email: currentUser.email,
+          full_name: currentUser.user_metadata?.full_name || '',
+          plan: 'basic',
+          created_at: new Date().toISOString()
+        }, { onConflict: 'id' })
+        const { data: created } = await sb.from('members').select('*').eq('id', currentUser.id).single()
+        member = created
+      }
+    }
+
     currentMember = member
 
     if (!isAdmin) {
       const aPaye = member && plansPayants.includes(member.plan)
-      const statusOk = !member?.stripe_subscription_status ||
-                       member?.stripe_subscription_status === 'active' ||
-                       member?.stripe_subscription_status === 'trialing'
 
       // Vérifier trial prestige (3 jours offerts)
       const trialActif = member?.trial_plan && member?.trial_expires_at &&
                          new Date(member.trial_expires_at) > new Date()
 
       if (!aPaye && !trialActif) {
-        window.location.href = 'plans.html'
-        return
+        // Créer un membre basic plutôt que rediriger vers plans.html
+        await sb.from('members').upsert({
+          id: currentUser.id,
+          email: currentUser.email,
+          full_name: currentUser.user_metadata?.full_name || '',
+          plan: 'basic',
+          created_at: new Date().toISOString()
+        }, { onConflict: 'id' })
+        const { data: created } = await sb.from('members').select('*').eq('id', currentUser.id).single()
+        if (created) {
+          member = created
+          currentMember = created
+        }
       }
 
       // Si trial actif, utiliser le plan trial pour les accès
@@ -1338,19 +1366,21 @@
       : email.split('@')[0].replace(/[._-]/g, ' ').split(' ')[0]
     const displayName = fullName || email
     const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-    const plan = currentMember?.plan === 'intro' ? 'Club SBW — 1€/mois' :
+    const plan = currentMember?.plan === 'inscrit' ? 'Club SBW — Inscrit' :
+                 currentMember?.plan === 'intro' ? 'Club SBW — 1€/mois' :
                  currentMember?.plan === 'basic' ? 'Plan Basic — 29€/mois' :
                  currentMember?.plan === 'pro' ? 'Plan Pro — 79€/mois' :
                  currentMember?.plan === 'business' ? 'Plan Business — 149€/mois' : 'Club SBW'
 
-    document.getElementById('userInitials').textContent = initials
+    var uiEl = document.getElementById('userInitials'); if(uiEl) uiEl.textContent = initials;
     var mav = document.getElementById('mobileUserAv'); if(mav) mav.textContent = initials;
-    document.getElementById('userName').textContent = displayName
-    document.getElementById('userPlan').textContent = plan
-    document.getElementById('welcomeName').textContent = firstName
+    var unEl = document.getElementById('userName'); if(unEl) unEl.textContent = displayName;
+    var upEl = document.getElementById('userPlan'); if(upEl) upEl.textContent = plan;
+    var wnEl = document.getElementById('welcomeName'); if(wnEl) wnEl.textContent = firstName;
 
     // Abonnement — éléments optionnels (section compte)
-    const planLabel = currentMember?.plan === 'intro' ? '1€/mois — Offre lancement' :
+    const planLabel = currentMember?.plan === 'inscrit' ? 'Inscrit — Club SBW' :
+                      currentMember?.plan === 'intro' ? '1€/mois — Offre lancement' :
                       currentMember?.plan === 'basic' ? '29€/mois — Plan Basic' :
                       currentMember?.plan === 'pro' ? '79€/mois — Plan Pro' :
                       currentMember?.plan === 'business' ? '149€/mois — Plan Business' : 'Club SBW'
@@ -1414,6 +1444,7 @@
 
     document.getElementById('statSince').textContent = formatDate(currentMember?.created_at)
     document.getElementById('statPlan').textContent =
+      currentMember?.plan === 'inscrit' ? 'Inscrit' :
       currentMember?.plan === 'trial' ? 'Période d\'essai' :
       currentMember?.plan === 'pro' ? 'Plan Pro' :
       currentMember?.plan === 'business' ? 'Plan Business' : 'Plan Basic'
