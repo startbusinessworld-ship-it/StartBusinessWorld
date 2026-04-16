@@ -137,13 +137,27 @@ const sb = supabase.createClient(
 // Vérifier session et plan — si déjà payant → dashboard
 ;(async function() {
   const { data: { session } } = await sb.auth.getSession()
-  if (!session) {
-    window.location.href = 'client-login.html'
-    return
-  }
+  if (!session) return // Pas connecté = page publique, on laisse voir les plans
+
   const plansPayants = ['intro', 'basic', 'pro', 'business']
-  const { data: member } = await sb.from('members').select('plan').eq('id', session.user.id).single()
-  if (member && plansPayants.includes(member.plan)) {
+  let { data: member } = await sb.from('members').select('plan, stripe_subscription_status').eq('id', session.user.id).single()
+
+  // Si plan pas actif, tenter une sync Stripe directe
+  if (member && !plansPayants.includes(member.plan)) {
+    try {
+      const res = await fetch('https://grwimhqsthcmfwblwdwg.supabase.co/functions/v1/sync-subscription', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+      })
+      const sync = await res.json()
+      if (sync.synced) {
+        const { data: refreshed } = await sb.from('members').select('plan, stripe_subscription_status').eq('id', session.user.id).single()
+        if (refreshed) member = refreshed
+      }
+    } catch(e) {}
+  }
+
+  if (member && plansPayants.includes(member.plan) && member.stripe_subscription_status !== 'canceled') {
     window.location.href = 'client-dashboard.html'
   }
 })()

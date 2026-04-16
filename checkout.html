@@ -96,6 +96,16 @@ async function startCheckout(session) {
     window.location.href = 'client-login.html'
     return
   }
+
+  // Vérifier si le membre a déjà un plan actif
+  const { data: member } = await sb.from('members').select('plan, stripe_subscription_status').eq('id', session.user.id).single()
+  const plansActifs = ['intro', 'basic', 'pro', 'business']
+  if (member && plansActifs.includes(member.plan) && member.stripe_subscription_status !== 'canceled') {
+    // Déjà abonné → rediriger vers le dashboard
+    window.location.href = 'client-dashboard.html'
+    return
+  }
+
   startCheckout(session)
 })()
 </script>
