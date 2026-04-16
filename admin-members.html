@@ -143,6 +143,8 @@
 
 <script src="admin-auth.js"></script>
 <script>
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
   let allMembers = []
 
   async function init() {
@@ -218,10 +220,10 @@
           <td>
             <div style="display:flex;align-items:center;gap:8px">
               <div class="member-avatar">${initials}</div>
-              <span style="font-weight:500">${m.full_name || '—'}</span>
+              <span style="font-weight:500">${esc(m.full_name) || '—'}</span>
             </div>
           </td>
-          <td style="color:var(--muted)">${m.email}</td>
+          <td style="color:var(--muted)">${esc(m.email)}</td>
           <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
           <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
           <td style="color:var(--muted)">${formatDate(m.created_at)}</td>

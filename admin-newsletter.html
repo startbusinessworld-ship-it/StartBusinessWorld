@@ -230,6 +230,8 @@
 
 <script src="admin-auth.js"></script>
 <script>
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
   let allSubscribers = []
 
   async function init() {
@@ -269,7 +271,7 @@
 
     tbody.innerHTML = data.map(c => `
       <tr>
-        <td style="font-weight:500">${c.subject}</td>
+        <td style="font-weight:500">${esc(c.subject)}</td>
         <td><span class="status-pill ${c.status}">${c.status === 'sent' ? 'Envoyée' : c.status === 'draft' ? 'Brouillon' : c.status}</span></td>
         <td>${(c.sent_count||0).toLocaleString('fr-FR')}</td>
         <td>${c.open_rate ? Math.round(c.open_rate) + '%' : '—'}</td>

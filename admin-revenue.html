@@ -131,6 +131,8 @@
 
 <script src="admin-auth.js"></script>
 <script>
+  function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
   let allPayments = []
 
   async function init() {
@@ -150,7 +152,8 @@
     const total = allPayments.reduce((s, p) => s + (p.amount || 0), 0)
 
     const { data: members } = await sb.from('members').select('plan').eq('status', 'active')
-    const mrr = (members || []).reduce((s, m) => s + (m.plan === 'active' ? 29 : m.plan === 'trial' ? 1 : 0), 0)
+    const planPrices = {intro:1, basic:29, pro:79, business:149}
+    const mrr = (members || []).reduce((s, m) => s + ((['basic','pro','business','intro'].includes(m.plan)) ? (planPrices[m.plan]||0) : 0), 0)
 
     document.getElementById('mMonthly').textContent = monthly.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
     document.getElementById('mMonthlyDelta').textContent = '+12% vs mois dernier'
@@ -170,7 +173,7 @@
     }
     tbody.innerHTML = payments.map(p => `
       <tr>
-        <td style="font-weight:500">${p.members?.full_name || p.members?.email || '—'}</td>
+        <td style="font-weight:500">${esc(p.members?.full_name || p.members?.email || '—')}</td>
         <td style="font-weight:500">${(p.amount||0).toLocaleString('fr-FR', { style:'currency', currency:'EUR' })}</td>
         <td><span class="status-pill ${p.status === 'succeeded' ? 'sent' : 'draft'}">${p.status === 'succeeded' ? 'Réussi' : 'Échoué'}</span></td>
         <td style="color:var(--muted)">${formatDate(p.created_at)}</td>

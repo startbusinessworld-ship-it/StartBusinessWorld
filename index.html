@@ -1258,6 +1258,8 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
     var SB = supabase.createClient(
       "https://grwimhqsthcmfwblwdwg.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc"
@@ -1352,7 +1354,7 @@
             var div = document.createElement("div");
             div.className = "ticker-item";
             var itemCat = (item.category || "").split(",")[0].trim();
-            div.innerHTML = "<b>" + itemCat + "</b> — " + item.title;
+            div.innerHTML = "<b>" + esc(itemCat) + "</b> — " + esc(item.title);
             div.addEventListener("click", (function(id) {
               return function() { window.location.href = "article.html?id=" + id; };
             })(item.id));
@@ -1677,7 +1679,6 @@
     }
   </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="sbw-nav-auth.js"></script>
 <script src="sbw-tracker.js"></script>
 </body>
