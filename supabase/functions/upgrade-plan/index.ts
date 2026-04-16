@@ -49,16 +49,32 @@ serve(async (req) => {
       })
     }
 
-    // Récupérer le membre
-    const { data: member } = await sb.from("members")
-      .select("id, plan, stripe_subscription_id, stripe_customer_id")
+    // Récupérer le membre (par ID, puis par email)
+    let { data: member } = await sb.from("members")
+      .select("id, email, plan, stripe_subscription_id, stripe_customer_id")
       .eq("id", user.id)
       .single()
 
     if (!member) {
-      return new Response(JSON.stringify({ error: "Membre non trouvé" }), {
-        status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" }
-      })
+      const { data: memberByEmail } = await sb.from("members")
+        .select("id, email, plan, stripe_subscription_id, stripe_customer_id")
+        .eq("email", user.email)
+        .maybeSingle()
+      if (memberByEmail) {
+        await sb.from("members").update({ id: user.id, email: user.email! }).eq("id", memberByEmail.id)
+        member = { ...memberByEmail, id: user.id }
+      }
+    }
+
+    if (!member) {
+      // Créer le membre s'il n'existe pas
+      await sb.from("members").upsert({
+        id: user.id,
+        email: user.email!,
+        plan: "basic",
+        created_at: new Date().toISOString()
+      }, { onConflict: "id" })
+      member = { id: user.id, email: user.email!, plan: "basic", stripe_subscription_id: null, stripe_customer_id: null }
     }
 
     // Si le membre a un abonnement Stripe actif → modifier l'abonnement
@@ -150,7 +166,11 @@ async function createNewCheckout(user: any, member: any, plan: string) {
     "subscription_data[metadata][supabase_id]": user.id,
     "subscription_data[metadata][plan]": plan,
   }
-  if (customerId) params.customer = customerId
+  if (customerId) {
+    params.customer = customerId
+  } else {
+    params.customer_email = user.email || member.email
+  }
 
   const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
