@@ -168,17 +168,48 @@ var isLoginMode = new URLSearchParams(window.location.search).get('mode') === 'l
 })()
 
 async function redirectUser(userId) {
-  // Vérifier le plan du membre
-  const { data: member } = await sb.from('members').select('plan, role').eq('id', userId).single()
   const plansPayants = ['intro', 'basic', 'pro', 'business']
-  
+
   // Vérifier si admin
   const { data: userData } = await sb.from('users').select('role').eq('id', userId).single()
   if (userData?.role === 'admin') {
     window.location.href = 'client-dashboard.html'
     return
   }
-  
+
+  // Chercher le membre par ID
+  let { data: member } = await sb.from('members').select('plan').eq('id', userId).single()
+
+  // Fallback: chercher par email
+  if (!member) {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session?.user?.email) {
+      const { data: memberByEmail } = await sb.from('members').select('id, plan').eq('email', session.user.email).maybeSingle()
+      if (memberByEmail) {
+        await sb.from('members').update({ id: userId, email: session.user.email }).eq('id', memberByEmail.id)
+        member = memberByEmail
+      }
+    }
+  }
+
+  // Si pas de plan payant, tenter une sync Stripe
+  if (!member || !plansPayants.includes(member.plan)) {
+    try {
+      const { data: { session } } = await sb.auth.getSession()
+      if (session) {
+        const res = await fetch('https://grwimhqsthcmfwblwdwg.supabase.co/functions/v1/sync-subscription', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token }
+        })
+        const sync = await res.json()
+        if (sync.synced) {
+          window.location.href = 'client-dashboard.html'
+          return
+        }
+      }
+    } catch(e) {}
+  }
+
   if (member && plansPayants.includes(member.plan)) {
     window.location.href = 'client-dashboard.html'
   } else {
