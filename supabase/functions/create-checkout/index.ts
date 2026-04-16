@@ -42,16 +42,30 @@ serve(async (req) => {
 
     const body = await req.json()
     const plan = body.plan || "basic"
-    const email = body.email || user.email
-    const userId = body.userId || user.id
+    // Toujours utiliser l'email et l'ID du user authentifié (pas celui du body)
+    const email = user.email!
+    const userId = user.id
     const isIntro = body.isIntro !== false // true par défaut
 
-    // Créer ou récupérer le client Stripe
-    const { data: member } = await sb
+    // Créer ou récupérer le client Stripe (chercher par ID d'abord, puis par email)
+    let { data: member } = await sb
       .from("members")
       .select("stripe_customer_id")
       .eq("id", userId)
       .maybeSingle()
+
+    if (!member) {
+      // Fallback: chercher par email et lier au user auth
+      const { data: memberByEmail } = await sb
+        .from("members")
+        .select("id, stripe_customer_id")
+        .eq("email", email)
+        .maybeSingle()
+      if (memberByEmail) {
+        await sb.from("members").update({ id: userId, email: email }).eq("id", memberByEmail.id)
+        member = memberByEmail
+      }
+    }
 
     let customerId = member?.stripe_customer_id
 
@@ -84,7 +98,6 @@ serve(async (req) => {
     // Créer le Checkout Session
     const baseParams: Record<string, string> = {
       mode: "subscription",
-      customer: customerId,
       success_url: "https://www.startbusinessworld.com/client-dashboard.html?payment=success",
       cancel_url: "https://www.startbusinessworld.com/club.html",
       "metadata[supabase_id]": userId,
@@ -92,6 +105,13 @@ serve(async (req) => {
       "metadata[is_intro]": isIntro ? "true" : "false",
       "subscription_data[metadata][supabase_id]": userId,
       "subscription_data[metadata][plan]": plan,
+    }
+
+    // Si on a un customer Stripe existant, l'utiliser. Sinon, forcer l'email.
+    if (customerId) {
+      baseParams.customer = customerId
+    } else {
+      baseParams.customer_email = email
     }
 
     if (isIntro) {
