@@ -134,6 +134,12 @@ async function fetchSourceContent(topic: string, category?: string): Promise<str
       { name: "Le Coin des Entrepreneurs — Création", url: `https://www.lecoindesentrepreneurs.fr/?s=${encodeURIComponent(topic)}` },
       { name: "Luminos Corp", url: `https://www.luminoscorp.com/` },
     );
+  } else if (category === "Fiscalité") {
+    sites.unshift(
+      { name: "Service Public Fiscalité", url: `https://entreprendre.service-public.fr/vosdroits/N13442` },
+      { name: "Le Coin des Entrepreneurs — Fiscalité", url: `https://www.lecoindesentrepreneurs.fr/?s=${encodeURIComponent(topic)}` },
+      { name: "Luminos Corp", url: `https://www.luminoscorp.com/` },
+    );
   }
 
   try {
