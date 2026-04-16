@@ -10,7 +10,23 @@ const corsHeaders = {
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
+const UNSPLASH_KEY = "DN6WRgVvzG_ZivB2m1HabRpSaUZXv2PpXUwAnNlMjC0";
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
+
+// ─── UNSPLASH — RECHERCHE CIBLÉE ────────────────────────────────────────────
+async function searchImage(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape`,
+      { headers: { Authorization: `Client-ID ${UNSPLASH_KEY}` }, signal: AbortSignal.timeout(6000) }
+    );
+    const data = await res.json();
+    if (data.results?.length > 0) {
+      return data.results[Math.floor(Math.random() * Math.min(3, data.results.length))].urls.regular;
+    }
+    return null;
+  } catch { return null; }
+}
 
 // ─── COVER SVG GENERATOR ─────────────────────────────────────────────────────
 const CAT_EMOJI: Record<string, string> = {
@@ -401,8 +417,10 @@ Paragraphes séparés par ligne vide
 CATÉGORIES (utilise EXACTEMENT un de ces noms, sans emoji):
 Création de société | Business Chine | Fiscalité | Outils | E-commerce | Expatriation | Finance | Import-Export | Mindset | Actualité
 
+IMAGES: Ajoute un champ "images" avec 3 termes de recherche EN ANGLAIS pour trouver des photos pertinentes sur Unsplash. Sois TRÈS SPÉCIFIQUE (ex: "entrepreneur signing contract office" et pas juste "business"). Chaque terme doit correspondre à une section différente de l'article.
+
 RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
-{"title":"Titre accrocheur et simple","deck":"Résumé 150 chars en langage simple","slug":"url-en-tirets","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"Meta 55-60 chars","meta_description":"Meta 150-155 chars","content":"accroche\\n\\n## Titre\\n\\ncontenu...","tools":["outil1"],"seo_score":85,"copy_score":80,"engagement_score":78,"seo_recommendations":"3 points précis pour le prochain article"}`,
+{"title":"Titre accrocheur et simple","deck":"Résumé 150 chars en langage simple","slug":"url-en-tirets","category":"catégorie","tags":["tag1","tag2","tag3"],"meta_title":"Meta 55-60 chars","meta_description":"Meta 150-155 chars","content":"accroche\\n\\n## Titre\\n\\ncontenu...","tools":["outil1"],"images":["specific search term 1","specific search term 2","specific search term 3"],"seo_score":85,"copy_score":80,"engagement_score":78,"seo_recommendations":"3 points précis pour le prochain article"}`,
       3000
     );
 
@@ -460,16 +478,44 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     const coverSVG = generateCoverSVG(article.title, article.category, article.deck || "");
     const coverDataUri = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(coverSVG)));
 
-    // Assembler contenu final
+    // Chercher des images pertinentes sur Unsplash
+    const imageQueries = article.images || [];
+    const imageResults = await Promise.all(
+      imageQueries.slice(0, 3).map((q: string) => searchImage(q))
+    );
+    const images = imageResults.filter(Boolean) as string[];
+
+    // Assembler contenu final avec images réparties
     const paragraphs = content.split("\n\n").filter((p: string) => p.trim());
-    const mid = Math.floor(paragraphs.length / 2);
     const ctaBlock = getCTAs(article.category);
 
     const parts: string[] = [];
+    // Cover SVG en premier
     parts.push(`[IMAGE:${coverDataUri}|${article.title}]`);
-    parts.push(...paragraphs.slice(0, mid));
-    parts.push(ctaBlock);
-    parts.push(...paragraphs.slice(mid));
+
+    // Répartir les images et CTA dans le contenu
+    const totalP = paragraphs.length;
+    const imgPositions = images.length >= 3
+      ? [Math.floor(totalP * 0.25), Math.floor(totalP * 0.5), Math.floor(totalP * 0.75)]
+      : images.length === 2
+      ? [Math.floor(totalP * 0.33), Math.floor(totalP * 0.66)]
+      : images.length === 1
+      ? [Math.floor(totalP * 0.5)]
+      : [];
+    const ctaPosition = Math.floor(totalP * 0.6);
+
+    for (let i = 0; i < totalP; i++) {
+      parts.push(paragraphs[i]);
+      // Insérer image si c'est la bonne position
+      const imgIdx = imgPositions.indexOf(i);
+      if (imgIdx !== -1 && images[imgIdx]) {
+        parts.push(`[IMAGE:${images[imgIdx]}|${escXml(imageQueries[imgIdx] || article.category)}]`);
+      }
+      // Insérer CTA
+      if (i === ctaPosition) {
+        parts.push(ctaBlock);
+      }
+    }
     parts.push("");
     parts.push(CLUB_BLOCK);
 
