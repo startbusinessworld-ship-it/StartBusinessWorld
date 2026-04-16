@@ -47,21 +47,37 @@ const LINKS: Record<string, string> = {
   club:      "https://www.startbusinessworld.com/club.html",
 };
 
-// ─── CTA FORMAT [OUTIL:Nom|Description|URL] ──────────────────────────────────
+// ─── CTA FORMAT [OUTIL:Nom|Description|URL|LogoURL] ─────────────────────────
+const LOGOS: Record<string, string> = {
+  luminos:   "https://luminoscorp.com/favicon.ico",
+  airwallex: "https://www.airwallex.com/favicon.ico",
+  legalplace:"https://www.legalplace.fr/favicon.ico",
+  shopify:   "https://cdn.shopify.com/shopifycloud/web/assets/v1/favicon-default.ico",
+  wix:       "https://www.wix.com/favicon.ico",
+  wise:      "https://wise.com/favicon.ico",
+  xtransfer: "https://www.xtransfer.cn/favicon.ico",
+  pingpong:  "https://www.pingpongx.com/favicon.ico",
+  airalo:    "https://www.airalo.com/favicon.ico",
+  capcut:    "https://www.capcut.com/favicon.ico",
+  udemy:     "https://www.udemy.com/staticx/udemy/images/v7/favicon.ico",
+  kiwi:      "https://www.kiwi.com/favicon.ico",
+  club:      "https://startbusinessworld-ship-it.github.io/StartBusinessWorld/favicon.svg",
+};
+
 const CTA: Record<string, string> = {
-  luminos:   `[OUTIL:Luminos Corp — Société Hong Kong|Création en 7 jours, 100% en ligne|${LINKS.luminos}]`,
-  airwallex: `[OUTIL:Airwallex — Compte multi-devises|Compatible Stripe, PayPal, zéro frais cachés|${LINKS.airwallex}]`,
-  legalplace:`[OUTIL:LegalPlace — Créer sa société|SASU EURL SAS. Code SBW15 pour -15%|${LINKS.legalplace}]`,
-  shopify:   `[OUTIL:Shopify — Boutique e-commerce|Plateforme n°1. Essai gratuit 3 mois|${LINKS.shopify}]`,
-  wix:       `[OUTIL:Wix — Site professionnel no-code|Simple, rapide, efficace|${LINKS.wix}]`,
-  wise:      `[OUTIL:Wise Business — Virements internationaux|Frais bas, multi-devises, transparent|${LINKS.wise}]`,
-  xtransfer: `[OUTIL:XTransfer — Paiements Chine|La référence pour payer tes fournisseurs chinois|${LINKS.xtransfer}]`,
-  pingpong:  `[OUTIL:PingPong — Encaisser à l'international|Idéal Amazon FBA et ventes en ligne|${LINKS.pingpong}]`,
-  airalo:    `[OUTIL:Airalo — eSIM de voyage|Reste connecté partout dans le monde|${LINKS.airalo}]`,
-  capcut:    `[OUTIL:CapCut — Montage vidéo|Reels, Shorts, TikTok — simple et pro|${LINKS.capcut}]`,
-  udemy:     `[OUTIL:Udemy — Formations en ligne|Des milliers de cours pour monter en compétences|${LINKS.udemy}]`,
-  kiwi:      `[OUTIL:Kiwi.com — Vols pas chers|Les meilleurs prix pour voyager partout|${LINKS.kiwi}]`,
-  club:      `[OUTIL:Club Start Business World|Formations + outils + communauté d'entrepreneurs|${LINKS.club}]`,
+  luminos:   `[OUTIL:Luminos Corp — Société Hong Kong|Création en 7 jours, 100% en ligne|${LINKS.luminos}|${LOGOS.luminos}]`,
+  airwallex: `[OUTIL:Airwallex — Compte multi-devises|Compatible Stripe, PayPal, zéro frais cachés|${LINKS.airwallex}|${LOGOS.airwallex}]`,
+  legalplace:`[OUTIL:LegalPlace — Créer sa société|SASU EURL SAS. Code SBW15 pour -15%|${LINKS.legalplace}|${LOGOS.legalplace}]`,
+  shopify:   `[OUTIL:Shopify — Boutique e-commerce|Plateforme n°1. Essai gratuit 3 mois|${LINKS.shopify}|${LOGOS.shopify}]`,
+  wix:       `[OUTIL:Wix — Site professionnel no-code|Simple, rapide, efficace|${LINKS.wix}|${LOGOS.wix}]`,
+  wise:      `[OUTIL:Wise Business — Virements internationaux|Frais bas, multi-devises, transparent|${LINKS.wise}|${LOGOS.wise}]`,
+  xtransfer: `[OUTIL:XTransfer — Paiements Chine|La référence pour payer tes fournisseurs chinois|${LINKS.xtransfer}|${LOGOS.xtransfer}]`,
+  pingpong:  `[OUTIL:PingPong — Encaisser à l'international|Idéal Amazon FBA et ventes en ligne|${LINKS.pingpong}|${LOGOS.pingpong}]`,
+  airalo:    `[OUTIL:Airalo — eSIM de voyage|Reste connecté partout dans le monde|${LINKS.airalo}|${LOGOS.airalo}]`,
+  capcut:    `[OUTIL:CapCut — Montage vidéo|Reels, Shorts, TikTok — simple et pro|${LINKS.capcut}|${LOGOS.capcut}]`,
+  udemy:     `[OUTIL:Udemy — Formations en ligne|Des milliers de cours pour monter en compétences|${LINKS.udemy}|${LOGOS.udemy}]`,
+  kiwi:      `[OUTIL:Kiwi.com — Vols pas chers|Les meilleurs prix pour voyager partout|${LINKS.kiwi}|${LOGOS.kiwi}]`,
+  club:      `[OUTIL:Club Start Business World|Formations + outils + communauté d'entrepreneurs|${LINKS.club}|${LOGOS.club}]`,
 };
 
 const CLUB_BLOCK = `> T'as aimé cet article ? Dans le Club SBW tu vas encore plus loin — formations complètes, outils exclusifs, et une communauté d'entrepreneurs qui bougent vraiment.
@@ -281,8 +297,17 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     const clean = raw.replace(/^```json\s*/i, "").replace(/```\s*$/i, "").trim();
     const article = JSON.parse(clean);
 
-    // Nettoyer markdown
+    // Nettoyer le titre (enlever # markdown, hashtags, guillemets)
+    article.title = (article.title || "")
+      .replace(/^#+\s*/, "")
+      .replace(/#\w+/g, "")
+      .replace(/^["']+|["']+$/g, "")
+      .trim();
+
+    // Nettoyer markdown du contenu
     let content: string = article.content || "";
+    // Supprimer les hashtags type #entrepreneur #business
+    content = content.replace(/#[A-Za-zÀ-ÿ]\w+/g, "");
     content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
     content = content.replace(/([^\n])\n(#{2,3} )/g, "$1\n\n$2");
     content = content.replace(/(#{2,3} [^\n]+)\n([^\n#>-])/g, "$1\n\n$2");

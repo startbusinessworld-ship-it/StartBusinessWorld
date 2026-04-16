@@ -1019,16 +1019,25 @@
         }
 
         function renderOutil(line) {
-          var m = line.match(/\[OUTIL:([^|]+)\|([^|]+)\|([^\]]+)\]/);
+          var m = line.match(/\[OUTIL:([^|]+)\|([^|]+)\|([^|\]]+)(?:\|([^\]]+))?\]/);
           if (!m) return null;
-          var nom = m[1], desc = m[2], url = m[3];
+          var nom = m[1], desc = m[2], url = m[3], logo = m[4] || "";
           var card = document.createElement("div");
           card.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:1rem 1.2rem;border:0.5px solid var(--subtle);border-radius:8px;margin:1.5rem 0;background:var(--surface)";
           var left = document.createElement("div");
           left.style.cssText = "display:flex;align-items:center;gap:0.8rem";
           var icon = document.createElement("div");
-          icon.style.cssText = "width:36px;height:36px;border-radius:8px;background:var(--bg);border:0.5px solid var(--subtle);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0";
-          icon.textContent = "🔗";
+          icon.style.cssText = "width:36px;height:36px;border-radius:8px;background:var(--bg);border:0.5px solid var(--subtle);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;overflow:hidden";
+          if (logo) {
+            var img = document.createElement("img");
+            img.src = logo;
+            img.alt = nom;
+            img.style.cssText = "width:24px;height:24px;object-fit:contain";
+            img.onerror = function() { this.parentNode.textContent = "🔗"; };
+            icon.appendChild(img);
+          } else {
+            icon.textContent = "🔗";
+          }
           var nameEl = document.createElement("div");
           nameEl.style.cssText = "font-weight:500;font-size:0.9rem";
           nameEl.textContent = nom;
@@ -1112,6 +1121,7 @@
             var nom = parts[0] || "";
             var desc = parts[1] || "";
             var ourl = parts[2] || "#";
+            var ologo = parts[3] || "";
             var card = document.createElement("a");
             card.href = ourl;
             card.target = "_blank";
@@ -1119,16 +1129,32 @@
             card.onmouseover = function() { this.style.borderColor = "var(--gold)"; };
             card.onmouseout = function() { this.style.borderColor = "var(--subtle)"; };
             var oleft = document.createElement("div");
+            oleft.style.cssText = "display:flex;align-items:center;gap:0.8rem";
+            var oicon = document.createElement("div");
+            oicon.style.cssText = "width:36px;height:36px;border-radius:8px;background:var(--surface);border:0.5px solid var(--subtle);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden";
+            if (ologo) {
+              var oimg = document.createElement("img");
+              oimg.src = ologo;
+              oimg.alt = nom;
+              oimg.style.cssText = "width:24px;height:24px;object-fit:contain";
+              oimg.onerror = function() { this.parentNode.textContent = "🔗"; };
+              oicon.appendChild(oimg);
+            } else {
+              oicon.textContent = "🔗";
+            }
+            var oinfo = document.createElement("div");
             var oname = document.createElement("div");
             oname.textContent = nom;
             oname.style.cssText = "font-weight:600;font-size:0.9rem;margin-bottom:3px";
-            oleft.appendChild(oname);
+            oinfo.appendChild(oname);
             if (desc) {
               var odesc = document.createElement("div");
               odesc.textContent = desc;
               odesc.style.cssText = "font-size:0.75rem;color:var(--muted)";
-              oleft.appendChild(odesc);
+              oinfo.appendChild(odesc);
             }
+            oleft.appendChild(oicon);
+            oleft.appendChild(oinfo);
             var octa = document.createElement("div");
             octa.textContent = "Découvrir →";
             octa.style.cssText = "font-size:0.78rem;font-weight:500;color:var(--gold);white-space:nowrap;border:1px solid rgba(166,124,58,0.3);padding:5px 12px;border-radius:5px";
