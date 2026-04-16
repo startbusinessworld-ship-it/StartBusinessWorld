@@ -448,7 +448,6 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
       category: article.category,
       tags: article.tags || [],
       content: contentFinal,
-      cover_url: coverDataUri,
       meta_title: article.meta_title || article.title,
       meta_description: article.meta_description || article.deck,
       tools: article.tools || [],
