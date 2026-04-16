@@ -237,14 +237,7 @@ var PLAN_LEVELS = { 'intro': 1, 'basic': 2, 'pro': 3, 'business': 4 };
 var userPlan = 'basic';
 var userPlanLevel = 2;
 
-// Formations qui nécessitent le plan Pro (basic n'y a pas accès, pro et business oui)
-var PRO_FORMATION_IDS = [
-  '09db6a77-9c6c-4c0a-96d7-a974595a1439', // Société Hong Kong
-  '94ec1de4-b507-4a44-9dcd-68230e41c154', // Boutique Shopify de A à Z
-  '6e167e1d-7d74-4a1d-9431-3f0fc4db3e71', // Préparer son projet e-commerce
-  'cb1ccca9-690d-404d-aa21-5e93ce8cd752', // Business Avec la Chine
-  '484c0d28-b2aa-47f0-9f6f-a87f41224a4d', // Amazon FBA de A à Z
-];
+// Le champ f.plan de la base Supabase détermine le plan requis (basic, pro, business)
 
 // ═══ INIT ═══
 async function init() {
@@ -356,7 +349,7 @@ function renderAll() {
 
   allData.forEach(function(f, fi) {
     // Vérifier si la formation nécessite un plan supérieur
-    var reqPlan = PRO_FORMATION_IDS.indexOf(f.id) !== -1 ? 'pro' : (f.required_plan || 'basic');
+    var reqPlan = f.plan || 'basic';
     var reqLevel = PLAN_LEVELS[reqPlan] || 2;
     var isLocked = userPlanLevel < reqLevel;
 
