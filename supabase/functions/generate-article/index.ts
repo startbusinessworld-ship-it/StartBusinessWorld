@@ -122,11 +122,17 @@ async function fetchSourceContent(topic: string, category?: string): Promise<str
     { name: "Shopify Blog FR", url: `https://www.shopify.com/fr/blog/search?q=${encodeURIComponent(topic)}` },
   ];
 
-  // Pour la catégorie Actualité, ajouter BFM Business comme source principale
+  // Sources spécifiques par catégorie
   if (category === "Actualité") {
     sites.unshift(
       { name: "BFM Business", url: `https://www.bfmtv.com/economie/` },
       { name: "BFM Entreprises", url: `https://www.bfmtv.com/economie/entreprises/` },
+    );
+  } else if (category === "Création de société") {
+    sites.unshift(
+      { name: "Service Public Entreprendre", url: `https://entreprendre.service-public.fr/vosdroits/N16178` },
+      { name: "Le Coin des Entrepreneurs — Création", url: `https://www.lecoindesentrepreneurs.fr/?s=${encodeURIComponent(topic)}` },
+      { name: "Luminos Corp", url: `https://www.luminoscorp.com/` },
     );
   }
 
