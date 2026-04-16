@@ -12,25 +12,37 @@ const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ANTHROPIC_KEY = Deno.env.get("ANTHROPIC_API_KEY")!;
 const sb = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
-// ─── SECTION BANNERS SVG ────────────────────────────────────────────────────
-function generateSectionBanner(text: string, emoji: string, color: string): string {
-  const shortText = text.length > 50 ? text.substring(0, 47) + "..." : text;
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="800" height="200">
-  <defs>
-    <linearGradient id="sb" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${color}" stop-opacity="0.15"/>
-      <stop offset="100%" stop-color="${color}" stop-opacity="0.05"/>
-    </linearGradient>
-  </defs>
-  <rect width="800" height="200" rx="12" fill="#0e0d0b"/>
-  <rect width="800" height="200" rx="12" fill="url(#sb)"/>
-  <rect x="0" y="0" width="4" height="200" rx="2" fill="${color}"/>
-  <text x="80" y="110" font-family="sans-serif" font-size="48">${emoji}</text>
-  <text x="150" y="105" font-family="Georgia, serif" font-size="28" font-weight="700" fill="white">${escXml(shortText)}</text>
-  <text x="150" y="140" font-family="sans-serif" font-size="14" fill="rgba(255,255,255,0.35)" letter-spacing="4">START BUSINESS WORLD</text>
-</svg>`;
-  return "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svg)));
+// ─── PEXELS — VRAIES PHOTOS ─────────────────────────────────────────────────
+const PEXELS_KEY = "PJHsWYbRdhFUIGqzplsRV4m7xAGmGMbRiLcTiDfClEdD1leyqx9rFy5r";
+
+async function searchPhoto(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=5&orientation=landscape&size=medium`,
+      { headers: { Authorization: PEXELS_KEY }, signal: AbortSignal.timeout(6000) }
+    );
+    const data = await res.json();
+    if (data.photos?.length > 0) {
+      const idx = Math.floor(Math.random() * Math.min(3, data.photos.length));
+      return data.photos[idx].src.large;
+    }
+    return null;
+  } catch { return null; }
 }
+
+// Termes de recherche photo par catégorie (en anglais, spécifiques)
+const CAT_PHOTO_QUERIES: Record<string, string[]> = {
+  "Création de société": ["business registration office", "entrepreneur signing documents", "startup team meeting"],
+  "Business Chine": ["china trade shipping containers", "chinese factory manufacturing", "canton fair exhibition"],
+  "Fiscalité": ["tax documents calculator", "accountant working laptop", "financial planning office"],
+  "Outils": ["laptop productivity tools", "digital workspace setup", "software dashboard screen"],
+  "E-commerce": ["online shopping packages", "ecommerce warehouse shipping", "shopify store laptop"],
+  "Expatriation": ["passport travel abroad", "digital nomad working cafe", "expat city skyline"],
+  "Finance": ["business finance charts", "bank transfer international", "money investment growth"],
+  "Import-Export": ["cargo ship port containers", "customs clearance documents", "freight logistics warehouse"],
+  "Mindset": ["entrepreneur motivation success", "morning routine productive", "focus determination work"],
+  "Actualité": ["business news newspaper", "stock market trading", "economy global trends"],
+};
 
 // ─── COVER SVG GENERATOR ─────────────────────────────────────────────────────
 const CAT_EMOJI: Record<string, string> = {
@@ -456,20 +468,28 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     // Nettoyer markdown du contenu
     let content: string = article.content || "";
 
+    // Normaliser les sauts de ligne (\\n littéral → vrai \n)
+    content = content.replace(/\\n/g, "\n");
+
     // Traiter ligne par ligne pour un nettoyage fiable
-    content = content.split("\n").map((line: string) => {
-      const trimmed = line.trim();
+    const cleanLines: string[] = [];
+    for (const line of content.split("\n")) {
+      let l = line;
       // Convertir # Titre (h1) en ## Titre
-      if (/^# [^#]/.test(trimmed)) {
-        return "#" + trimmed;  // # Titre → ## Titre
+      if (/^# [^#]/.test(l.trim())) {
+        l = "#" + l.trim();
       }
       // Supprimer les lignes qui ne sont que des hashtags (#entrepreneur #business)
-      if (/^(#[A-Za-zÀ-ÿ0-9]\S*\s*)+$/.test(trimmed) && !trimmed.startsWith("## ") && !trimmed.startsWith("### ")) {
-        return "";
+      if (/^(#[A-Za-zÀ-ÿ0-9]\S*[\s,]*)+$/.test(l.trim()) && !/^#{2,3} /.test(l.trim())) {
+        continue; // skip cette ligne
       }
       // Supprimer les hashtags en fin/milieu de ligne
-      return line.replace(/ #[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9_]*/g, "");
-    }).join("\n");
+      l = l.replace(/ #[A-Za-zÀ-ÿ0-9]\S*/g, "");
+      // Supprimer les hashtags en début de ligne qui ne sont pas des headers markdown
+      l = l.replace(/^#([^# \n])/gm, "$1");
+      cleanLines.push(l);
+    }
+    content = cleanLines.join("\n");
 
     // Fixer le formatage markdown
     content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
@@ -480,39 +500,33 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     const coverSVG = generateCoverSVG(article.title, article.category, article.deck || "");
     const coverDataUri = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(coverSVG)));
 
-    // Générer des banners SVG pour les sections (basés sur les ## titres)
-    const sectionTitles: string[] = [];
-    content.split("\n").forEach((line: string) => {
-      const m = line.match(/^## (.+)/);
-      if (m) sectionTitles.push(m[1].trim());
-    });
+    // Chercher 2 photos Pexels pertinentes pour la catégorie
+    const photoQueries = CAT_PHOTO_QUERIES[article.category] || ["business entrepreneur professional"];
+    const q1 = photoQueries[Math.floor(Math.random() * photoQueries.length)];
+    const q2 = photoQueries[Math.floor(Math.random() * photoQueries.length)];
+    const [photo1, photo2] = await Promise.all([searchPhoto(q1), searchPhoto(q2)]);
 
-    const catEmoji = CAT_EMOJI[article.category] || "📄";
-    const catColor = CAT_COLORS[article.category] || "#A67C3A";
-    const sectionEmojis = ["💡", "📋", "🎯", "✅", "🚀"];
-
-    // Assembler contenu final avec banners avant chaque section
+    // Assembler contenu final avec photos réparties
     const paragraphs = content.split("\n\n").filter((p: string) => p.trim());
     const ctaBlock = getCTAs(article.category);
-    const ctaPosition = Math.floor(paragraphs.length * 0.6);
+    const totalP = paragraphs.length;
+    const photo1Pos = Math.floor(totalP * 0.3);
+    const ctaPos = Math.floor(totalP * 0.55);
+    const photo2Pos = Math.floor(totalP * 0.75);
 
     const parts: string[] = [];
     parts.push(`[IMAGE:${coverDataUri}|${article.title}]`);
 
-    let sectionIdx = 0;
-    for (let i = 0; i < paragraphs.length; i++) {
-      const p = paragraphs[i];
-      // Si c'est un titre de section ##, ajouter un banner SVG avant
-      if (p.trim().startsWith("## ") && sectionIdx < 3) {
-        const sTitle = p.trim().replace(/^## /, "");
-        const sEmoji = sectionEmojis[sectionIdx % sectionEmojis.length];
-        const banner = generateSectionBanner(sTitle, sEmoji, catColor);
-        parts.push(`[IMAGE:${banner}|${sTitle}]`);
-        sectionIdx++;
+    for (let i = 0; i < totalP; i++) {
+      parts.push(paragraphs[i]);
+      if (i === photo1Pos && photo1) {
+        parts.push(`[IMAGE:${photo1}|${article.category}]`);
       }
-      parts.push(p);
-      if (i === ctaPosition) {
+      if (i === ctaPos) {
         parts.push(ctaBlock);
+      }
+      if (i === photo2Pos && photo2) {
+        parts.push(`[IMAGE:${photo2}|${article.title}]`);
       }
     }
     parts.push("");
