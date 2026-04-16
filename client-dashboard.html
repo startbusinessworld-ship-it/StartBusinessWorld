@@ -1544,17 +1544,30 @@
     try {
       const { data: { session } } = await sb.auth.getSession()
       if (!session) { window.location.href = 'client-login.html'; return }
-      const res = await fetch(SUPABASE_URL + '/functions/v1/create-checkout', {
+
+      showToast('Changement de plan en cours...', 'success')
+
+      const res = await fetch(SUPABASE_URL + '/functions/v1/upgrade-plan', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer ' + session.access_token
         },
-        body: JSON.stringify({ plan: plan, isIntro: false, userId: currentUser.id, email: currentUser.email })
+        body: JSON.stringify({ plan: plan })
       })
       const data = await res.json()
-      if (data.url) window.location.href = data.url
-      else showToast('Erreur: ' + (data.error || 'Impossible de créer le checkout'), 'error')
+
+      if (data.url) {
+        // Pas d'abonnement existant → redirection vers Stripe Checkout
+        window.location.href = data.url
+      } else if (data.success) {
+        // Upgrade direct sur l'abonnement existant
+        showToast('Plan mis à jour vers ' + plan.charAt(0).toUpperCase() + plan.slice(1) + ' !', 'success')
+        // Recharger le dashboard avec le nouveau plan
+        setTimeout(() => window.location.reload(), 1500)
+      } else {
+        showToast('Erreur: ' + (data.error || 'Échec du changement de plan'), 'error')
+      }
     } catch(err) {
       showToast('Erreur: ' + err.message, 'error')
     }
