@@ -484,7 +484,7 @@
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
         Articles & Ressources
       </div>
-      <div class="nav-item" onclick="window.location.href='membre-annuaire.html'">
+      <div class="nav-item" onclick="accessFournisseurs()">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
         Fournisseurs & Contacts
       </div>
@@ -735,7 +735,7 @@
             </div>
 
             <!-- 3. FOURNISSEURS -->
-            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-annuaire.html'">
+            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="accessFournisseurs()">
               <div class="card-head">
                 <div class="card-title">Fournisseurs & Contacts<span style="font-size:.55rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);border:1px solid rgba(166,124,58,.25);padding:1px 7px;border-radius:8px;margin-left:6px">Pro</span></div>
                 <div class="card-link">Voir l'annuaire →</div>
@@ -1523,7 +1523,17 @@
   }
 
   window.accessFournisseurs = function() {
-    window.location.href = 'membre-annuaire.html'
+    var proPlans = ['pro', 'business']
+    if (currentMember && proPlans.includes(currentMember.plan)) {
+      window.location.href = 'membre-annuaire.html'
+    } else {
+      document.getElementById('modalIcon').textContent = '📂'
+      document.getElementById('modalTitle').textContent = 'Accède aux fournisseurs vérifiés'
+      document.getElementById('modalDesc').textContent = 'L\'annuaire fournisseurs est réservé aux membres Pro et Business. Des contacts vérifiés, des prix négociés, zéro arnaque.'
+      document.getElementById('modalBusiness').querySelector('button[onclick*="handleUpgrade"]').setAttribute('onclick', "handleUpgrade(event,'pro')")
+      document.getElementById('modalBusiness').querySelector('button[onclick*="handleUpgrade"]').textContent = 'Passer au plan Pro — 79€/mois →'
+      document.getElementById('modalBusiness').style.display = 'flex'
+    }
   }
 
   window.accessGroupe = function() {
