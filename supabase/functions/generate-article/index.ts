@@ -39,26 +39,47 @@ const CAT_COLORS: Record<string, string> = {
   "Actualité": "#4A7FD4",
 };
 
+function wrapText(text: string, maxChars: number): string[] {
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    if (current && (current + " " + word).length > maxChars) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = current ? current + " " + word : word;
+    }
+  }
+  if (current) lines.push(current);
+  return lines.slice(0, 3); // max 3 lignes
+}
+
 function generateCoverSVG(title: string, category: string, deck: string): string {
   const emoji = CAT_EMOJI[category] || "📄";
   const accent = CAT_COLORS[category] || "#A67C3A";
 
-  // Couper le titre en 2 lignes si trop long
-  const words = title.split(" ");
-  let line1 = title;
-  let line2 = "";
-  if (title.length > 30) {
-    const mid = Math.ceil(words.length / 2);
-    line1 = words.slice(0, mid).join(" ");
-    line2 = words.slice(mid).join(" ");
-  }
+  // Découper le titre en lignes (max ~22 chars par ligne pour rester dans le cadre)
+  const lines = wrapText(title, 22);
+  const lineCount = lines.length;
 
-  // Adapter la taille de police selon la longueur
-  const fontSize1 = line1.length > 25 ? 72 : line1.length > 18 ? 85 : 100;
-  const fontSize2 = line2.length > 25 ? 72 : line2.length > 18 ? 85 : 100;
+  // Adapter la taille de police
+  const fontSize = lineCount >= 3 ? 58 : lineCount === 2 ? 68 : title.length > 20 ? 72 : 90;
+  const lineHeight = fontSize * 1.25;
+
+  // Position Y de départ pour centrer les lignes de titre
+  const titleBlockHeight = lineCount * lineHeight;
+  const titleStartY = 320 - titleBlockHeight / 2 + fontSize;
 
   // Tronquer le deck
-  const shortDeck = deck.length > 90 ? deck.substring(0, 87) + "..." : deck;
+  const shortDeck = deck.length > 80 ? deck.substring(0, 77) + "..." : deck;
+  const deckY = titleStartY + (lineCount - 1) * lineHeight + 70;
+
+  const titleLines = lines.map((line, i) => {
+    const color = i === lineCount - 1 && lineCount > 1 ? accent : "white";
+    const y = titleStartY + i * lineHeight;
+    return `<text x="700" y="${y}" text-anchor="middle" font-family="Georgia, serif" font-size="${fontSize}" font-weight="700" fill="${color}">${escXml(line)}</text>`;
+  }).join("\n  ");
 
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 788" width="1400" height="788">
   <defs>
@@ -70,11 +91,10 @@ function generateCoverSVG(title: string, category: string, deck: string): string
   <rect width="1400" height="788" fill="url(#bg)"/>
   <rect width="1400" height="788" fill="black" opacity="0.2"/>
   <text x="700" y="80" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="400" letter-spacing="10" fill="rgba(255,255,255,0.45)">START BUSINESS WORLD</text>
-  <text x="700" y="210" text-anchor="middle" font-size="80">${emoji}</text>
-  <text x="700" y="${line2 ? 360 : 400}" text-anchor="middle" font-family="Georgia, serif" font-size="${fontSize1}" font-weight="700" fill="white">${escXml(line1)}</text>
-  ${line2 ? `<text x="700" y="480" text-anchor="middle" font-family="Georgia, serif" font-size="${fontSize2}" font-weight="700" fill="${accent}">${escXml(line2)}</text>` : ""}
-  <text x="700" y="${line2 ? 580 : 520}" text-anchor="middle" font-family="sans-serif" font-size="24" font-weight="300" fill="rgba(255,255,255,0.5)">${escXml(shortDeck)}</text>
-  <rect x="650" y="${line2 ? 620 : 560}" width="100" height="3" rx="1.5" fill="${accent}" opacity="0.6"/>
+  <text x="700" y="160" text-anchor="middle" font-size="60">${emoji}</text>
+  ${titleLines}
+  <text x="700" y="${Math.min(deckY, 680)}" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="300" fill="rgba(255,255,255,0.45)">${escXml(shortDeck)}</text>
+  <rect x="650" y="${Math.min(deckY + 30, 720)}" width="100" height="3" rx="1.5" fill="${accent}" opacity="0.6"/>
 </svg>`;
 
   return svg;
@@ -416,15 +436,20 @@ RÉPONDS UNIQUEMENT EN JSON VALIDE (sauts de ligne = \\n):
     // Nettoyer markdown du contenu
     let content: string = article.content || "";
 
-    // Convertir # Titre (h1) en ## Titre (h2) — on ne veut pas de h1 dans le contenu
-    content = content.replace(/^# ([^\n#])/gm, "## $1");
-
-    // Supprimer les hashtags type #entrepreneur #business (milieu/fin de ligne)
-    content = content.replace(/ #[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9_]*/g, "");
-    // Supprimer les hashtags en début de ligne (pas suivis d'un espace = pas un header markdown)
-    content = content.replace(/^#([^#\s ])/gm, "$1");
-    // Supprimer les lignes qui ne contiennent que des hashtags
-    content = content.replace(/^(#[A-Za-zÀ-ÿ0-9]\S*\s*)+$/gm, "");
+    // Traiter ligne par ligne pour un nettoyage fiable
+    content = content.split("\n").map((line: string) => {
+      const trimmed = line.trim();
+      // Convertir # Titre (h1) en ## Titre
+      if (/^# [^#]/.test(trimmed)) {
+        return "#" + trimmed;  // # Titre → ## Titre
+      }
+      // Supprimer les lignes qui ne sont que des hashtags (#entrepreneur #business)
+      if (/^(#[A-Za-zÀ-ÿ0-9]\S*\s*)+$/.test(trimmed) && !trimmed.startsWith("## ") && !trimmed.startsWith("### ")) {
+        return "";
+      }
+      // Supprimer les hashtags en fin/milieu de ligne
+      return line.replace(/ #[A-Za-zÀ-ÿ0-9][A-Za-zÀ-ÿ0-9_]*/g, "");
+    }).join("\n");
 
     // Fixer le formatage markdown
     content = content.replace(/^(#{2,3})([^ \n])/gm, "$1 $2");
