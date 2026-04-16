@@ -118,7 +118,17 @@
       } catch(e) {}
 
       if (!PLANS_PAYANTS.includes(currentPlan)) {
-        window.location.href = 'plans.html'
+        // Créer le membre avec plan basic s'il n'existe pas
+        try {
+          await sb.from('members').upsert({
+            id: userId,
+            email: s.data.session.user.email,
+            plan: 'basic',
+            created_at: new Date().toISOString()
+          }, { onConflict: 'id' })
+        } catch(e) {}
+        // Recharger la page pour prendre en compte le nouveau plan
+        window.location.reload()
         return false
       }
     }

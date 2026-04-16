@@ -713,7 +713,7 @@
 
       if (!session) {
         sessionStorage.setItem('sbw_plan', plan)
-        window.location.href = 'plans.html'
+        window.location.href = 'client-login.html'
         return
       }
 
@@ -764,8 +764,7 @@
       const { data: { session } } = await _sb.auth.getSession()
 
       if (!session) {
-        // Pas de session — retour login
-        window.location.href = 'plans.html'
+        window.location.href = 'client-login.html'
         return
       }
 
@@ -781,7 +780,7 @@
             plan: 'basic',
             email: session.user.email,
             userId: session.user.id,
-            isIntro: true,
+            isIntro: false,
           }),
         })
         const data = await res.json()

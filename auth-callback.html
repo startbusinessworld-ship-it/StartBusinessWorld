@@ -25,42 +25,58 @@ const sb = supabase.createClient(
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
 )
 
-const PLANS_PAYANTS = ['intro', 'basic', 'pro', 'business']
-
-async function redirect(userId) {
+async function redirect(session) {
+  var user = session.user
   try {
-    const { data: userData } = await sb.from('users').select('role').eq('id', userId).single()
+    // Admin → dashboard direct
+    var { data: userData } = await sb.from('users').select('role').eq('id', user.id).single()
     if (userData?.role === 'admin') {
       window.location.href = 'client-dashboard.html'
       return
     }
-    const { data: member } = await sb.from('members').select('plan').eq('id', userId).single()
-    if (member && PLANS_PAYANTS.includes(member.plan)) {
-      window.location.href = 'client-dashboard.html'
-    } else {
-      window.location.href = 'plans.html'
+
+    // Chercher membre par ID
+    var { data: member } = await sb.from('members').select('plan').eq('id', user.id).single()
+
+    // Pas trouvé → chercher par email
+    if (!member) {
+      var { data: memberByEmail } = await sb.from('members').select('id, plan').eq('email', user.email).maybeSingle()
+      if (memberByEmail) {
+        await sb.from('members').update({ id: user.id, email: user.email }).eq('id', memberByEmail.id)
+        member = memberByEmail
+      }
     }
+
+    // Toujours pas de membre → le créer avec plan basic (inscription gratuite)
+    if (!member) {
+      var fullName = user.user_metadata?.full_name || user.user_metadata?.name || ''
+      await sb.from('members').upsert({
+        id: user.id,
+        email: user.email,
+        full_name: fullName,
+        plan: 'basic',
+        created_at: new Date().toISOString()
+      }, { onConflict: 'id' })
+    }
+
+    // Accès direct au dashboard
+    window.location.href = 'client-dashboard.html'
+
   } catch(e) {
-    window.location.href = 'plans.html'
+    console.error('Auth callback error:', e)
+    window.location.href = 'client-dashboard.html'
   }
 }
 
-// Supabase traite automatiquement le token dans le hash
 sb.auth.onAuthStateChange(async (event, session) => {
-  if (session) {
-    await redirect(session.user.id)
-  }
+  if (session) await redirect(session)
 })
 
-// Vérifier aussi si session déjà active
 sb.auth.getSession().then(({ data: { session } }) => {
-  if (session) redirect(session.user.id)
+  if (session) redirect(session)
 })
 
-// Timeout de sécurité — si rien après 5s → login
-setTimeout(() => {
-  window.location.href = 'client-login.html'
-}, 5000)
+setTimeout(() => { window.location.href = 'client-login.html' }, 8000)
 </script>
 </body>
 </html>

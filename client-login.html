@@ -213,7 +213,18 @@ async function redirectUser(userId) {
   if (member && plansPayants.includes(member.plan)) {
     window.location.href = 'client-dashboard.html'
   } else {
-    window.location.href = 'plans.html'
+    // Pas de membre ou plan inconnu → créer avec basic et accès direct
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) {
+      await sb.from('members').upsert({
+        id: userId,
+        email: session.user.email,
+        full_name: session.user.user_metadata?.full_name || '',
+        plan: 'basic',
+        created_at: new Date().toISOString()
+      }, { onConflict: 'id' })
+    }
+    window.location.href = 'client-dashboard.html'
   }
 }
 
