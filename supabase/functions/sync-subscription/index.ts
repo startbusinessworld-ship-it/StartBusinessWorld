@@ -7,7 +7,7 @@ const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
 const PRICE_TO_PLAN: Record<string, string> = {
   "price_1TIMA8LBxNkjNd23sNkSycog": "mensuel",
-  "price_1TIM2kA5M4c8fIsKmDwrKAAf": "annuel",
+  "price_1TNBzvLBxNkjNd23p62hTGuH": "annuel",
 }
 
 const corsHeaders = {
