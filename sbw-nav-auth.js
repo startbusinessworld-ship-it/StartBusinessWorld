@@ -56,17 +56,17 @@
         var user = session.user
         var name = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0]
         var initials = name.split(' ').map(function(n){ return n[0] }).join('').toUpperCase().slice(0,2)
-        var plansPayants = ['intro', 'basic', 'pro', 'business']
+        var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
 
         // Vérifier plan pour le lien dashboard
-        sb.from('members').select('plan').eq('id', user.id).single().then(function(res) {
+        sb.from('members').select('plan').eq('id', user.id).maybeSingle().then(function(res) {
           var member = res.data
           var isAdmin = false
-          sb.from('users').select('role').eq('id', user.id).single().then(function(r) {
+          sb.from('users').select('role').eq('id', user.id).maybeSingle().then(function(r) {
             isAdmin = r.data?.role === 'admin'
-            var dashUrl = (isAdmin || (member && plansPayants.includes(member.plan)))
+            var dashUrl = (isAdmin || (member && plansPaids.includes(member.plan)))
               ? 'client-dashboard.html'
-              : 'plans.html'
+              : 'club.html'
 
             container.innerHTML =
               '<div class="sbw-auth-wrap">' +

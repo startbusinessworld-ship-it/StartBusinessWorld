@@ -326,8 +326,6 @@
       nav { grid-template-columns: auto 1fr auto; padding:0 1rem; }
       .nav-back { display: none; }
       .nav-logo { text-align:center; font-size:1rem; }
-      .nav-desktop-link { display:none !important; }
-      .nav-mobile-login { display:flex !important; }
       .hero h1 { font-size: 2.2rem; }
       .hero-stats { gap: 1rem; flex-wrap:wrap; justify-content:center; }
       .hero { padding:4rem 1.2rem 2.5rem; }
@@ -369,10 +367,7 @@
   <div class="hamburger" id="ham" style="color:#F0EDE4"><span></span><span></span><span></span></div>
   <a href="index.html" class="nav-logo" style="text-decoration:none;color:#F0EDE4">Start Business World</a>
   <div class="nav-right" style="display:flex;align-items:center;gap:1rem">
-    <!-- Desktop : seulement Se connecter via sbw-auth -->
-    <span class="nav-desktop-link" data-sbw-auth></span>
-    <!-- Mobile uniquement : bouton Se connecter -->
-    <a href="#" class="nav-mobile-login" onclick="handleJoin(event,'mensuel')" style="display:none;padding:6px 12px;font-size:.75rem;background:rgba(166,124,58,.15);color:#A67C3A;border:0.5px solid rgba(166,124,58,.3);border-radius:7px;text-decoration:none;font-family:DM Sans,sans-serif;font-weight:500">S'abonner</a>
+    <span data-sbw-auth></span>
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mm-section">
@@ -812,56 +807,21 @@
     }
   }
 
-  // Déclencher le checkout automatiquement si ?checkout=1
+  // Auto-checkout : si l'utilisateur a choisi un plan avant login (sessionStorage.sbw_plan)
+  // et qu'il revient connecté, on lance direct le checkout
   window.addEventListener('load', async () => {
-    const urlParams = new URLSearchParams(window.location.search)
-    if (urlParams.get('checkout') !== '1') return
+    const pendingPlan = sessionStorage.getItem('sbw_plan')
+    if (!pendingPlan) return
 
-    // Nettoyer l'URL
-    history.replaceState({}, '', 'club.html')
+    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
+    const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+    const { data: { session } } = await _sb.auth.getSession()
+    if (!session) return
 
-    var checkoutStarted = false
-
-    async function startCheckout() {
-      if (checkoutStarted) return
-      checkoutStarted = true
-
-      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-      const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      const { data: { session } } = await _sb.auth.getSession()
-
-      if (!session) {
-        window.location.href = 'client-login.html'
-        return
-      }
-
-      // Session active — lancer Stripe
-      try {
-        const res = await fetch(`${SUPABASE_URL}/functions/v1/create-checkout`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            plan: 'basic',
-            email: session.user.email,
-            userId: session.user.id,
-            isIntro: false,
-          }),
-        })
-        const data = await res.json()
-        if (data.url) {
-          window.location.href = data.url
-        } else {
-          alert('Erreur : ' + (data.error || 'Impossible de créer le paiement'))
-        }
-      } catch(err) {
-        alert('Erreur de connexion. Réessaie.')
-      }
-    }
-
-    startCheckout()
+    sessionStorage.removeItem('sbw_plan')
+    currentPlan = pendingPlan
+    window.currentPlan = pendingPlan
+    handleJoin({ preventDefault: function(){} }, pendingPlan)
   })
 
   // Intersection Observer pour animations au scroll
