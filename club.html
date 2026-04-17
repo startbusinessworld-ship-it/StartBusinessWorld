@@ -401,26 +401,7 @@
     Formations complètes, groupe d'entraide actif et bons plans négociés — tout ce qu'il faut pour construire un business qui pense global.
   </p>
 
-  <!-- Toggle mensuel / annuel -->
-  <div class="pricing-toggle" style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:1.8rem">
-    <span id="toggleLabelM" style="font-size:.82rem;font-weight:500;color:rgba(240,237,228,0.35);transition:color .2s">Mensuel</span>
-    <div id="toggleSwitch" onclick="togglePlan()" style="width:50px;height:28px;border-radius:14px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);cursor:pointer;position:relative;transition:background .2s">
-      <div id="toggleDot" style="width:22px;height:22px;border-radius:50%;background:var(--gold);position:absolute;top:2px;left:25px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>
-    </div>
-    <span id="toggleLabelA" style="font-size:.82rem;font-weight:500;color:#F0EDE4;transition:color .2s">Annuel <span style="background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:4px">-37%</span></span>
-  </div>
-
-  <!-- Prix affiché -->
-  <div style="text-align:center;margin-bottom:1.5rem">
-    <div style="display:flex;align-items:baseline;justify-content:center;gap:6px">
-      <span id="priceNum" style="font-family:'DM Serif Display',serif;font-size:4rem;color:#F0EDE4;line-height:1;letter-spacing:-.03em">49€</span>
-      <span id="pricePeriod" style="font-size:.95rem;color:rgba(240,237,228,0.4);font-weight:300">/mois</span>
-    </div>
-    <div id="priceSub" style="font-size:.82rem;color:rgba(240,237,228,0.35);margin-top:8px;min-height:1.2em">597€ facturés par an</div>
-  </div>
-
-  <!-- Bouton CTA -->
-  <button id="heroCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Rejoindre maintenant →</button>
+  <a href="#rejoindre" class="hero-cta" style="display:inline-block" onclick="event.preventDefault();document.getElementById('rejoindre').scrollIntoView({behavior:'smooth'})">Rejoindre maintenant →</a>
   <div class="hero-cta-note">Sans engagement · Annulation en 1 clic</div>
 
   <div class="hero-stats">
@@ -672,18 +653,31 @@
   </div>
 </section>
 
-<!-- CTA FINAL -->
+<!-- CTA FINAL + PRICING -->
 <section class="cta-final" id="rejoindre">
   <h2>Prêt à penser<br><em>global ?</em></h2>
   <p>Rejoins le Club SBW et commence à construire ton business international dès aujourd'hui.</p>
-  <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin:1.5rem 0 1.2rem">
-    <span id="toggleLabelM2" style="font-size:.82rem;font-weight:500;color:rgba(240,237,228,0.35);transition:color .2s">Mensuel</span>
+
+  <!-- Toggle -->
+  <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin:2rem 0 1.5rem">
+    <span id="toggleLabelM" style="font-size:.82rem;font-weight:500;color:rgba(240,237,228,0.35);transition:color .2s">Mensuel</span>
     <div onclick="togglePlan()" style="width:50px;height:28px;border-radius:14px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);cursor:pointer;position:relative;transition:background .2s">
-      <div id="toggleDot2" style="width:22px;height:22px;border-radius:50%;background:var(--gold);position:absolute;top:2px;left:25px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>
+      <div id="toggleDot" style="width:22px;height:22px;border-radius:50%;background:var(--gold);position:absolute;top:2px;left:25px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>
     </div>
-    <span id="toggleLabelA2" style="font-size:.82rem;font-weight:500;color:#F0EDE4;transition:color .2s">Annuel <span style="background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:4px">-37%</span></span>
+    <span id="toggleLabelA" style="font-size:.82rem;font-weight:500;color:#F0EDE4;transition:color .2s">Annuel <span style="background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:4px">-37%</span></span>
   </div>
-  <button id="footerCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Rejoindre maintenant →</button>
+
+  <!-- Prix -->
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:baseline;justify-content:center;gap:6px">
+      <span id="priceNum" style="font-family:'DM Serif Display',serif;font-size:4rem;color:#F0EDE4;line-height:1;letter-spacing:-.03em">49€</span>
+      <span id="pricePeriod" style="font-size:.95rem;color:rgba(240,237,228,0.4);font-weight:300">/mois</span>
+    </div>
+    <div id="priceSub" style="font-size:.82rem;color:rgba(240,237,228,0.35);margin-top:8px">597€ facturés par an</div>
+  </div>
+
+  <!-- Bouton -->
+  <button onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Rejoindre maintenant →</button>
   <div class="hero-cta-note" style="margin-top:1rem">Sans engagement · Annulation en 1 clic</div>
 </section>
 
@@ -766,14 +760,12 @@
     }
 
 
-    ;['', '2'].forEach(function(s) {
-      var dot = document.getElementById('toggleDot' + s)
-      var lm = document.getElementById('toggleLabelM' + s)
-      var la = document.getElementById('toggleLabelA' + s)
-      if (dot) dot.style.left = goMensuel ? '3px' : '25px'
-      if (lm) lm.style.color = goMensuel ? '#F0EDE4' : 'rgba(240,237,228,0.35)'
-      if (la) la.style.color = goMensuel ? 'rgba(240,237,228,0.35)' : '#F0EDE4'
-    })
+    var dot = document.getElementById('toggleDot')
+    var lm = document.getElementById('toggleLabelM')
+    var la = document.getElementById('toggleLabelA')
+    if (dot) dot.style.left = goMensuel ? '3px' : '25px'
+    if (lm) lm.style.color = goMensuel ? '#F0EDE4' : 'rgba(240,237,228,0.35)'
+    if (la) la.style.color = goMensuel ? 'rgba(240,237,228,0.35)' : '#F0EDE4'
   }
   window.togglePlan = togglePlan
 
