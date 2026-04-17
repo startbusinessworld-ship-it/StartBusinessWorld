@@ -9,10 +9,6 @@ const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 const PRICE_TO_PLAN: Record<string, string> = {
   "price_1TIMA8LBxNkjNd23sNkSycog": "mensuel",
   "price_ANNUEL_597": "annuel",                // TODO: remplacer par le vrai Price ID Stripe
-  // Legacy — anciens prix toujours reconnus
-  "price_1TIM9hLBxNkjNd236Z3AfvoS": "mensuel",
-  "price_1TIMAPLBxNkjNd23KR5yVvdf": "mensuel",
-  "price_1TIQSWLBxNkjNd23gtGJ3LKp": "mensuel",
 }
 
 serve(async (req) => {
@@ -94,7 +90,7 @@ serve(async (req) => {
         const sub = event.data.object
         let subMemberId = sub.metadata?.supabase_id
         const priceId = sub.items?.data?.[0]?.price?.id
-        const plan = PRICE_TO_PLAN[priceId] || "basic"
+        const plan = PRICE_TO_PLAN[priceId] || "mensuel"
         const status = sub.status
         // Fallback: chercher par stripe_customer_id
         if (!subMemberId) {

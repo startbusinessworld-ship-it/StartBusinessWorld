@@ -70,10 +70,10 @@ serve(async (req) => {
       await sb.from("members").upsert({
         id: user.id,
         email: user.email!,
-        plan: "basic",
+        plan: "inscrit",
         created_at: new Date().toISOString()
       }, { onConflict: "id" })
-      member = { id: user.id, email: user.email!, plan: "basic", stripe_subscription_id: null, stripe_customer_id: null }
+      member = { id: user.id, email: user.email!, plan: "inscrit", stripe_subscription_id: null, stripe_customer_id: null }
     }
 
     // Si le membre a un abonnement Stripe actif → modifier l'abonnement

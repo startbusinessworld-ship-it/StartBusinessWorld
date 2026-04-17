@@ -9,10 +9,6 @@ const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 const SBW_PRICE_IDS = new Set([
   'price_1TIMA8LBxNkjNd23sNkSycog',  // mensuel 79€
   'price_ANNUEL_597',                 // annuel 597€ — TODO: remplacer par le vrai Price ID
-  // Legacy
-  'price_1TIM9hLBxNkjNd236Z3AfvoS',
-  'price_1TIMAPLBxNkjNd23KR5yVvdf',
-  'price_1TIQSWLBxNkjNd23gtGJ3LKp',
 ])
 
 const corsHeaders = {
