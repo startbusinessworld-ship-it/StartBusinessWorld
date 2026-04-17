@@ -1,0 +1,21 @@
+project_id = "grwimhqsthcmfwblwdwg"
+
+# Les fonctions vérifient elles-mêmes le JWT avec sb.auth.getUser(token)
+# On désactive la vérif auto de Supabase qui ne supporte pas ES256
+
+[functions.create-checkout]
+verify_jwt = false
+
+[functions.upgrade-plan]
+verify_jwt = false
+
+[functions.sync-subscription]
+verify_jwt = false
+
+[functions.get-stripe-stats]
+verify_jwt = false
+
+# Stripe webhook: pas d'Authorization header (vient de Stripe, pas d'un user)
+# Signature vérifiée via verifyWebhook() dans le code
+[functions.stripe-webhook]
+verify_jwt = false
