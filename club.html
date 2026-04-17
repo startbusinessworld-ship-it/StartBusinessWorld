@@ -372,12 +372,11 @@
     <!-- Desktop : seulement Se connecter via sbw-auth -->
     <span class="nav-desktop-link" data-sbw-auth></span>
     <!-- Mobile uniquement : bouton Se connecter -->
-    <a href="client-login.html?mode=login" class="nav-mobile-login" style="display:none;padding:6px 12px;font-size:.75rem;background:rgba(166,124,58,.15);color:#A67C3A;border:0.5px solid rgba(166,124,58,.3);border-radius:7px;text-decoration:none;font-family:DM Sans,sans-serif;font-weight:500">Se connecter</a>
+    <a href="#" class="nav-mobile-login" onclick="handleJoin(event,'mensuel')" style="display:none;padding:6px 12px;font-size:.75rem;background:rgba(166,124,58,.15);color:#A67C3A;border:0.5px solid rgba(166,124,58,.3);border-radius:7px;text-decoration:none;font-family:DM Sans,sans-serif;font-weight:500">S'abonner</a>
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mm-section">
-      <a href="client-login.html?mode=login" class="mm-link secondary">Se connecter</a>
-      <a href="client-login.html" class="mm-link primary">Rejoindre le Club →</a>
+      <a href="#" class="mm-link primary" onclick="handleJoin(event,'mensuel')">S'abonner — 79€/mois →</a>
     </div>
     <div class="mm-section">
       <a href="index.html" class="mm-link" style="color:#F0EDE4">🏠 Accueil</a>
@@ -671,8 +670,18 @@
 <section class="cta-final" id="rejoindre">
   <h2>Prêt à penser<br><em>global ?</em></h2>
   <p>Rejoins le Club SBW et commence à construire ton business international dès aujourd'hui.</p>
-  <a href="client-login.html" class="hero-cta" style="display:inline-block;margin-top:1.5rem">Rejoindre le Club SBW →</a>
-  <div class="hero-cta-note" style="margin-top:1rem">Sans engagement · Accès immédiat · Annulation en 1 clic</div>
+  <div class="hero-pricing" style="margin-top:1.5rem">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(166,124,58,0.3);border-radius:12px;padding:1.2rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:180px" onclick="handleJoin(event,'mensuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(166,124,58,0.3)'">
+      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:6px">Mensuel</div>
+      <div class="price-main"><span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">79€</span><span style="font-size:.8rem;color:rgba(240,237,228,0.4)">/mois</span></div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.2rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:180px;position:relative" onclick="handleJoin(event,'annuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+      <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:8px">-37%</div>
+      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(240,237,228,0.5);margin-bottom:6px">Annuel</div>
+      <div class="price-main"><span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">597€</span><span style="font-size:.8rem;color:rgba(240,237,228,0.4)">/an</span></div>
+    </div>
+  </div>
+  <div class="hero-cta-note" style="margin-top:1rem">Sans engagement · Annulation en 1 clic</div>
 </section>
 
 <!-- FOOTER MINI -->
