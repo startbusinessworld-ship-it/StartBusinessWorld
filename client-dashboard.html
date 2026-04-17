@@ -534,7 +534,7 @@
       </div>
       <div class="topbar-actions">
         <a href="index.html" class="btn-outline">← Retour au site</a>
-        <a href="client-login.html#rejoindre" class="btn-gold" id="upgradeBtn" style="display:none">Passer à 29€/mois</a>
+        <a href="club.html#rejoindre" class="btn-gold" id="upgradeBtn" style="display:none">Passer à 29€/mois</a>
       </div>
     </div>
 
@@ -1507,7 +1507,7 @@
     // Mettre à jour dans Supabase
     await sb.from('members').update({ plan: 'cancelled', stripe_subscription_status: 'canceled' }).eq('id', currentUser.id)
     showToast('Abonnement annulé.')
-    setTimeout(() => window.location.href = 'client-login.html', 2000)
+    setTimeout(() => window.location.href = 'club.html', 2000)
   }
 
   window.handleLogout = async function() {

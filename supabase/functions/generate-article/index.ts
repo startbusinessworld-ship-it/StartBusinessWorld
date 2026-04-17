@@ -150,7 +150,7 @@ const LINKS: Record<string, string> = {
   capcut:    "https://capcutaffiliateprogram.pxf.io/jeK1EP",
   udemy:     "https://trk.udemy.com/c/5645860/3193860/39854",
   kiwi:      "https://kiwi.com/user/refer-friend/",
-  club:      "https://www.startbusinessworld.com/client-login.html",
+  club:      "https://www.startbusinessworld.com/club.html",
 };
 
 // ─── CTA FORMAT [OUTIL:Nom|Description|URL|LogoURL] ─────────────────────────
