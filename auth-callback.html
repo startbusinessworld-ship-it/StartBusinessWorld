@@ -27,6 +27,7 @@ const sb = supabase.createClient(
 
 async function redirect(session) {
   var user = session.user
+  var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
   try {
     // Admin → dashboard direct
     var { data: userData } = await sb.from('users').select('role').eq('id', user.id).single()
@@ -47,24 +48,28 @@ async function redirect(session) {
       }
     }
 
-    // Toujours pas de membre → le créer avec plan basic (inscription gratuite)
+    // Toujours pas de membre → le créer avec plan inscrit
     if (!member) {
       var fullName = user.user_metadata?.full_name || user.user_metadata?.name || ''
       await sb.from('members').upsert({
         id: user.id,
         email: user.email,
         full_name: fullName,
-        plan: 'basic',
+        plan: 'inscrit',
         created_at: new Date().toISOString()
       }, { onConflict: 'id' })
     }
 
-    // Accès direct au dashboard
-    window.location.href = 'client-dashboard.html'
+    // Si plan payé → dashboard, sinon → club.html pour choisir sa formule
+    if (member && plansPaids.includes(member.plan)) {
+      window.location.href = 'client-dashboard.html'
+    } else {
+      window.location.href = 'club.html'
+    }
 
   } catch(e) {
     console.error('Auth callback error:', e)
-    window.location.href = 'client-dashboard.html'
+    window.location.href = 'club.html'
   }
 }
 

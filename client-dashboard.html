@@ -1300,26 +1300,16 @@
     currentMember = member
 
     if (!isAdmin) {
-      const aPaye = member && plansPayants.includes(member.plan)
+      const plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+      const aPaye = member && plansPaids.includes(member.plan)
 
       // Vérifier trial prestige (3 jours offerts)
       const trialActif = member?.trial_plan && member?.trial_expires_at &&
                          new Date(member.trial_expires_at) > new Date()
 
       if (!aPaye && !trialActif) {
-        // Créer un membre basic plutôt que rediriger vers plans.html
-        await sb.from('members').upsert({
-          id: currentUser.id,
-          email: currentUser.email,
-          full_name: currentUser.user_metadata?.full_name || '',
-          plan: 'basic',
-          created_at: new Date().toISOString()
-        }, { onConflict: 'id' })
-        const { data: created } = await sb.from('members').select('*').eq('id', currentUser.id).single()
-        if (created) {
-          member = created
-          currentMember = created
-        }
+        window.location.href = 'club.html'
+        return
       }
 
       // Si trial actif, utiliser le plan trial pour les accès

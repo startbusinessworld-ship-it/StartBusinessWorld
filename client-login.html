@@ -168,7 +168,7 @@ var isLoginMode = new URLSearchParams(window.location.search).get('mode') === 'l
 })()
 
 async function redirectUser(userId) {
-  const plansPayants = ['inscrit', 'intro', 'basic', 'pro', 'business', 'mensuel', 'annuel']
+  const plansPaids = ['pro', 'business', 'mensuel', 'annuel']
 
   // Vérifier si admin
   const { data: userData } = await sb.from('users').select('role').eq('id', userId).single()
@@ -192,8 +192,22 @@ async function redirectUser(userId) {
     }
   }
 
-  // Si pas de plan payant, tenter une sync Stripe
-  if (!member || !plansPayants.includes(member.plan)) {
+  // Créer le membre s'il n'existe pas
+  if (!member) {
+    const { data: { session } } = await sb.auth.getSession()
+    if (session) {
+      await sb.from('members').upsert({
+        id: userId,
+        email: session.user.email,
+        full_name: session.user.user_metadata?.full_name || '',
+        plan: 'inscrit',
+        created_at: new Date().toISOString()
+      }, { onConflict: 'id' })
+    }
+  }
+
+  // Tenter sync Stripe si pas de plan payé
+  if (!member || !plansPaids.includes(member.plan)) {
     try {
       const { data: { session } } = await sb.auth.getSession()
       if (session) {
@@ -210,21 +224,11 @@ async function redirectUser(userId) {
     } catch(e) {}
   }
 
-  if (member && plansPayants.includes(member.plan)) {
+  // Si plan payé → dashboard, sinon → club.html pour choisir sa formule
+  if (member && plansPaids.includes(member.plan)) {
     window.location.href = 'client-dashboard.html'
   } else {
-    // Pas de membre ou plan inconnu → créer avec basic et accès direct
-    const { data: { session } } = await sb.auth.getSession()
-    if (session) {
-      await sb.from('members').upsert({
-        id: userId,
-        email: session.user.email,
-        full_name: session.user.user_metadata?.full_name || '',
-        plan: 'basic',
-        created_at: new Date().toISOString()
-      }, { onConflict: 'id' })
-    }
-    window.location.href = 'client-dashboard.html'
+    window.location.href = 'club.html'
   }
 }
 
