@@ -401,21 +401,27 @@
     Formations complètes, groupe d'entraide actif et bons plans négociés — tout ce qu'il faut pour construire un business qui pense global.
   </p>
 
-  <div class="hero-pricing">
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(166,124,58,0.3);border-radius:12px;padding:1.5rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:200px" onclick="handleJoin(event,'mensuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(166,124,58,0.3)'">
-      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px">Mensuel</div>
-      <div class="price-main"><span class="price-num">79€</span><span class="price-period">/mois</span></div>
-      <div style="font-size:.72rem;color:rgba(240,237,228,0.35);margin-top:6px">Sans engagement</div>
+  <!-- Toggle mensuel / annuel -->
+  <div class="pricing-toggle" style="display:flex;align-items:center;gap:12px;justify-content:center;margin-bottom:1.8rem">
+    <span id="toggleLabelM" style="font-size:.82rem;font-weight:500;color:#F0EDE4;transition:color .2s">Mensuel</span>
+    <div id="toggleSwitch" onclick="togglePlan()" style="width:50px;height:28px;border-radius:14px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);cursor:pointer;position:relative;transition:background .2s">
+      <div id="toggleDot" style="width:22px;height:22px;border-radius:50%;background:var(--gold);position:absolute;top:2px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>
     </div>
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:200px;position:relative" onclick="handleJoin(event,'annuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
-      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap">-37%</div>
-      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(240,237,228,0.5);margin-bottom:8px">Annuel</div>
-      <div class="price-main"><span class="price-num">597€</span><span class="price-period">/an</span></div>
-      <div style="font-size:.72rem;color:rgba(240,237,228,0.35);margin-top:6px">49,75€/mois</div>
-    </div>
+    <span id="toggleLabelA" style="font-size:.82rem;font-weight:500;color:rgba(240,237,228,0.35);transition:color .2s">Annuel <span style="background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:4px">-37%</span></span>
   </div>
 
-  <div class="hero-cta-note">Sans engagement · Acces immediat · Annulation en 1 clic</div>
+  <!-- Prix affiché -->
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <div style="display:flex;align-items:baseline;justify-content:center;gap:6px">
+      <span id="priceNum" style="font-family:'DM Serif Display',serif;font-size:4rem;color:#F0EDE4;line-height:1;letter-spacing:-.03em;transition:opacity .15s">79€</span>
+      <span id="pricePeriod" style="font-size:.95rem;color:rgba(240,237,228,0.4);font-weight:300">/mois</span>
+    </div>
+    <div id="priceSub" style="font-size:.78rem;color:rgba(240,237,228,0.3);margin-top:6px;min-height:1.2em">Sans engagement</div>
+  </div>
+
+  <!-- Bouton CTA -->
+  <button id="heroCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">S'abonner — 79€/mois →</button>
+  <div class="hero-cta-note">Sans engagement · Annulation en 1 clic</div>
 
   <div class="hero-stats">
     <div class="hero-stat">
@@ -670,17 +676,14 @@
 <section class="cta-final" id="rejoindre">
   <h2>Prêt à penser<br><em>global ?</em></h2>
   <p>Rejoins le Club SBW et commence à construire ton business international dès aujourd'hui.</p>
-  <div class="hero-pricing" style="margin-top:1.5rem">
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(166,124,58,0.3);border-radius:12px;padding:1.2rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:180px" onclick="handleJoin(event,'mensuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(166,124,58,0.3)'">
-      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:6px">Mensuel</div>
-      <div class="price-main"><span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">79€</span><span style="font-size:.8rem;color:rgba(240,237,228,0.4)">/mois</span></div>
+  <div style="display:flex;align-items:center;gap:12px;justify-content:center;margin:1.5rem 0 1.2rem">
+    <span id="toggleLabelM2" style="font-size:.82rem;font-weight:500;color:#F0EDE4;transition:color .2s">Mensuel</span>
+    <div onclick="togglePlan()" style="width:50px;height:28px;border-radius:14px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.15);cursor:pointer;position:relative;transition:background .2s">
+      <div id="toggleDot2" style="width:22px;height:22px;border-radius:50%;background:var(--gold);position:absolute;top:2px;left:3px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)"></div>
     </div>
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.2rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:180px;position:relative" onclick="handleJoin(event,'annuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
-      <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:8px">-37%</div>
-      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(240,237,228,0.5);margin-bottom:6px">Annuel</div>
-      <div class="price-main"><span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">597€</span><span style="font-size:.8rem;color:rgba(240,237,228,0.4)">/an</span></div>
-    </div>
+    <span id="toggleLabelA2" style="font-size:.82rem;font-weight:500;color:rgba(240,237,228,0.35);transition:color .2s">Annuel <span style="background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:4px">-37%</span></span>
   </div>
+  <button id="footerCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">S'abonner — 79€/mois →</button>
   <div class="hero-cta-note" style="margin-top:1rem">Sans engagement · Annulation en 1 clic</div>
 </section>
 
@@ -739,6 +742,42 @@
       }
     })
   }
+
+  // ═══ TOGGLE MENSUEL / ANNUEL ═══
+  var currentPlan = 'mensuel'
+  window.currentPlan = currentPlan
+
+  function togglePlan() {
+    var isAnnuel = currentPlan === 'mensuel'
+    currentPlan = isAnnuel ? 'annuel' : 'mensuel'
+    window.currentPlan = currentPlan
+
+    // Prix hero
+    var num = document.getElementById('priceNum')
+    var period = document.getElementById('pricePeriod')
+    var sub = document.getElementById('priceSub')
+    if (num) { num.textContent = isAnnuel ? '597€' : '79€' }
+    if (period) { period.textContent = isAnnuel ? '/an' : '/mois' }
+    if (sub) { sub.textContent = isAnnuel ? 'Soit 49,75€/mois — économise 37%' : 'Sans engagement' }
+
+    // Boutons CTA
+    var ctaText = isAnnuel ? 'S\'abonner — 597€/an →' : 'S\'abonner — 79€/mois →'
+    var heroCta = document.getElementById('heroCta')
+    var footerCta = document.getElementById('footerCta')
+    if (heroCta) heroCta.textContent = ctaText
+    if (footerCta) footerCta.textContent = ctaText
+
+    // Toggle dots (hero + footer)
+    ;['', '2'].forEach(function(s) {
+      var dot = document.getElementById('toggleDot' + s)
+      var lm = document.getElementById('toggleLabelM' + s)
+      var la = document.getElementById('toggleLabelA' + s)
+      if (dot) dot.style.left = isAnnuel ? '25px' : '3px'
+      if (lm) lm.style.color = isAnnuel ? 'rgba(240,237,228,0.35)' : '#F0EDE4'
+      if (la) la.style.color = isAnnuel ? '#F0EDE4' : 'rgba(240,237,228,0.35)'
+    })
+  }
+  window.togglePlan = togglePlan
 
   async function handleJoin(e, plan) {
     e.preventDefault()
