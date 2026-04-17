@@ -158,13 +158,16 @@
     allMembers = data || []
 
     const inscrit = allMembers.filter(m => m.plan === 'inscrit').length
+    const mensuel = allMembers.filter(m => m.plan === 'mensuel').length
+    const annuel = allMembers.filter(m => m.plan === 'annuel').length
+    // Legacy plans
     const intro = allMembers.filter(m => m.plan === 'intro').length
     const basic = allMembers.filter(m => m.plan === 'basic').length
     const pro = allMembers.filter(m => m.plan === 'pro').length
     const business = allMembers.filter(m => m.plan === 'business').length
     const cancelled = allMembers.filter(m => m.plan === 'cancelled').length
-    const totalPayants = intro + basic + pro + business
-    const mrr = (intro * 1) + (basic * 29) + (pro * 79) + (business * 149)
+    const totalPayants = mensuel + annuel + intro + basic + pro + business
+    const mrr = (mensuel * 79) + (annuel * 597/12) + (intro * 1) + (basic * 29) + (pro * 79) + (business * 149)
 
     document.getElementById('memberCount').textContent = totalPayants + ' membres actifs'
     document.getElementById('mActive').textContent = totalPayants

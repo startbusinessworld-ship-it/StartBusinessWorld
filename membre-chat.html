@@ -606,7 +606,8 @@ async function init() {
   var member = memberRes.data;
   var isAdmin = await window.SBW_checkAdmin(user.id);
   window.SBW_showAdminBadge();
-  var isBusiness = member?.plan === 'business' || isAdmin;
+  var plansPaids = ['business', 'mensuel', 'annuel'];
+  var isBusiness = (member?.plan && plansPaids.includes(member.plan)) || isAdmin;
 
   if (!isBusiness) {
     // Affiche un écran de lock au lieu du chat

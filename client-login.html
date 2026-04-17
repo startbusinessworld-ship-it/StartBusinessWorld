@@ -282,16 +282,16 @@ async function handleSubmit() {
       })
       if (error) { showError(error.message); return }
       if (data.user) {
-        // Créer profil members avec accès direct
+        // Créer profil members (inscrit = pas encore abonné)
         await sb.from('members').upsert({
           id: data.user.id,
           email: email,
           full_name: prenom,
-          plan: 'basic',
+          plan: 'inscrit',
           created_at: new Date().toISOString()
         }, { onConflict: 'id' })
-        // Accès direct au dashboard
-        window.location.href = 'client-dashboard.html'
+        // Rediriger vers Club pour choisir sa formule et payer
+        window.location.href = 'club.html'
       }
     }
   } catch(e) {

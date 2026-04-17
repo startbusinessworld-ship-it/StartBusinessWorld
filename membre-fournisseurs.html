@@ -302,7 +302,8 @@ async function init() {
   // Vérifier le plan
   var memberRes = await SB.from('members').select('plan').eq('email', user.email).maybeSingle();
   var plan = memberRes.data?.plan;
-  var hasAccess = (plan === 'pro' || plan === 'business');
+  var plansPaids = ['pro', 'business', 'mensuel', 'annuel'];
+  var hasAccess = plan && plansPaids.includes(plan);
 
   if (!hasAccess) {
     showLockScreen();

@@ -33,7 +33,7 @@
   <div class="sub" id="sub">Tu vas être redirigé vers notre page de paiement sécurisé.</div>
   <div class="error-box" id="errorBox">
     <p id="errorMsg">Une erreur est survenue.</p>
-    <a href="plans.html" class="btn">Réessayer →</a>
+    <a href="club.html" class="btn">Réessayer →</a>
     <a href="client-login.html" class="btn-out" onclick="logout()">Se déconnecter</a>
   </div>
 </div>
@@ -95,15 +95,10 @@ async function startCheckout(session) {
     return
   }
 
-  // Vérifier si c'est un upgrade ou un premier paiement
-  const { data: member } = await sb.from('members').select('plan, stripe_subscription_status').eq('id', session.user.id).single()
-  const targetPlan = sessionStorage.getItem('sbw_plan') || 'mensuel'
-  const planLevels = { 'inscrit': 1, 'intro': 1, 'basic': 1, 'pro': 2, 'business': 3, 'mensuel': 2, 'annuel': 3 }
-  const currentLevel = planLevels[member?.plan] || 0
-  const targetLevel = planLevels[targetPlan] || 2
-
-  // Si le membre a déjà ce plan ou un plan supérieur → dashboard
-  if (member && currentLevel >= targetLevel && currentLevel > 0 && member.stripe_subscription_status !== 'canceled') {
+  // Si déjà abonné actif → dashboard
+  const plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+  const { data: member } = await sb.from('members').select('plan, stripe_subscription_status').eq('id', session.user.id).maybeSingle()
+  if (member && plansPaids.includes(member.plan) && member.stripe_subscription_status !== 'canceled') {
     window.location.href = 'client-dashboard.html'
     return
   }

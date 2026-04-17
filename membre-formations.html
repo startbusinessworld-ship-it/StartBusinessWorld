@@ -259,16 +259,16 @@ async function init() {
       memberData = memberByEmail;
     }
   }
-  // Si pas de membre, créer avec basic
+  // Si pas de membre, créer avec inscrit (pas encore abonné)
   if (!memberData) {
     await SB.from('members').upsert({
       id: user.id,
       email: user.email,
       full_name: fullName,
-      plan: 'basic',
+      plan: 'inscrit',
       created_at: new Date().toISOString()
     }, { onConflict: 'id' });
-    memberData = { plan: 'basic' };
+    memberData = { plan: 'inscrit' };
   }
   // Déterminer le plan effectif
   var effectivePlan = memberData.plan;
@@ -326,42 +326,26 @@ async function loadAll() {
 }
 
 // ═══ UPGRADE ═══
-async function doUpgrade(plan) {
-  try {
-    var s = await SB.auth.getSession();
-    if (!s.data.session) { window.location.href = 'client-login.html'; return; }
-    var res = await fetch('https://grwimhqsthcmfwblwdwg.supabase.co/functions/v1/upgrade-plan', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.data.session.access_token },
-      body: JSON.stringify({ plan: plan })
-    });
-    var data = await res.json();
-    if (data.url) { window.location.href = data.url; }
-    else if (data.success) { window.location.reload(); }
-    else { alert('Erreur: ' + (data.error || 'Réessaie')); }
-  } catch(e) { alert('Erreur: ' + e.message); }
+// Redirige vers club.html pour choisir la formule (mensuel ou annuel)
+function doUpgrade() {
+  window.location.href = 'club.html';
 }
 
 // ═══ LOCK CARD ═══
-function applyLock(card, reqPlan) {
-  var planName = reqPlan.charAt(0).toUpperCase() + reqPlan.slice(1);
-  var prices = { 'pro': '79', 'business': '149' };
-  var price = prices[reqPlan] || '79';
-
+function applyLock(card) {
   card.style.position = 'relative';
   card.style.overflow = 'hidden';
 
   var lock = document.createElement('div');
   lock.style.cssText = 'position:absolute;inset:0;z-index:10;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:12px;cursor:pointer';
   lock.innerHTML = '<div style="font-size:2rem;margin-bottom:8px">🔒</div>'
-    + '<div style="color:#fff;font-size:0.85rem;font-weight:600;margin-bottom:4px">Plan ' + planName + '</div>'
-    + '<div style="color:rgba(255,255,255,0.6);font-size:0.72rem;margin-bottom:12px">' + price + '€/mois</div>'
-    + '<div style="background:#A67C3A;color:#fff;padding:10px 24px;border-radius:6px;font-size:0.82rem;font-weight:500">Passer au plan ' + planName + ' →</div>';
+    + '<div style="color:#fff;font-size:0.85rem;font-weight:600;margin-bottom:4px">Réservé au Club SBW</div>'
+    + '<div style="color:rgba(255,255,255,0.6);font-size:0.72rem;margin-bottom:12px">À partir de 79€/mois</div>'
+    + '<div style="background:#A67C3A;color:#fff;padding:10px 24px;border-radius:6px;font-size:0.82rem;font-weight:500">Rejoindre le Club →</div>';
 
   lock.onclick = function(e) {
     e.stopPropagation();
-    lock.querySelector('div:last-child').textContent = 'Chargement...';
-    doUpgrade(reqPlan);
+    doUpgrade();
   };
 
   card.appendChild(lock);
