@@ -90,6 +90,9 @@ serve(async (req) => {
         const sub = event.data.object
         let subMemberId = sub.metadata?.supabase_id
         const priceId = sub.items?.data?.[0]?.price?.id
+        if (priceId && !PRICE_TO_PLAN[priceId]) {
+          console.warn(`Price ID inconnu dans sub.updated: ${priceId}`)
+        }
         const plan = PRICE_TO_PLAN[priceId] || "mensuel"
         const status = sub.status
         // Fallback: chercher par stripe_customer_id

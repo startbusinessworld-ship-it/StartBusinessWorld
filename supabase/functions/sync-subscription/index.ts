@@ -40,10 +40,10 @@ serve(async (req) => {
     }
 
     // Récupérer le membre
-    const { data: member } = await sb.from("members")
+    let { data: member } = await sb.from("members")
       .select("id, email, plan, stripe_customer_id")
       .eq("id", user.id)
-      .single()
+      .maybeSingle()
 
     if (!member) {
       // Fallback: chercher par email dans members
@@ -63,11 +63,12 @@ serve(async (req) => {
       }
     }
 
-    // Si pas de customer Stripe, chercher par email
+    // Si pas de customer Stripe, chercher par email (escape les apostrophes)
     let customerId = member.stripe_customer_id
-    if (!customerId) {
+    if (!customerId && member.email) {
+      const safeEmail = member.email.replace(/'/g, "\\'")
       const searchRes = await fetch(
-        `https://api.stripe.com/v1/customers/search?query=email:'${member.email}'`,
+        `https://api.stripe.com/v1/customers/search?query=email:'${safeEmail}'`,
         { headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` } }
       )
       const searchData = await searchRes.json()

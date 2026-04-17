@@ -183,11 +183,11 @@ async function createNewCheckout(user: any, member: any, plan: string) {
 
   if (session.error) {
     return new Response(JSON.stringify({ error: session.error.message }), {
-      status: 400, headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" }
+      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" }
     })
   }
 
   return new Response(JSON.stringify({ url: session.url }), {
-    headers: { "Access-Control-Allow-Origin": "*", "Content-Type": "application/json" }
+    headers: { ...corsHeaders, "Content-Type": "application/json" }
   })
 }

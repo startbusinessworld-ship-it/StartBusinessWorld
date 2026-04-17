@@ -17,15 +17,6 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 }
 
-async function stripePost(endpoint: string, params: Record<string, string>) {
-  const body = new URLSearchParams(params)
-  const res = await fetch(`https://api.stripe.com/v1${endpoint}`, {
-    method: 'GET',
-    headers: { Authorization: `Bearer ${STRIPE_SECRET_KEY}` }
-  })
-  return res.json()
-}
-
 async function stripeList(endpoint: string, params: Record<string, string> = {}) {
   const qs = new URLSearchParams(params).toString()
   const url = `https://api.stripe.com/v1${endpoint}${qs ? '?' + qs : ''}`
@@ -99,9 +90,13 @@ serve(async (req) => {
       ? Math.round(((revenueThisMonth - revenueLastMonth) / revenueLastMonth) * 100)
       : 0
 
+    // MRR : mensuel = unit_amount, annuel = unit_amount / 12
     const mrr = sbwSubs.reduce((sum: number, s: any) => {
       const item = s.items?.data?.find((i: any) => SBW_PRICE_IDS.has(i.price?.id))
-      return sum + (item?.price?.unit_amount || 0) / 100
+      if (!item) return sum
+      const amount = (item.price?.unit_amount || 0) / 100
+      const interval = item.price?.recurring?.interval
+      return sum + (interval === 'year' ? amount / 12 : amount)
     }, 0)
 
     // Derniers paiements SBW

@@ -43,6 +43,12 @@ serve(async (req) => {
     const email = user.email!
     const userId = user.id
 
+    if (!PRICE_IDS[plan]) {
+      return new Response(JSON.stringify({ error: "Plan invalide" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" }
+      })
+    }
+
     // Créer ou récupérer le client Stripe (chercher par ID d'abord, puis par email)
     let { data: member } = await sb
       .from("members")
@@ -92,14 +98,13 @@ serve(async (req) => {
     }
 
     // Créer le Checkout Session
-    const priceId = PRICE_IDS[plan] || PRICE_IDS.mensuel
     const baseParams: Record<string, string> = {
       mode: "subscription",
       success_url: "https://www.startbusinessworld.com/client-dashboard.html?payment=success",
       cancel_url: "https://www.startbusinessworld.com/club.html",
       "metadata[supabase_id]": userId,
       "metadata[plan]": plan,
-      "line_items[0][price]": priceId,
+      "line_items[0][price]": PRICE_IDS[plan],
       "line_items[0][quantity]": "1",
       "subscription_data[metadata][supabase_id]": userId,
       "subscription_data[metadata][plan]": plan,
