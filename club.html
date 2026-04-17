@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -699,14 +700,16 @@
   const SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
   const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
 
+  // Client Supabase unique (évite "Multiple GoTrueClient instances")
+  window.sb = window.sb || supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  const sb = window.sb
+
   // Si déjà membre payant → rediriger vers le dashboard
   ;(async function checkPaid() {
     try {
-      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-      const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-      const { data: { session } } = await _sb.auth.getSession()
+      const { data: { session } } = await sb.auth.getSession()
       if (session) {
-        const { data: member } = await _sb.from('members').select('plan').eq('id', session.user.id).single()
+        const { data: member } = await sb.from('members').select('plan').eq('id', session.user.id).maybeSingle()
         var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
         if (member && plansPaids.includes(member.plan)) {
           window.location.href = 'client-dashboard.html'
@@ -765,13 +768,11 @@
   window.togglePlan = togglePlan
 
   async function handleJoin(e, plan) {
-    e.preventDefault()
+    if (e && e.preventDefault) e.preventDefault()
     plan = plan || 'mensuel'
     setLoading(true)
 
     try {
-      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-      const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
       const { data: { session } } = await sb.auth.getSession()
 
       if (!session) {
@@ -785,27 +786,26 @@
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${session.access_token}`,
+          'apikey': SUPABASE_ANON_KEY,
         },
-        body: JSON.stringify({
-          plan: plan,
-          email: session.user.email,
-          userId: session.user.id,
-        }),
+        body: JSON.stringify({ plan: plan }),
       })
 
       const data = await res.json()
       if (data.url) {
         window.location.href = data.url
       } else {
-        throw new Error(data.error || 'Erreur lors de la création du paiement')
+        console.error('create-checkout error:', data)
+        throw new Error(data.error || ('HTTP ' + res.status))
       }
 
     } catch (err) {
       console.error(err)
-      alert('Une erreur est survenue. Réessaie dans quelques instants.')
+      alert('Une erreur est survenue : ' + (err.message || 'Réessaie'))
       setLoading(false)
     }
   }
+  window.handleJoin = handleJoin
 
   // Auto-checkout : si l'utilisateur a choisi un plan avant login (sessionStorage.sbw_plan)
   // et qu'il revient connecté, on lance direct le checkout
@@ -813,15 +813,13 @@
     const pendingPlan = sessionStorage.getItem('sbw_plan')
     if (!pendingPlan) return
 
-    const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm')
-    const _sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    const { data: { session } } = await _sb.auth.getSession()
+    const { data: { session } } = await sb.auth.getSession()
     if (!session) return
 
     sessionStorage.removeItem('sbw_plan')
     currentPlan = pendingPlan
     window.currentPlan = pendingPlan
-    handleJoin({ preventDefault: function(){} }, pendingPlan)
+    handleJoin(null, pendingPlan)
   })
 
   // Intersection Observer pour animations au scroll
