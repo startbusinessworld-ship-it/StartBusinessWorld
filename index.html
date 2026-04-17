@@ -535,6 +535,165 @@
     }
     .tool-link { font-size: 0.7rem; color: var(--ink); font-weight: 500; }
 
+    /* =============================================
+       LE CLUB SBW
+    ============================================= */
+    .club {
+      margin: 2.5rem 2rem;
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--ink);
+      color: var(--bg);
+      display: grid;
+      grid-template-columns: 1fr 1px 1fr;
+    }
+
+    .club-sep { background: rgba(255,255,255,0.07); }
+
+    .club-left {
+      padding: 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    /* liseré rouge */
+    .club-left::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: var(--red);
+    }
+
+    .club-eyebrow {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.32);
+      margin-bottom: 1.5rem;
+      margin-top: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .club-eyebrow::before {
+      content: '';
+      width: 16px;
+      height: 1px;
+      background: rgba(250,250,248,0.2);
+    }
+
+    .club-left h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.8rem;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      margin-bottom: 1rem;
+    }
+    .club-left h2 i { color: var(--gold); font-style: italic; }
+
+    .club-left p {
+      font-size: 0.88rem;
+      color: rgba(250,250,248,0.45);
+      line-height: 1.8;
+      font-weight: 300;
+      max-width: 400px;
+      margin-bottom: 2.5rem;
+    }
+
+    .pricing { display: flex; gap: 0.8rem; margin-bottom: 2rem; }
+
+    .pc {
+      flex: 1;
+      padding: 1.2rem;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+    .pc.hi { border-color: rgba(255,255,255,0.22); }
+
+    .pc-tag {
+      font-size: 0.58rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.3);
+      margin-bottom: 0.45rem;
+    }
+
+    .pc-price {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      line-height: 1;
+      letter-spacing: -0.02em;
+    }
+    .pc-price small {
+      font-family: 'DM Sans';
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: rgba(250,250,248,0.28);
+    }
+
+    .pc-sub {
+      font-size: 0.63rem;
+      color: rgba(250,250,248,0.28);
+      margin-top: 0.3rem;
+      line-height: 1.45;
+    }
+
+    .club-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--gold);
+      color: #fff;
+      padding: 0.8rem 1.8rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: opacity 0.15s;
+      cursor: pointer;
+    }
+    .club-cta:hover { opacity: 0.88; }
+
+    .club-note {
+      margin-top: 0.7rem;
+      font-size: 0.63rem;
+      color: rgba(250,250,248,0.18);
+    }
+
+    .club-right { padding: 3.5rem; }
+
+    .club-right h3 {
+      font-size: 0.62rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(250,250,248,0.28);
+      margin-bottom: 1.5rem;
+    }
+
+    .perk {
+      display: flex;
+      gap: 0.9rem;
+      padding: 0.9rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .perk:last-child { border-bottom: none; }
+
+    .perk-i {
+      width: 32px;
+      height: 32px;
+      border-radius: 7px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+
+    .perk h4 { font-size: 0.83rem; font-weight: 400; margin-bottom: 0.15rem; }
+    .perk p { font-size: 0.72rem; color: rgba(250,250,248,0.3); font-weight: 300; line-height: 1.5; }
 
     /* =============================================
        MODULES
@@ -750,6 +909,11 @@
       .tool { border-right: none; }
       .tool:nth-child(n) { border-right: none; }
 
+      .club { grid-template-columns: 1fr; margin: 1.5rem 1rem; }
+      .club-sep { display: none; }
+      .club-left { padding: 2rem 1.5rem; }
+      .club-right { border-top: 1px solid rgba(255,255,255,0.07); padding: 2rem 1.5rem; }
+      .pricing { flex-direction: column; }
 
       .modules { grid-template-columns: 1fr 1fr; margin: 0 1rem 1.5rem; }
       .mod:nth-child(2) { border-right: none; }
@@ -774,7 +938,8 @@
     @media (max-width: 480px) {
       h1 { font-size: 2.1rem; }
       .hero-main { padding: 2rem 1rem; }
-
+      .club-left { padding: 1.5rem 1rem; }
+      .club-left h2 { font-size: 2.2rem; }
       .modules { grid-template-columns: 1fr; }
       .mod:nth-child(n) { border-right: none; border-bottom: 1px solid var(--subtle); }
       .f-nav-cols { grid-template-columns: 1fr; }
@@ -856,7 +1021,7 @@
     <!-- Desktop droite -->
     <div class="nav-right">
       <span data-sbw-auth></span>
-      <a href="#newsletter" class="nav-join" onclick="event.preventDefault();document.getElementById('newsletter').scrollIntoView({behavior:'smooth'})">Newsletter →</a>
+      <a href="client-login.html" class="nav-join">Le Club SBW</a>
     </div>
     <!-- Hamburger mobile uniquement -->
     <div class="hamburger" id="hamburger" onclick="toggleMenu()">
@@ -867,7 +1032,8 @@
   <!-- MENU MOBILE -->
   <div class="mobile-menu" id="mobileMenu">
     <div class="mobile-menu-top">
-      <a href="#newsletter" class="mobile-nav-link highlight" onclick="toggleMenu();setTimeout(function(){document.getElementById('newsletter').scrollIntoView({behavior:'smooth'})},300)">S'abonner à la newsletter →</a>
+      <a href="client-login.html?mode=login" class="mobile-nav-link outline">Se connecter</a>
+      <a href="client-login.html" class="mobile-nav-link highlight">Rejoindre le Club SBW →</a>
     </div>
     <div class="mobile-menu-themes">
       <div class="mobile-menu-label">Thèmes</div>
@@ -884,7 +1050,7 @@
     </div>
     <div class="mobile-menu-top">
       <a href="blog.html" class="mobile-nav-link">📝 Blog</a>
-      <a href="#newsletter" class="mobile-nav-link" onclick="toggleMenu();setTimeout(function(){document.getElementById('newsletter').scrollIntoView({behavior:'smooth'})},300)">📬 Newsletter</a>
+      <a href="client-login.html" class="mobile-nav-link">⭐ Le Club SBW</a>
       <a href="#" class="mobile-nav-link">📞 Contact</a>
     </div>
   </div>
@@ -903,7 +1069,7 @@
       <h1>Le business<br>mondial,<br><i>décrypté.</i></h1>
       <p class="hero-deck">Fiscalité, sourcing en Chine, création de société, e-commerce et expatriation. Des articles approfondis, des vidéos et une communauté — pour entrepreneurs qui pensent global.</p>
       <div class="hero-ctas">
-        <a href="#newsletter" class="cta-primary" onclick="event.preventDefault();document.getElementById('newsletter').scrollIntoView({behavior:'smooth'})">S'abonner gratuitement →</a>
+        <a href="client-login.html" class="cta-primary">Rejoindre le Club SBW</a>
         <a href="#articles" class="cta-sec" onclick="event.preventDefault();document.getElementById('articles').scrollIntoView({behavior:'smooth'})">Lire le blog →</a>
       </div>
     </div>
@@ -955,6 +1121,36 @@
     <a href="blog.html" style="font-size:0.85rem;color:var(--muted);border:0.5px solid var(--subtle);padding:0.6rem 1.6rem;border-radius:4px;text-decoration:none;transition:all 0.15s" onmouseover="this.style.color='var(--ink)';this.style.borderColor='var(--ink)'" onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--subtle)'">Voir tous les articles →</a>
   </div>
 
+  <!-- CLUB SBW -->
+  <div class="club" id="club">
+    <div class="club-left">
+      <div class="club-eyebrow">Le Club SBW — Accès membres</div>
+      <h2>Plus loin,<br>ensemble.<br><i>Ensemble.</i></h2>
+      <p>Formations complètes, groupe d'entraide actif et bons plans négociés — réservés aux membres du Club SBW. Pour entrepreneurs sérieux.</p>
+      <a href="client-login.html" class="club-cta">Rejoindre le Club SBW →</a>
+      <div class="club-note">Sans engagement · Accès immédiat · Annulation en 1 clic</div>
+    </div>
+    <div class="club-sep"></div>
+    <div class="club-right">
+      <h3>Ce qui t'attend dans le club</h3>
+      <div class="perk">
+        <div class="perk-i">🎬</div>
+        <div><h4>Formations vidéo exclusives</h4><p>Modules sur la Chine, fiscalité, création de société, e-commerce et expatriation.</p></div>
+      </div>
+      <div class="perk">
+        <div class="perk-i">💬</div>
+        <div><h4>Groupe d'entraide privé</h4><p>Des entrepreneurs actifs. Questions, retours d'expérience, conseils entre membres.</p></div>
+      </div>
+      <div class="perk">
+        <div class="perk-i">🎁</div>
+        <div><h4>Bons plans exclusifs</h4><p>Deals négociés, outils à prix réduit, offres réservées aux membres uniquement.</p></div>
+      </div>
+      <div class="perk">
+        <div class="perk-i">📰</div>
+        <div><h4>Contenus premium</h4><p>Guides approfondis et articles réservés aux membres du club.</p></div>
+      </div>
+    </div>
+  </div>
 
   <!-- SHORTS -->
   <section class="shorts-section" id="shorts">
@@ -980,7 +1176,7 @@
   </section>
 
   <!-- NEWSLETTER -->
-  <section id="newsletter" style="background:linear-gradient(135deg,rgba(166,124,58,.08) 0%,rgba(166,124,58,.03) 100%);border-top:0.5px solid rgba(166,124,58,.2);border-bottom:0.5px solid rgba(166,124,58,.2);padding:4rem 1.5rem;text-align:center">
+  <section style="background:linear-gradient(135deg,rgba(166,124,58,.08) 0%,rgba(166,124,58,.03) 100%);border-top:0.5px solid rgba(166,124,58,.2);border-bottom:0.5px solid rgba(166,124,58,.2);padding:4rem 1.5rem;text-align:center">
     <div style="max-width:520px;margin:0 auto">
       <div style="font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#A67C3A;margin-bottom:.8rem">Newsletter SBW</div>
       <h2 style="font-family:'DM Serif Display',serif;font-size:1.8rem;margin-bottom:.8rem;line-height:1.2">Le business international<br><em style="color:#A67C3A;font-style:italic">dans ta boîte mail.</em></h2>
@@ -1039,8 +1235,9 @@
           <a href="#">E-commerce</a>
         </div>
         <div class="f-col">
-          <div class="f-col-title">Newsletter</div>
-          <a href="#newsletter" onclick="event.preventDefault();document.getElementById('newsletter').scrollIntoView({behavior:'smooth'})">S'abonner</a>
+          <div class="f-col-title">Club SBW</div>
+          <a href="client-login.html">Rejoindre</a>
+          <a href="client-login.html?mode=login">Se connecter</a>
           <a href="#">Contact</a>
           <a href="#">Mentions légales</a>
         </div>
