@@ -376,7 +376,7 @@
   </div>
   <div class="mobile-menu" id="mobileMenu">
     <div class="mm-section">
-      <a href="#" class="mm-link primary" onclick="handleJoin(event,'mensuel')">S'abonner — 79€/mois →</a>
+      <a href="#" class="mm-link primary" onclick="handleJoin(event,'mensuel')">Rejoindre maintenant →</a>
     </div>
     <div class="mm-section">
       <a href="index.html" class="mm-link" style="color:#F0EDE4">🏠 Accueil</a>
@@ -420,7 +420,7 @@
   </div>
 
   <!-- Bouton CTA -->
-  <button id="heroCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">S'abonner — 597€/an →</button>
+  <button id="heroCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Rejoindre maintenant →</button>
   <div class="hero-cta-note">Sans engagement · Annulation en 1 clic</div>
 
   <div class="hero-stats">
@@ -683,7 +683,7 @@
     </div>
     <span id="toggleLabelA2" style="font-size:.82rem;font-weight:500;color:#F0EDE4;transition:color .2s">Annuel <span style="background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:6px;margin-left:4px">-37%</span></span>
   </div>
-  <button id="footerCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">S'abonner — 597€/an →</button>
+  <button id="footerCta" onclick="handleJoin(event, currentPlan)" style="background:var(--gold);color:#fff;border:none;padding:1rem 3rem;border-radius:8px;font-size:.95rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Rejoindre maintenant →</button>
   <div class="hero-cta-note" style="margin-top:1rem">Sans engagement · Annulation en 1 clic</div>
 </section>
 
@@ -765,11 +765,6 @@
       if (sub) sub.textContent = '597€ facturés par an'
     }
 
-    var ctaText = goMensuel ? 'S\'abonner — 79€/mois →' : 'S\'abonner — 597€/an →'
-    var heroCta = document.getElementById('heroCta')
-    var footerCta = document.getElementById('footerCta')
-    if (heroCta) heroCta.textContent = ctaText
-    if (footerCta) footerCta.textContent = ctaText
 
     ;['', '2'].forEach(function(s) {
       var dot = document.getElementById('toggleDot' + s)
