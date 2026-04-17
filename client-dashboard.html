@@ -1021,31 +1021,23 @@
             <div class="card-head">
               <div class="card-title">Changer de plan</div>
             </div>
-            <div style="padding:14px 16px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s"
-                onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--subtle)'"
-                onclick="handleUpgrade(event,'basic')">
-                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Basic</div>
-                <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">29€</div>
-                <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/mois</div>
-                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Formations IA · Articles</div>
-              </div>
+            <div style="padding:14px 16px;display:grid;grid-template-columns:repeat(2,1fr);gap:10px">
               <div style="border:1px solid var(--gold);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;background:rgba(166,124,58,.04);position:relative;transition:all .15s"
                 onmouseover="this.style.background='rgba(166,124,58,.1)'" onmouseout="this.style.background='rgba(166,124,58,.04)'"
-                onclick="handleUpgrade(event,'pro')">
-                <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap">POPULAIRE</div>
-                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:6px">Pro</div>
+                onclick="handleUpgrade(event,'mensuel')">
+                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:6px">Mensuel</div>
                 <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">79€</div>
                 <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/mois</div>
-                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Basic · Fournisseurs · Vidéos</div>
+                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Tout inclus · Sans engagement</div>
               </div>
-              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s"
+              <div style="border:0.5px solid var(--subtle);border-radius:10px;padding:14px 10px;text-align:center;cursor:pointer;transition:all .15s;position:relative"
                 onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--subtle)'"
-                onclick="handleUpgrade(event,'business')">
-                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Business</div>
-                <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">149€</div>
-                <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/mois</div>
-                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Pro · Groupe · Live</div>
+                onclick="handleUpgrade(event,'annuel')">
+                <div style="position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.58rem;font-weight:700;padding:2px 8px;border-radius:8px;white-space:nowrap">-37%</div>
+                <div style="font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:6px">Annuel</div>
+                <div style="font-size:1.3rem;font-weight:700;font-family:'DM Serif Display',serif;margin-bottom:2px">597€</div>
+                <div style="font-size:.65rem;color:var(--muted);margin-bottom:8px">/an</div>
+                <div style="font-size:.65rem;color:var(--muted);line-height:1.5">Tout inclus · 49,75€/mois</div>
               </div>
             </div>
             <div style="padding:0 16px 14px;font-size:.7rem;color:var(--muted);text-align:center">Sans engagement · Annulation en 1 clic</div>
@@ -1075,18 +1067,18 @@
   <div style="background:#111008;border:1px solid rgba(166,124,58,0.3);border-radius:14px;padding:2.5rem;max-width:420px;width:100%;position:relative">
     <button onclick="closeModal()" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:rgba(240,237,228,0.3);font-size:1.2rem;cursor:pointer">✕</button>
     <div style="font-size:2rem;margin-bottom:1rem" id="modalIcon">💬</div>
-    <div style="font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem">Plan Business requis</div>
-    <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1.2;margin-bottom:0.8rem;color:#F0EDE4" id="modalTitle">Accède au groupe privé</div>
-    <div style="font-size:0.82rem;color:rgba(240,237,228,0.45);line-height:1.7;margin-bottom:2rem" id="modalDesc">Le groupe privé est réservé aux membres Business. Des entrepreneurs sérieux, des questions de fond, zéro bruit.</div>
+    <div style="font-size:0.62rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:0.6rem">Abonnement requis</div>
+    <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;line-height:1.2;margin-bottom:0.8rem;color:#F0EDE4" id="modalTitle">Accede a ce contenu</div>
+    <div style="font-size:0.82rem;color:rgba(240,237,228,0.45);line-height:1.7;margin-bottom:2rem" id="modalDesc">Ce contenu est reserve aux membres du Club SBW.</div>
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;padding:1rem;margin-bottom:1.5rem">
-      <div style="font-size:0.75rem;color:rgba(240,237,228,0.4);margin-bottom:0.3rem">Plan Business</div>
+      <div style="font-size:0.75rem;color:rgba(240,237,228,0.4);margin-bottom:0.3rem">Club SBW</div>
       <div style="display:flex;align-items:baseline;gap:0.3rem">
-        <span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">149€</span>
+        <span style="font-family:'DM Serif Display',serif;font-size:2rem;color:#F0EDE4">79€</span>
         <span style="font-size:0.8rem;color:rgba(240,237,228,0.3)">/mois</span>
       </div>
-      <div style="font-size:0.72rem;color:rgba(240,237,228,0.3);margin-top:0.3rem">Groupe privé · Live mensuel · Avant-première contenu · Sans engagement</div>
+      <div style="font-size:0.72rem;color:rgba(240,237,228,0.3);margin-top:0.3rem">Formations · Fournisseurs · Groupe prive · Live · Sans engagement</div>
     </div>
-    <button id="modalUpgradeBtn" onclick="handleUpgrade(event,'business')" style="width:100%;background:var(--gold);color:#fff;border:none;padding:1rem;border-radius:7px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">Passer au plan Business →</button>
+    <button id="modalUpgradeBtn" onclick="handleUpgrade(event,'mensuel')" style="width:100%;background:var(--gold);color:#fff;border:none;padding:1rem;border-radius:7px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif">S'abonner — 79€/mois →</button>
     <div style="font-size:0.65rem;color:rgba(240,237,228,0.2);text-align:center;margin-top:0.7rem">Sans engagement · Annulation en 1 clic</div>
   </div>
 </div>
@@ -1275,7 +1267,7 @@
     }
 
     // Si le plan n'est pas payant, tenter une sync Stripe directe
-    const plansPayants = ['inscrit', 'intro', 'basic', 'pro', 'business']
+    const plansPayants = ['inscrit', 'intro', 'basic', 'pro', 'business', 'mensuel', 'annuel']
     if (member && !plansPayants.includes(member.plan)) {
       const sync = await syncFromStripe(session.access_token)
       if (sync.synced) {
@@ -1366,11 +1358,13 @@
       : email.split('@')[0].replace(/[._-]/g, ' ').split(' ')[0]
     const displayName = fullName || email
     const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-    const plan = currentMember?.plan === 'inscrit' ? 'Club SBW — Inscrit' :
-                 currentMember?.plan === 'intro' ? 'Club SBW — 1€/mois' :
-                 currentMember?.plan === 'basic' ? 'Plan Basic — 29€/mois' :
-                 currentMember?.plan === 'pro' ? 'Plan Pro — 79€/mois' :
-                 currentMember?.plan === 'business' ? 'Plan Business — 149€/mois' : 'Club SBW'
+    const plan = currentMember?.plan === 'mensuel' ? 'Club SBW — 79€/mois' :
+                 currentMember?.plan === 'annuel' ? 'Club SBW — 597€/an' :
+                 currentMember?.plan === 'pro' ? 'Club SBW — 79€/mois' :
+                 currentMember?.plan === 'business' ? 'Club SBW — 149€/mois' :
+                 currentMember?.plan === 'basic' ? 'Club SBW — 29€/mois' :
+                 currentMember?.plan === 'intro' ? 'Club SBW — Intro' :
+                 currentMember?.plan === 'inscrit' ? 'Club SBW — Inscrit' : 'Club SBW'
 
     var uiEl = document.getElementById('userInitials'); if(uiEl) uiEl.textContent = initials;
     var mav = document.getElementById('mobileUserAv'); if(mav) mav.textContent = initials;
@@ -1379,11 +1373,13 @@
     var wnEl = document.getElementById('welcomeName'); if(wnEl) wnEl.textContent = firstName;
 
     // Abonnement — éléments optionnels (section compte)
-    const planLabel = currentMember?.plan === 'inscrit' ? 'Inscrit — Club SBW' :
-                      currentMember?.plan === 'intro' ? '1€/mois — Offre lancement' :
-                      currentMember?.plan === 'basic' ? '29€/mois — Plan Basic' :
-                      currentMember?.plan === 'pro' ? '79€/mois — Plan Pro' :
-                      currentMember?.plan === 'business' ? '149€/mois — Plan Business' : 'Club SBW'
+    const planLabel = currentMember?.plan === 'mensuel' ? '79€/mois — Mensuel' :
+                      currentMember?.plan === 'annuel' ? '597€/an — Annuel' :
+                      currentMember?.plan === 'pro' ? '79€/mois' :
+                      currentMember?.plan === 'business' ? '149€/mois' :
+                      currentMember?.plan === 'basic' ? '29€/mois' :
+                      currentMember?.plan === 'intro' ? 'Intro' :
+                      currentMember?.plan === 'inscrit' ? 'Inscrit' : 'Club SBW'
     var subPriceEl = document.getElementById('subPrice')
     if (subPriceEl) subPriceEl.innerHTML = currentMember?.plan === 'trial'
       ? '1€<small>/mois</small>'
@@ -1444,10 +1440,11 @@
 
     document.getElementById('statSince').textContent = formatDate(currentMember?.created_at)
     document.getElementById('statPlan').textContent =
-      currentMember?.plan === 'inscrit' ? 'Inscrit' :
-      currentMember?.plan === 'trial' ? 'Période d\'essai' :
-      currentMember?.plan === 'pro' ? 'Plan Pro' :
-      currentMember?.plan === 'business' ? 'Plan Business' : 'Plan Basic'
+      currentMember?.plan === 'mensuel' ? 'Mensuel — 79€/mois' :
+      currentMember?.plan === 'annuel' ? 'Annuel — 597€/an' :
+      currentMember?.plan === 'pro' ? 'Pro' :
+      currentMember?.plan === 'business' ? 'Business' :
+      currentMember?.plan === 'basic' ? 'Basic' : 'Club SBW'
   }
 
   window.showSection = function(name, el) {

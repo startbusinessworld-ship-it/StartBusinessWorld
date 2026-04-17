@@ -7,14 +7,13 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
 const PRICE_TO_PLAN: Record<string, string> = {
-  "price_1TIM9hLBxNkjNd236Z3AfvoS": "basic",
-  "price_1TIMA8LBxNkjNd23sNkSycog": "pro",
-  "price_1TIMAPLBxNkjNd23KR5yVvdf": "business",
-  "price_1TIQSWLBxNkjNd23gtGJ3LKp": "intro",
+  "price_1TIMA8LBxNkjNd23sNkSycog": "mensuel",
+  "price_ANNUEL_597": "annuel",                // TODO: remplacer par le vrai Price ID Stripe
+  // Legacy — anciens prix toujours reconnus
+  "price_1TIM9hLBxNkjNd236Z3AfvoS": "mensuel",
+  "price_1TIMAPLBxNkjNd23KR5yVvdf": "mensuel",
+  "price_1TIQSWLBxNkjNd23gtGJ3LKp": "mensuel",
 }
-
-const INTRO_PRICE_ID = "price_1TIQSWLBxNkjNd23gtGJ3LKp"
-const BASIC_PRICE_ID = "price_1TIM9hLBxNkjNd236Z3AfvoS"
 
 serve(async (req) => {
   const body = await req.text()
@@ -37,8 +36,7 @@ serve(async (req) => {
       case "checkout.session.completed": {
         const session = event.data.object
         const supabaseId = session.metadata?.supabase_id
-        const isIntro = session.metadata?.is_intro === "true"
-        const plan = isIntro ? "intro" : (session.metadata?.plan || "basic")
+        const plan = session.metadata?.plan || "mensuel"
         const customerId = session.customer
         const subscriptionId = session.subscription
         const customerEmail = session.customer_details?.email || session.customer_email || ""
@@ -89,58 +87,6 @@ serve(async (req) => {
         }
 
         console.log(`Membre mis à jour: ${supabaseId} → ${plan}`)
-
-        // Offre intro: créer Subscription Schedule 1€×3 puis bascule 29€
-        if (isIntro && subscriptionId) {
-          try {
-            // Étape 1 : Créer le schedule depuis l'abonnement existant
-            const createRes = await fetch("https://api.stripe.com/v1/subscription_schedules", {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: new URLSearchParams({
-                from_subscription: subscriptionId,
-              }),
-            })
-            const schedule = await createRes.json()
-
-            if (schedule.error) {
-              console.error("Erreur création schedule:", schedule.error.message)
-            } else {
-              // Étape 2 : Mettre à jour avec les 2 phases (1€ x 3 mois → 29€)
-              const now = Math.floor(Date.now() / 1000)
-              const in3Months = now + (90 * 24 * 60 * 60) // ~3 mois
-
-              const updateRes = await fetch(`https://api.stripe.com/v1/subscription_schedules/${schedule.id}`, {
-                method: "POST",
-                headers: {
-                  Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-                  "Content-Type": "application/x-www-form-urlencoded",
-                },
-                body: new URLSearchParams({
-                  end_behavior: "release",
-                  "phases[0][items][0][price]": INTRO_PRICE_ID,
-                  "phases[0][items][0][quantity]": "1",
-                  "phases[0][start_date]": String(now),
-                  "phases[0][end_date]": String(in3Months),
-                  "phases[1][items][0][price]": BASIC_PRICE_ID,
-                  "phases[1][items][0][quantity]": "1",
-                  "phases[1][start_date]": String(in3Months),
-                }),
-              })
-              const updated = await updateRes.json()
-              if (updated.error) {
-                console.error("Erreur update schedule:", updated.error.message)
-              } else {
-                console.log("Schedule OK:", schedule.id, "— 1€ x 3 mois puis 29€/mois")
-              }
-            }
-          } catch (schedErr) {
-            console.error("Schedule exception:", schedErr)
-          }
-        }
         break
       }
 

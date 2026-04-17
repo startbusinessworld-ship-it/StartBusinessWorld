@@ -6,9 +6,8 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
 const PRICE_IDS: Record<string, string> = {
-  basic:    "price_1TIM9hLBxNkjNd236Z3AfvoS",
-  pro:      "price_1TIMA8LBxNkjNd23sNkSycog",
-  business: "price_1TIMAPLBxNkjNd23KR5yVvdf",
+  mensuel:  "price_1TIMA8LBxNkjNd23sNkSycog", // 79€/mois
+  annuel:   "price_ANNUEL_597",                // 597€/an — TODO: créer dans Stripe Dashboard
 }
 
 const corsHeaders = {

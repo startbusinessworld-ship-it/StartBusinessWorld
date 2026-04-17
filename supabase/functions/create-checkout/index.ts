@@ -6,11 +6,9 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
 const PRICE_IDS: Record<string, string> = {
-  basic:    "price_1TIM9hLBxNkjNd236Z3AfvoS", // 29€/mois
-  pro:      "price_1TIMA8LBxNkjNd23sNkSycog", // 79€/mois
-  business: "price_1TIMAPLBxNkjNd23KR5yVvdf", // 149€/mois
+  mensuel:  "price_1TIMA8LBxNkjNd23sNkSycog", // 79€/mois
+  annuel:   "price_ANNUEL_597",                // TODO: créer dans Stripe Dashboard (597€/an)
 }
-const INTRO_PRICE_ID = "price_1TIQSWLBxNkjNd23gtGJ3LKp" // 1€/mois
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -41,11 +39,9 @@ serve(async (req) => {
     }
 
     const body = await req.json()
-    const plan = body.plan || "basic"
-    // Toujours utiliser l'email et l'ID du user authentifié (pas celui du body)
+    const plan = body.plan || "mensuel"
     const email = user.email!
     const userId = user.id
-    const isIntro = body.isIntro !== false // true par défaut
 
     // Créer ou récupérer le client Stripe (chercher par ID d'abord, puis par email)
     let { data: member } = await sb
@@ -96,38 +92,23 @@ serve(async (req) => {
     }
 
     // Créer le Checkout Session
+    const priceId = PRICE_IDS[plan] || PRICE_IDS.mensuel
     const baseParams: Record<string, string> = {
       mode: "subscription",
       success_url: "https://www.startbusinessworld.com/client-dashboard.html?payment=success",
       cancel_url: "https://www.startbusinessworld.com/club.html",
       "metadata[supabase_id]": userId,
       "metadata[plan]": plan,
-      "metadata[is_intro]": isIntro ? "true" : "false",
+      "line_items[0][price]": priceId,
+      "line_items[0][quantity]": "1",
       "subscription_data[metadata][supabase_id]": userId,
       "subscription_data[metadata][plan]": plan,
     }
 
-    // Si on a un customer Stripe existant, l'utiliser. Sinon, forcer l'email.
     if (customerId) {
       baseParams.customer = customerId
     } else {
       baseParams.customer_email = email
-    }
-
-    if (isIntro) {
-      // Offre intro : 1€/mois pendant 3 mois via Subscription Schedule
-      // Phase 1 : 3 mois à 1€
-      // Phase 2 : passage automatique à 29€/mois
-      // On utilise le mode subscription_data avec phases
-      // Stripe ne supporte pas les phases dans checkout, donc on crée
-      // un abo à 1€ et un schedule séparé APRÈS le checkout
-      baseParams["line_items[0][price]"] = INTRO_PRICE_ID
-      baseParams["line_items[0][quantity]"] = "1"
-      baseParams["subscription_data[metadata][is_intro]"] = "true"
-    } else {
-      const priceId = PRICE_IDS[plan] || PRICE_IDS.basic
-      baseParams["line_items[0][price]"] = priceId
-      baseParams["line_items[0][quantity]"] = "1"
     }
 
     const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {

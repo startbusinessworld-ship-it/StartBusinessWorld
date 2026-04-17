@@ -6,10 +6,12 @@ const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!
 const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 
 const PRICE_TO_PLAN: Record<string, string> = {
-  "price_1TIM9hLBxNkjNd236Z3AfvoS": "basic",
-  "price_1TIMA8LBxNkjNd23sNkSycog": "pro",
-  "price_1TIMAPLBxNkjNd23KR5yVvdf": "business",
-  "price_1TIQSWLBxNkjNd23gtGJ3LKp": "intro",
+  "price_1TIMA8LBxNkjNd23sNkSycog": "mensuel",
+  "price_ANNUEL_597": "annuel",                // TODO: remplacer par le vrai Price ID Stripe
+  // Legacy
+  "price_1TIM9hLBxNkjNd236Z3AfvoS": "mensuel",
+  "price_1TIMAPLBxNkjNd23KR5yVvdf": "mensuel",
+  "price_1TIQSWLBxNkjNd23gtGJ3LKp": "mensuel",
 }
 
 const corsHeaders = {

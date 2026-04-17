@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Rejoins le Club SBW — Formations exclusives, groupe d'entraide et bons plans pour entrepreneurs internationaux. 1€/mois pour commencer.">
+  <meta name="description" content="Rejoins le Club SBW — Formations exclusives, groupe d'entraide et bons plans pour entrepreneurs internationaux. 79€/mois ou 597€/an.">
   <title>Le Club SBW — Start Business World</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -402,8 +402,21 @@
     Formations complètes, groupe d'entraide actif et bons plans négociés — tout ce qu'il faut pour construire un business qui pense global.
   </p>
 
-  <a href="client-login.html" class="hero-cta">Rejoindre le Club SBW →</a>
-  <div class="hero-cta-note">Sans engagement · Accès immédiat · Annulation en 1 clic</div>
+  <div class="hero-pricing">
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(166,124,58,0.3);border-radius:12px;padding:1.5rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:200px" onclick="handleJoin(event,'mensuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(166,124,58,0.3)'">
+      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--gold);margin-bottom:8px">Mensuel</div>
+      <div class="price-main"><span class="price-num">79€</span><span class="price-period">/mois</span></div>
+      <div style="font-size:.72rem;color:rgba(240,237,228,0.35);margin-top:6px">Sans engagement</div>
+    </div>
+    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:1.5rem 2rem;text-align:center;cursor:pointer;transition:all .15s;min-width:200px;position:relative" onclick="handleJoin(event,'annuel')" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.1)'">
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-size:.6rem;font-weight:700;padding:3px 10px;border-radius:8px;white-space:nowrap">-37%</div>
+      <div style="font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:rgba(240,237,228,0.5);margin-bottom:8px">Annuel</div>
+      <div class="price-main"><span class="price-num">597€</span><span class="price-period">/an</span></div>
+      <div style="font-size:.72rem;color:rgba(240,237,228,0.35);margin-top:6px">49,75€/mois</div>
+    </div>
+  </div>
+
+  <div class="hero-cta-note">Sans engagement · Acces immediat · Annulation en 1 clic</div>
 
   <div class="hero-stats">
     <div class="hero-stat">
@@ -611,10 +624,10 @@
   <div class="faq-list">
     <div class="faq-item">
       <div class="faq-question" onclick="toggleFaq(this)">
-        Comment fonctionne le 1€/mois pendant 3 mois ?
+        Comment fonctionne l'abonnement ?
         <div class="faq-icon">+</div>
       </div>
-      <div class="faq-answer">Tu paies 1€ par mois pendant les 3 premiers mois. Après cette période, l'abonnement passe automatiquement à 29€/mois. Tu peux annuler à tout moment, sans aucune contrainte.</div>
+      <div class="faq-answer">Tu choisis entre l'abonnement mensuel a 79€/mois ou l'abonnement annuel a 597€/an (soit 49,75€/mois). Tu peux annuler a tout moment, sans aucune contrainte.</div>
     </div>
     <div class="faq-item">
       <div class="faq-question" onclick="toggleFaq(this)">
@@ -703,7 +716,7 @@
 
   async function handleJoin(e, plan) {
     e.preventDefault()
-    plan = plan || 'basic'
+    plan = plan || 'mensuel'
     setLoading(true)
 
     try {
@@ -727,7 +740,6 @@
           plan: plan,
           email: session.user.email,
           userId: session.user.id,
-          isIntro: false,
         }),
       })
 
