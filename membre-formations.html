@@ -602,7 +602,12 @@ function playLecon(l) {
   curLecon = l;
   var box = document.getElementById('videoBox');
 
-  if (l.youtube_id) {
+  if (l.video_url) {
+    // Vidéo uploadée sur Supabase Storage → player HTML5 natif
+    box.innerHTML =
+      '<video controls playsinline preload="metadata" controlsList="nodownload" style="width:100%;height:100%;background:#000;display:block" src="' +
+      l.video_url + '"></video>';
+  } else if (l.youtube_id) {
     var id = l.youtube_id.split('?')[0].trim();
     box.innerHTML =
       '<div class="vthumb">' +

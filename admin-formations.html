@@ -495,6 +495,7 @@ function openLeconEd(id, l, moduleId){
   }
   curL=l;
   var ytId=l?(l.youtube_id||''):'';
+  var videoUrl=l?(l.video_url||''):'';
   var lType=l?(l.lecon_type||'youtube'):'youtube';
   var mid=moduleId||(l?l.module_id:'');
 
@@ -507,10 +508,22 @@ function openLeconEd(id, l, moduleId){
       '<div class="field"><label>Titre *</label><input type="text" id="lTitle" value="'+(l?l.title.replace(/"/g,'&quot;'):'')+'" placeholder="Titre de la leçon"></div>'+
       '<div class="field"><label>Type</label><div class="type-btns">'+
         '<button class="type-btn'+(lType==='youtube'?' on':'')+'" id="ltbtn_yt" onclick="setLType(\'youtube\')">▶ YouTube</button>'+
+        '<button class="type-btn'+(lType==='video'?' on':'')+'" id="ltbtn_vid" onclick="setLType(\'video\')">📹 Upload vidéo</button>'+
         '<button class="type-btn'+(lType==='text'?' on':'')+'" id="ltbtn_txt" onclick="setLType(\'text\')">📝 Texte</button>'+
       '</div></div>'+
       '<div id="lYtField" style="'+(lType!=='youtube'?'display:none':'')+'">'+
         '<div class="field"><label>URL YouTube</label><input type="text" id="lYt" value="'+ytId+'" placeholder="https://youtu.be/..."></div>'+
+      '</div>'+
+      '<div id="lVidField" style="'+(lType!=='video'?'display:none':'')+'">'+
+        '<div class="field">'+
+          '<label>Vidéo (MP4 recommandé, max 50 MB)</label>'+
+          '<div id="lVidCurrent" style="'+(videoUrl?'':'display:none')+'margin-bottom:8px;padding:8px;background:#f5f5f5;border-radius:6px;font-size:.72rem;color:#555;word-break:break-all">'+
+            '📹 <span id="lVidUrl">'+videoUrl+'</span>'+
+          '</div>'+
+          '<input type="file" id="lVidFile" accept="video/*" style="width:100%;padding:6px;border:0.5px solid var(--subtle);border-radius:6px;font-size:.78rem">'+
+          '<div id="lVidProgress" style="display:none;margin-top:8px;height:4px;background:#eee;border-radius:2px;overflow:hidden"><div id="lVidBar" style="height:100%;background:#A67C3A;width:0%;transition:width .2s"></div></div>'+
+          '<div class="field-note" id="lVidNote" style="margin-top:4px">La vidéo sera uploadée vers Supabase Storage quand tu enregistreras.</div>'+
+        '</div>'+
       '</div>'+
       '<div class="field"><label>Durée (min)</label><input type="number" id="lDur" value="'+(l&&l.duration_min?l.duration_min:'')+'" placeholder="10" min="0"></div>'+
       '<div class="field"><label>Notes & Ressources</label>'+
@@ -528,18 +541,21 @@ function openLeconEd(id, l, moduleId){
       '</div>'+
       '<div style="display:flex;gap:8px">'+
         '<button class="btn-ghost" style="flex:1" onclick="col3Empty()">Annuler</button>'+
-        '<button class="btn-primary" style="flex:1;justify-content:center" onclick="saveLecon(\''+mid+'\')">💾 Enregistrer</button>'+
+        '<button class="btn-primary" style="flex:1;justify-content:center" id="lSaveBtn" onclick="saveLecon(\''+mid+'\')">💾 Enregistrer</button>'+
       '</div>'+
     '</div>';
 }
 
 function setLType(t){
-  ['yt','txt'].forEach(function(x){
+  ['yt','vid','txt'].forEach(function(x){
     var b=document.getElementById('ltbtn_'+x);
-    if(b) b.className='type-btn'+(( x==='yt'&&t==='youtube')||(x==='txt'&&t==='text')?' on':'');
+    if(b){
+      var active = (x==='yt'&&t==='youtube')||(x==='vid'&&t==='video')||(x==='txt'&&t==='text');
+      b.className='type-btn'+(active?' on':'');
+    }
   });
-  var yf=document.getElementById('lYtField');
-  if(yf) yf.style.display=t==='youtube'?'block':'none';
+  var yf=document.getElementById('lYtField'); if(yf) yf.style.display=t==='youtube'?'block':'none';
+  var vf=document.getElementById('lVidField'); if(vf) vf.style.display=t==='video'?'block':'none';
 }
 
 function lTb(before,after){
@@ -563,13 +579,45 @@ async function saveLecon(mid){
   var title=document.getElementById('lTitle').value.trim();
   if(!title){toast('Titre obligatoire.','error');return;}
   var isYt=document.getElementById('ltbtn_yt')&&document.getElementById('ltbtn_yt').classList.contains('on');
+  var isVid=document.getElementById('ltbtn_vid')&&document.getElementById('ltbtn_vid').classList.contains('on');
+  var lType=isYt?'youtube':(isVid?'video':'text');
+
   var ytRaw=document.getElementById('lYt')?document.getElementById('lYt').value.trim():'';
   var ytId=null;
   if(ytRaw){var mm=ytRaw.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|shorts\/|embed\/))([a-zA-Z0-9_-]{11})/);ytId=mm?mm[1]:(ytRaw.length===11?ytRaw:null);}
+
+  // Upload vidéo si fichier sélectionné
+  var videoUrl=document.getElementById('lVidUrl')?document.getElementById('lVidUrl').textContent:'';
+  var fileInput=document.getElementById('lVidFile');
+  if(isVid&&fileInput&&fileInput.files&&fileInput.files[0]){
+    var file=fileInput.files[0];
+    if(file.size>50*1024*1024){toast('Fichier trop gros (max 50 MB).','error');return;}
+    var btn=document.getElementById('lSaveBtn');
+    if(btn){btn.disabled=true;btn.textContent='Upload en cours…';}
+    var prog=document.getElementById('lVidProgress');
+    var bar=document.getElementById('lVidBar');
+    if(prog){prog.style.display='block';}
+    if(bar){bar.style.width='30%';}
+    // Nom de fichier : timestamp + nom original (nettoyé)
+    var safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    var fileName=Date.now()+'_'+safeName;
+    var up=await sb.storage.from('formation-videos').upload(fileName,file,{cacheControl:'3600',upsert:false});
+    if(up.error){
+      if(btn){btn.disabled=false;btn.textContent='💾 Enregistrer';}
+      if(prog){prog.style.display='none';}
+      toast('Erreur upload : '+up.error.message,'error');
+      return;
+    }
+    if(bar){bar.style.width='100%';}
+    var pub=sb.storage.from('formation-videos').getPublicUrl(fileName);
+    videoUrl=pub.data.publicUrl;
+  }
+
   var data={
     title:title,
-    lecon_type:isYt?'youtube':'text',
-    youtube_id:ytId||null,
+    lecon_type:lType,
+    youtube_id:isYt?(ytId||null):null,
+    video_url:isVid?(videoUrl||null):null,
     duration_min:parseInt(document.getElementById('lDur').value)||0,
     content:document.getElementById('lCont').value.trim()
   };
@@ -581,6 +629,8 @@ async function saveLecon(mid){
     data.position=mod?mod.lecons.length:0;
     res=await sb.from('lecons').insert(data);
   }
+  var sBtn=document.getElementById('lSaveBtn');
+  if(sBtn){sBtn.disabled=false;sBtn.textContent='💾 Enregistrer';}
   if(res.error){toast('Erreur : '+res.error.message,'error');return;}
   toast(curL?'Leçon mise à jour !':'Leçon ajoutée !','success');
   await loadModules(curF.id);
