@@ -516,7 +516,7 @@ function openLeconEd(id, l, moduleId){
       '</div>'+
       '<div id="lVidField" style="'+(lType!=='video'?'display:none':'')+'">'+
         '<div class="field">'+
-          '<label>Vidéo (MP4 recommandé, max 50 MB)</label>'+
+          '<label>Vidéo (MP4 recommandé, max 500 MB)</label>'+
           '<div id="lVidCurrent" style="'+(videoUrl?'':'display:none')+'margin-bottom:8px;padding:8px;background:#f5f5f5;border-radius:6px;font-size:.72rem;color:#555;word-break:break-all">'+
             '📹 <span id="lVidUrl">'+videoUrl+'</span>'+
           '</div>'+
@@ -591,7 +591,7 @@ async function saveLecon(mid){
   var fileInput=document.getElementById('lVidFile');
   if(isVid&&fileInput&&fileInput.files&&fileInput.files[0]){
     var file=fileInput.files[0];
-    if(file.size>50*1024*1024){toast('Fichier trop gros (max 50 MB).','error');return;}
+    if(file.size>500*1024*1024){toast('Fichier trop gros (max 500 MB).','error');return;}
     var btn=document.getElementById('lSaveBtn');
     if(btn){btn.disabled=true;btn.textContent='Upload en cours…';}
     var prog=document.getElementById('lVidProgress');
