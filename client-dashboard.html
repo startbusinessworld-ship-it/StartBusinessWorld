@@ -534,7 +534,6 @@
       </div>
       <div class="topbar-actions">
         <a href="index.html" class="btn-outline">← Retour au site</a>
-        <a href="club.html#rejoindre" class="btn-gold" id="upgradeBtn" style="display:none">Passer à 29€/mois</a>
       </div>
     </div>
 
@@ -1370,23 +1369,6 @@
                       currentMember?.plan === 'basic' ? '29€/mois' :
                       currentMember?.plan === 'intro' ? 'Intro' :
                       currentMember?.plan === 'inscrit' ? 'Inscrit' : 'Club SBW'
-    var subPriceEl = document.getElementById('subPrice')
-    if (subPriceEl) subPriceEl.innerHTML = currentMember?.plan === 'trial'
-      ? '1€<small>/mois</small>'
-      : currentMember?.plan === 'pro' ? '79€<small>/mois</small>'
-      : currentMember?.plan === 'business' ? '149€<small>/mois</small>'
-      : '29€<small>/mois</small>'
-    var subRenewalEl = document.getElementById('subRenewal')
-    if (subRenewalEl) subRenewalEl.textContent = currentMember?.plan === 'trial'
-      ? 'Période d\'essai · 3 mois'
-      : 'Abonnement actif · sans engagement'
-
-    // Affiche bouton upgrade si trial
-    var upgradeBtn = document.getElementById('upgradeBtn')
-    if (upgradeBtn && currentMember?.plan === 'trial') {
-      upgradeBtn.style.display = 'inline-flex'
-    }
-
     // Profil
     var profileName = document.getElementById('profileName')
     if (profileName) {
@@ -1457,10 +1439,10 @@
       dashboard: ['Tableau de bord', 'Bienvenue dans le Club SBW'],
       formations: ['Formations', 'Tous tes modules vidéo'],
       articles: ['Articles & Ressources', 'Le blog Start Business World'],
-      communaute: ['Groupe privé Business', 'Réservé aux membres Business'],
+      communaute: ['Groupe privé', 'Réservé aux membres du Club SBW'],
       bonsplans: ['Bons Plans', 'Offres exclusives membres'],
       compte: ['Mon compte', 'Profil & abonnement'],
-      live: ['Live mensuel', 'Réservé aux membres Business']
+      live: ['Live mensuel', 'Réservé aux membres du Club SBW']
     }
     const t = titles[name] || ['', '']
     document.getElementById('topbarTitle').textContent = t[0]
@@ -1476,25 +1458,30 @@
   }
 
   window.cancelSub = async function() {
-    if (!confirm('Annuler ton abonnement ? Tu perdras l\'accès à la fin de la période en cours.')) return
-    // Annuler dans Stripe via la Edge Function
+    if (!confirm('Annuler ton abonnement ? Tu garderas l\'accès jusqu\'à la fin de la période déjà payée.')) return
     try {
       const { data: { session } } = await sb.auth.getSession()
-      if (session && currentMember?.stripe_subscription_id) {
-        await fetch(SUPABASE_URL + '/functions/v1/sync-subscription', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + session.access_token
-          },
-          body: JSON.stringify({ action: 'cancel' })
-        })
+      if (!session) { window.location.href = 'client-login.html'; return }
+
+      const res = await fetch(SUPABASE_URL + '/functions/v1/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + session.access_token
+        }
+      })
+      const data = await res.json()
+
+      if (data.success) {
+        showToast('Abonnement annulé. Accès conservé jusqu\'à la fin de la période.', 'success')
+        setTimeout(() => window.location.reload(), 2500)
+      } else {
+        showToast('Erreur: ' + (data.error || 'Impossible d\'annuler'), 'error')
       }
-    } catch(e) { console.log('Erreur annulation Stripe:', e) }
-    // Mettre à jour dans Supabase
-    await sb.from('members').update({ plan: 'cancelled', stripe_subscription_status: 'canceled' }).eq('id', currentUser.id)
-    showToast('Abonnement annulé.')
-    setTimeout(() => window.location.href = 'club.html', 2000)
+    } catch(e) {
+      console.error('Erreur annulation:', e)
+      showToast('Erreur de connexion', 'error')
+    }
   }
 
   window.handleLogout = async function() {
