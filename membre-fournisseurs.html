@@ -299,8 +299,11 @@ async function init() {
     await SB.auth.signOut(); window.location.href = 'client-login.html';
   };
 
-  // Vérifier le plan
-  var memberRes = await SB.from('members').select('plan').eq('email', user.email).maybeSingle();
+  // Vérifier le plan (par ID d'abord, fallback email)
+  var memberRes = await SB.from('members').select('plan').eq('id', user.id).maybeSingle();
+  if (!memberRes.data) {
+    memberRes = await SB.from('members').select('plan').eq('email', user.email).maybeSingle();
+  }
   var plan = memberRes.data?.plan;
   var plansPaids = ['pro', 'business', 'mensuel', 'annuel'];
   var hasAccess = plan && plansPaids.includes(plan);
