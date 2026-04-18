@@ -1527,31 +1527,16 @@
     } catch(e) { console.log('Module progress error:', e) }
   }
 
+  // Le user est sur le dashboard = déjà abonné (init redirige vers club sinon).
+  // La page de destination gère son propre check d'accès au besoin.
   window.accessFournisseurs = function() {
-    var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
-    if (currentMember && plansPaids.includes(currentMember.plan)) {
-      window.location.href = 'membre-annuaire.html'
-    } else {
-      window.location.href = 'club.html'
-    }
+    window.location.href = 'membre-annuaire.html'
   }
-
   window.accessGroupe = function() {
-    var plansPaids = ['business', 'mensuel', 'annuel']
-    if (currentMember && plansPaids.includes(currentMember.plan)) {
-      window.location.href = 'membre-chat.html'
-    } else {
-      window.location.href = 'club.html'
-    }
+    window.location.href = 'membre-chat.html'
   }
-
   function accessLive() {
-    var plansPaids = ['business', 'mensuel', 'annuel']
-    if (currentMember && plansPaids.includes(currentMember.plan)) {
-      window.location.href = 'membre-live.html'
-    } else {
-      window.location.href = 'club.html'
-    }
+    window.location.href = 'membre-live.html'
   }
 
   function closeModal() {
