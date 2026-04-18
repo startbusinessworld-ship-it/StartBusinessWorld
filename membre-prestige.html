@@ -318,11 +318,11 @@ var REWARDS = [
   },
   {
     level: 3,
-    title: "3 jours offerts — Plan Pro",
-    desc: "Accès gratuit pendant 3 jours au plan Pro : formations vidéo avancées, annuaire fournisseurs Chine et contacts exclusifs.",
-    badge: "⭐",
-    cta: "Activer 3 jours Pro",
-    type: "trial_pro"
+    title: "Accès au groupe privé",
+    desc: "Débloque l'accès au groupe privé du Club SBW : échange avec des entrepreneurs sérieux, questions de fond, zéro bruit.",
+    badge: "💬",
+    cta: "Débloquer le groupe",
+    type: "unlock_groupe"
   },
   {
     level: 4,
@@ -334,11 +334,11 @@ var REWARDS = [
   },
   {
     level: 5,
-    title: "3 jours offerts — Plan Business",
-    desc: "Accès complet au plan Business pendant 3 jours : groupe privé, live mensuel et accompagnement prioritaire.",
-    badge: "🚀",
-    cta: "Activer 3 jours Business",
-    type: "trial_business"
+    title: "Accès au live mensuel",
+    desc: "Débloque l'accès au live mensuel du Club SBW : pose tes questions en direct et retrouve tous les replays exclusifs.",
+    badge: "🎥",
+    cta: "Débloquer le live",
+    type: "unlock_live"
   }
 ];
 
@@ -539,20 +539,17 @@ async function claimReward(type) {
       claimed_at: new Date().toISOString()
     }, { onConflict: 'user_id,reward_type' });
 
-    if (type === 'trial_pro' || type === 'trial_business') {
-      // Activer 3 jours d'accès
-      var planTrial = type === 'trial_pro' ? 'pro' : 'business';
-      var expires = new Date();
-      expires.setDate(expires.getDate() + 3);
-
-      await SB.from('members').update({
-        trial_plan: planTrial,
-        trial_expires_at: expires.toISOString()
-      }).eq('id', user.id);
-
-      btn.textContent = '✓ Activé !';
+    if (type === 'unlock_groupe') {
+      btn.textContent = '✓ Débloqué !';
       btn.style.background = '#22c55e';
-      alert('🎉 ' + (type === 'trial_pro' ? '3 jours Pro activés' : '3 jours Business activés') + ' ! Retourne sur le dashboard pour en profiter.');
+      alert('🎉 Groupe privé débloqué ! Tu peux maintenant y accéder depuis le dashboard.');
+      setTimeout(function(){ window.location.href = 'membre-chat.html'; }, 1500);
+
+    } else if (type === 'unlock_live') {
+      btn.textContent = '✓ Débloqué !';
+      btn.style.background = '#22c55e';
+      alert('🎉 Live mensuel débloqué ! Tu peux maintenant y accéder depuis le dashboard.');
+      setTimeout(function(){ window.location.href = 'membre-live.html'; }, 1500);
 
     } else if (type === 'ebook') {
       btn.textContent = '✓ Débloqué !';
