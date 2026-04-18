@@ -299,47 +299,11 @@ var user = null;
 var myXp = null;
 
 var LEVELS = [
-  { num:1, title:"Débutant",  badge:"⚪", class:"l1", xp:0,    color:"#aaa" },
-  { num:2, title:"Apprenti",  badge:"🟢", class:"l2", xp:100,  color:"#22c55e" },
-  { num:3, title:"Confirmé",  badge:"🔵", class:"l3", xp:300,  color:"#3b82f6" },
-  { num:4, title:"Expert",    badge:"🟣", class:"l4", xp:700,  color:"#a855f7" },
-  { num:5, title:"Légende",   badge:"🌟", class:"l5", xp:1500, color:"#A67C3A" }
-];
-
-// Récompenses débloquables à chaque niveau
-var REWARDS = [
-  {
-    level: 2,
-    title: "eBook — Go Créer Mon Business",
-    desc: "Le guide complet pour lancer ton business international. Sourcing, fiscalité, création de société — tout ce qu'il faut savoir.",
-    badge: "📖",
-    cta: "Télécharger l'eBook",
-    type: "ebook"
-  },
-  {
-    level: 3,
-    title: "Accès au groupe privé",
-    desc: "Débloque l'accès au groupe privé du Club SBW : échange avec des entrepreneurs sérieux, questions de fond, zéro bruit.",
-    badge: "💬",
-    cta: "Débloquer le groupe",
-    type: "unlock_groupe"
-  },
-  {
-    level: 4,
-    title: "Pack Business en Chine",
-    desc: "Accès exclusif au pack Business Chine : contacts fournisseurs premium, guide sourcing avancé et templates de contrats import.",
-    badge: "🇨🇳",
-    cta: "Débloquer le Pack",
-    type: "pack_china"
-  },
-  {
-    level: 5,
-    title: "Accès au live mensuel",
-    desc: "Débloque l'accès au live mensuel du Club SBW : pose tes questions en direct et retrouve tous les replays exclusifs.",
-    badge: "🎥",
-    cta: "Débloquer le live",
-    type: "unlock_live"
-  }
+  { num:1, title:"Débutant",  badge:"⚪", class:"l1", xp:0,    color:"#aaa",     reward:null },
+  { num:2, title:"Apprenti",  badge:"🟢", class:"l2", xp:100,  color:"#22c55e",  reward:{ title:"eBook — Go Créer Mon Business", desc:"Le guide complet pour lancer ton business international.", icon:"📖", cta:"Télécharger", type:"ebook" } },
+  { num:3, title:"Confirmé",  badge:"🔵", class:"l3", xp:300,  color:"#3b82f6",  reward:{ title:"Accès au groupe privé", desc:"Échange avec des entrepreneurs sérieux, questions de fond, zéro bruit.", icon:"💬", cta:"Accéder au groupe", type:"unlock_groupe" } },
+  { num:4, title:"Expert",    badge:"🟣", class:"l4", xp:700,  color:"#a855f7",  reward:{ title:"Pack Business en Chine", desc:"Contacts fournisseurs premium, guide sourcing avancé et templates.", icon:"🇨🇳", cta:"Débloquer le Pack", type:"pack_china" } },
+  { num:5, title:"Légende",   badge:"🌟", class:"l5", xp:1500, color:"#A67C3A",  reward:{ title:"Accès au live mensuel", desc:"Pose tes questions en direct et accède à tous les replays exclusifs.", icon:"🎥", cta:"Accéder au live", type:"unlock_live" } }
 ];
 
 async function init() {
@@ -473,10 +437,22 @@ function renderLevels() {
       pct = Math.min(100, Math.round((myXp.xp - l.xp) / (nextL.xp - l.xp) * 100));
     } else if (isUnlocked) { pct = 100; }
 
-    var reward = REWARDS.find(function(r) { return r.level === l.num; });
+    var r = l.reward;
 
     var row = document.createElement("div");
     row.className = "level-row" + (isCurrent ? " current-level" : "") + (!isUnlocked ? " locked" : " unlocked");
+
+    var rewardHtml = '';
+    if (r) {
+      rewardHtml = '<div style="margin-top:8px;padding:8px 10px;background:' + (isUnlocked ? 'rgba(166,124,58,.06)' : 'rgba(0,0,0,.02)') + ';border:0.5px solid ' + (isUnlocked ? 'rgba(166,124,58,.2)' : 'var(--subtle)') + ';border-radius:8px;display:flex;align-items:center;gap:10px">' +
+        '<div style="font-size:1.3rem;flex-shrink:0">' + (isUnlocked ? r.icon : '🔒') + '</div>' +
+        '<div style="flex:1">' +
+          '<div style="font-size:.78rem;font-weight:500;color:' + (isUnlocked ? 'var(--ink)' : 'var(--muted)') + '">' + r.title + '</div>' +
+          '<div style="font-size:.68rem;color:var(--muted)">' + r.desc + '</div>' +
+        '</div>' +
+        (isUnlocked ? '<button onclick="claimReward(\'' + r.type + '\')" style="background:var(--gold);color:#fff;border:none;padding:5px 12px;border-radius:6px;font-family:inherit;font-size:.72rem;font-weight:500;cursor:pointer;flex-shrink:0">' + r.cta + ' →</button>' : '') +
+      '</div>';
+    }
 
     row.innerHTML =
       '<div class="level-icon">' + l.badge + '</div>' +
@@ -486,7 +462,7 @@ function renderLevels() {
           (isUnlocked && !isCurrent ? ' <span class="badge-done">✓ Débloqué</span>' : '') +
         '</div>' +
         '<div class="level-xp-req">' + l.xp.toLocaleString("fr-FR") + ' XP requis</div>' +
-        (reward ? '<div class="level-reward">🏆 ' + reward.text + '</div>' : '') +
+        rewardHtml +
       '</div>' +
       '<div class="level-progress-mini">' +
         '<div class="level-progress-bar"><div class="level-progress-fill" style="width:' + pct + '%;background:' + l.color + '"></div></div>' +
@@ -499,31 +475,7 @@ function renderLevels() {
 
 function renderRewards() {
   var container = document.getElementById('rewardsList');
-  if (!container) return;
-  var currentLevel = myXp.level;
-
-  container.innerHTML = REWARDS.map(function(r) {
-    var unlocked = currentLevel >= r.level;
-    var levelInfo = LEVELS[r.level - 1];
-    var xpRequired = levelInfo ? levelInfo.xp : 0;
-    var xpMissing = Math.max(0, xpRequired - myXp.xp);
-
-    return '<div style="background:' + (unlocked ? '#fff' : '#f8f8f6') + ';border:0.5px solid ' + (unlocked ? 'rgba(166,124,58,.3)' : 'var(--subtle)') + ';border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:16px;' + (unlocked ? '' : 'opacity:.6') + '">' +
-      '<div style="font-size:2.2rem;flex-shrink:0;width:52px;text-align:center">' + (unlocked ? r.badge : '🔒') + '</div>' +
-      '<div style="flex:1">' +
-        '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">' +
-          '<div style="font-size:.92rem;font-weight:500;color:var(--ink)">' + r.title + '</div>' +
-          (unlocked
-            ? '<span style="font-size:.6rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);padding:2px 8px;border-radius:10px;border:.5px solid rgba(166,124,58,.2)">DÉBLOQUÉ</span>'
-            : '<span style="font-size:.6rem;font-weight:600;background:var(--surface);color:var(--muted);padding:2px 8px;border-radius:10px">Niveau ' + r.level + ' requis</span>') +
-        '</div>' +
-        '<div style="font-size:.78rem;color:var(--muted);line-height:1.5;margin-bottom:' + (unlocked ? '12' : '0') + 'px">' + r.desc + '</div>' +
-        (unlocked
-          ? '<button onclick="claimReward(\'' + r.type + '\')" style="background:var(--gold);color:#fff;border:none;padding:7px 18px;border-radius:7px;font-family:inherit;font-size:.8rem;font-weight:500;cursor:pointer">' + r.cta + ' →</button>'
-          : '<div style="font-size:.72rem;color:var(--muted);margin-top:6px">Encore ' + xpMissing.toLocaleString("fr-FR") + ' XP pour débloquer</div>') +
-      '</div>' +
-    '</div>';
-  }).join('');
+  if (container) container.style.display = 'none';
 }
 
 async function claimReward(type) {
