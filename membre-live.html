@@ -317,9 +317,9 @@ var user = null;
 var member = null;
 var isBusiness = false;
 
-// Prochain live — à mettre à jour chaque mois
+// Prochain live — chargé depuis la DB
 var NEXT_LIVE = {
-  date: new Date('2026-05-08T19:00:00'),
+  date: null,
   subject: 'Business international — toutes les questions sont acceptées.',
   meet_url: null,
   titre: 'Live mensuel'
@@ -359,14 +359,16 @@ async function init() {
   var res = await SB.from('members').select('*').eq('id', user.id).maybeSingle();
   member = res.data;
   var plansPaids = ['business', 'mensuel', 'annuel'];
-  isBusiness = member?.plan && plansPaids.includes(member.plan);
 
   // Vérifier si admin
-  var adminRes = await SB.from('users').select('role').eq('id', user.id).single();
+  var adminRes = await SB.from('users').select('role').eq('id', user.id).maybeSingle();
   var isAdmin = adminRes.data?.role === 'admin';
 
-  // Bloquer si pas Business (sauf admin)
-  if (!isBusiness && !isAdmin) {
+  // isBusiness = plan payé OU admin (pour que l'admin voit aussi le bouton)
+  isBusiness = isAdmin || (member?.plan && plansPaids.includes(member.plan));
+
+  // Bloquer si pas payé et pas admin
+  if (!isBusiness) {
     // Afficher message et rediriger vers dashboard avec modal upgrade
     document.body.innerHTML = \`
       <div style="background:#0C0C0A;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:DM Sans,sans-serif;color:#F0EDE4;text-align:center;padding:2rem">
@@ -398,19 +400,26 @@ async function init() {
     NEXT_LIVE.subject = nextLive.desc || 'Business international — toutes les questions sont acceptées.';
     NEXT_LIVE.meet_url = nextLive.meet_url || null;
     NEXT_LIVE.titre = nextLive.titre || 'Live mensuel';
+  } else {
+    console.warn('Aucun live dans la DB. Vérifie la table lives + les RLS policies.');
   }
 
   // Date prochain live
-  document.getElementById('nextLiveDate').textContent = NEXT_LIVE.date.toLocaleDateString('fr-FR', {
-    weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
-  });
+  var dateEl = document.getElementById('nextLiveDate');
+  if (NEXT_LIVE.date) {
+    dateEl.textContent = NEXT_LIVE.date.toLocaleDateString('fr-FR', {
+      weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit'
+    });
+  } else {
+    dateEl.textContent = 'Aucun live programmé';
+  }
   document.getElementById('nextLiveSubject').textContent = NEXT_LIVE.subject;
 
   // Bouton Meet si Business et lien disponible
   renderMeetButton();
 
   // Countdown
-  startCountdown();
+  if (NEXT_LIVE.date) startCountdown();
 
   // Compteur question
   document.getElementById('questionText').addEventListener('input', function() {
