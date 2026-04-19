@@ -1328,7 +1328,12 @@
     var el = document.getElementById('dashNextLiveDate')
     if (!el) return
     try {
-      const { data } = await sb.from('lives').select('titre,live_date').eq('statut','upcoming').order('live_date').limit(1).maybeSingle()
+      var nowIso = new Date().toISOString()
+      var { data } = await sb.from('lives').select('titre,live_date').gte('live_date', nowIso).order('live_date').limit(1).maybeSingle()
+      if (!data) {
+        var up = await sb.from('lives').select('titre,live_date').eq('statut','upcoming').order('live_date', {ascending:false}).limit(1).maybeSingle()
+        data = up.data
+      }
       if (data?.live_date) {
         var d = new Date(data.live_date)
         el.textContent = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }) + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })

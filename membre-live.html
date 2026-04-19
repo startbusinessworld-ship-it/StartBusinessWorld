@@ -399,9 +399,15 @@ async function init() {
   document.getElementById('heroLiveCount').textContent = '0';
   document.getElementById('heroQuestionsCount').textContent = '0';
 
-  // Charger le prochain live depuis Supabase
-  var liveRes = await SB.from('lives').select('*').eq('statut','upcoming').order('live_date').limit(1).maybeSingle();
+  // Charger le prochain live depuis Supabase (date future prioritaire)
+  var nowIso = new Date().toISOString();
+  var liveRes = await SB.from('lives').select('*').gte('live_date', nowIso).order('live_date').limit(1).maybeSingle();
   var nextLive = liveRes.data;
+  // Fallback : si pas de live futur, tenter upcoming
+  if (!nextLive) {
+    var upRes = await SB.from('lives').select('*').eq('statut','upcoming').order('live_date', {ascending:false}).limit(1).maybeSingle();
+    nextLive = upRes.data;
+  }
 
   if (nextLive) {
     NEXT_LIVE.date = new Date(nextLive.live_date);
