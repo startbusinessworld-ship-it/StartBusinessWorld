@@ -379,15 +379,26 @@ function renderAll() {
       var card = makeExtCard(f, fi);
       if (isLocked) applyLock(card, reqPlan);
       grid.appendChild(card);
-    } else {
-      f.modules.forEach(function(m, mi) {
-        var prog_data = getModuleProgress(f, m);
-        if (!isLocked) { totalDone += prog_data.done; totalAll += prog_data.total; }
-        var card = makeModuleCard(f, m, mi + fi * 10, prog_data);
-        if (isLocked) applyLock(card, reqPlan);
-        grid.appendChild(card);
-      });
+      return;
     }
+
+    // 1 carte par formation. On agrège la progression de tous ses modules.
+    var totalDoneF = 0, totalAllF = 0;
+    (f.modules || []).forEach(function(m) {
+      var p = getModuleProgress(f, m);
+      totalDoneF += p.done;
+      totalAllF += p.total;
+    });
+    var pctF = totalAllF > 0 ? Math.round(totalDoneF / totalAllF * 100) : 0;
+    var progF = { done: totalDoneF, total: totalAllF, pct: pctF };
+
+    if (!isLocked) { totalDone += totalDoneF; totalAll += totalAllF; }
+
+    // On prend le premier module comme référence (html_url ou liste de leçons)
+    var firstModule = (f.modules && f.modules[0]) || { title: f.title, lecons: [] };
+    var card = makeModuleCard(f, firstModule, fi, progF);
+    if (isLocked) applyLock(card, reqPlan);
+    grid.appendChild(card);
   });
 
   container.appendChild(grid);
