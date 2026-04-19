@@ -370,7 +370,7 @@ async function init() {
   // Bloquer si pas payé et pas admin
   if (!isBusiness) {
     // Afficher message et rediriger vers dashboard avec modal upgrade
-    document.body.innerHTML = \`
+    document.body.innerHTML = `
       <div style="background:#0C0C0A;min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:DM Sans,sans-serif;color:#F0EDE4;text-align:center;padding:2rem">
         <div>
           <div style="font-size:2.5rem;margin-bottom:1rem">🔒</div>
@@ -379,7 +379,7 @@ async function init() {
           <a href="client-dashboard.html" style="display:inline-block;padding:12px 28px;background:rgba(255,255,255,.08);color:#F0EDE4;border:0.5px solid rgba(255,255,255,.15);border-radius:8px;text-decoration:none;font-weight:500;margin-right:8px">Retour au dashboard</a>
           <a href="club.html" style="display:inline-block;padding:12px 28px;background:#A67C3A;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">Rejoindre le Club</a>
         </div>
-      </div>\`;
+      </div>`;
     return;
   }
 
