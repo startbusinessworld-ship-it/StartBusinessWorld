@@ -113,7 +113,12 @@
           <div class="metric-delta up" id="metricSubDelta"></div>
         </div>
         <div class="metric-card">
-          <div class="metric-label">Membres Club SBW</div>
+          <div class="metric-label">Inscrits (total)</div>
+          <div class="metric-value" id="metricInscrits">—</div>
+          <div class="metric-delta up" id="metricInscritsDelta"></div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-label">Membres payants</div>
           <div class="metric-value" id="metricMembers">—</div>
           <div class="metric-delta up" id="metricMembersDelta"></div>
         </div>
@@ -242,11 +247,13 @@
     const startOfWeek = new Date(); startOfWeek.setDate(startOfWeek.getDate() - 7); startOfWeek.setHours(0,0,0,0)
 
     // Lancer toutes les requêtes en parallèle
-    const [subRes, subWeekRes, memberRes, memberLastRes, visitsRes, visitsLastRes, draftsRes, sessionRes] = await Promise.all([
+    const [subRes, subWeekRes, inscritsRes, inscritsWeekRes, paidRes, paidLastRes, visitsRes, visitsLastRes, draftsRes, sessionRes] = await Promise.all([
       sb.from('subscribers').select('*', {count:'exact',head:true}),
       sb.from('subscribers').select('*', {count:'exact',head:true}).gte('created_at', startOfWeek.toISOString()),
-      sb.from('members').select('*', {count:'exact',head:true}).not('plan','eq','trial').not('plan','is',null),
-      sb.from('members').select('*', {count:'exact',head:true}).not('plan','eq','trial').not('plan','is',null).lt('plan_updated_at', startOfMonth.toISOString()),
+      sb.from('members').select('*', {count:'exact',head:true}),
+      sb.from('members').select('*', {count:'exact',head:true}).gte('created_at', startOfWeek.toISOString()),
+      sb.from('members').select('*', {count:'exact',head:true}).in('plan', ['mensuel','annuel','pro','business']),
+      sb.from('members').select('*', {count:'exact',head:true}).in('plan', ['mensuel','annuel','pro','business']).lt('plan_updated_at', startOfMonth.toISOString()),
       sb.from('page_views').select('*', {count:'exact',head:true}).gte('created_at', startOfMonth.toISOString()),
       sb.from('page_views').select('*', {count:'exact',head:true}).gte('created_at', lastMonth.toISOString()).lt('created_at', startOfMonth.toISOString()),
       sb.from('articles').select('*', {count:'exact',head:true}).eq('status','draft'),
@@ -260,12 +267,19 @@
     document.getElementById('metricSubDelta').textContent = '+' + subWeekCount + ' cette semaine'
     document.getElementById('metricSubDelta').className = 'metric-delta up'
 
-    // Membres Club actifs
-    const memberCount = memberRes.count || 0
-    const memberCountLast = memberLastRes.count || 0
-    const newMembers = memberCount - memberCountLast
-    document.getElementById('metricMembers').textContent = memberCount.toLocaleString('fr-FR')
-    setDelta('metricMembersDelta', newMembers, ' ce mois')
+    // Inscrits (total)
+    const inscritsCount = inscritsRes.count || 0
+    const inscritsWeek = inscritsWeekRes.count || 0
+    document.getElementById('metricInscrits').textContent = inscritsCount.toLocaleString('fr-FR')
+    document.getElementById('metricInscritsDelta').textContent = '+' + inscritsWeek + ' cette semaine'
+    document.getElementById('metricInscritsDelta').className = 'metric-delta up'
+
+    // Membres payants (mensuel, annuel + legacy pro, business)
+    const paidCount = paidRes.count || 0
+    const paidLast = paidLastRes.count || 0
+    const newPaid = paidCount - paidLast
+    document.getElementById('metricMembers').textContent = paidCount.toLocaleString('fr-FR')
+    setDelta('metricMembersDelta', newPaid, ' ce mois')
 
     // Visites
     const visitsThisMonth = visitsRes.count || 0
