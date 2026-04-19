@@ -257,7 +257,8 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
     <div class="next-live-body">
       <div class="next-live-theme">Thème du mois</div>
       <div class="next-live-subject" id="nextLiveSubject">Business international, structure juridique, sourcing Chine — toutes les questions sont acceptées.</div>
-      <div id="meetBtnContainer" style="margin-bottom:1.2rem"></div>
+      <div id="meetBtnContainer" style="margin-bottom:1rem"></div>
+      <div id="calendarBtnContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.2rem"></div>
       <div class="question-form">
         <label class="question-form-label">📝 Pose ta question pour le prochain live</label>
         <textarea class="question-textarea" id="questionText" placeholder="Ex: Comment choisir entre une SASU et une société Hong Kong pour mon e-commerce ?" maxlength="500"></textarea>
@@ -346,6 +347,77 @@ function renderMeetButton() {
   }
 }
 
+// ═══ AJOUTER AU CALENDRIER ═══
+function pad(n){return String(n).padStart(2,'0');}
+function toIcalUtc(d){
+  return d.getUTCFullYear()+pad(d.getUTCMonth()+1)+pad(d.getUTCDate())+
+    'T'+pad(d.getUTCHours())+pad(d.getUTCMinutes())+pad(d.getUTCSeconds())+'Z';
+}
+
+function renderCalendarButtons(){
+  var container = document.getElementById('calendarBtnContainer');
+  if (!container) return;
+  if (!NEXT_LIVE.date) { container.innerHTML = ''; return; }
+
+  var dur = (NEXT_LIVE.duree || 90) * 60 * 1000; // durée en ms (défaut 90 min)
+  var end = new Date(NEXT_LIVE.date.getTime() + dur);
+  var title = NEXT_LIVE.titre;
+  var details = (NEXT_LIVE.subject || '') + (NEXT_LIVE.meet_url ? '\n\nLien Meet : ' + NEXT_LIVE.meet_url : '');
+  var location = NEXT_LIVE.meet_url || '';
+
+  var startUtc = toIcalUtc(NEXT_LIVE.date);
+  var endUtc = toIcalUtc(end);
+
+  var gcalUrl = 'https://www.google.com/calendar/render?action=TEMPLATE' +
+    '&text=' + encodeURIComponent(title) +
+    '&dates=' + startUtc + '/' + endUtc +
+    '&details=' + encodeURIComponent(details) +
+    '&location=' + encodeURIComponent(location);
+
+  var btnStyle = 'display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:7px;font-size:.78rem;font-weight:500;text-decoration:none;border:0.5px solid var(--subtle);background:var(--bg);color:var(--ink);cursor:pointer;font-family:inherit;transition:all .15s';
+
+  container.innerHTML =
+    '<a href="' + gcalUrl + '" target="_blank" style="' + btnStyle + '" onmouseover="this.style.borderColor=\'var(--ink)\'" onmouseout="this.style.borderColor=\'var(--subtle)\'">📅 Google Calendar</a>' +
+    '<button onclick="downloadIcs()" style="' + btnStyle + '">🗓️ Apple/Outlook (.ics)</button>';
+}
+
+function downloadIcs(){
+  if (!NEXT_LIVE.date) return;
+  var dur = (NEXT_LIVE.duree || 90) * 60 * 1000;
+  var end = new Date(NEXT_LIVE.date.getTime() + dur);
+  var ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Start Business World//SBW Live//FR',
+    'BEGIN:VEVENT',
+    'UID:sbw-live-' + NEXT_LIVE.date.getTime() + '@startbusinessworld.com',
+    'DTSTAMP:' + toIcalUtc(new Date()),
+    'DTSTART:' + toIcalUtc(NEXT_LIVE.date),
+    'DTEND:' + toIcalUtc(end),
+    'SUMMARY:' + NEXT_LIVE.titre.replace(/\n/g, '\\n'),
+    'DESCRIPTION:' + ((NEXT_LIVE.subject || '') + (NEXT_LIVE.meet_url ? '\\n\\nLien Meet : ' + NEXT_LIVE.meet_url : '')).replace(/\n/g, '\\n'),
+    'LOCATION:' + (NEXT_LIVE.meet_url || ''),
+    'BEGIN:VALARM',
+    'TRIGGER:-PT1H',
+    'ACTION:DISPLAY',
+    'DESCRIPTION:Live SBW dans 1h',
+    'END:VALARM',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+
+  var blob = new Blob([ics], {type:'text/calendar;charset=utf-8'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'sbw-live.ics';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+window.downloadIcs = downloadIcs;
+
 async function init() {
   var s = await SB.auth.getSession();
   if (!s.data.session) { window.location.href = 'client-login.html'; return; }
@@ -417,6 +489,7 @@ async function init() {
 
   // Bouton Meet si Business et lien disponible
   renderMeetButton();
+  renderCalendarButtons();
 
   // Countdown
   if (NEXT_LIVE.date) startCountdown();
