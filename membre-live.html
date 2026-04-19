@@ -207,21 +207,7 @@ nav{background:var(--dark);height:54px;padding:0 2rem;display:flex;align-items:c
   <div class="live-hero">
     <div class="hero-badge">🎥 Live mensuel</div>
     <h1>Tes questions.<br><em>Mes réponses.</em></h1>
-    <p>Chaque mois, pose tes questions en avance. Je réponds en live, en direct, sans filtre. Réservé aux membres Business.</p>
-    <div class="live-status">
-      <div class="live-stat">
-        <div class="live-stat-n" id="heroLiveCount">—</div>
-        <div class="live-stat-l">Lives réalisés</div>
-      </div>
-      <div class="live-stat">
-        <div class="live-stat-n" id="heroQuestionsCount">—</div>
-        <div class="live-stat-l">Questions répondues</div>
-      </div>
-      <div class="live-stat">
-        <div class="live-stat-n">1×</div>
-        <div class="live-stat-l">Par mois</div>
-      </div>
-    </div>
+    <p>Chaque mois, pose tes questions en avance. Je réponds en live, en direct, sans filtre. Réservé aux membres du Club SBW.</p>
   </div>
 
   <!-- BANNER LOCK (si pas Business) -->
@@ -396,8 +382,6 @@ async function init() {
   }
 
   // Stats hero
-  document.getElementById('heroLiveCount').textContent = '0';
-  document.getElementById('heroQuestionsCount').textContent = '0';
 
   // Charger le prochain live depuis Supabase (date future prioritaire)
   var nowIso = new Date().toISOString();
