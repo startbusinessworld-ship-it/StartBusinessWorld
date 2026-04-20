@@ -710,7 +710,7 @@
       const { data: { session } } = await sb.auth.getSession()
       if (session) {
         const { data: member } = await sb.from('members').select('plan').eq('id', session.user.id).maybeSingle()
-        var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+        var plansPaids = ['mensuel', 'annuel']
         if (member && plansPaids.includes(member.plan)) {
           window.location.href = 'client-dashboard.html'
           return

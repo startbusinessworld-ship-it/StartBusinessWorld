@@ -56,7 +56,7 @@
         var user = session.user
         var name = user.user_metadata?.full_name || user.user_metadata?.name || user.email.split('@')[0]
         var initials = name.split(' ').map(function(n){ return n[0] }).join('').toUpperCase().slice(0,2)
-        var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+        var plansPaids = ['mensuel', 'annuel']
 
         // Vérifier plan pour le lien dashboard
         sb.from('members').select('plan').eq('id', user.id).maybeSingle().then(function(res) {

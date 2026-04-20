@@ -81,10 +81,8 @@
         <select class="btn-ghost" id="filterPlan" onchange="filterMembers()" style="cursor:pointer">
           <option value="all">Tous les plans</option>
           <option value="inscrit">Inscrit (sans plan)</option>
-          <option value="intro">1€/mois — Offre lancement</option>
-          <option value="basic">Basic — 29€/mois</option>
-          <option value="pro">Pro — 79€/mois</option>
-          <option value="business">Business — 149€/mois</option>
+          <option value="mensuel">Mensuel — 79€/mois</option>
+          <option value="annuel">Annuel — 597€/an</option>
           <option value="cancelled">Annulé</option>
         </select>
         <button class="btn-ghost" onclick="exportMembers()">↓ Exporter CSV</button>
@@ -160,21 +158,17 @@
     const inscrit = allMembers.filter(m => m.plan === 'inscrit').length
     const mensuel = allMembers.filter(m => m.plan === 'mensuel').length
     const annuel = allMembers.filter(m => m.plan === 'annuel').length
-    // Legacy plans
-    const intro = allMembers.filter(m => m.plan === 'intro').length
-    const basic = allMembers.filter(m => m.plan === 'basic').length
-    const pro = allMembers.filter(m => m.plan === 'pro').length
-    const business = allMembers.filter(m => m.plan === 'business').length
     const cancelled = allMembers.filter(m => m.plan === 'cancelled').length
-    const totalPayants = mensuel + annuel + intro + basic + pro + business
-    const mrr = (mensuel * 79) + (annuel * 597/12) + (intro * 1) + (basic * 29) + (pro * 79) + (business * 149)
+    const totalPayants = mensuel + annuel
+    const mrr = (mensuel * 79) + (annuel * 597/12)
 
-    document.getElementById('memberCount').textContent = totalPayants + ' membres actifs'
+    document.getElementById('memberCount').textContent = totalPayants + ' membres payants'
     document.getElementById('mActive').textContent = totalPayants
     document.getElementById('mActiveDelta').textContent = inscrit + ' inscrits sans plan'
-    document.getElementById('mTrial').textContent = intro
+    var mTrialEl = document.getElementById('mTrial'); if (mTrialEl) mTrialEl.textContent = annuel
+    var mTrialLabel = document.getElementById('mTrialDelta'); if (mTrialLabel) mTrialLabel.textContent = mensuel + ' mensuels · ' + annuel + ' annuels'
     document.getElementById('mCancelled').textContent = cancelled
-    document.getElementById('mCancelledDelta').textContent = basic + ' Basic · ' + pro + ' Pro · ' + business + ' Business'
+    var mCancelLabel = document.getElementById('mCancelledDelta'); if (mCancelLabel) mCancelLabel.textContent = 'Annulés'
     document.getElementById('mMRR').textContent = mrr.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
 
     renderMembers(allMembers)
@@ -203,15 +197,12 @@
       const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
       const planLabels = {
         inscrit: 'Inscrit',
-        intro: '1€/mois',
-        basic: 'Basic 29€',
-        pro: 'Pro 79€',
-        business: 'Business 149€',
+        mensuel: 'Mensuel 79€/mois',
+        annuel: 'Annuel 597€/an',
         cancelled: 'Annulé'
       }
       const planLabel = planLabels[m.plan] || m.plan || '—'
       const planClass = m.plan === 'inscrit' ? 'draft' :
-                        m.plan === 'intro' ? 'trial' :
                         m.plan === 'cancelled' ? 'draft' : ''
       const statusLabel = m.stripe_subscription_status === 'active' ? 'Actif' :
                           m.stripe_subscription_status === 'past_due' ? 'Impayé' :
@@ -242,7 +233,7 @@
   }
 
   async function upgradeMember(id) {
-    await sb.from('members').update({ plan: 'intro' }).eq('id', id)
+    await sb.from('members').update({ plan: 'mensuel' }).eq('id', id)
     showToast('Membre activé.', 'success')
     loadMembers()
   }

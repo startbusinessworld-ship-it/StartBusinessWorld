@@ -305,7 +305,7 @@ async function init() {
     memberRes = await SB.from('members').select('plan').eq('email', user.email).maybeSingle();
   }
   var plan = memberRes.data?.plan;
-  var plansPaids = ['pro', 'business', 'mensuel', 'annuel'];
+  var plansPaids = ['mensuel', 'annuel'];
   var hasAccess = plan && plansPaids.includes(plan);
 
   if (!hasAccess) {

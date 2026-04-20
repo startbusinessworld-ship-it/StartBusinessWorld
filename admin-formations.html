@@ -163,14 +163,6 @@
     <div class="field"><label>Statut</label>
       <select id="fStatus"><option value="draft">Brouillon</option><option value="published">Publié</option></select>
     </div>
-    <div class="field">
-      <label>Plan requis</label>
-      <div class="type-btns">
-        <button class="type-btn on" id="fplanbtn_basic" onclick="setFPlan('basic')">🆓 Basic (inclus)</button>
-        <button class="type-btn" id="fplanbtn_pro" onclick="setFPlan('pro')">⭐ Pro uniquement</button>
-      </div>
-      <div class="field-note" id="fPlanNote" style="margin-top:4px;font-size:.7rem;color:#888">Inclus dans tous les abonnements.</div>
-    </div>
     <div class="btn-row">
       <button class="btn-ghost" style="flex:1" onclick="closeOv('overlayFormation')">Annuler</button>
       <button class="btn-primary" style="flex:1;justify-content:center" id="fSaveBtn" onclick="saveFormation()">Créer</button>
@@ -234,7 +226,7 @@ function renderFormations(){
     item.setAttribute('data-id',f.id);
     var tl=f.type==='html'?'⚡ IA':f.type==='external'?'🔗':' ▶';
     var bc=f.type==='html'?'badge-html':f.type==='external'?'badge-external':'badge-video';
-    var planBadge=f.plan==='pro'?'<span class="f-badge" style="background:rgba(166,124,58,0.12);color:#A67C3A">⭐ Pro</span>':'';
+    var planBadge='';
     item.innerHTML=
       '<span class="drag-h" onclick="event.stopPropagation()">⠿</span>'+
       '<span class="f-item-name">'+f.title+'</span>'+
@@ -263,7 +255,7 @@ function openFormationModal(f){
   document.getElementById('fStatus').value=f?f.status:'draft';
   document.getElementById('fSaveBtn').textContent=f?'Mettre à jour':'Créer';
   setFType(f?(f.type||'html'):'html');
-  setFPlan(f?(f.plan||'basic'):'basic');
+  // Plan inutile dans le nouveau systeme (une seule grille Club SBW)
   prevImg('fCover','fCoverPrev');
   openOv('overlayFormation');
   setTimeout(function(){document.getElementById('fTitle').focus();},100);
@@ -278,16 +270,9 @@ function setFType(t){
   document.getElementById('fExtField').style.display=t==='external'?'block':'none';
 }
 
-var fPlan='basic';
-function setFPlan(p){
-  fPlan=p;
-  ['basic','pro'].forEach(function(x){
-    var b=document.getElementById('fplanbtn_'+x);
-    if(b) b.className='type-btn'+(x===p?' on':'');
-  });
-  var note=document.getElementById('fPlanNote');
-  if(note) note.textContent=p==='pro'?'⭐ Réservé aux membres Plan Pro (79€/mois).':'Inclus dans tous les abonnements.';
-}
+// Toutes les formations sont incluses dans le Club SBW (un seul tier d'accès)
+var fPlan='inscrit';
+function setFPlan(){}
 
 async function saveFormation(){
   var title=document.getElementById('fTitle').value.trim();

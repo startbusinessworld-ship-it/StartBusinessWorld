@@ -430,7 +430,7 @@ async function init() {
   // Récupère le membre par ID
   var res = await SB.from('members').select('*').eq('id', user.id).maybeSingle();
   member = res.data;
-  var plansPaids = ['business', 'mensuel', 'annuel'];
+  var plansPaids = ['mensuel', 'annuel'];
 
   // Vérifier si admin
   var adminRes = await SB.from('users').select('role').eq('id', user.id).maybeSingle();

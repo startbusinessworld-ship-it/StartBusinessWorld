@@ -1266,7 +1266,7 @@
     }
 
     // Si le plan n'est pas payant, tenter une sync Stripe directe
-    const plansPayants = ['inscrit', 'intro', 'basic', 'pro', 'business', 'mensuel', 'annuel']
+    const plansPayants = ['inscrit', 'mensuel', 'annuel']
     if (member && !plansPayants.includes(member.plan)) {
       const sync = await syncFromStripe(session.access_token)
       if (sync.synced) {
@@ -1299,7 +1299,7 @@
     currentMember = member
 
     if (!isAdmin) {
-      const plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+      const plansPaids = ['mensuel', 'annuel']
       const aPaye = member && plansPaids.includes(member.plan)
 
       // Vérifier trial prestige (3 jours offerts)
@@ -1354,10 +1354,6 @@
     const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     const plan = currentMember?.plan === 'mensuel' ? 'Club SBW — 79€/mois' :
                  currentMember?.plan === 'annuel' ? 'Club SBW — 597€/an' :
-                 currentMember?.plan === 'pro' ? 'Club SBW — 79€/mois' :
-                 currentMember?.plan === 'business' ? 'Club SBW — 149€/mois' :
-                 currentMember?.plan === 'basic' ? 'Club SBW — 29€/mois' :
-                 currentMember?.plan === 'intro' ? 'Club SBW — Intro' :
                  currentMember?.plan === 'inscrit' ? 'Club SBW — Inscrit' : 'Club SBW'
 
     var uiEl = document.getElementById('userInitials'); if(uiEl) uiEl.textContent = initials;
@@ -1369,10 +1365,6 @@
     // Abonnement — éléments optionnels (section compte)
     const planLabel = currentMember?.plan === 'mensuel' ? '79€/mois — Mensuel' :
                       currentMember?.plan === 'annuel' ? '597€/an — Annuel' :
-                      currentMember?.plan === 'pro' ? '79€/mois' :
-                      currentMember?.plan === 'business' ? '149€/mois' :
-                      currentMember?.plan === 'basic' ? '29€/mois' :
-                      currentMember?.plan === 'intro' ? 'Intro' :
                       currentMember?.plan === 'inscrit' ? 'Inscrit' : 'Club SBW'
     // Profil
     var profileName = document.getElementById('profileName')
@@ -1418,10 +1410,7 @@
     document.getElementById('statSince').textContent = formatDate(currentMember?.created_at)
     document.getElementById('statPlan').textContent =
       currentMember?.plan === 'mensuel' ? 'Mensuel — 79€/mois' :
-      currentMember?.plan === 'annuel' ? 'Annuel — 597€/an' :
-      currentMember?.plan === 'pro' ? 'Pro' :
-      currentMember?.plan === 'business' ? 'Business' :
-      currentMember?.plan === 'basic' ? 'Basic' : 'Club SBW'
+      currentMember?.plan === 'annuel' ? 'Annuel — 597€/an' : 'Club SBW'
   }
 
   window.showSection = function(name, el) {

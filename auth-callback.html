@@ -27,7 +27,7 @@ const sb = supabase.createClient(
 
 async function redirect(session) {
   var user = session.user
-  var plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+  var plansPaids = ['mensuel', 'annuel']
   try {
     // Admin → dashboard direct
     var { data: userData } = await sb.from('users').select('role').eq('id', user.id).single()

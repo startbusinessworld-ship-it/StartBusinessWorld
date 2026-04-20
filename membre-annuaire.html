@@ -380,7 +380,7 @@ async function init() {
   var plan = memberRes.data?.plan;
   var isAdmin = window.SBW_checkAdmin ? await window.SBW_checkAdmin(user.id) : false;
   if (window.SBW_showAdminBadge) window.SBW_showAdminBadge();
-  var plansPaids = ['pro', 'business', 'mensuel', 'annuel'];
+  var plansPaids = ['mensuel', 'annuel'];
   var hasAccess = (plan && plansPaids.includes(plan)) || isAdmin;
 
   if (!hasAccess) {

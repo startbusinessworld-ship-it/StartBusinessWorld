@@ -168,7 +168,7 @@ var isLoginMode = new URLSearchParams(window.location.search).get('mode') === 'l
 })()
 
 async function redirectUser(userId) {
-  const plansPaids = ['pro', 'business', 'mensuel', 'annuel']
+  const plansPaids = ['mensuel', 'annuel']
 
   // Vérifier si admin
   const { data: userData } = await sb.from('users').select('role').eq('id', userId).single()

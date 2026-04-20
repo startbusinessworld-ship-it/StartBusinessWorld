@@ -233,8 +233,8 @@ var curModule = null, curLecon = null, curModLecons = [];
 var EMOJIS = ['📚','🎯','⚡','🚀','💡','🌍','💼','🔥','📈','🎓'];
 
 // ═══ PLAN LEVELS ═══
-var PLAN_LEVELS = { 'inscrit': 2, 'intro': 2, 'basic': 2, 'pro': 3, 'business': 4, 'mensuel': 4, 'annuel': 4 };
-var userPlan = 'basic';
+var PLAN_LEVELS = { 'inscrit': 2, 'mensuel': 4, 'annuel': 4 };
+var userPlan = 'inscrit';
 var userPlanLevel = 2;
 
 // Le champ f.plan de la base Supabase détermine le plan requis (basic, pro, business)
@@ -281,7 +281,7 @@ async function init() {
     userPlan = effectivePlan;
     userPlanLevel = PLAN_LEVELS[effectivePlan];
   } else {
-    userPlan = 'basic';
+    userPlan = 'inscrit';
     userPlanLevel = 2;
   }
   // Admin → accès total
@@ -371,7 +371,7 @@ function renderAll() {
 
   allData.forEach(function(f, fi) {
     // Vérifier si la formation nécessite un plan supérieur
-    var reqPlan = f.plan || 'basic';
+    var reqPlan = f.plan || 'inscrit';
     var reqLevel = PLAN_LEVELS[reqPlan] || 2;
     var isLocked = userPlanLevel < reqLevel;
 

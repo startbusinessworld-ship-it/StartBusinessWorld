@@ -4,7 +4,7 @@
   var SUPABASE_URL = 'https://grwimhqsthcmfwblwdwg.supabase.co'
   var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdyd2ltaHFzdGhjbWZ3Ymx3ZHdnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ0OTA5NDIsImV4cCI6MjA5MDA2Njk0Mn0.faK7rX_1OElj5g28NJyAkhucvJIX1R8scopOZ8TRKXc'
   // Plans avec accès payant actif (mensuel, annuel + legacy pro/business)
-  var PLANS_PAIDS = ['pro', 'business', 'mensuel', 'annuel']
+  var PLANS_PAIDS = ['mensuel', 'annuel']
 
   async function checkAuth() {
     var sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)

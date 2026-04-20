@@ -152,8 +152,8 @@
     const total = allPayments.reduce((s, p) => s + (p.amount || 0), 0)
 
     const { data: members } = await sb.from('members').select('plan').eq('status', 'active')
-    // MRR : mensuel = 79€, annuel = 597/12 = 49.75€ (+ legacy plans)
-    const planPrices = { mensuel: 79, annuel: 597/12, pro: 79, business: 149, basic: 29, intro: 1 }
+    // MRR : mensuel = 79€, annuel = 597/12 = 49.75€
+    const planPrices = { mensuel: 79, annuel: 597/12 }
     const mrr = (members || []).reduce((s, m) => s + (planPrices[m.plan] || 0), 0)
 
     document.getElementById('mMonthly').textContent = monthly.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })

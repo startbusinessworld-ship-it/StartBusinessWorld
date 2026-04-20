@@ -606,7 +606,7 @@ async function init() {
   var member = memberRes.data;
   var isAdmin = await window.SBW_checkAdmin(user.id);
   window.SBW_showAdminBadge();
-  var plansPaids = ['business', 'mensuel', 'annuel'];
+  var plansPaids = ['mensuel', 'annuel'];
   var isBusiness = (member?.plan && plansPaids.includes(member.plan)) || isAdmin;
 
   if (!isBusiness) {
