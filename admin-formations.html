@@ -362,6 +362,7 @@ function renderModules(){
         '<span class="drag-h" onclick="event.stopPropagation()">⠿</span>'+
         '<div class="m-item-info"><div class="m-item-title">'+m.title+'</div><div class="m-item-sub">'+sub+'</div></div>'+
         '<div class="m-item-actions">'+
+          '<button class="row-action" onclick="event.stopPropagation();dupModule(\''+m.id+'\')" title="Dupliquer">📋</button>'+
           '<button class="row-action" onclick="event.stopPropagation();openModuleModal(modules.find(function(x){return x.id===\''+m.id+'\'}))">✏️</button>'+
           '<button class="row-action" onclick="event.stopPropagation();delModule(\''+m.id+'\')" style="color:var(--red)">✕</button>'+
         '</div>';
@@ -383,6 +384,7 @@ function renderModules(){
             '<span class="l-item-title">'+l.title+'</span>'+
             '<span class="l-item-badge">'+ico+'</span>'+
             '<div class="l-item-actions">'+
+              '<button class="row-action" onclick="event.stopPropagation();dupLecon(\''+l.id+'\')" style="font-size:.7rem" title="Dupliquer">📋</button>'+
               '<button class="row-action" onclick="event.stopPropagation();openLeconEd(\''+l.id+'\',null)" style="font-size:.7rem">✏️</button>'+
               '<button class="row-action" onclick="event.stopPropagation();delLecon(\''+l.id+'\')" style="color:var(--red);font-size:.7rem">✕</button>'+
             '</div>';
@@ -452,6 +454,41 @@ async function delModule(id){
   if(curM&&curM.id===id){curM=null;col3Empty();}
   await loadModules(curF.id);
   toast('Module supprimé.','success');
+}
+
+async function dupModule(id){
+  var mod=modules.find(function(m){return m.id===id;});
+  if(!mod) return;
+  toast('Duplication en cours...','success');
+  var newMod={
+    formation_id:mod.formation_id,
+    title:mod.title+' (copie)',
+    html_url:mod.html_url||null,
+    cover_url:mod.cover_url||null,
+    extra_stats:mod.extra_stats||null,
+    position:(modules.length||0)
+  };
+  var res=await sb.from('modules').insert(newMod).select().single();
+  if(res.error){toast('Erreur : '+res.error.message,'error');return;}
+  var newId=res.data.id;
+  // Dupliquer les leçons
+  if(mod.lecons&&mod.lecons.length){
+    for(var i=0;i<mod.lecons.length;i++){
+      var lc=mod.lecons[i];
+      await sb.from('lecons').insert({
+        module_id:newId,
+        title:lc.title,
+        lecon_type:lc.lecon_type||'text',
+        youtube_id:lc.youtube_id||null,
+        video_url:lc.video_url||null,
+        duration_min:lc.duration_min||0,
+        content:lc.content||'',
+        position:lc.position||i
+      });
+    }
+  }
+  await loadModules(curF.id);
+  toast('Module dupliqué avec ses leçons !','success');
 }
 
 // ═══ ÉDITEUR MODULE HTML ═══
@@ -619,6 +656,26 @@ async function saveLecon(mid){
   if(res.error){toast('Erreur : '+res.error.message,'error');return;}
   toast(curL?'Leçon mise à jour !':'Leçon ajoutée !','success');
   await loadModules(curF.id);
+}
+
+async function dupLecon(id){
+  var lc=null;
+  modules.forEach(function(m){m.lecons.forEach(function(l){if(l.id===id)lc=l;});});
+  if(!lc) return;
+  toast('Duplication...','success');
+  var res=await sb.from('lecons').insert({
+    module_id:lc.module_id,
+    title:lc.title+' (copie)',
+    lecon_type:lc.lecon_type||'text',
+    youtube_id:lc.youtube_id||null,
+    video_url:lc.video_url||null,
+    duration_min:lc.duration_min||0,
+    content:lc.content||'',
+    position:(lc.position||0)+1
+  });
+  if(res.error){toast('Erreur : '+res.error.message,'error');return;}
+  await loadModules(curF.id);
+  toast('Leçon dupliquée !','success');
 }
 
 async function delLecon(id){
