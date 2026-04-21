@@ -295,10 +295,11 @@
     body.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Chargement...</div>'
 
     // Charger les données en parallèle
-    var [msgRes, questRes, affRes] = await Promise.all([
+    var [msgRes, questRes, affRes, progRes] = await Promise.all([
       sb.from('messages').select('id,content,created_at,channel_id', {count:'exact'}).eq('user_id', id).order('created_at', {ascending:false}).limit(5),
       sb.from('live_questions').select('question,created_at,live_date').eq('user_id', id).order('created_at', {ascending:false}).limit(5).then(function(r){return r}).catch(function(){return {data:null,count:0}}),
-      sb.from('affiliations').select('ref_code,clicks,conversions').eq('user_id', id).maybeSingle()
+      sb.from('affiliations').select('ref_code,clicks,conversions').eq('user_id', id).maybeSingle(),
+      sb.from('formation_progress').select('formation_key,progress,updated_at').eq('user_id', id)
     ])
 
     var planLabels = { inscrit:'Inscrit', mensuel:'Mensuel 79€/mois', annuel:'Annuel 597€/an', cancelled:'Annulé' }
@@ -323,6 +324,37 @@
       if (m.stripe_customer_id) html += '🔑 Customer: <span style="font-family:monospace;color:var(--ink)">' + m.stripe_customer_id + '</span><br>'
       if (m.stripe_subscription_id) html += '📋 Subscription: <span style="font-family:monospace;color:var(--ink)">' + m.stripe_subscription_id + '</span>'
       html += '</div>'
+    }
+
+    // Progression formations
+    var FORMATION_TOTALS = {
+      'formation-mindset': { title: 'Mindset & Fondations', total: 20 },
+      'formation_mindset': { title: 'Mindset & Fondations', total: 20 },
+      'formation-creation-entreprise': { title: 'Fiscalité & Structure', total: 16 },
+      'formation_creation_entreprise': { title: 'Fiscalité & Structure', total: 16 },
+      'formation-hong-kong': { title: 'Hong Kong', total: 15 },
+      'formation_hong_kong': { title: 'Hong Kong', total: 15 },
+      'formation-ecom-module-1': { title: 'E-commerce', total: 30 },
+      'formation-shopify': { title: 'Shopify', total: 18 },
+      'formation-amazon-fba': { title: 'Amazon FBA', total: 22 }
+    }
+    var progData = progRes.data || []
+    html += '<div style="font-size:.82rem;font-weight:600;margin:12px 0 8px;display:flex;align-items:center;gap:6px">🎓 Progression des formations</div>'
+    if (progData.length) {
+      progData.forEach(function(p) {
+        var info = FORMATION_TOTALS[p.formation_key] || { title: p.formation_key, total: 0 }
+        var done = 0
+        var d = p.progress || {}
+        Object.keys(d).forEach(function(k) { if (d[k] === true) done++ })
+        var total = info.total || Math.max(done, Object.keys(d).length)
+        var pct = total > 0 ? Math.round(done / total * 100) : 0
+        html += '<div style="background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:6px">'
+        html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><span style="font-size:.8rem;font-weight:500">' + esc(info.title) + '</span><span style="font-size:.72rem;color:var(--muted)">' + done + '/' + total + ' · ' + pct + '%</span></div>'
+        html += '<div style="height:4px;background:rgba(0,0,0,.08);border-radius:2px;overflow:hidden"><div style="height:100%;background:var(--gold);width:' + pct + '%;transition:width .3s"></div></div>'
+        html += '</div>'
+      })
+    } else {
+      html += '<div style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Aucune formation commencée (ou progression non synchronisée).</div>'
     }
 
     // Messages du groupe

@@ -1,4 +1,4 @@
-// SBW Tracker — tracker de visites léger
+// SBW Tracker — tracker de visites + sync progression formations
 ;(function() {
   'use strict'
 
@@ -37,6 +37,49 @@
     }).catch(function() {})
   }
 
+  // ═══ SYNC PROGRESSION FORMATIONS ═══
+  // Pousse toutes les clés sbw_tracker__* vers Supabase pour que l'admin puisse voir la progression
+  async function syncProgress() {
+    try {
+      // Récupérer la session
+      if (!window.supabase) return
+      var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      var s = await sb.auth.getSession()
+      if (!s.data.session) return
+      var userId = s.data.session.user.id
+
+      // Parcourir localStorage
+      var keys = []
+      for (var i = 0; i < localStorage.length; i++) {
+        var k = localStorage.key(i)
+        if (k && k.indexOf('sbw_tracker__') === 0) keys.push(k)
+      }
+      if (!keys.length) return
+
+      // Upsert chaque formation
+      for (var j = 0; j < keys.length; j++) {
+        var key = keys[j]
+        var formationKey = key.replace('sbw_tracker__', '')
+        var data = {}
+        try { data = JSON.parse(localStorage.getItem(key) || '{}') } catch(e) {}
+        await sb.from('formation_progress').upsert({
+          user_id: userId,
+          formation_key: formationKey,
+          progress: data,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id,formation_key' })
+      }
+    } catch(e) {}
+  }
+
   // Tracker après 1 seconde pour éviter les bounces instantanés
   setTimeout(track, 1000)
+
+  // Sync progression après 3s (laisse le temps à la page de se charger)
+  // + toutes les 60s pour capturer les progressions en cours
+  setTimeout(syncProgress, 3000)
+  setInterval(syncProgress, 60000)
+
+  // Sync avant de quitter la page
+  window.addEventListener('beforeunload', syncProgress)
 })()
