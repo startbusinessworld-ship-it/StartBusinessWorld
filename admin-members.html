@@ -217,12 +217,13 @@
               <span style="font-weight:500">${esc(m.full_name) || '—'}</span>
             </div>
           </td>
-          <td style="color:var(--muted)">${esc(m.email)}</td>
+          <td><a href="mailto:${esc(m.email)}" style="color:var(--gold);text-decoration:none" title="Envoyer un email">${esc(m.email)}</a></td>
           <td><span class="plan-badge ${planClass}">${planLabel}</span></td>
           <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
           <td style="color:var(--muted)">${formatDate(m.created_at)}</td>
           <td>
             <div style="display:flex;gap:6px">
+              <button class="row-action" onclick="emailMember('${esc(m.email)}','${esc(m.full_name||'').replace(/'/g,"\\'")}')" title="Envoyer un email">✉️</button>
               ${m.plan === 'inscrit' ? `<button class="row-action" onclick="upgradeMember('${m.id}')">Activer</button>` : ''}
               ${m.plan !== 'cancelled' && m.plan !== 'inscrit' ? `<button class="row-action" style="color:var(--red);border-color:rgba(192,57,43,0.3)" onclick="cancelMember('${m.id}')">Annuler</button>` : ''}
             </div>
@@ -231,6 +232,19 @@
       `
     }).join('')
   }
+
+  function emailMember(email, name) {
+    var firstName = (name || '').split(' ')[0] || 'membre'
+    var subject = prompt('Objet du mail :', '')
+    if (subject === null) return
+    var body = prompt('Message (préremplira ton app mail) :', 'Bonjour ' + firstName + ',\n\n')
+    if (body === null) return
+    var url = 'mailto:' + encodeURIComponent(email) +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(body)
+    window.location.href = url
+  }
+  window.emailMember = emailMember
 
   async function upgradeMember(id) {
     await sb.from('members').update({ plan: 'mensuel' }).eq('id', id)
