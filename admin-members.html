@@ -139,6 +139,19 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MODAL FICHE MEMBRE -->
+<div id="memberModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;padding:2rem;overflow-y:auto">
+  <div style="background:#fff;border-radius:14px;max-width:640px;width:100%;margin-top:60px;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:20px 24px;border-bottom:0.5px solid var(--subtle);display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:1rem;font-weight:600" id="mmName">—</div>
+      <button onclick="closeMemberModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div style="padding:20px 24px" id="mmBody">
+      <div style="color:var(--muted);text-align:center;padding:2rem">Chargement...</div>
+    </div>
+  </div>
+</div>
+
 <script src="admin-auth.js"></script>
 <script>
   function esc(s){var d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
@@ -212,9 +225,9 @@
       return `
         <tr>
           <td>
-            <div style="display:flex;align-items:center;gap:8px">
+            <div style="display:flex;align-items:center;gap:8px;cursor:pointer" onclick="openMemberModal('${m.id}')">
               <div class="member-avatar">${initials}</div>
-              <span style="font-weight:500">${esc(m.full_name) || '—'}</span>
+              <span style="font-weight:500;color:var(--gold)">${esc(m.full_name) || '—'}</span>
             </div>
           </td>
           <td><a href="mailto:${esc(m.email)}" style="color:var(--gold);text-decoration:none" title="Envoyer un email">${esc(m.email)}</a></td>
@@ -269,6 +282,102 @@
     a.download = 'membres-sbw.csv'
     a.click()
   }
+
+  // ═══ FICHE MEMBRE ═══
+  async function openMemberModal(id) {
+    var m = allMembers.find(function(x){return x.id===id})
+    if (!m) return
+    var modal = document.getElementById('memberModal')
+    modal.style.display = 'flex'
+    document.getElementById('mmName').textContent = m.full_name || m.email
+
+    var body = document.getElementById('mmBody')
+    body.innerHTML = '<div style="color:var(--muted);text-align:center;padding:2rem">Chargement...</div>'
+
+    // Charger les données en parallèle
+    var [msgRes, questRes, affRes] = await Promise.all([
+      sb.from('messages').select('id,content,created_at,channel_id', {count:'exact'}).eq('user_id', id).order('created_at', {ascending:false}).limit(5),
+      sb.from('live_questions').select('question,created_at,live_date').eq('user_id', id).order('created_at', {ascending:false}).limit(5).then(function(r){return r}).catch(function(){return {data:null,count:0}}),
+      sb.from('affiliations').select('ref_code,clicks,conversions').eq('user_id', id).maybeSingle()
+    ])
+
+    var planLabels = { inscrit:'Inscrit', mensuel:'Mensuel 79€/mois', annuel:'Annuel 597€/an', cancelled:'Annulé' }
+    var msgs = msgRes.data || []
+    var msgCount = msgRes.count || 0
+    var questions = questRes.data || []
+    var aff = affRes.data
+
+    var html = ''
+
+    // Infos principales
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">'
+    html += '<div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Email</div><div style="font-size:.85rem;word-break:break-all">' + esc(m.email) + '</div></div>'
+    html += '<div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Plan</div><div style="font-size:.85rem;font-weight:500">' + (planLabels[m.plan]||m.plan||'—') + '</div></div>'
+    html += '<div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Inscrit le</div><div style="font-size:.85rem">' + formatDate(m.created_at) + '</div></div>'
+    html += '<div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Statut Stripe</div><div style="font-size:.85rem">' + (m.stripe_subscription_status||'—') + '</div></div>'
+    html += '</div>'
+
+    // Stripe IDs
+    if (m.stripe_customer_id || m.stripe_subscription_id) {
+      html += '<div style="background:rgba(166,124,58,.06);border:0.5px solid rgba(166,124,58,.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:.72rem;color:var(--muted)">'
+      if (m.stripe_customer_id) html += '🔑 Customer: <span style="font-family:monospace;color:var(--ink)">' + m.stripe_customer_id + '</span><br>'
+      if (m.stripe_subscription_id) html += '📋 Subscription: <span style="font-family:monospace;color:var(--ink)">' + m.stripe_subscription_id + '</span>'
+      html += '</div>'
+    }
+
+    // Messages du groupe
+    html += '<div style="font-size:.82rem;font-weight:600;margin-bottom:8px;display:flex;align-items:center;gap:6px">💬 Messages dans le groupe <span style="background:var(--surface);padding:1px 8px;border-radius:10px;font-size:.72rem;color:var(--muted)">' + msgCount + '</span></div>'
+    if (msgs.length) {
+      msgs.forEach(function(msg) {
+        html += '<div style="background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:.78rem">'
+        html += '<div style="color:var(--muted);font-size:.65rem;margin-bottom:3px">' + formatDate(msg.created_at) + '</div>'
+        html += '<div style="line-height:1.5">' + esc((msg.content||'').substring(0,200)) + '</div>'
+        html += '</div>'
+      })
+    } else {
+      html += '<div style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Aucun message envoyé.</div>'
+    }
+
+    // Questions live
+    html += '<div style="font-size:.82rem;font-weight:600;margin:12px 0 8px;display:flex;align-items:center;gap:6px">🎙️ Questions pour les lives <span style="background:var(--surface);padding:1px 8px;border-radius:10px;font-size:.72rem;color:var(--muted)">' + questions.length + '</span></div>'
+    if (questions.length) {
+      questions.forEach(function(q) {
+        html += '<div style="background:var(--surface);border-radius:8px;padding:10px 12px;margin-bottom:6px;font-size:.78rem">'
+        html += '<div style="line-height:1.5">' + esc((q.question||'').substring(0,200)) + '</div>'
+        html += '</div>'
+      })
+    } else {
+      html += '<div style="font-size:.78rem;color:var(--muted);margin-bottom:16px">Aucune question soumise.</div>'
+    }
+
+    // Affiliation
+    if (aff) {
+      html += '<div style="font-size:.82rem;font-weight:600;margin:12px 0 8px">🤝 Affiliation</div>'
+      html += '<div style="display:flex;gap:12px;margin-bottom:16px">'
+      html += '<div style="background:var(--surface);border-radius:8px;padding:10px 16px;text-align:center;flex:1"><div style="font-size:1.2rem;font-weight:600">' + (aff.clicks||0) + '</div><div style="font-size:.65rem;color:var(--muted)">Clics</div></div>'
+      html += '<div style="background:var(--surface);border-radius:8px;padding:10px 16px;text-align:center;flex:1"><div style="font-size:1.2rem;font-weight:600">' + (aff.conversions||0) + '</div><div style="font-size:.65rem;color:var(--muted)">Conversions</div></div>'
+      html += '<div style="background:var(--surface);border-radius:8px;padding:10px 16px;text-align:center;flex:1"><div style="font-size:.72rem;font-family:monospace;color:var(--gold)">' + (aff.ref_code||'—') + '</div><div style="font-size:.65rem;color:var(--muted)">Code ref</div></div>'
+      html += '</div>'
+    }
+
+    // Actions
+    html += '<div style="display:flex;gap:8px;padding-top:12px;border-top:0.5px solid var(--subtle)">'
+    html += '<button onclick="emailMember(\'' + esc(m.email) + '\',\'' + esc(m.full_name||'').replace(/'/g,"\\'") + '\')" style="flex:1;padding:10px;border-radius:7px;border:0.5px solid var(--subtle);background:#fff;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:500">✉️ Envoyer un email</button>'
+    if (m.plan === 'inscrit') html += '<button onclick="upgradeMember(\'' + m.id + '\');closeMemberModal()" style="flex:1;padding:10px;border-radius:7px;border:none;background:var(--gold);color:#fff;cursor:pointer;font-family:inherit;font-size:.78rem;font-weight:500">Activer en mensuel</button>'
+    html += '</div>'
+
+    body.innerHTML = html
+  }
+  window.openMemberModal = openMemberModal
+
+  function closeMemberModal() {
+    document.getElementById('memberModal').style.display = 'none'
+  }
+  window.closeMemberModal = closeMemberModal
+
+  document.getElementById('memberModal').addEventListener('click', function(e) {
+    if (e.target === this) closeMemberModal()
+  })
 
   function formatDate(str) {
     if (!str) return '—'
