@@ -132,6 +132,8 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
 /* Panneau leçons */
 .lessons-panel{position:fixed;bottom:0;left:0;width:320px;background:var(--surface);border-top:0.5px solid var(--border);border-right:0.5px solid var(--border);border-radius:0 12px 0 0;z-index:300;transform:translateY(100%);transition:transform .3s;max-height:70vh;display:flex;flex-direction:column}
 .lessons-panel.open{transform:translateY(0)}
+.lp-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;display:none}
+.lp-overlay.open{display:block}
 .lp-head{padding:14px 16px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .lp-head-title{font-size:.8rem;font-weight:600;color:var(--white)}
 .lp-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;padding:2px 6px}
@@ -173,6 +175,7 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
 .slide-eyebrow-tag{font-size:.65rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;color:var(--gold)}
 @media(max-width:600px){
   .sidebar{display:none}
+  .lessons-panel{width:100%;border-right:none;border-radius:12px 12px 0 0;max-height:80vh}
   .nav-bar{left:0}
   .slide-area{padding:20px}
   .compare-grid{grid-template-columns:1fr}
@@ -209,8 +212,8 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
     <div class="nav-bar">
       <div class="nav-left">
         <!-- Hamburger menu -->
-        <button class="btn-menu" id="lessonsTab" onclick="toggleLessonsPanel()" title="Navigation">
-          <span></span><span></span><span></span>
+        <button class="btn-menu" id="lessonsTab" onclick="toggleLessonsPanel()" title="Navigation" style="flex-direction:row;gap:6px;padding:6px 12px">
+          <span></span><span></span><span></span><span class="btn-menu-label" style="font-size:.7rem;font-weight:500;color:var(--muted)">Leçons</span>
         </button>
         <!-- Play / Pause -->
         <button class="btn-play" id="playBtn" onclick="togglePlay()" title="Play / Pause">
@@ -232,6 +235,7 @@ header{height:var(--header);background:var(--surface);border-bottom:0.5px solid 
 </div>
 
 <!-- Panneau leçons -->
+<div class="lp-overlay" id="lpOverlay" onclick="toggleLessonsPanel()"></div>
 <div class="lessons-panel" id="lessonsPanel">
   <div class="lp-head">
     <span class="lp-head-title">Navigation</span>
@@ -415,10 +419,12 @@ function toggleLessonsPanel() {
   var isOpen = panel.classList.contains('open');
   if (isOpen) {
     panel.classList.remove('open');
+    var ov=document.getElementById('lpOverlay');if(ov)ov.classList.remove('open');
     tab.classList.remove('active');
   } else {
     renderLessonsPanel();
     panel.classList.add('open');
+    var ov=document.getElementById('lpOverlay');if(ov)ov.classList.add('open');
     tab.classList.add('active');
   }
 }
