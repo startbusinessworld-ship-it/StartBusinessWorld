@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 788" width="1400" height="788">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&amp;family=DM+Sans:wght@300;400&amp;display=swap');
+    </style>
+    <radialGradient id="bg" cx="50%" cy="40%" r="70%">
+      <stop offset="0%" stop-color="#3a0a0a"/>
+      <stop offset="100%" stop-color="#0a0200"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1400" height="788" fill="url(#bg)"/>
+  <rect width="1400" height="788" fill="black" opacity="0.2"/>
+
+  <text x="700" y="80" text-anchor="middle"
+    font-family="'DM Sans', sans-serif"
+    font-size="18" font-weight="400"
+    letter-spacing="10"
+    fill="rgba(255,255,255,0.45)">START BUSINESS WORLD</text>
+
+  <text x="700" y="220" text-anchor="middle" font-size="90">🇨🇳💼🌏</text>
+
+  <text x="700" y="380" text-anchor="middle"
+    font-family="Georgia, 'DM Serif Display', serif"
+    font-size="110" font-weight="700"
+    fill="white">Business</text>
+
+  <text x="700" y="510" text-anchor="middle"
+    font-family="Georgia, 'DM Serif Display', serif"
+    font-size="110" font-weight="700"
+    fill="#D4534A">avec la Chine</text>
+
+  <text x="700" y="615" text-anchor="middle"
+    font-family="'DM Sans', Georgia, sans-serif"
+    font-size="26" font-weight="300"
+    fill="rgba(255,255,255,0.5)">Sourcing, import-export, plateformes chinoises et agents fiables</text>
+  <text x="700" y="650" text-anchor="middle"
+    font-family="'DM Sans', Georgia, sans-serif"
+    font-size="26" font-weight="300"
+    fill="rgba(255,255,255,0.5)">De Yiwu à Alibaba — tout ce qu'il faut pour sourcer intelligemment.</text>
+</svg>
