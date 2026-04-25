@@ -1090,6 +1090,54 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- MODAL ONBOARDING — Compléter le profil -->
+<div id="onboardingModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:1.5rem;overflow-y:auto">
+  <div style="background:var(--bg);border-radius:16px;max-width:520px;width:100%;box-shadow:0 24px 64px rgba(0,0,0,.4);max-height:92vh;overflow-y:auto">
+    <div style="background:var(--dark);color:#F0EDE4;padding:24px 28px 20px;border-radius:16px 16px 0 0;position:relative">
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--gold);border-radius:16px 16px 0 0"></div>
+      <div style="font-size:.65rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:8px">Bienvenue dans le Club SBW 👋</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:1.4rem;line-height:1.2;margin-bottom:6px">Complète ton profil</div>
+      <div style="font-size:.85rem;color:rgba(240,237,228,0.5);line-height:1.6">Quelques infos pour personnaliser ton expérience et te recontacter si besoin.</div>
+    </div>
+    <div style="padding:24px 28px">
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Prénom & Nom <span style="color:var(--red)">*</span></label>
+        <input type="text" id="obFullName" placeholder="Ex: Jean Dupont" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Téléphone <span style="color:var(--red)">*</span></label>
+        <input type="tel" id="obPhone" placeholder="Ex: +33 6 12 34 56 78" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Pays <span style="color:var(--red)">*</span></label>
+        <select id="obCountry" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;background:var(--bg);box-sizing:border-box">
+          <option value="">Choisir...</option>
+          <option value="France">🇫🇷 France</option>
+          <option value="Belgique">🇧🇪 Belgique</option>
+          <option value="Suisse">🇨🇭 Suisse</option>
+          <option value="Canada">🇨🇦 Canada</option>
+          <option value="Maroc">🇲🇦 Maroc</option>
+          <option value="Algérie">🇩🇿 Algérie</option>
+          <option value="Tunisie">🇹🇳 Tunisie</option>
+          <option value="Sénégal">🇸🇳 Sénégal</option>
+          <option value="Côte d'Ivoire">🇨🇮 Côte d'Ivoire</option>
+          <option value="Cameroun">🇨🇲 Cameroun</option>
+          <option value="Congo">🇨🇬 Congo</option>
+          <option value="Émirats">🇦🇪 Émirats Arabes Unis</option>
+          <option value="Autre">🌍 Autre</option>
+        </select>
+      </div>
+      <div style="margin-bottom:18px">
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Ton projet business <span style="color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0">(optionnel)</span></label>
+        <textarea id="obProject" rows="3" placeholder="Ex: Lancer mon e-commerce de cosmétiques en sourçant en Chine" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.85rem;outline:none;resize:vertical;line-height:1.5;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'"></textarea>
+      </div>
+      <div id="obError" style="display:none;font-size:.78rem;color:var(--red);margin-bottom:10px;text-align:center"></div>
+      <button id="obSaveBtn" onclick="saveOnboarding()" style="width:100%;padding:13px;background:var(--gold);color:#fff;border:none;border-radius:8px;font-family:inherit;font-size:.9rem;font-weight:600;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">Continuer →</button>
+      <div style="margin-top:10px;text-align:center;font-size:.7rem;color:var(--muted)">Tes infos restent privées et ne sont jamais partagées.</div>
+    </div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV MOBILE -->
 <div class="mobile-nav">
   <div class="mobile-nav-items">
@@ -1322,6 +1370,84 @@
     renderModuleProgress()
     loadDashPrestige()
     loadDashLive()
+    checkProfileCompletion()
+  }
+
+  // ═══ ONBOARDING — COMPLETER LE PROFIL ═══
+  function checkProfileCompletion() {
+    if (!currentMember) return
+    var fullNameOk = currentMember.full_name && currentMember.full_name.trim().split(' ').length >= 2
+    var phoneOk = currentMember.phone && currentMember.phone.trim().length > 4
+    var countryOk = currentMember.country && currentMember.country.trim().length > 0
+    if (fullNameOk && phoneOk && countryOk) return // Profil complet
+
+    // Pré-remplir avec ce qu'on a
+    var fn = document.getElementById('obFullName')
+    if (fn && currentMember.full_name) fn.value = currentMember.full_name
+    var ph = document.getElementById('obPhone')
+    if (ph && currentMember.phone) ph.value = currentMember.phone
+    var co = document.getElementById('obCountry')
+    if (co && currentMember.country) co.value = currentMember.country
+    var pr = document.getElementById('obProject')
+    if (pr && currentMember.business_project) pr.value = currentMember.business_project
+
+    document.getElementById('onboardingModal').style.display = 'flex'
+  }
+
+  window.saveOnboarding = async function() {
+    var fullName = document.getElementById('obFullName').value.trim()
+    var phone = document.getElementById('obPhone').value.trim()
+    var country = document.getElementById('obCountry').value
+    var project = document.getElementById('obProject').value.trim()
+    var errEl = document.getElementById('obError')
+    errEl.style.display = 'none'
+
+    if (!fullName || fullName.split(' ').length < 2) {
+      errEl.textContent = 'Renseigne ton prénom et ton nom complet.'
+      errEl.style.display = 'block'
+      return
+    }
+    if (!phone || phone.length < 5) {
+      errEl.textContent = 'Renseigne un numéro de téléphone valide.'
+      errEl.style.display = 'block'
+      return
+    }
+    if (!country) {
+      errEl.textContent = 'Sélectionne ton pays.'
+      errEl.style.display = 'block'
+      return
+    }
+
+    var btn = document.getElementById('obSaveBtn')
+    btn.disabled = true
+    btn.textContent = 'Enregistrement...'
+
+    var { error } = await sb.from('members').update({
+      full_name: fullName,
+      phone: phone,
+      country: country,
+      business_project: project || null,
+      profile_completed: true
+    }).eq('id', currentUser.id)
+
+    if (error) {
+      errEl.textContent = 'Erreur : ' + error.message
+      errEl.style.display = 'block'
+      btn.disabled = false
+      btn.textContent = 'Continuer →'
+      return
+    }
+
+    // Mettre à jour le membre local
+    currentMember.full_name = fullName
+    currentMember.phone = phone
+    currentMember.country = country
+    currentMember.business_project = project
+    currentMember.profile_completed = true
+
+    document.getElementById('onboardingModal').style.display = 'none'
+    showToast('Profil complété ! 🎉', 'success')
+    renderUser()
   }
 
   async function loadDashLive() {

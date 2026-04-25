@@ -318,6 +318,16 @@
     html += '<div style="background:var(--surface);border-radius:8px;padding:12px"><div style="font-size:.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Statut Stripe</div><div style="font-size:.85rem">' + (m.stripe_subscription_status||'—') + '</div></div>'
     html += '</div>'
 
+    // Profil étendu
+    if (m.phone || m.country || m.business_project) {
+      html += '<div style="background:rgba(166,124,58,.05);border:0.5px solid rgba(166,124,58,.2);border-radius:8px;padding:12px;margin-bottom:16px">'
+      html += '<div style="font-size:.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-weight:600">📋 Profil détaillé</div>'
+      if (m.phone) html += '<div style="font-size:.78rem;margin-bottom:6px"><strong>📞 Téléphone :</strong> <a href="tel:' + esc(m.phone) + '" style="color:var(--ink);text-decoration:none">' + esc(m.phone) + '</a></div>'
+      if (m.country) html += '<div style="font-size:.78rem;margin-bottom:6px"><strong>🌍 Pays :</strong> ' + esc(m.country) + '</div>'
+      if (m.business_project) html += '<div style="font-size:.78rem;margin-top:8px"><strong>💼 Projet :</strong><br><span style="color:var(--muted);line-height:1.5">' + esc(m.business_project) + '</span></div>'
+      html += '</div>'
+    }
+
     // Stripe IDs
     if (m.stripe_customer_id || m.stripe_subscription_id) {
       html += '<div style="background:rgba(166,124,58,.06);border:0.5px solid rgba(166,124,58,.15);border-radius:8px;padding:12px;margin-bottom:16px;font-size:.72rem;color:var(--muted)">'
