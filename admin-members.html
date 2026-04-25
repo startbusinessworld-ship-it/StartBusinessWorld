@@ -319,10 +319,14 @@
     html += '</div>'
 
     // Profil étendu
-    if (m.phone || m.country || m.business_project) {
+    if (m.phone || m.address || m.country || m.business_project) {
       html += '<div style="background:rgba(166,124,58,.05);border:0.5px solid rgba(166,124,58,.2);border-radius:8px;padding:12px;margin-bottom:16px">'
       html += '<div style="font-size:.65rem;color:var(--gold);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;font-weight:600">📋 Profil détaillé</div>'
-      if (m.phone) html += '<div style="font-size:.78rem;margin-bottom:6px"><strong>📞 Téléphone :</strong> <a href="tel:' + esc(m.phone) + '" style="color:var(--ink);text-decoration:none">' + esc(m.phone) + '</a></div>'
+      if (m.phone) {
+        var waNum = (m.phone||'').replace(/[^0-9+]/g,'').replace(/^\+/,'')
+        html += '<div style="font-size:.78rem;margin-bottom:6px"><strong>📱 WhatsApp :</strong> <a href="https://wa.me/' + waNum + '" target="_blank" style="color:#25D366;text-decoration:none">' + esc(m.phone) + ' →</a></div>'
+      }
+      if (m.address) html += '<div style="font-size:.78rem;margin-bottom:6px"><strong>📍 Adresse :</strong> ' + esc(m.address) + '</div>'
       if (m.country) html += '<div style="font-size:.78rem;margin-bottom:6px"><strong>🌍 Pays :</strong> ' + esc(m.country) + '</div>'
       if (m.business_project) html += '<div style="font-size:.78rem;margin-top:8px"><strong>💼 Projet :</strong><br><span style="color:var(--muted);line-height:1.5">' + esc(m.business_project) + '</span></div>'
       html += '</div>'

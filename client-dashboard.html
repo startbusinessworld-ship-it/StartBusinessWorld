@@ -1105,11 +1105,16 @@
         <input type="text" id="obFullName" placeholder="Ex: Jean Dupont" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'">
       </div>
       <div style="margin-bottom:14px">
-        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Téléphone <span style="color:var(--red)">*</span></label>
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">📱 WhatsApp <span style="color:var(--red)">*</span></label>
         <input type="tel" id="obPhone" placeholder="Ex: +33 6 12 34 56 78" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'">
+        <div style="font-size:.7rem;color:var(--muted);margin-top:4px">Format international avec indicatif pays (+33, +32, +212...)</div>
       </div>
       <div style="margin-bottom:14px">
-        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Pays <span style="color:var(--red)">*</span></label>
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">📍 Adresse <span style="color:var(--red)">*</span></label>
+        <input type="text" id="obAddress" placeholder="Ex: 12 rue de la Paix, 75002 Paris" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--subtle)'">
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:.72rem;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">🌍 Pays <span style="color:var(--red)">*</span></label>
         <select id="obCountry" style="width:100%;padding:10px 14px;border:0.5px solid var(--subtle);border-radius:8px;font-family:inherit;font-size:.88rem;outline:none;background:var(--bg);box-sizing:border-box">
           <option value="">Choisir...</option>
           <option value="France">🇫🇷 France</option>
@@ -1378,14 +1383,17 @@
     if (!currentMember) return
     var fullNameOk = currentMember.full_name && currentMember.full_name.trim().split(' ').length >= 2
     var phoneOk = currentMember.phone && currentMember.phone.trim().length > 4
+    var addressOk = currentMember.address && currentMember.address.trim().length > 4
     var countryOk = currentMember.country && currentMember.country.trim().length > 0
-    if (fullNameOk && phoneOk && countryOk) return // Profil complet
+    if (fullNameOk && phoneOk && addressOk && countryOk) return // Profil complet
 
     // Pré-remplir avec ce qu'on a
     var fn = document.getElementById('obFullName')
     if (fn && currentMember.full_name) fn.value = currentMember.full_name
     var ph = document.getElementById('obPhone')
     if (ph && currentMember.phone) ph.value = currentMember.phone
+    var ad = document.getElementById('obAddress')
+    if (ad && currentMember.address) ad.value = currentMember.address
     var co = document.getElementById('obCountry')
     if (co && currentMember.country) co.value = currentMember.country
     var pr = document.getElementById('obProject')
@@ -1397,6 +1405,7 @@
   window.saveOnboarding = async function() {
     var fullName = document.getElementById('obFullName').value.trim()
     var phone = document.getElementById('obPhone').value.trim()
+    var address = document.getElementById('obAddress').value.trim()
     var country = document.getElementById('obCountry').value
     var project = document.getElementById('obProject').value.trim()
     var errEl = document.getElementById('obError')
@@ -1408,7 +1417,12 @@
       return
     }
     if (!phone || phone.length < 5) {
-      errEl.textContent = 'Renseigne un numéro de téléphone valide.'
+      errEl.textContent = 'Renseigne ton numéro WhatsApp.'
+      errEl.style.display = 'block'
+      return
+    }
+    if (!address || address.length < 5) {
+      errEl.textContent = 'Renseigne ton adresse.'
       errEl.style.display = 'block'
       return
     }
@@ -1425,6 +1439,7 @@
     var { error } = await sb.from('members').update({
       full_name: fullName,
       phone: phone,
+      address: address,
       country: country,
       business_project: project || null,
       profile_completed: true
@@ -1441,6 +1456,7 @@
     // Mettre à jour le membre local
     currentMember.full_name = fullName
     currentMember.phone = phone
+    currentMember.address = address
     currentMember.country = country
     currentMember.business_project = project
     currentMember.profile_completed = true
