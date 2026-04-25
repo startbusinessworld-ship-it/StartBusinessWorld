@@ -325,14 +325,6 @@
     if (!subject) { alert('L\'objet est obligatoire'); return }
     if (!message) { alert('Le message est obligatoire'); return }
 
-    var btn = document.getElementById('emSendBtn')
-    var statusEl = document.getElementById('emStatus')
-    btn.disabled = true
-    btn.textContent = 'Envoi en cours...'
-
-    var session = (await sb.auth.getSession()).data.session
-    if (!session) { alert('Session expirée'); return }
-
     var targets = []
     if (recipient === '__all__') {
       targets = emailMembers.filter(function(m){return m.plan==='mensuel'||m.plan==='annuel'})
@@ -343,33 +335,20 @@
       targets = [{ email: recipient, full_name: m ? m.full_name : '' }]
     }
 
-    var sent = 0, errors = 0
-    for (var i = 0; i < targets.length; i++) {
-      var t = targets[i]
-      statusEl.textContent = 'Envoi ' + (i+1) + '/' + targets.length + '...'
-      try {
-        var res = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + session.access_token
-          },
-          body: JSON.stringify({ to: t.email, subject: subject, message: message, memberName: t.full_name || '' })
-        })
-        var data = await res.json()
-        if (data.success) sent++
-        else errors++
-      } catch(e) { errors++ }
-    }
+    var emails = targets.map(function(t){return t.email})
 
-    btn.disabled = false
-    btn.textContent = 'Envoyer →'
-    if (errors === 0) {
-      statusEl.innerHTML = '<span style="color:#22c55e">✓ ' + sent + ' email' + (sent>1?'s':'') + ' envoyé' + (sent>1?'s':'') + '</span>'
-      setTimeout(closeEmailModal, 2000)
+    // Ouvrir Gmail compose avec BCC pour groupe, TO pour individuel
+    var gmailUrl = 'https://mail.google.com/mail/?view=cm'
+    if (emails.length === 1) {
+      gmailUrl += '&to=' + encodeURIComponent(emails[0])
     } else {
-      statusEl.innerHTML = '<span style="color:#C0392B">' + sent + ' envoyé' + (sent>1?'s':'') + ', ' + errors + ' erreur' + (errors>1?'s':'') + '</span>'
+      gmailUrl += '&bcc=' + encodeURIComponent(emails.join(','))
     }
+    gmailUrl += '&su=' + encodeURIComponent(subject)
+    gmailUrl += '&body=' + encodeURIComponent(message)
+
+    window.open(gmailUrl, '_blank')
+    closeEmailModal()
   }
   window.sendEmail = sendEmail
 
