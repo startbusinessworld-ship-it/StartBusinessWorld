@@ -18,6 +18,9 @@ verify_jwt = false
 [functions.cancel-subscription]
 verify_jwt = false
 
+[functions.send-email]
+verify_jwt = false
+
 # Stripe webhook: pas d'Authorization header (vient de Stripe, pas d'un user)
 # Signature vérifiée via verifyWebhook() dans le code
 [functions.stripe-webhook]

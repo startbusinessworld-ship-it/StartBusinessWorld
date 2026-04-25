@@ -131,7 +131,11 @@
 
       <!-- ACTIONS RAPIDES -->
       <div class="quick-actions">
-        <a href="admin-articles-list.html" class="qa-btn primary">
+        <button onclick="openEmailModal()" class="qa-btn primary" style="border:none;cursor:pointer;font-family:inherit">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 3h14v10H1V3z"/><path d="M1 3l7 5 7-5"/></svg>
+          Envoyer un message
+        </button>
+        <a href="admin-articles-list.html" class="qa-btn">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 1v14M1 8h14"/></svg>
           Rédiger un article
         </a>
@@ -209,6 +213,43 @@
   </main>
 </div>
 
+<!-- MODAL ENVOI EMAIL -->
+<div id="emailModal" style="display:none;position:fixed;inset:0;z-index:999;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);align-items:flex-start;justify-content:center;padding:2rem;overflow-y:auto">
+  <div style="background:#fff;border-radius:14px;max-width:560px;width:100%;margin-top:60px;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+    <div style="padding:16px 20px;border-bottom:0.5px solid #ddd;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:.95rem;font-weight:600">✉️ Envoyer un message</div>
+      <button onclick="closeEmailModal()" style="background:none;border:none;font-size:1.2rem;cursor:pointer;color:#888">✕</button>
+    </div>
+    <div style="padding:20px">
+      <div style="margin-bottom:12px">
+        <label style="font-size:.72rem;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block">Destinataire</label>
+        <select id="emRecipient" style="width:100%;padding:10px 12px;border:0.5px solid #ddd;border-radius:8px;font-family:inherit;font-size:.85rem;outline:none" onchange="onRecipientChange()">
+          <option value="">Choisir un membre...</option>
+          <option value="__all__">📢 Tous les membres payants</option>
+          <option value="__inscrit__">👋 Tous les inscrits (non payants)</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:.72rem;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block">Objet</label>
+        <input type="text" id="emSubject" placeholder="Ex: Nouveau contenu disponible !" style="width:100%;padding:10px 12px;border:0.5px solid #ddd;border-radius:8px;font-family:inherit;font-size:.85rem;outline:none;box-sizing:border-box">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:.72rem;font-weight:500;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;display:block">Message</label>
+        <textarea id="emMessage" rows="8" placeholder="Écris ton message ici... Le prénom du membre sera utilisé automatiquement dans la salutation." style="width:100%;padding:10px 12px;border:0.5px solid #ddd;border-radius:8px;font-family:inherit;font-size:.85rem;outline:none;resize:vertical;line-height:1.6;box-sizing:border-box"></textarea>
+      </div>
+      <div id="emPreview" style="display:none;margin-bottom:12px;background:#f8f8f6;border:0.5px solid #eee;border-radius:8px;padding:12px;font-size:.78rem;color:#555">
+        <div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">Aperçu</div>
+        <div id="emPreviewContent"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button onclick="closeEmailModal()" style="flex:1;padding:11px;border-radius:8px;border:0.5px solid #ddd;background:#fff;cursor:pointer;font-family:inherit;font-size:.82rem">Annuler</button>
+        <button id="emSendBtn" onclick="sendEmail()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#A67C3A;color:#fff;cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:600">Envoyer →</button>
+      </div>
+      <div id="emStatus" style="margin-top:10px;font-size:.78rem;text-align:center;color:#888"></div>
+    </div>
+  </div>
+</div>
+
 <script src="admin-auth.js"></script>
 <script>
   // Date actuelle
@@ -227,6 +268,110 @@
     el.textContent = (value >= 0 ? '+' : '') + value + label
     el.className = 'metric-delta ' + (value >= 0 ? 'up' : 'down')
   }
+
+  // ═══ EMAIL MODAL ═══
+  var emailMembers = []
+
+  async function openEmailModal() {
+    document.getElementById('emailModal').style.display = 'flex'
+    document.getElementById('emSubject').value = ''
+    document.getElementById('emMessage').value = ''
+    document.getElementById('emStatus').textContent = ''
+    document.getElementById('emPreview').style.display = 'none'
+    // Charger la liste des membres pour le dropdown
+    if (!emailMembers.length) {
+      var res = await sb.from('members').select('id,email,full_name,plan').order('full_name')
+      emailMembers = res.data || []
+    }
+    var sel = document.getElementById('emRecipient')
+    // Garder les 2 premières options (choisir + tous)
+    while (sel.options.length > 3) sel.remove(3)
+    emailMembers.forEach(function(m) {
+      var opt = document.createElement('option')
+      opt.value = m.email
+      opt.textContent = (m.full_name || m.email) + ' (' + m.email + ') — ' + (m.plan || '?')
+      opt.setAttribute('data-name', m.full_name || '')
+      sel.appendChild(opt)
+    })
+  }
+  window.openEmailModal = openEmailModal
+
+  function closeEmailModal() {
+    document.getElementById('emailModal').style.display = 'none'
+  }
+  window.closeEmailModal = closeEmailModal
+
+  document.getElementById('emailModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEmailModal()
+  })
+
+  function onRecipientChange() {
+    var val = document.getElementById('emRecipient').value
+    if (val === '__all__' || val === '__inscrit__') {
+      var plan = val === '__all__' ? ['mensuel','annuel'] : ['inscrit']
+      var count = emailMembers.filter(function(m){return plan.includes(m.plan)}).length
+      document.getElementById('emStatus').textContent = count + ' destinataires sélectionnés'
+    } else {
+      document.getElementById('emStatus').textContent = ''
+    }
+  }
+  window.onRecipientChange = onRecipientChange
+
+  async function sendEmail() {
+    var recipient = document.getElementById('emRecipient').value
+    var subject = document.getElementById('emSubject').value.trim()
+    var message = document.getElementById('emMessage').value.trim()
+    if (!recipient) { alert('Choisis un destinataire'); return }
+    if (!subject) { alert('L\'objet est obligatoire'); return }
+    if (!message) { alert('Le message est obligatoire'); return }
+
+    var btn = document.getElementById('emSendBtn')
+    var statusEl = document.getElementById('emStatus')
+    btn.disabled = true
+    btn.textContent = 'Envoi en cours...'
+
+    var session = (await sb.auth.getSession()).data.session
+    if (!session) { alert('Session expirée'); return }
+
+    var targets = []
+    if (recipient === '__all__') {
+      targets = emailMembers.filter(function(m){return m.plan==='mensuel'||m.plan==='annuel'})
+    } else if (recipient === '__inscrit__') {
+      targets = emailMembers.filter(function(m){return m.plan==='inscrit'})
+    } else {
+      var m = emailMembers.find(function(x){return x.email===recipient})
+      targets = [{ email: recipient, full_name: m ? m.full_name : '' }]
+    }
+
+    var sent = 0, errors = 0
+    for (var i = 0; i < targets.length; i++) {
+      var t = targets[i]
+      statusEl.textContent = 'Envoi ' + (i+1) + '/' + targets.length + '...'
+      try {
+        var res = await fetch(SUPABASE_URL + '/functions/v1/send-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + session.access_token
+          },
+          body: JSON.stringify({ to: t.email, subject: subject, message: message, memberName: t.full_name || '' })
+        })
+        var data = await res.json()
+        if (data.success) sent++
+        else errors++
+      } catch(e) { errors++ }
+    }
+
+    btn.disabled = false
+    btn.textContent = 'Envoyer →'
+    if (errors === 0) {
+      statusEl.innerHTML = '<span style="color:#22c55e">✓ ' + sent + ' email' + (sent>1?'s':'') + ' envoyé' + (sent>1?'s':'') + '</span>'
+      setTimeout(closeEmailModal, 2000)
+    } else {
+      statusEl.innerHTML = '<span style="color:#C0392B">' + sent + ' envoyé' + (sent>1?'s':'') + ', ' + errors + ' erreur' + (errors>1?'s':'') + '</span>'
+    }
+  }
+  window.sendEmail = sendEmail
 
   async function loadDashboard() {
     const profile = await initAuth()
