@@ -503,6 +503,7 @@ function makeCard(f) {
 
   card.innerHTML =
     '<div class="fourn-card-top">' +
+      (f.photo_url ? '<img src="' + escHtml(f.photo_url) + '" alt="" style="width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px">' : '') +
       '<div class="fourn-badges">' +
         '<span class="fourn-cat ' + catClass + '">' + catEmoji + ' ' + catLabel + '</span>' +
         (f.verified ? '<span class="fourn-verified">✓ Vérifié SBW</span>' : '') +

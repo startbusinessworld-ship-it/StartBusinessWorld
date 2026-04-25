@@ -251,6 +251,17 @@
       <label>Description</label>
       <textarea id="fDesc" placeholder="Description du fournisseur, spécialités, certifications..."></textarea>
     </div>
+    <div class="form-row">
+      <label>Photo / Logo (max 5 MB)</label>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <img id="fPhotoPrev" src="" alt="" style="width:64px;height:64px;border-radius:8px;object-fit:cover;border:0.5px solid var(--subtle);background:var(--surface);display:none">
+        <div style="flex:1">
+          <input type="file" id="fPhotoFile" accept="image/*" onchange="prevPhoto()" style="width:100%;padding:6px;border:0.5px solid var(--subtle);border-radius:6px;font-size:.78rem">
+          <input type="hidden" id="fPhoto" value="">
+          <div id="fPhotoStatus" style="font-size:.7rem;color:var(--muted);margin-top:4px">JPG, PNG ou WebP. Sera uploadé automatiquement.</div>
+        </div>
+      </div>
+    </div>
     <div class="form-grid">
       <div class="form-row">
         <label>Email</label>
@@ -353,7 +364,8 @@ function render(list) {
     return `
     <div class="f-card">
       <div class="f-card-head">
-        <div>
+        ${f.photo_url ? `<img src="${f.photo_url}" alt="" style="width:48px;height:48px;border-radius:8px;object-fit:cover;flex-shrink:0;margin-right:10px">` : ''}
+        <div style="flex:1">
           <div class="f-card-name">${f.nom}${f.nouveaute ? '<span class="badge-new">Nouveau</span>' : ''}</div>
           <div style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap">
             <span class="f-card-cat">${catEmoji} ${catLabel}</span>
@@ -397,7 +409,23 @@ function openModal(data) {
   document.getElementById('fSite').value = data?.site || '';
   document.getElementById('fVerified').checked = data ? !!data.verified : true;
   document.getElementById('fNouveaute').checked = !!data?.nouveaute;
+  // Photo
+  document.getElementById('fPhoto').value = data?.photo_url || '';
+  document.getElementById('fPhotoFile').value = '';
+  var prev = document.getElementById('fPhotoPrev');
+  if (data?.photo_url) { prev.src = data.photo_url; prev.style.display = 'block'; }
+  else { prev.src = ''; prev.style.display = 'none'; }
+  document.getElementById('fPhotoStatus').textContent = 'JPG, PNG ou WebP. Sera uploadé automatiquement.';
   document.getElementById('modalOverlay').classList.add('open');
+}
+
+function prevPhoto() {
+  var f = document.getElementById('fPhotoFile').files[0];
+  if (!f) return;
+  var prev = document.getElementById('fPhotoPrev');
+  prev.src = URL.createObjectURL(f);
+  prev.style.display = 'block';
+  document.getElementById('fPhotoStatus').textContent = 'Photo prête (' + Math.round(f.size/1024) + ' KB) — sera uploadée à l\'enregistrement';
 }
 
 function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
@@ -422,8 +450,28 @@ async function saveFournisseur() {
     site: document.getElementById('fSite').value.trim(),
     verified: document.getElementById('fVerified').checked,
     nouveaute: document.getElementById('fNouveaute').checked,
+    photo_url: document.getElementById('fPhoto').value || null,
   };
   if (!payload.nom) { alert('Le nom est obligatoire.'); return; }
+
+  // Upload photo si fichier sélectionné
+  var fileInput = document.getElementById('fPhotoFile');
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    var file = fileInput.files[0];
+    if (file.size > 5*1024*1024) { alert('Photo trop lourde (max 5 MB).'); return; }
+    var statusEl = document.getElementById('fPhotoStatus');
+    if (statusEl) statusEl.textContent = 'Upload de la photo...';
+    var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+    var fileName = 'fournisseur_' + Date.now() + '_' + safeName;
+    var up = await sb.storage.from('fournisseurs').upload(fileName, file, { cacheControl:'3600', upsert:false });
+    if (up.error) {
+      alert('Erreur upload photo : ' + up.error.message + '\n(Vérifie que le bucket "fournisseurs" existe et est public)');
+      return;
+    }
+    var pub = sb.storage.from('fournisseurs').getPublicUrl(fileName);
+    payload.photo_url = pub.data.publicUrl;
+    if (statusEl) statusEl.textContent = '✓ Photo uploadée';
+  }
 
   let res;
   if (id) {
