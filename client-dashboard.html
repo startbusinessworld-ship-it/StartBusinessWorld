@@ -633,7 +633,7 @@
                 <div class="card-title">Formations — continuer</div>
                 <div class="card-link" onclick="window.location.href='membre-formations.html'">Voir tout →</div>
               </div>
-              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-mindset.html'">
+              <div class="module-row" id="row-mindset" style="cursor:pointer;display:none" onclick="window.location.href='formation-mindset.html'">
                 <div class="module-icon">🧠</div>
                 <div class="module-info">
                   <div class="module-name">Mindset & Fondations</div>
@@ -643,9 +643,9 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" id="prog-mindset" style="width:0%"></div></div>
                   <div class="module-progress-pct" id="pct-mindset">0%</div>
                 </div>
-                <span class="module-status status-inprogress" id="status-mindset">À commencer</span>
+                <span class="module-status status-inprogress" id="status-mindset">En cours</span>
               </div>
-              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-creation-entreprise.html'">
+              <div class="module-row" id="row-fiscalite" style="cursor:pointer;display:none" onclick="window.location.href='formation-creation-entreprise.html'">
                 <div class="module-icon">🏛️</div>
                 <div class="module-info">
                   <div class="module-name">Fiscalité & Structure</div>
@@ -655,9 +655,9 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" id="prog-fiscalite" style="width:0%"></div></div>
                   <div class="module-progress-pct" id="pct-fiscalite">0%</div>
                 </div>
-                <span class="module-status status-inprogress" id="status-fiscalite">À commencer</span>
+                <span class="module-status status-inprogress" id="status-fiscalite">En cours</span>
               </div>
-              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-hong-kong.html'">
+              <div class="module-row" id="row-hk" style="cursor:pointer;display:none" onclick="window.location.href='formation-hong-kong.html'">
                 <div class="module-icon">🇭🇰</div>
                 <div class="module-info">
                   <div class="module-name">Hong Kong</div>
@@ -667,9 +667,9 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" id="prog-hk" style="width:0%"></div></div>
                   <div class="module-progress-pct" id="pct-hk">0%</div>
                 </div>
-                <span class="module-status status-inprogress" id="status-hk">À commencer</span>
+                <span class="module-status status-inprogress" id="status-hk">En cours</span>
               </div>
-              <div class="module-row" style="cursor:pointer" onclick="window.location.href='formation-ecom-module-1.html'">
+              <div class="module-row" id="row-ecom" style="cursor:pointer;display:none" onclick="window.location.href='formation-ecom-module-1.html'">
                 <div class="module-icon">📦</div>
                 <div class="module-info">
                   <div class="module-name">E-commerce</div>
@@ -679,19 +679,13 @@
                   <div class="module-progress-bar"><div class="module-progress-fill" id="prog-ecom" style="width:0%"></div></div>
                   <div class="module-progress-pct" id="pct-ecom">0%</div>
                 </div>
-                <span class="module-status status-inprogress" id="status-ecom">À commencer</span>
+                <span class="module-status status-inprogress" id="status-ecom">En cours</span>
               </div>
-              <div class="module-row" style="opacity:0.5">
-                <div class="module-icon">🎬</div>
-                <div class="module-info">
-                  <div class="module-name">Formations vidéo Pro</div>
-                  <div class="module-meta">En production</div>
-                </div>
-                <div class="module-progress-wrap">
-                  <div class="module-progress-bar"><div class="module-progress-fill" style="width:0%"></div></div>
-                  <div class="module-progress-pct">—</div>
-                </div>
-                <span class="module-status status-pro">Bientôt</span>
+              <!-- Empty state quand aucune formation commencée -->
+              <div id="formationsEmpty" class="module-row" style="cursor:pointer;text-align:center;padding:24px;display:flex;flex-direction:column;align-items:center;gap:8px" onclick="window.location.href='membre-formations.html'">
+                <div style="font-size:1.6rem">🎓</div>
+                <div style="font-size:.85rem;font-weight:500">Tu n'as pas encore commencé de formation</div>
+                <div style="font-size:.72rem;color:var(--muted)">Clique pour découvrir toutes les formations disponibles →</div>
               </div>
             </div>
 
@@ -1644,22 +1638,35 @@
         { id: 'ecom',      key: 'formation-ecom-module-1',       total: 30 },
       ]
 
+      var anyStarted = false
       modules.forEach(function(m) {
         var data = getFormationProgress(m.key, m.total)
         var pct = data.pct
+        var rowEl = document.getElementById('row-' + m.id)
 
-        var barEl = document.getElementById('prog-' + m.id)
-        var pctEl = document.getElementById('pct-' + m.id)
-        var statusEl = document.getElementById('status-' + m.id)
+        // Afficher uniquement si la formation a été commencée
+        if (pct > 0) {
+          anyStarted = true
+          if (rowEl) rowEl.style.display = 'flex'
 
-        if (barEl) setTimeout(function(b,p){ b.style.width = p + '%'; }, 300, barEl, pct)
-        if (pctEl) pctEl.textContent = pct + '%'
-        if (statusEl) {
-          if (pct === 0) { statusEl.textContent = 'À commencer'; statusEl.className = 'module-status'; }
-          else if (pct >= 100) { statusEl.textContent = 'Terminé ✓'; statusEl.className = 'module-status status-done'; }
-          else { statusEl.textContent = 'En cours'; statusEl.className = 'module-status status-inprogress'; }
+          var barEl = document.getElementById('prog-' + m.id)
+          var pctEl = document.getElementById('pct-' + m.id)
+          var statusEl = document.getElementById('status-' + m.id)
+
+          if (barEl) setTimeout(function(b,p){ b.style.width = p + '%'; }, 300, barEl, pct)
+          if (pctEl) pctEl.textContent = pct + '%'
+          if (statusEl) {
+            if (pct >= 100) { statusEl.textContent = 'Terminé ✓'; statusEl.className = 'module-status status-done'; }
+            else { statusEl.textContent = 'En cours'; statusEl.className = 'module-status status-inprogress'; }
+          }
+        } else {
+          if (rowEl) rowEl.style.display = 'none'
         }
       })
+
+      // Afficher l'empty state si aucune formation commencée
+      var emptyEl = document.getElementById('formationsEmpty')
+      if (emptyEl) emptyEl.style.display = anyStarted ? 'none' : 'flex'
     } catch(e) { console.log('Module progress error:', e) }
   }
 
