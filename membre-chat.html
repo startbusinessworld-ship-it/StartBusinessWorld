@@ -273,8 +273,8 @@ textarea#msgInput::placeholder{color:var(--muted)}
   .mob-channel-selector{display:block}
   .mob-bottom-nav{display:block}
 
-  /* Layout */
-  .app{height:calc(100vh - 50px)}
+  /* Layout — dvh pour gérer la barre d'adresse mobile iOS/Android */
+  .app{height:calc(100dvh - 50px);height:calc(100vh - 50px)}
   .channels-sidebar{display:none}
   .chat-zone{height:100%}
 
@@ -780,10 +780,14 @@ function appendMsgEl(msg, container, isNew) {
     (isOwn ? '<button class="act-btn del" onclick="deleteMsg(\'' + msg.id + '\',this)" title="Supprimer">✕</button>' : '') +
   '</div>';
 
+  var nameHtml = isAdmin() && !isOwn
+    ? '<div class="msg-name"><a href="#" onclick="event.preventDefault();showUserProfile(\'' + msg.user_id + '\',\'' + escAttr(msg.user_name) + '\')" style="color:var(--gold);text-decoration:none;cursor:pointer">' + escHtml(msg.user_name) + '</a></div>'
+    : '<div class="msg-name">' + escHtml(msg.user_name) + '</div>';
+
   div.innerHTML =
     '<div class="msg-av">' + initials + '</div>' +
     '<div class="msg-body">' +
-      '<div class="msg-name">' + escHtml(msg.user_name) + '</div>' +
+      nameHtml +
       (msg.reply_to ? replyHtml : '') +
       '<div class="msg-bubble' + (msg.reply_to ? ' has-reply' : '') + '">' +
         escHtml(msg.content).replace(/\n/g, "<br>") +
@@ -1065,6 +1069,54 @@ async function getUserBadge(userId) {
 
 function escHtml(t) { return (t||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
 function escAttr(t) { return (t||"").replace(/'/g,"&#39;").replace(/"/g,"&quot;"); }
+
+// ═══ PROFIL UTILISATEUR (admin seulement) ═══
+async function showUserProfile(userId, userName) {
+  if (!isAdmin()) return;
+  var old = document.getElementById('chatProfileModal');
+  if (old) old.remove();
+
+  var modal = document.createElement('div');
+  modal.id = 'chatProfileModal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.onclick = function(e){ if(e.target===modal) modal.remove(); };
+  modal.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:400px;width:100%;padding:20px;box-shadow:0 16px 48px rgba(0,0,0,.2)"><div style="text-align:center;color:var(--muted)">Chargement...</div></div>';
+  document.body.appendChild(modal);
+
+  var res = await SB.from('members').select('full_name,email,plan,phone,address,country,business_project,created_at,stripe_subscription_status').eq('id', userId).maybeSingle();
+  var m = res.data;
+  if (!m) {
+    modal.querySelector('div > div').innerHTML = '<div style="text-align:center;color:var(--muted);padding:1rem">Membre introuvable.</div><button onclick="this.closest(\'#chatProfileModal\').remove()" style="margin-top:10px;width:100%;padding:8px;border-radius:6px;border:.5px solid #ddd;background:#fff;cursor:pointer;font-family:inherit">Fermer</button>';
+    return;
+  }
+
+  var planLabels = {inscrit:'Inscrit',mensuel:'Mensuel 79€/mois',annuel:'Annuel 597€/an',cancelled:'Annulé'};
+  var waNum = (m.phone||'').replace(/[^0-9+]/g,'').replace(/^\+/,'');
+
+  var html = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">';
+  html += '<div style="width:48px;height:48px;border-radius:50%;background:rgba(166,124,58,.12);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:600;color:var(--gold);flex-shrink:0">' + escHtml((m.full_name||'?').slice(0,2).toUpperCase()) + '</div>';
+  html += '<div><div style="font-size:1rem;font-weight:600">' + escHtml(m.full_name || userName) + '</div>';
+  html += '<div style="font-size:.75rem;color:var(--muted)">' + escHtml(m.email||'') + '</div></div></div>';
+
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">';
+  html += '<div style="background:#f8f8f6;padding:8px 10px;border-radius:6px"><div style="font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.05em">Plan</div><div style="font-size:.82rem;font-weight:500">' + (planLabels[m.plan]||m.plan||'—') + '</div></div>';
+  html += '<div style="background:#f8f8f6;padding:8px 10px;border-radius:6px"><div style="font-size:.6rem;color:#888;text-transform:uppercase;letter-spacing:.05em">Pays</div><div style="font-size:.82rem">' + escHtml(m.country||'—') + '</div></div>';
+  html += '</div>';
+
+  if (m.phone) html += '<div style="font-size:.8rem;margin-bottom:6px">📱 <a href="https://wa.me/' + waNum + '" target="_blank" style="color:#25D366;text-decoration:none">' + escHtml(m.phone) + '</a></div>';
+  if (m.address) html += '<div style="font-size:.8rem;margin-bottom:6px;color:var(--muted)">📍 ' + escHtml(m.address) + '</div>';
+  if (m.business_project) html += '<div style="font-size:.78rem;margin-top:8px;background:#f8f8f6;padding:8px 10px;border-radius:6px;line-height:1.5"><strong>💼 Projet :</strong><br><span style="color:var(--muted)">' + escHtml(m.business_project) + '</span></div>';
+
+  html += '<div style="margin-top:14px;display:flex;gap:8px">';
+  html += '<a href="mailto:' + escHtml(m.email||'') + '" style="flex:1;text-align:center;padding:8px;border-radius:6px;border:.5px solid #ddd;font-size:.78rem;text-decoration:none;color:var(--ink)">✉️ Email</a>';
+  if (m.phone) html += '<a href="https://wa.me/' + waNum + '" target="_blank" style="flex:1;text-align:center;padding:8px;border-radius:6px;background:#25D366;color:#fff;font-size:.78rem;text-decoration:none">💬 WhatsApp</a>';
+  html += '<button onclick="this.closest(\'#chatProfileModal\').remove()" style="flex:1;padding:8px;border-radius:6px;border:.5px solid #ddd;background:#fff;cursor:pointer;font-family:inherit;font-size:.78rem">Fermer</button>';
+  html += '</div>';
+
+  modal.querySelector('div > div').innerHTML = html;
+}
+window.showUserProfile = showUserProfile;
+
 function showRules() { document.getElementById("rulesOverlay").classList.add("on"); }
 function hideRules() { document.getElementById("rulesOverlay").classList.remove("on"); }
 
