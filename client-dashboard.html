@@ -488,10 +488,6 @@
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M2 3h12l-1 9H3L2 3z"/><path d="M5 3V2a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/></svg>
         Fournisseurs & Contacts
       </div>
-      <div class="nav-item" onclick="window.location.href='membre-live.html'">
-        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="8" cy="8" r="7"/><polygon points="6.5 5.5 11.5 8 6.5 10.5 6.5 5.5"/></svg>
-        Live mensuel
-      </div>
       <div class="nav-item" onclick="showSection('bonsplans', this)">
         <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 3H6L3 8h4l-1 5 7-8H9l1-5z"/></svg>
         Bons Plans membres
@@ -597,30 +593,6 @@
 
         <div class="content-grid">
           <div>
-
-            <!-- 1. LIVE MENSUEL -->
-            <div class="card" style="margin-bottom:16px;cursor:pointer" onclick="window.location.href='membre-live.html'">
-              <div class="card-head">
-                <div class="card-title">Live mensuel<span style="font-size:.55rem;font-weight:600;background:rgba(166,124,58,.12);color:var(--gold);border:1px solid rgba(166,124,58,.25);padding:1px 7px;border-radius:8px;margin-left:6px">Business</span></div>
-                <div class="card-link">Voir →</div>
-              </div>
-              <div class="module-row">
-                <div class="module-icon">📅</div>
-                <div class="module-info">
-                  <div class="module-name">Prochain live</div>
-                  <div class="module-meta" id="dashNextLiveDate">Date à confirmer</div>
-                </div>
-                <span class="module-status status-inprogress">À venir</span>
-              </div>
-              <div class="module-row">
-                <div class="module-icon">❓</div>
-                <div class="module-info">
-                  <div class="module-name">Pose ta question</div>
-                  <div class="module-meta">Soumets ta question avant le live</div>
-                </div>
-                <div class="card-link">Participer →</div>
-              </div>
-            </div>
 
             <!-- 2. FORMATIONS — CONTINUER -->
             <div class="card" style="margin-bottom:16px">
@@ -879,18 +851,6 @@
           <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Articles & Ressources</div>
           <div style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem">Tous les articles du blog SBW accessibles ici.</div>
           <a href="index.html#articles" class="btn-gold" style="display:inline-block">Voir le blog →</a>
-        </div>
-      </div>
-
-      <div id="sectionLive" style="display:none">
-        <div class="card" style="padding:3rem;text-align:center">
-          <div style="font-size:2rem;margin-bottom:1rem">🎥</div>
-          <div style="font-family:'DM Serif Display',serif;font-size:1.5rem;margin-bottom:0.5rem">Live mensuel</div>
-          <div style="color:var(--muted);font-size:0.85rem;margin-bottom:0.5rem;max-width:420px;margin-left:auto;margin-right:auto">Chaque mois, pose tes questions en avance et retrouve les réponses en live. Réservé aux membres du Club SBW.</div>
-          <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(166,124,58,0.1);border:1px solid rgba(166,124,58,0.25);color:var(--gold);padding:8px 16px;border-radius:20px;font-size:0.75rem;margin:1.5rem 0">🔒 Réservé Club SBW</div>
-          <br>
-          <a href="club.html" style="display:inline-flex;align-items:center;gap:8px;background:var(--gold);color:#fff;border:none;padding:12px 28px;border-radius:6px;font-size:0.85rem;cursor:pointer;font-family:'DM Sans',sans-serif;text-decoration:none">Rejoindre le Club →</a>
-          <div style="font-size:0.7rem;color:var(--muted);margin-top:12px">Sans engagement · Annulation en 1 clic</div>
         </div>
       </div>
 
@@ -1305,7 +1265,6 @@
     renderStats()
     renderModuleProgress()
     loadDashPrestige()
-    loadDashLive()
     checkProfileCompletion()
   }
 
@@ -1397,25 +1356,6 @@
     renderUser()
   }
 
-  async function loadDashLive() {
-    var el = document.getElementById('dashNextLiveDate')
-    if (!el) return
-    try {
-      var nowIso = new Date().toISOString()
-      var { data } = await sb.from('lives').select('titre,live_date').gte('live_date', nowIso).order('live_date').limit(1).maybeSingle()
-      if (!data) {
-        var up = await sb.from('lives').select('titre,live_date').eq('statut','upcoming').order('live_date', {ascending:false}).limit(1).maybeSingle()
-        data = up.data
-      }
-      if (data?.live_date) {
-        var d = new Date(data.live_date)
-        el.textContent = d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' }) + ' à ' + d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' })
-      } else {
-        el.textContent = 'Date à confirmer prochainement'
-      }
-    } catch(e) { el.textContent = 'Date à confirmer' }
-  }
-
   function renderUser() {
     const fullName = currentMember?.full_name || currentUser.user_metadata?.full_name || ''
     const email = currentUser.email
@@ -1491,7 +1431,7 @@
     var mbn = document.getElementById('mbn-' + name);
     if (mbn) mbn.classList.add('active');
 
-    const sections = ['Dashboard', 'Formations', 'Articles', 'Bonsplans', 'Compte', 'Live']
+    const sections = ['Dashboard', 'Formations', 'Articles', 'Bonsplans', 'Compte']
       sections.forEach(s => {
       const elem = document.getElementById('section' + s)
       if (elem) elem.style.display = 'none'
@@ -1508,7 +1448,6 @@
       articles: ['Articles & Ressources', 'Le blog Start Business World'],
       bonsplans: ['Bons Plans', 'Offres exclusives membres'],
       compte: ['Mon compte', 'Profil & abonnement'],
-      live: ['Live mensuel', 'Réservé aux membres du Club SBW']
     }
     const t = titles[name] || ['', '']
     document.getElementById('topbarTitle').textContent = t[0]
@@ -1611,10 +1550,6 @@
   window.accessFournisseurs = function() {
     window.location.href = 'membre-annuaire.html'
   }
-  function accessLive() {
-    window.location.href = 'membre-live.html'
-  }
-
   function closeModal() {
     document.getElementById('modalBusiness').style.display = 'none'
   }
