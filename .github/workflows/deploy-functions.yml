@@ -31,3 +31,18 @@ jobs:
         run: supabase functions deploy get-stripe-stats --no-verify-jwt --project-ref grwimhqsthcmfwblwdwg
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy cancel-subscription
+        run: supabase functions deploy cancel-subscription --no-verify-jwt --project-ref grwimhqsthcmfwblwdwg
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy upgrade-plan
+        run: supabase functions deploy upgrade-plan --no-verify-jwt --project-ref grwimhqsthcmfwblwdwg
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+
+      - name: Deploy sync-subscription
+        run: supabase functions deploy sync-subscription --no-verify-jwt --project-ref grwimhqsthcmfwblwdwg
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
