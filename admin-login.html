@@ -45,6 +45,9 @@
         <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
       </div>
       <button class="btn-login" id="loginBtn" onclick="handleLogin()">Se connecter</button>
+      <button type="button" id="forgotBtn" onclick="requestReset()" style="display:block;margin:1.2rem auto 0;background:none;border:0;text-decoration:underline;cursor:pointer;color:#666">Mot de passe oublié ?</button>
+      <div id="resetNotice" role="status" style="display:none;margin-top:1rem;font-size:.82rem;line-height:1.5;color:#35613f"></div>
+      <div id="recoveryForm" style="display:none"><div class="field"><label for="newPassword">Nouveau mot de passe</label><input type="password" id="newPassword" autocomplete="new-password" minlength="8"></div><div class="field"><label for="confirmPassword">Confirmer le mot de passe</label><input type="password" id="confirmPassword" autocomplete="new-password" minlength="8"></div><button class="btn-login" id="savePasswordBtn" type="button" onclick="savePassword()">Enregistrer le mot de passe</button></div>
     </div>
     <div class="login-footer">Start Business World © 2026 — Accès réservé</div>
   </div>
@@ -59,10 +62,70 @@
     const { createClient } = supabase
     const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
 
+    const recoveryRequested = new URLSearchParams(location.hash.slice(1)).get('type') === 'recovery'
+    let recoveryReady = false
+    const emailField = document.getElementById('email').closest('.field')
+    const passwordField = document.getElementById('password').closest('.field')
+    function showRecovery() {
+      emailField.style.display = 'none'
+      passwordField.style.display = 'none'
+      document.getElementById('loginBtn').style.display = 'none'
+      document.getElementById('forgotBtn').style.display = 'none'
+      document.getElementById('recoveryForm').style.display = 'block'
+      document.querySelector('.login-sub').textContent = 'Choisis un nouveau mot de passe'
+    }
+    if (recoveryRequested) showRecovery()
+    sb.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY' && session) {
+        recoveryReady = true
+        showRecovery()
+      }
+    })
+    async function requestReset() {
+      const email = document.getElementById('email').value.trim()
+      if (!email) { showError('Renseigne ton adresse email pour recevoir le lien.'); return }
+      const btn = document.getElementById('forgotBtn')
+      btn.disabled = true
+      document.getElementById('errorMsg').style.display = 'none'
+      try {
+        const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.origin + '/admin-login.html' })
+        if (error) throw error
+        const notice = document.getElementById('resetNotice')
+        notice.textContent = 'Si un compte existe avec cette adresse, un lien de réinitialisation sera envoyé. Vérifie aussi les spams.'
+        notice.style.display = 'block'
+      } catch (e) { showError('Impossible de demander le lien pour le moment. Réessaie plus tard.') }
+      finally { btn.disabled = false }
+    }
+    async function savePassword() {
+      const pass = document.getElementById('newPassword').value
+      const confirm = document.getElementById('confirmPassword').value
+      if (!recoveryReady) { showError('Ce lien est invalide ou a expiré. Demande un nouveau lien.'); return }
+      if (pass.length < 8) { showError('Choisis au moins 8 caractères.'); return }
+      if (pass !== confirm) { showError('Les deux mots de passe ne sont pas identiques.'); return }
+      const btn = document.getElementById('savePasswordBtn')
+      btn.disabled = true
+      try {
+        const { error } = await sb.auth.updateUser({ password: pass })
+        if (error) throw error
+        await sb.auth.signOut()
+        document.getElementById('recoveryForm').style.display = 'none'
+        document.getElementById('errorMsg').style.display = 'none'
+        const notice = document.getElementById('resetNotice')
+        notice.textContent = 'Mot de passe modifié. Tu peux maintenant te connecter.'
+        notice.style.display = 'block'
+        emailField.style.display = ''
+        passwordField.style.display = ''
+        document.getElementById('loginBtn').style.display = ''
+        document.getElementById('forgotBtn').style.display = ''
+        document.querySelector('.login-sub').textContent = 'Espace administration'
+        history.replaceState(null, '', location.pathname)
+      } catch (e) { showError('Impossible de modifier le mot de passe. Le lien a peut-être expiré.') }
+      finally { btn.disabled = false }
+    }
     // Vérifie si déjà connecté
     async function checkSession() {
       const { data: { session } } = await sb.auth.getSession()
-      if (session) redirectByRole(session.user)
+      if (session && !recoveryRequested && !recoveryReady) redirectByRole(session.user)
     }
 
     async function handleLogin() {
@@ -122,7 +185,7 @@
 
     // Enter pour valider
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter') handleLogin()
+      if (e.key === 'Enter' && document.getElementById('recoveryForm').style.display !== 'block') handleLogin()
     })
 
     checkSession()
